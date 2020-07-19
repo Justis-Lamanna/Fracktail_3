@@ -1,0 +1,96 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://github.com/Justis-Lamanna/botSchema.xsd"
+    xmlns:discord="http://github.com/Justis-Lamanna/discordSchema.xsd"
+    xmlns:bases="http://github.com/Justis-Lamanna/baseSchema.xsd"
+    targetNamespace="http://github.com/Justis-Lamanna/botSchema.xsd"
+    elementFormDefault="qualified">
+    <xs:element name="bot" type="tns:Bot"/>
+
+    <xs:complexType name="Bot">
+        <xs:sequence>
+            <xs:element name="configuration" type="tns:ConfigurationGroup" minOccurs="0"/>
+            <xs:element name="commands" type="tns:CommandList"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ConfigurationGroup">
+        <xs:sequence>
+            <xs:element name="global" type="bases:Configuration" minOccurs="0"/>
+            <xs:element name="discord" type="discord:DiscordConfiguration" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CommandList">
+        <xs:sequence>
+            <xs:element name="command" type="tns:Command" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Command">
+        <xs:sequence>
+            <xs:element name="name" type="bases:FromProviderString"/>
+            <xs:choice minOccurs="0">
+                <xs:element name="aliases">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="alias" type="bases:FromProviderString" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="aliasesFrom" type="bases:NonEmptyString"/>
+            </xs:choice>
+            <xs:element name="behaviors">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="behavior" type="tns:Behavior" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Behavior">
+        <xs:sequence>
+            <xs:element name="parameters" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="parameter" type="tns:Parameter" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="action" type="tns:Action"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Parameter">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="index" type="xs:nonNegativeInteger" default="2147483647"/>
+                <xs:attribute name="startIndex" type="xs:nonNegativeInteger" default="2147483647"/>
+                <xs:attribute name="endIndex" type="bases:IntOrUnbounded" default="2147483647"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="Action">
+        <xs:choice>
+            <xs:element name="respond" type="bases:FromProviderString"/>
+            <xs:element name="random">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="action" type="tns:WeightedAction" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="WeightedAction">
+        <xs:complexContent>
+            <xs:extension base="tns:Action">
+                <xs:attribute name="weight" type="xs:float" default="1.0"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

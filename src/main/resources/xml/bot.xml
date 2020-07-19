@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bot xmlns="http://github.com/Justis-Lamanna/botSchema.xsd">
+    <configuration>
+        <global>
+            <providers>
+                <env/>
+            </providers>
+        </global>
+        <discord>
+            <token>discord.token</token>
+            <prefix>!</prefix>
+        </discord>
+    </configuration>
+    <commands>
+        <command>
+            <name>math</name>
+            <behaviors>
+                <behavior>
+                    <parameters>
+                        <parameter startIndex="0" endIndex="unbounded">expression</parameter>
+                    </parameters>
+                    <action>
+                        <respond>The answer is 3.</respond>
+                    </action>
+                </behavior>
+            </behaviors>
+        </command>
+    </commands>
+</bot>
