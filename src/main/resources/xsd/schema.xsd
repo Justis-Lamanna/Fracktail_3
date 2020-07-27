@@ -3,7 +3,7 @@
     xmlns:tns="http://github.com/Justis-Lamanna/botSchema.xsd"
     targetNamespace="http://github.com/Justis-Lamanna/botSchema.xsd"
     elementFormDefault="qualified">
-    <xs:element name="bot" type="tns:Bot"/>
+    <xs:element name="bot" type="tns:DTDBot"/>
 
     <xs:simpleType name="NonEmptyString">
         <xs:annotation>
@@ -13,6 +13,14 @@
             <xs:minLength value="1"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="I18NString">
+        <xs:simpleContent>
+            <xs:extension base="tns:NonEmptyString">
+                <xs:attribute name="i18n" type="xs:boolean"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 
     <xs:simpleType name="UnboundedString">
         <xs:annotation>
@@ -30,76 +38,41 @@
         <xs:union memberTypes="xs:nonNegativeInteger tns:UnboundedString"/>
     </xs:simpleType>
 
-    <xs:complexType name="FromProviderString">
-        <xs:annotation>
-            <xs:documentation>A string with attributes "fromProvider" and "default"</xs:documentation>
-        </xs:annotation>
-        <xs:simpleContent>
-            <xs:extension base="tns:NonEmptyString">
-                <xs:attribute name="fromProvider" type="xs:boolean" default="false">
-                    <xs:annotation>
-                        <xs:documentation>If marked as fromProvider, the text body is treated as a key to the bot's value providers, and will be resolved at runtime.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
-
-    <xs:complexType name="Configuration">
+    <xs:complexType name="DTDConfiguration">
         <xs:sequence>
-            <xs:element name="providers" type="tns:Providers" minOccurs="0"/>
+            <xs:element name="i18n" type="xs:anyURI" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="Providers">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="env" type="tns:EnvironmentProvider"/>
-            <xs:element name="i18n" type="tns:I18nProvider"/>
-        </xs:choice>
-    </xs:complexType>
-
-    <xs:complexType name="EnvironmentProvider">
-        <xs:attribute name="prefix" type="xs:string"/>
-        <xs:attribute name="suffix" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="I18nProvider">
-        <xs:simpleContent>
-            <xs:extension base="xs:anyURI">
-                <xs:attribute name="prefix" type="xs:string"/>
-                <xs:attribute name="suffix" type="xs:string"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
-
-    <xs:complexType name="Bot">
+    <xs:complexType name="DTDBot">
         <xs:sequence>
-            <xs:element name="configuration" type="tns:ConfigurationGroup" minOccurs="0"/>
-            <xs:element name="commands" type="tns:CommandList"/>
+            <xs:element name="configuration" type="tns:DTDConfigurationGroup" minOccurs="0"/>
+            <xs:element name="commands" type="tns:DTDCommandList"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="ConfigurationGroup">
+    <xs:complexType name="DTDConfigurationGroup">
         <xs:sequence>
-            <xs:element name="global" type="tns:Configuration" minOccurs="0"/>
-            <xs:element name="discord" type="tns:DiscordConfiguration" minOccurs="0"/>
+            <xs:element name="global" type="tns:DTDConfiguration" minOccurs="0"/>
+            <xs:element name="discord" type="tns:DTDDiscordConfiguration" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="CommandList">
+    <xs:complexType name="DTDCommandList">
         <xs:sequence>
-            <xs:element name="command" type="tns:Command" maxOccurs="unbounded"/>
+            <xs:element name="command" type="tns:DTDCommand" maxOccurs="unbounded"/>
+            <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="Command">
+    <xs:complexType name="DTDCommand">
         <xs:sequence>
-            <xs:element name="name" type="tns:FromProviderString"/>
+            <xs:element name="name" type="tns:I18NString"/>
             <xs:choice minOccurs="0">
                 <xs:element name="aliases">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="alias" type="tns:FromProviderString" maxOccurs="unbounded"/>
+                            <xs:element name="alias" type="tns:I18NString" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -108,27 +81,34 @@
             <xs:element name="behaviors">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="behavior" type="tns:Behavior" maxOccurs="unbounded"/>
+                        <xs:element name="behavior" type="tns:DTDBehavior" maxOccurs="unbounded"/>
+                        <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="Behavior">
+    <xs:complexType name="DTDBehavior">
         <xs:sequence>
             <xs:element name="parameters" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="parameter" type="tns:Parameter" maxOccurs="unbounded"/>
+                        <xs:element name="parameter" type="tns:DTDParameter" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="action" type="tns:Action"/>
+            <xs:element name="action" type="tns:DTDAction"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="Parameter">
+    <xs:complexType name="DTDElseBehavior">
+        <xs:sequence>
+            <xs:element name="action" type="tns:DTDAction"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDParameter">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="index" type="xs:nonNegativeInteger" default="2147483647"/>
@@ -138,47 +118,47 @@
         </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType name="Action">
+    <xs:complexType name="DTDAction">
         <xs:choice>
-            <xs:element name="respond" type="tns:FromProviderString"/>
+            <xs:element name="respond" type="tns:I18NString"/>
             <xs:element name="random">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="action" type="tns:WeightedAction" maxOccurs="unbounded"/>
+                        <xs:element name="action" type="tns:DTDWeightedAction" maxOccurs="unbounded"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:choice>
     </xs:complexType>
 
-    <xs:complexType name="WeightedAction">
+    <xs:complexType name="DTDWeightedAction">
         <xs:complexContent>
-            <xs:extension base="tns:Action">
+            <xs:extension base="tns:DTDAction">
                 <xs:attribute name="weight" type="xs:float" default="1.0"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:simpleType name="DiscordTokenLiteral">
+    <xs:simpleType name="DTDDiscordTokenLiteral">
         <xs:restriction base="xs:string">
             <xs:pattern value="[A-Za-z0-9.]{59}"/>
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:complexType name="DiscordTokenFromProvider">
+    <xs:complexType name="DTDDiscordTokenFromProvider">
         <xs:simpleContent>
             <xs:extension base="tns:NonEmptyString">
-                <xs:attribute name="default" type="tns:DiscordTokenLiteral"/>
+                <xs:attribute name="default" type="tns:DTDDiscordTokenLiteral"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType name="DiscordConfiguration" >
+    <xs:complexType name="DTDDiscordConfiguration" >
         <xs:complexContent>
-            <xs:extension base="tns:Configuration">
+            <xs:extension base="tns:DTDConfiguration">
                 <xs:sequence>
-                    <xs:element name="token" type="tns:FromProviderString"/>
-                    <xs:element name="prefix" type="tns:FromProviderString" minOccurs="0"/>
+                    <xs:element name="token" type="tns:NonEmptyString"/>
+                    <xs:element name="prefix" type="tns:NonEmptyString" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

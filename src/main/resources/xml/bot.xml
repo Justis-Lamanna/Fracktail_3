@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bot xmlns="http://github.com/Justis-Lamanna/botSchema.xsd">
     <configuration>
-        <global>
-            <providers>
-                <env/>
-            </providers>
-        </global>
         <discord>
-            <token>discord.token</token>
+            <token>${token}</token>
             <prefix>!</prefix>
         </discord>
     </configuration>
