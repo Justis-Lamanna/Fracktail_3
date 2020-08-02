@@ -4,11 +4,18 @@
         <discord>
             <token>${token}</token>
             <prefix>!</prefix>
+            <presence>
+                <status>DO_NOT_DISTURB</status>
+                <playing>v3!</playing>
+            </presence>
         </discord>
     </configuration>
     <commands>
         <command>
             <name>math</name>
+            <aliases>
+                <alias>mathematics</alias>
+            </aliases>
             <behaviors>
                 <behavior>
                     <parameters>

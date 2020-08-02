@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.magic.config;
 
+import discord4j.core.object.presence.Presence;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -8,12 +10,14 @@ public class DiscordConfiguration extends GlobalConfiguration {
     private final GlobalConfiguration parent;
     private final String token;
     private final String prefix;
+    private final Presence presence;
 
-    public DiscordConfiguration(GlobalConfiguration parent, String token, String prefix, String i18nPath) {
-       super(i18nPath);
-       this.parent = parent;
-       this.token = token;
-       this.prefix = prefix;
+    public DiscordConfiguration(GlobalConfiguration parent, String token, String prefix, String i18nPath, Presence presence) {
+        super(i18nPath);
+        this.parent = parent;
+        this.token = token;
+        this.prefix = prefix;
+        this.presence = presence;
     }
 
     public ResourceBundle getParentResourceBundle(Locale locale) {
@@ -37,5 +41,9 @@ public class DiscordConfiguration extends GlobalConfiguration {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public Presence getPresence() {
+        return presence;
     }
 }

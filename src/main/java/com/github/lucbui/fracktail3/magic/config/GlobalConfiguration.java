@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class GlobalConfiguration {
+public class GlobalConfiguration implements Config{
     private String i18nPath;
 
     public GlobalConfiguration(String i18nPath) {
@@ -19,6 +19,7 @@ public class GlobalConfiguration {
         return ResourceBundle.getBundle(i18nPath, locale);
     }
 
+    @Override
     public Optional<String> getTextForKey(String key, Locale locale) {
         if(hasI18nEnabled()) {
             ResourceBundle bundle = getResourceBundle(locale);

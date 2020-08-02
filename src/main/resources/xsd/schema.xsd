@@ -139,29 +139,43 @@
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:simpleType name="DTDDiscordTokenLiteral">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Za-z0-9.]{59}"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:complexType name="DTDDiscordTokenFromProvider">
-        <xs:simpleContent>
-            <xs:extension base="tns:NonEmptyString">
-                <xs:attribute name="default" type="tns:DTDDiscordTokenLiteral"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
-
     <xs:complexType name="DTDDiscordConfiguration" >
         <xs:complexContent>
             <xs:extension base="tns:DTDConfiguration">
                 <xs:sequence>
                     <xs:element name="token" type="tns:NonEmptyString"/>
                     <xs:element name="prefix" type="tns:NonEmptyString" minOccurs="0"/>
+                    <xs:element name="presence" type="tns:DTDDiscordPresence" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 
+    <xs:complexType name="DTDDiscordPresence">
+        <xs:sequence>
+            <xs:element name="status" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ONLINE"/>
+                        <xs:enumeration value="DO_NOT_DISTURB"/>
+                        <xs:enumeration value="IDLE"/>
+                        <xs:enumeration value="INVISIBLE"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:choice minOccurs="0">
+                <xs:element name="playing" type="xs:string"/>
+                <xs:element name="listening" type="xs:string"/>
+                <xs:element name="watching" type="xs:string"/>
+                <xs:element name="streaming">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="title" type="xs:string"/>
+                            <xs:element name="url" type="xs:anyURI"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
