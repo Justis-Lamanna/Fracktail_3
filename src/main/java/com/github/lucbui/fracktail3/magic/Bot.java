@@ -57,7 +57,7 @@ public class Bot {
 
             discordClient.getEventDispatcher().on(MessageCreateEvent.class)
                     .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                    .flatMap(msg -> discordHandler.execute(this, msg))
+                    .flatMap(msg -> discordHandler.execute(this, this.discordConfig, msg))
                     .subscribe();
 
             starters.add(discordClient.login().thenReturn(true));

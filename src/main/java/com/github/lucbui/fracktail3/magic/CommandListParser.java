@@ -1,12 +1,12 @@
 package com.github.lucbui.fracktail3.magic;
 
+import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.resolver.*;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDCommand;
 import com.github.lucbui.fracktail3.xsd.I18NString;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,7 +26,6 @@ public class CommandListParser {
         List<Command> commands = xml.getCommands().getCommand().stream()
                 .map(dtdCommand -> fromXml(xml, dtdCommand))
                 .collect(Collectors.toList());
-
         return new CommandList(commands);
     }
 
@@ -53,7 +52,7 @@ public class CommandListParser {
             aliases = Resolver.identity(Collections.emptyList());
         }
         //TODO: Parse behavior...
-        return new Command(name, aliases);
+        return new Command(name, aliases, new Behavior());
     }
 
     private String getDebugString(String type, I18NString string) {
