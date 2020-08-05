@@ -111,9 +111,9 @@
     <xs:complexType name="DTDParameter">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="index" type="xs:nonNegativeInteger" default="2147483647"/>
-                <xs:attribute name="startIndex" type="xs:nonNegativeInteger" default="2147483647"/>
-                <xs:attribute name="endIndex" type="tns:IntOrUnbounded" default="2147483647"/>
+                <xs:attribute name="index" type="xs:nonNegativeInteger"/>
+                <xs:attribute name="startIndex" type="xs:nonNegativeInteger" default="0"/>
+                <xs:attribute name="endIndex" type="tns:IntOrUnbounded" default="unbounded"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

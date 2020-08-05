@@ -1,12 +1,14 @@
 package com.github.lucbui.fracktail3.magic;
 
-import com.github.lucbui.fracktail3.magic.handlers.Behavior;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.resolver.*;
-import com.github.lucbui.fracktail3.xsd.DTDBot;
-import com.github.lucbui.fracktail3.xsd.DTDCommand;
-import com.github.lucbui.fracktail3.xsd.I18NString;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.handlers.*;
+import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
+import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
+import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
+import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
+import com.github.lucbui.fracktail3.magic.resolver.Resolver;
+import com.github.lucbui.fracktail3.xsd.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -51,8 +53,42 @@ public class CommandListParser {
         } else {
             aliases = Resolver.identity(Collections.emptyList());
         }
-        //TODO: Parse behavior...
-        return new Command(name, aliases, new Behavior());
+        List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
+                .map(s -> fromXml(xml, command, s))
+                .collect(Collectors.toList());
+        return new Command(name, aliases, behaviors);
+    }
+
+    private Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
+        DTDBehavior.Parameters parameters = behavior.getParameters();
+        NamedParametersConfiguration npConfig = new NamedParametersConfiguration();
+        int totalParameters;
+        if(parameters != null && CollectionUtils.isNotEmpty(parameters.getParameter())) {
+            int highestParameterIdx = -1;
+            for (DTDParameter param : parameters.getParameter()) {
+                String name = param.getValue();
+                if (npConfig.hasKey(name)) {
+                    throw new BotConfigurationException("Two parameters with same name: " + name);
+                }
+                int start;
+                int end;
+                if (param.getIndex() != null) {
+                    start = end = param.getIndex().intValue();
+                } else {
+                    start = param.getStartIndex() == null ? 0 : param.getStartIndex().intValue();
+                    end = param.getEndIndex().equalsIgnoreCase("unbounded") ? -1 : Integer.parseInt(param.getEndIndex());
+                }
+                if (end > highestParameterIdx) {
+                    highestParameterIdx = end;
+                }
+                npConfig.add(name, Range.fromTo(start, end));
+            }
+            totalParameters = highestParameterIdx + 1;
+        } else {
+            totalParameters = 0;
+        }
+
+        return new Behavior(totalParameters, npConfig, new RespondAction());
     }
 
     private String getDebugString(String type, I18NString string) {

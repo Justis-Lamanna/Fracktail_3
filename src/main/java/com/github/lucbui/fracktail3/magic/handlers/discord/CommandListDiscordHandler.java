@@ -61,7 +61,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                         context.contents,
                                         context.command, context.normalizedCommand,
                                         context.parameters, context.normalizedParameters);
-                                return command.doDiscordAction(bot, configuration, context);
+                                return command.doAction(bot, context);
                             }
                         }
                     }

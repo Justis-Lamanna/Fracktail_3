@@ -19,10 +19,20 @@
             <behaviors>
                 <behavior>
                     <parameters>
-                        <parameter startIndex="0" endIndex="unbounded">expression</parameter>
+                        <parameter>expression</parameter>
                     </parameters>
                     <action>
                         <respond>The answer is 3.</respond>
+                    </action>
+                </behavior>
+            </behaviors>
+        </command>
+        <command>
+            <name>eggplant</name>
+            <behaviors>
+                <behavior>
+                    <action>
+                        <respond>Hi, {user}</respond>
                     </action>
                 </behavior>
             </behaviors>
