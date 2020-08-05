@@ -1,6 +1,7 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.handlers.NamedParameters;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandContext;
 import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
 import org.slf4j.LoggerFactory;

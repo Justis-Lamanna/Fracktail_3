@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandContext;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import org.slf4j.Logger;
@@ -43,7 +44,6 @@ public class Command {
     public Mono<Void> doAction(Bot bot, CommandContext context) {
         for(Behavior b : behaviors) {
             if(b.matches(bot, context)) {
-                LOGGER.debug("Performing behavior {}", b.getClass().getSimpleName());
                 return b.doAction(bot, context);
             }
         }

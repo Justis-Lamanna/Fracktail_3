@@ -34,7 +34,11 @@ public class CommandListDiscordHandler implements DiscordHandler {
 
     @Override
     public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, MessageCreateEvent event) {
+        if(event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
+            return Mono.empty();
+        }
         return Mono.justOrEmpty(event.getMessage().getContent())
+                .filter(s -> StringUtils.startsWith(s, configuration.getPrefix()))
                 .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH))
                 .flatMap(tuple -> {
                     String msg = tuple.getT1();
