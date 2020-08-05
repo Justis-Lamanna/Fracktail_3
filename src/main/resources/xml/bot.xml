@@ -12,27 +12,11 @@
     </configuration>
     <commands>
         <command>
-            <name>math</name>
-            <aliases>
-                <alias>mathematics</alias>
-            </aliases>
-            <behaviors>
-                <behavior>
-                    <parameters>
-                        <parameter>expression</parameter>
-                    </parameters>
-                    <action>
-                        <respond>The answer is 3.</respond>
-                    </action>
-                </behavior>
-            </behaviors>
-        </command>
-        <command>
             <name>eggplant</name>
             <behaviors>
                 <behavior>
                     <action>
-                        <respond>Hi, {user}</respond>
+                        <respond>?</respond>
                     </action>
                 </behavior>
             </behaviors>

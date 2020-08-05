@@ -28,7 +28,11 @@ public class CommandListParser {
         List<Command> commands = xml.getCommands().getCommand().stream()
                 .map(dtdCommand -> fromXml(xml, dtdCommand))
                 .collect(Collectors.toList());
-        return new CommandList(commands);
+        if(xml.getCommands().getOrElse() != null) {
+            return new CommandList(commands, fromXml(xml, null, null, xml.getCommands().getOrElse().getAction()));
+        } else {
+            return new CommandList(commands, null);
+        }
     }
 
     private Command fromXml(DTDBot xml, DTDCommand command) {
@@ -56,7 +60,12 @@ public class CommandListParser {
         List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
                 .map(s -> fromXml(xml, command, s))
                 .collect(Collectors.toList());
-        return new Command(name, aliases, behaviors);
+        if(command.getBehaviors().getOrElse() != null) {
+            return new Command(name, aliases, behaviors,
+                    fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
+        } else {
+            return new Command(name, aliases, behaviors, null);
+        }
     }
 
     private Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
@@ -88,7 +97,14 @@ public class CommandListParser {
             totalParameters = 0;
         }
 
-        return new Behavior(totalParameters, npConfig, new RespondAction());
+        return new Behavior(totalParameters, npConfig, fromXml(xml, command, behavior, behavior.getAction()));
+    }
+
+    private Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {
+        if(behavior != null) {
+            return new RespondAction();
+        }
+        return null;
     }
 
     private String getDebugString(String type, I18NString string) {

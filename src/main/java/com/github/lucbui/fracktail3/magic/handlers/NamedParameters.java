@@ -4,10 +4,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-public class Parameters {
+public class NamedParameters {
+    public static final NamedParameters EMPTY = new NamedParameters(Collections.emptyMap());
+
     private final Map<String, String> params;
 
-    public Parameters(Map<String, String> params) {
+    public NamedParameters(Map<String, String> params) {
         this.params = Collections.unmodifiableMap(params);
     }
 

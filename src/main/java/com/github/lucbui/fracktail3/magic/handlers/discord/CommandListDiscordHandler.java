@@ -39,6 +39,12 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 .flatMap(tuple -> {
                     String msg = tuple.getT1();
                     Locale locale = tuple.getT2();
+
+                    DiscordContext context = new DiscordContext();
+                    context.message = event;
+                    context.locale = locale;
+                    context.contents = msg;
+
                     for(Command command : commandList.getCommands()) {
                         String[] names = Stream.concat(
                                 Stream.of(command.getName().resolve(configuration, locale)),
@@ -46,27 +52,28 @@ public class CommandListDiscordHandler implements DiscordHandler {
                         ).toArray(String[]::new);
                         for(String name : names) {
                             if(StringUtils.startsWith(msg, configuration.getPrefix() + name)) {
-                                DiscordContext context = new DiscordContext();
-                                context.message = event;
-                                context.locale = locale;
-                                context.contents = msg;
                                 context.command = name;
                                 context.normalizedCommand = names[0];
                                 context.parameters = StringUtils.removeStart(msg, configuration.getPrefix() + name).trim();
                                 context.normalizedParameters = parseParameters(context.parameters);
                                 LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {} (Normalized: {})\n\tParameters: {} (Normalized: {})",
-                                        event.getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                        event.getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                                        context.locale,
-                                        context.contents,
-                                        context.command, context.normalizedCommand,
-                                        context.parameters, context.normalizedParameters);
+                                        context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                        context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                        context.getLocale(),
+                                        context.getContents(),
+                                        context.getCommand(), context.getNormalizedCommand(),
+                                        context.getParameters(), context.getNormalizedParameters());
                                 return command.doAction(bot, context);
                             }
                         }
                     }
-                    //No command found. Perform the "forElse" action, but for now, just return empty.
-                    return Mono.empty();
+
+                    LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
+                            context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                            context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                            context.getLocale(),
+                            context.getContents());
+                    return commandList.doOrElse(bot, context);
                 });
     }
 

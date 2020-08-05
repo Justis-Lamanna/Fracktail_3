@@ -24,7 +24,7 @@ public class NamedParametersConfiguration {
         this.parameterMappings.add(Tuples.of(key, range));
     }
 
-    public Parameters resolve(CommandContext context) {
+    public NamedParameters resolve(CommandContext context) {
         Map<String, String> params = new HashMap<>(parameterMappings.size());
         for(Tuple2<String, Range> mapping : parameterMappings) {
             String[] inputParams = context.getNormalizedParameters();
@@ -45,6 +45,6 @@ public class NamedParametersConfiguration {
                 }
             }
         }
-        return new Parameters(params);
+        return new NamedParameters(params);
     }
 }
