@@ -47,6 +47,7 @@
     <xs:complexType name="DTDBot">
         <xs:sequence>
             <xs:element name="configuration" type="tns:DTDConfigurationGroup" minOccurs="0"/>
+            <xs:element name="rolesets" type="tns:DTDRolesets" minOccurs="0"/>
             <xs:element name="commands" type="tns:DTDCommandList"/>
         </xs:sequence>
     </xs:complexType>
@@ -56,6 +57,53 @@
             <xs:element name="global" type="tns:DTDConfiguration" minOccurs="0"/>
             <xs:element name="discord" type="tns:DTDDiscordConfiguration" minOccurs="0"/>
         </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDRolesets">
+        <xs:sequence>
+            <xs:element name="roleset" type="tns:DTDRoleset" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDAbstractRoleset" abstract="true">
+        <xs:sequence>
+            <xs:element name="discord" type="tns:DTDDiscordRoleset" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDRoleset">
+        <xs:complexContent>
+            <xs:extension base="tns:DTDAbstractRoleset">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="blacklist" type="xs:boolean" default="false"/>
+                <xs:attribute name="extends" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DTDDiscordRoleset">
+        <xs:sequence>
+            <xs:element name="snowflakes" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="snowflake" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="roles" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="role" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDCommandRoleset">
+        <xs:simpleContent>
+            <xs:extension base="xs:string"/>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="DTDCommandList">
@@ -78,6 +126,7 @@
                 </xs:element>
                 <xs:element name="aliasesFrom" type="tns:NonEmptyString"/>
             </xs:choice>
+            <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
             <xs:element name="behaviors">
                 <xs:complexType>
                     <xs:sequence>
@@ -98,6 +147,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
             <xs:element name="action" type="tns:DTDAction"/>
         </xs:sequence>
     </xs:complexType>

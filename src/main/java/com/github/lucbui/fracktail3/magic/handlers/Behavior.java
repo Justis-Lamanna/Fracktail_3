@@ -12,11 +12,13 @@ public class Behavior {
 
     private final int paramCount;
     private final NamedParametersConfiguration namedParameters;
+    private final String role;
     private final Action action;
 
-    public Behavior(int paramCount, NamedParametersConfiguration namedParameters, Action action) {
+    public Behavior(int paramCount, NamedParametersConfiguration namedParameters, String role, Action action) {
         this.paramCount = paramCount;
         this.namedParameters = namedParameters;
+        this.role = role;
         this.action = action;
     }
 

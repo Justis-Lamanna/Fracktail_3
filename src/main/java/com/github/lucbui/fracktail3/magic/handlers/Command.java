@@ -15,12 +15,14 @@ public class Command {
 
     private final Resolver<String> name;
     private final Resolver<List<String>> aliases;
+    private final String role;
     private final List<Behavior> behaviors;
     private final Action orElse;
 
-    public Command(Resolver<String> name, Resolver<List<String>> aliases, List<Behavior> behaviors, Action orElse) {
+    public Command(Resolver<String> name, Resolver<List<String>> aliases, String role, List<Behavior> behaviors, Action orElse) {
         this.name = name;
         this.aliases = aliases;
+        this.role = role;
         this.behaviors = behaviors;
         this.orElse = orElse;
     }

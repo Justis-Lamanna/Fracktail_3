@@ -58,14 +58,17 @@ public class CommandListParser {
         } else {
             aliases = Resolver.identity(Collections.emptyList());
         }
+
+        String role = command.getRole() == null ? null : command.getRole().getValue();
+
         List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
                 .map(s -> fromXml(xml, command, s))
                 .collect(Collectors.toList());
         if(command.getBehaviors().getOrElse() != null) {
-            return new Command(name, aliases, behaviors,
+            return new Command(name, aliases, role, behaviors,
                     fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
         } else {
-            return new Command(name, aliases, behaviors, null);
+            return new Command(name, aliases, role, behaviors, null);
         }
     }
 
@@ -98,7 +101,9 @@ public class CommandListParser {
             totalParameters = 0;
         }
 
-        return new Behavior(totalParameters, npConfig, fromXml(xml, command, behavior, behavior.getAction()));
+        String role = behavior.getRole() == null ? null : behavior.getRole().getValue();
+
+        return new Behavior(totalParameters, npConfig, role, fromXml(xml, command, behavior, behavior.getAction()));
     }
 
     private Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {

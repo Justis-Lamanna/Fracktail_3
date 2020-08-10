@@ -10,9 +10,19 @@
             </presence>
         </discord>
     </configuration>
+    <rolesets>
+        <roleset name="admin">
+            <discord>
+                <snowflakes>
+                    <snowflake>248612704019808258</snowflake>
+                </snowflakes>
+            </discord>
+        </roleset>
+    </rolesets>
     <commands>
         <command>
             <name>eggplant</name>
+            <role>admin</role>
             <behaviors>
                 <behavior>
                     <action>

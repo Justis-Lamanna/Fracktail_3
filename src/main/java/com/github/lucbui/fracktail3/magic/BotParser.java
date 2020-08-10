@@ -14,7 +14,6 @@ import discord4j.core.object.presence.Presence;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
@@ -36,9 +35,13 @@ public class BotParser {
     @Autowired
     private CommandListParser commandListParser;
 
+    @Autowired
+    private RolesetParser rolesetParser;
+
     public Bot fromXml(DTDBot xml) {
         Objects.requireNonNull(xml);
         Bot bot = new Bot();
+        rolesetParser.fromXml(xml);
         CommandList commandList = commandListParser.fromXml(xml);
         if(xml.getConfiguration() != null) {
             if(xml.getConfiguration().getGlobal() != null) {
