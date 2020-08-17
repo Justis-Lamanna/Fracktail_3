@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandListDiscordHandler;
+import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import com.github.lucbui.fracktail3.magic.utils.PresenceUtils;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDConfiguration;
@@ -41,8 +42,13 @@ public class BotParser {
     public Bot fromXml(DTDBot xml) {
         Objects.requireNonNull(xml);
         Bot bot = new Bot();
-        rolesetParser.fromXml(xml);
-        CommandList commandList = commandListParser.fromXml(xml);
+
+        if(xml.getRolesets() != null) {
+            Rolesets rolesets = rolesetParser.fromXml(xml);
+            bot.setRolesets(rolesets);
+        }
+
+        CommandList commandList = commandListParser.fromXml(bot, xml);
         if(xml.getConfiguration() != null) {
             if(xml.getConfiguration().getGlobal() != null) {
                 LOGGER.debug("Initializing Global config");

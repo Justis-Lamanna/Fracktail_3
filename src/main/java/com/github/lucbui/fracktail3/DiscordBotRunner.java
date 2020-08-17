@@ -12,6 +12,6 @@ public class DiscordBotRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        //bot.start().block();
+        bot.start().block();
     }
 }

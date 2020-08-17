@@ -26,4 +26,12 @@ public class CommandContext {
     public String[] getNormalizedParameters() {
         return normalizedParameters;
     }
+
+    public boolean isDiscord() {
+        return this instanceof DiscordContext;
+    }
+
+    public boolean isUnknown() {
+        return !isDiscord();
+    }
 }

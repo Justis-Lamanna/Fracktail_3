@@ -24,15 +24,31 @@ import java.util.stream.Collectors;
 public class CommandListParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListParser.class);
 
-    public CommandList fromXml(DTDBot xml) {
+    public CommandList fromXml(Bot bot, DTDBot xml) {
         LOGGER.debug("Parsing command list");
         List<Command> commands = xml.getCommands().getCommand().stream()
                 .map(dtdCommand -> fromXml(xml, dtdCommand))
                 .collect(Collectors.toList());
+        commands.forEach(c -> validateCommand(bot, c));
         if(xml.getCommands().getOrElse() != null) {
             return new CommandList(commands, fromXml(xml, null, null, xml.getCommands().getOrElse().getAction()));
         } else {
             return new CommandList(commands, null);
+        }
+    }
+
+    private void validateCommand(Bot bot, Command c) {
+        if(c.hasRoleRestriction()) {
+            bot.getRolesets().flatMap(r -> r.getRoleset(c.getRole()))
+                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getName() + " contains unknown role " + c.getRole()));
+        }
+        c.getBehaviors().forEach(b -> validateBehavior(bot, c, b));
+    }
+
+    private void validateBehavior(Bot bot, Command c, Behavior b) {
+        if(b.hasRoleRestriction()) {
+            bot.getRolesets().flatMap(r -> r.getRoleset(b.getRole()))
+                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getName() + " contains unknown role " + b.getRole()));
         }
     }
 

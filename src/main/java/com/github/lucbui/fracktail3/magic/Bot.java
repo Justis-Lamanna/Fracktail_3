@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordHandler;
+import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -23,6 +24,7 @@ public class Bot {
     private GlobalConfiguration globalConfig;
     private DiscordConfiguration discordConfig;
     private DiscordHandler discordHandler;
+    private Rolesets rolesets;
 
     public Optional<GlobalConfiguration> getGlobalConfiguration() {
         return Optional.ofNullable(globalConfig);
@@ -46,6 +48,14 @@ public class Bot {
 
     public void setDiscordHandler(@Nullable DiscordHandler discordHandler) {
         this.discordHandler = discordHandler;
+    }
+
+    public Optional<Rolesets> getRolesets() {
+        return Optional.ofNullable(rolesets);
+    }
+
+    public void setRolesets(@Nullable Rolesets rolesets) {
+        this.rolesets = rolesets;
     }
 
     public Mono<Boolean> start() {

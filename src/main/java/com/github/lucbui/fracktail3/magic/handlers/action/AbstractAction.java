@@ -10,16 +10,16 @@ import reactor.core.publisher.Mono;
 public abstract class AbstractAction implements Action {
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context, NamedParameters params) {
-        if(context instanceof DiscordContext) {
+        if(context.isDiscord()) {
             return doDiscordAction(bot, (DiscordContext)context, params);
         } else {
             return doUnknownAction(bot, context, params);
         }
     }
 
-    public abstract Mono<Void> doDiscordAction(Bot bot, DiscordContext ctx, NamedParameters params);
+    protected abstract Mono<Void> doDiscordAction(Bot bot, DiscordContext ctx, NamedParameters params);
 
-    public Mono<Void> doUnknownAction(Bot bot, CommandContext context, NamedParameters params) {
+    protected Mono<Void> doUnknownAction(Bot bot, CommandContext context, NamedParameters params) {
         LoggerFactory.getLogger(getClass()).info("Attempted action {} with context {}. Unable to handle, so nothing happened.", getClass().getSimpleName(), context.getClass().getSimpleName());
         return Mono.empty();
     }

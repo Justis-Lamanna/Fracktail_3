@@ -1,11 +1,15 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandContext;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
+import com.github.lucbui.fracktail3.magic.role.Roleset;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -35,6 +39,10 @@ public class Command {
         return aliases;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public List<Behavior> getBehaviors() {
         return behaviors;
     }
@@ -43,16 +51,35 @@ public class Command {
         return orElse;
     }
 
+    public Mono<Boolean> matchesRole(Bot bot, CommandContext context) {
+        if(hasRoleRestriction()) {
+            Roleset roleset = bot.getRolesets()
+                    .flatMap(r -> r.getRoleset(role))
+                    .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
+            return roleset.validateInRole(bot, context);
+        }
+        return Mono.just(true);
+    }
+
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        for(Behavior b : behaviors) {
-            if(b.matches(bot, context)) {
-                return b.doAction(bot, context);
-            }
-        }
-        LOGGER.debug("Executing unknown behavior for command {} | Contents: {}", context.getCommand(), context.getContents());
-        if(orElse != null) {
-            return orElse.doAction(bot, context, NamedParameters.EMPTY);
-        }
-        return Mono.empty();
+        return Flux.fromIterable(behaviors)
+                .filterWhen(b -> b.matches(bot, context))
+                .collectList()
+                .flatMap(b -> {
+                    if(b.isEmpty()) {
+                        LOGGER.debug("Executing unknown behavior for command {} | Contents: {}", context.getCommand(), context.getContents());
+                        if(orElse != null) {
+                            return orElse.doAction(bot, context, NamedParameters.EMPTY);
+                        } else {
+                            return Mono.empty();
+                        }
+                    } else {
+                        return b.get(0).doAction(bot, context);
+                    }
+                });
+    }
+
+    public boolean hasRoleRestriction() {
+        return StringUtils.isNotBlank(role);
     }
 }

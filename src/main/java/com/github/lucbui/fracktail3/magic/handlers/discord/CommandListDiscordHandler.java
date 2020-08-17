@@ -11,11 +11,14 @@ import discord4j.core.object.util.Snowflake;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -49,17 +52,24 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     context.locale = locale;
                     context.contents = msg;
 
-                    for(Command command : commandList.getCommands()) {
-                        String[] names = Stream.concat(
-                                Stream.of(command.getName().resolve(configuration, locale)),
-                                command.getAliases().resolve(configuration, locale).stream()
-                        ).toArray(String[]::new);
-                        for(String name : names) {
-                            if(StringUtils.startsWith(msg, configuration.getPrefix() + name)) {
-                                context.command = name;
-                                context.normalizedCommand = names[0];
-                                context.parameters = StringUtils.removeStart(msg, configuration.getPrefix() + name).trim();
-                                context.normalizedParameters = parseParameters(context.parameters);
+                    return Flux.fromIterable(commandList.getCommands())
+                            .flatMap(c -> {
+                                String[] names = Stream.concat(
+                                        Stream.of(c.getName().resolve(configuration, locale)),
+                                        c.getAliases().resolve(configuration, locale).stream()
+                                ).toArray(String[]::new);
+                                Optional<String> name = startsWithAny(msg, configuration.getPrefix(), names);
+                                return Mono.justOrEmpty(name.map(used -> {
+                                    context.command = used;
+                                    context.normalizedCommand = names[0];
+                                    context.parameters = StringUtils.removeStart(msg, configuration.getPrefix() + used).trim();
+                                    context.normalizedParameters = parseParameters(context.parameters);
+                                    return Tuples.of(c, context);
+                                }));
+                            })
+                            .filterWhen(t -> t.getT1().matchesRole(bot, t.getT2()))
+                            .next()
+                            .flatMap(t -> {
                                 LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {} (Normalized: {})\n\tParameters: {} (Normalized: {})",
                                         context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
                                         context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
@@ -67,18 +77,46 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                         context.getContents(),
                                         context.getCommand(), context.getNormalizedCommand(),
                                         context.getParameters(), context.getNormalizedParameters());
-                                return command.doAction(bot, context);
-                            }
-                        }
-                    }
+                                return t.getT1().doAction(bot, t.getT2()).thenReturn(true);
+                            })
+                            .switchIfEmpty(
+                                    Mono.fromRunnable(() -> {
+                                        LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
+                                                context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                                context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                                context.getLocale(),
+                                                context.getContents());
+                                    }).then(commandList.doOrElse(bot, context).thenReturn(true))
+                            );
+                })
+                .then();
+    }
 
-                    LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
-                            context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                            context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                            context.getLocale(),
-                            context.getContents());
-                    return commandList.doOrElse(bot, context);
-                });
+    private Mono<Boolean> canUseCommand(Bot bot, DiscordConfiguration configuration, Command command, DiscordContext ctx) {
+        String[] names = Stream.concat(
+                Stream.of(command.getName().resolve(configuration, ctx.getLocale())),
+                command.getAliases().resolve(configuration, ctx.getLocale()).stream()
+        ).toArray(String[]::new);
+        Optional<String> name = startsWithAny(ctx.getContents(), configuration.getPrefix(), names);
+        if(name.isPresent()) {
+
+        }
+        return Mono.just(false);
+    }
+
+    private Optional<String> startsWithAny(String value, String prefix, String... choices) {
+        for(String choice : choices) {
+            if (StringUtils.startsWith(value, prefix + choice)) {
+                return Optional.of(choice);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static class Help {
+        Command command;
+        String name;
+        String normalized;
     }
 
     private String[] parseParameters(String paramString) {

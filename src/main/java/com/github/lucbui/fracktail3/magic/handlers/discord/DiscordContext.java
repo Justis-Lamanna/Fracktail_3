@@ -15,4 +15,8 @@ public class DiscordContext extends CommandContext {
     public Locale getLocale() {
         return locale;
     }
+
+    public boolean isDm() {
+        return !message.getMember().isPresent();
+    }
 }

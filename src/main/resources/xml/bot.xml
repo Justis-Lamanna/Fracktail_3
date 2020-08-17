@@ -22,7 +22,6 @@
     <commands>
         <command>
             <name>eggplant</name>
-            <role>admin</role>
             <behaviors>
                 <behavior>
                     <action>
