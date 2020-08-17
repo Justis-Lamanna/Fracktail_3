@@ -53,8 +53,7 @@ public class Command {
 
     public Mono<Boolean> matchesRole(Bot bot, CommandContext context) {
         if(hasRoleRestriction()) {
-            Roleset roleset = bot.getRolesets()
-                    .flatMap(r -> r.getRoleset(role))
+            Roleset roleset = bot.getRoleset(role)
                     .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
             return roleset.validateInRole(bot, context);
         }
@@ -63,20 +62,12 @@ public class Command {
 
     public Mono<Void> doAction(Bot bot, CommandContext context) {
         return Flux.fromIterable(behaviors)
-                .filterWhen(b -> b.matches(bot, context))
-                .collectList()
-                .flatMap(b -> {
-                    if(b.isEmpty()) {
-                        LOGGER.debug("Executing unknown behavior for command {} | Contents: {}", context.getCommand(), context.getContents());
-                        if(orElse != null) {
-                            return orElse.doAction(bot, context, NamedParameters.EMPTY);
-                        } else {
-                            return Mono.empty();
-                        }
-                    } else {
-                        return b.get(0).doAction(bot, context);
-                    }
-                });
+                .filterWhen(b -> b.matchesRole(bot, context))
+                .filterWhen(b -> b.matchesParameterCount(bot, context))
+                .next()
+                .flatMap(behavior -> behavior.doAction(bot, context).thenReturn(true))
+                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(bot, context, NamedParameters.EMPTY).thenReturn(true))
+                .then();
     }
 
     public boolean hasRoleRestriction() {

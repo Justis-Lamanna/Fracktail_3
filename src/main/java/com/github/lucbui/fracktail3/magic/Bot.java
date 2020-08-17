@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordHandler;
+import com.github.lucbui.fracktail3.magic.role.Roleset;
 import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -52,6 +53,10 @@ public class Bot {
 
     public Optional<Rolesets> getRolesets() {
         return Optional.ofNullable(rolesets);
+    }
+
+    public Optional<Roleset> getRoleset(String name) {
+        return getRolesets().flatMap(r -> r.getRoleset(name));
     }
 
     public void setRolesets(@Nullable Rolesets rolesets) {
