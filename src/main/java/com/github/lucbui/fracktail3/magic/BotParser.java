@@ -15,29 +15,35 @@ import discord4j.core.object.presence.Presence;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.common.TemplateParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Component
 public class BotParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotParser.class);
-    private static final ExpressionParser parser = new SpelExpressionParser();
 
-    @Autowired
-    private Environment environment;
+    private ExpressionResolver expressionResolver;
 
-    @Autowired
     private CommandListParser commandListParser;
 
-    @Autowired
     private RolesetParser rolesetParser;
+
+    public BotParser() {
+        expressionResolver = new IdentityExpressionResolver();
+        commandListParser = new CommandListParser();
+        rolesetParser = new RolesetParser();
+    }
+
+    public void setExpressionResolver(ExpressionResolver expressionResolver) {
+        this.expressionResolver = expressionResolver;
+    }
+
+    public void setCommandListParser(CommandListParser commandListParser) {
+        this.commandListParser = commandListParser;
+    }
+
+    public void setRolesetParser(RolesetParser rolesetParser) {
+        this.rolesetParser = rolesetParser;
+    }
 
     public Bot fromXml(DTDBot xml) {
         Objects.requireNonNull(xml);
@@ -61,10 +67,11 @@ public class BotParser {
             if(xml.getConfiguration().getDiscord() != null) {
                 LOGGER.debug("Initializing Discord config");
                 DTDDiscordConfiguration discord = xml.getConfiguration().getDiscord();
-                String token = parseToken(discord.getToken());
+                String token = expressionResolver.parseExpression(discord.getToken());
                 if(StringUtils.isBlank(token)) {
                     throw new BotConfigurationException("Token must be non-null and non-blank");
                 }
+
                 Presence presence = PresenceUtils.getPresence(discord.getPresence());
                 if(LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Token: {}", token);
@@ -96,12 +103,5 @@ public class BotParser {
             }
         }
         return bot;
-    }
-
-    private String parseToken(String token) {
-        String resolvedToken = environment.resolvePlaceholders(token);
-        final TemplateParserContext templateContext = new TemplateParserContext();
-        Expression expression = parser.parseExpression(resolvedToken, templateContext);
-        return expression.getValue(String.class);
     }
 }

@@ -1,16 +1,15 @@
 package com.github.lucbui.fracktail3.magic;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.ObjectFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -20,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @Configuration
@@ -34,17 +34,29 @@ public class AutoConfig {
     @Bean
     @SuppressWarnings("unchecked")
     @ConditionalOnMissingBean
-    public DTDBot dtdBot() throws JAXBException, SAXException {
+    public DTDBot dtdBot(@Value("${bot.xml.uri:}") String uri) throws JAXBException, SAXException, MalformedURLException {
         Unmarshaller jaxbUnmarshaller = JAXBContext.newInstance(ObjectFactory.class)
                 .createUnmarshaller();
         jaxbUnmarshaller.setSchema(schema());
 
-        URL url = getClass().getResource("/xml/bot.xml");
-        if(url == null) {
-            throw new IllegalArgumentException("No bot.xml found");
-        }
+        if(StringUtils.isEmpty(uri)) {
+            URL url = getClass().getResource("/xml/bot.xml");
+            if (url == null) {
+                throw new BotConfigurationException("No bot.xml found");
+            }
 
-        return ((JAXBElement<DTDBot>)jaxbUnmarshaller.unmarshal(url)).getValue();
+            return ((JAXBElement<DTDBot>) jaxbUnmarshaller.unmarshal(url)).getValue();
+        } else {
+            return ((JAXBElement<DTDBot>) jaxbUnmarshaller.unmarshal(new URL(uri))).getValue();
+        }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BotParser botParser(Environment environment) {
+        BotParser parser = new BotParser();
+        parser.setExpressionResolver(new SpringExpressionResolver(environment));
+        return parser;
     }
 
     @Bean
