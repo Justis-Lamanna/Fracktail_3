@@ -1,6 +1,17 @@
-package com.github.lucbui.fracktail3.magic.handlers.discord;
+package com.github.lucbui.fracktail3.magic.handlers;
+
+import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandContext {
+    public static final String MESSAGE = "message";
+    public static final String USED_COMMAND = "usedCommand";
+    public static final String COMMAND = "command";
+    public static final String PARAMS = "params";
+    public static final String PARAM_PREFIX = "param.";
+
     private String contents;
     private String command;
     private String normalizedCommand;
@@ -53,5 +64,17 @@ public class CommandContext {
 
     public void setNormalizedParameters(String[] normalizedParameters) {
         this.normalizedParameters = normalizedParameters;
+    }
+
+    public Map<String, String> getVariableMap() {
+        Map<String, String> map = new HashMap<>();
+        map.put(MESSAGE, contents);
+        map.put(USED_COMMAND, command);
+        map.put(COMMAND, normalizedCommand);
+        map.put(PARAMS, parameters);
+        for(int idx = 0; idx < normalizedParameters.length; idx++) {
+            map.put(PARAM_PREFIX + idx, normalizedParameters[idx]);
+        }
+        return map;
     }
 }

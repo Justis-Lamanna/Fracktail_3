@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.handlers;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.handlers.discord.CommandContext;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.magic.role.Roleset;
 import org.apache.commons.lang3.StringUtils;
