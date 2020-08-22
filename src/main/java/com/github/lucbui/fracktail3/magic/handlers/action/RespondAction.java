@@ -21,13 +21,20 @@ public class RespondAction extends AbstractAction {
     @Override
     public Mono<Void> doDiscordAction(Bot bot, DiscordContext ctx) {
         String message = resolver.resolve(bot.getDiscordConfiguration().orElseThrow(CommandUseException::new), ctx.getLocale());
-        return ctx.getExtendedVariableMap()
-                .map(mapping -> {
-                    MessageFormat format = new MessageFormat(message, ctx.getLocale());
-                    return format.format(mapping);
-                })
-                .zipWith(ctx.getMessage().getMessage().getChannel())
-                .flatMap(t -> t.getT2().createMessage(t.getT1()))
-                .then();
+        if(DiscordContext.containsExtendedVariable(message)) {
+            return ctx.getExtendedVariableMap()
+                    .map(mapping -> {
+                        MessageFormat format = new MessageFormat(message, ctx.getLocale());
+                        return format.format(mapping);
+                    })
+                    .zipWith(ctx.getMessage().getMessage().getChannel())
+                    .flatMap(t -> t.getT2().createMessage(t.getT1()))
+                    .then();
+        } else {
+            MessageFormat format = new MessageFormat(message, ctx.getLocale());
+            return ctx.getMessage().getMessage().getChannel()
+                    .flatMap(c -> c.createMessage(format.format(ctx.getVariableMap())))
+                    .then();
+        }
     }
 }

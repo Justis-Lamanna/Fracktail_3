@@ -48,8 +48,8 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     Locale locale = tuple.getT2();
 
                     DiscordContext context = new DiscordContext();
-                    context.message = event;
-                    context.locale = locale;
+                    context.setMessage(event);
+                    context.setLocale(locale);
                     context.setContents(msg);
 
                     return Flux.fromIterable(commandList.getCommands())

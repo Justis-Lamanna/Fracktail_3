@@ -13,6 +13,12 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class DiscordContext extends CommandContext {
+    public static final String USERNAME = "username";
+    public static final String NICKNAME = "nickname";
+    public static final String NAME = "name";
+    public static final String LOCALE = "locale";
+    public static final String SELF = "self";
+    public static final String GUILD = "guild";
     private MessageCreateEvent message;
     private Locale locale;
 
@@ -24,6 +30,14 @@ public class DiscordContext extends CommandContext {
         return locale;
     }
 
+    public void setMessage(MessageCreateEvent message) {
+        this.message = message;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
     public boolean isDm() {
         return !message.getMember().isPresent();
     }
@@ -31,10 +45,10 @@ public class DiscordContext extends CommandContext {
     @Override
     public Map<String, String> getVariableMap() {
         Map<String, String> map = super.getVariableMap();
-        map.put("username", message.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY));
-        map.put("nickname", message.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
-        map.put("name", message.getMember().map(Member::getDisplayName).orElse(map.get("username")));
-        map.put("locale", locale.getDisplayName());
+        map.put(USERNAME, message.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY));
+        map.put(NICKNAME, message.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
+        map.put(NAME, message.getMember().map(Member::getDisplayName).orElse(map.get("username")));
+        map.put(LOCALE, locale.getDisplayName());
 
         return map;
     }
@@ -42,8 +56,12 @@ public class DiscordContext extends CommandContext {
     public Mono<Map<String, String>> getExtendedVariableMap() {
         Map<String, String> map = this.getVariableMap();
         return Mono.just(map)
-                .zipWith(message.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator("self"))
-                .zipWith(message.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator("guild"));
+                .zipWith(message.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator(SELF))
+                .zipWith(message.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator(GUILD));
+    }
+
+    public static boolean containsExtendedVariable(String msg) {
+        return StringUtils.containsAny(msg, "{" + SELF, "{" + GUILD);
     }
 
     private <T> BiFunction<Map<String, String>, String, Map<String, String>> mapCombinator(String name) {

@@ -6,6 +6,7 @@ import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.Range;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.action.RandomAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
@@ -127,6 +128,16 @@ public class CommandListParser {
             I18NString respond = action.getRespond();
             LOGGER.debug(getDebugString("Response Action", respond));
             return new RespondAction(fromI18NString(respond));
+        }
+        if(action.getRandom() != null) {
+            DTDAction.Random random = action.getRandom();
+            LOGGER.debug("Response Action: Random Actions:");
+            RandomAction.Builder rab = new RandomAction.Builder();
+            for(DTDWeightedAction a : random.getAction()) {
+                rab.add(fromXml(xml, command, behavior, a), a.getWeight());
+            }
+            LOGGER.debug("Random Actions Complete");
+            return rab.build();
         }
         return null;
     }
