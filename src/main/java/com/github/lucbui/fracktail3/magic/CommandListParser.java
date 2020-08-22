@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
+import com.github.lucbui.fracktail3.magic.handlers.Range;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
@@ -88,17 +89,37 @@ public class CommandListParser {
     }
 
     private Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
-        String paramCount = behavior.getParameters();
-        int totalParameters;
-        if(paramCount == null || paramCount.equalsIgnoreCase("unbounded")) {
-            totalParameters = -1;
+        Range parameterRange;
+        DTDValueOrRange valueOrRange = behavior.getParameters();
+        if(valueOrRange == null) {
+            LOGGER.debug("Behavior accepts unlimited params");
+            parameterRange = Range.unbounded();
+        } else if(valueOrRange.getValue() != null) {
+            String value = valueOrRange.getValue();
+            if(StringUtils.equalsIgnoreCase(value, "unbounded")) {
+                LOGGER.debug("Behavior accepts unlimited params");
+                parameterRange = Range.unbounded();
+            } else {
+                LOGGER.debug("Behavior accepts {} params", value);
+                parameterRange = Range.single(Integer.parseInt(value));
+            }
+        } else if(valueOrRange.getRange() != null) {
+            DTDRange range = valueOrRange.getRange();
+            int start = range.getMin().intValue();
+            if(StringUtils.equalsIgnoreCase(range.getMax(), "unbounded")) {
+                LOGGER.debug("Behavior accepts {} and more params", start);
+                parameterRange = Range.fromOnward(start);
+            } else {
+                LOGGER.debug("Behavior accepts between {} and {} params", start, range.getMax());
+                parameterRange = Range.fromTo(start, Integer.parseInt(range.getMax()));
+            }
         } else {
-            totalParameters = Integer.parseInt(paramCount);
+            throw new BotConfigurationException("Unable to parse parameters: expected value or range");
         }
 
         String role = behavior.getRole() == null ? null : behavior.getRole().getValue();
 
-        return new Behavior(totalParameters, fromXml(xml, command, behavior, behavior.getAction()), role);
+        return new Behavior(parameterRange, fromXml(xml, command, behavior, behavior.getAction()), role);
     }
 
     private Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {

@@ -38,6 +38,20 @@
         <xs:union memberTypes="xs:nonNegativeInteger tns:UnboundedString"/>
     </xs:simpleType>
 
+    <xs:complexType name="DTDRange">
+        <xs:sequence>
+            <xs:element minOccurs="0" type="xs:nonNegativeInteger" name="min" default="0"/>
+            <xs:element minOccurs="0" type="tns:IntOrUnbounded" name="max" default="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDValueOrRange">
+        <xs:choice>
+            <xs:element name="value" type="tns:IntOrUnbounded"/>
+            <xs:element name="range" type="tns:DTDRange"/>
+        </xs:choice>
+    </xs:complexType>
+
     <xs:complexType name="DTDConfiguration">
         <xs:sequence>
             <xs:element name="i18n" type="xs:anyURI" minOccurs="0"/>
@@ -140,7 +154,7 @@
 
     <xs:complexType name="DTDBehavior">
         <xs:sequence>
-            <xs:element name="parameters" minOccurs="0" type="tns:IntOrUnbounded" default="unbounded"/>
+            <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
             <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
             <xs:element name="action" type="tns:DTDAction"/>
         </xs:sequence>

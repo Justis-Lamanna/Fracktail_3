@@ -24,6 +24,9 @@
             <name>math</name>
             <behaviors>
                 <behavior>
+                    <parameters>
+                        <value>unbounded</value>
+                    </parameters>
                     <action>
                         <respond>The answer is 3.</respond>
                     </action>

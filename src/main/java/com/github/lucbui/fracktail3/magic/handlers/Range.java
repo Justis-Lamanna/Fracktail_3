@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import java.util.OptionalInt;
+
 public class Range {
     private final int start;
     private final int end;
@@ -33,12 +35,21 @@ public class Range {
         return start;
     }
 
-    public int getEnd() {
-        return end;
+    public OptionalInt getEnd() {
+        return isUnbounded() ? OptionalInt.empty() : OptionalInt.of(end);
     }
 
     public boolean isUnbounded() {
         return end == -1;
+    }
+
+    public boolean isInside(int value) {
+        OptionalInt endpoint = getEnd();
+        if(endpoint.isPresent()) {
+            return value >= start && endpoint.getAsInt() <= end;
+        } else {
+            return value >= start;
+        }
     }
 
     @Override
