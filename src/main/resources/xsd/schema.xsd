@@ -140,13 +140,7 @@
 
     <xs:complexType name="DTDBehavior">
         <xs:sequence>
-            <xs:element name="parameters" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="parameter" type="tns:DTDParameter" maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="parameters" minOccurs="0" type="tns:IntOrUnbounded" default="unbounded"/>
             <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
             <xs:element name="action" type="tns:DTDAction"/>
         </xs:sequence>

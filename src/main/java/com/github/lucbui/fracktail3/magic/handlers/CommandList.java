@@ -25,6 +25,6 @@ public class CommandList {
         if(orElse == null) {
             return Mono.empty();
         }
-        return orElse.doAction(bot, ctx, NamedParameters.EMPTY);
+        return orElse.doAction(bot, ctx);
     }
 }

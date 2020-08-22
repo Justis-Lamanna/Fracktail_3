@@ -66,7 +66,7 @@ public class Command {
                 .filterWhen(b -> b.matchesParameterCount(bot, context))
                 .next()
                 .flatMap(behavior -> behavior.doAction(bot, context).thenReturn(true))
-                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(bot, context, NamedParameters.EMPTY).thenReturn(true))
+                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(bot, context).thenReturn(true))
                 .then();
     }
 

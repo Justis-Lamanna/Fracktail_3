@@ -21,11 +21,11 @@
     </rolesets>
     <commands>
         <command>
-            <name>eggplant</name>
+            <name>math</name>
             <behaviors>
                 <behavior>
                     <action>
-                        <respond>?</respond>
+                        <respond>The answer is 3.</respond>
                     </action>
                 </behavior>
             </behaviors>

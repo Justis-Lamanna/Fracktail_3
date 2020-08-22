@@ -50,7 +50,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     DiscordContext context = new DiscordContext();
                     context.message = event;
                     context.locale = locale;
-                    context.contents = msg;
+                    context.setContents(msg);
 
                     return Flux.fromIterable(commandList.getCommands())
                             .flatMap(c -> {
@@ -60,10 +60,10 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                 ).toArray(String[]::new);
                                 Optional<String> name = startsWithAny(msg, configuration.getPrefix(), names);
                                 return Mono.justOrEmpty(name.map(used -> {
-                                    context.command = used;
-                                    context.normalizedCommand = names[0];
-                                    context.parameters = StringUtils.removeStart(msg, configuration.getPrefix() + used).trim();
-                                    context.normalizedParameters = parseParameters(context.parameters);
+                                    context.setCommand(used);
+                                    context.setNormalizedCommand(names[0]);
+                                    context.setParameters(StringUtils.removeStart(msg, configuration.getPrefix() + used).trim());
+                                    context.setNormalizedParameters(parseParameters(context.getParameters()));
                                     return Tuples.of(c, context);
                                 }));
                             })

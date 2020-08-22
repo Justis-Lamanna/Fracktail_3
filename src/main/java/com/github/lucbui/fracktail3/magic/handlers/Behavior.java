@@ -14,23 +14,17 @@ public class Behavior {
     private static final Logger LOGGER = LoggerFactory.getLogger(Behavior.class);
 
     private final int paramCount;
-    private final NamedParametersConfiguration namedParameters;
     private final String role;
     private final Action action;
 
-    public Behavior(int paramCount, Action action, String role, NamedParametersConfiguration namedParameters) {
+    public Behavior(int paramCount, Action action, String role) {
         this.paramCount = paramCount;
-        this.namedParameters = namedParameters;
         this.role = role;
         this.action = action;
     }
 
     public int getParamCount() {
         return paramCount;
-    }
-
-    public NamedParametersConfiguration getNamedParameters() {
-        return namedParameters;
     }
 
     public String getRole() {
@@ -56,7 +50,6 @@ public class Behavior {
 
     public Mono<Void> doAction(Bot bot, CommandContext context){
         LOGGER.info("Performing action: {}", action);
-        context.setNamedParameters(namedParameters.resolve(context));
         return action.doAction(bot, context);
     }
 
