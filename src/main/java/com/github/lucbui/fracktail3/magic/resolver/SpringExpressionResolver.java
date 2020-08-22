@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic;
+package com.github.lucbui.fracktail3.magic.resolver;
 
 import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;

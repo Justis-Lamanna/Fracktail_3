@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandListDiscordHandler;
+import com.github.lucbui.fracktail3.magic.resolver.ExpressionResolver;
+import com.github.lucbui.fracktail3.magic.resolver.IdentityExpressionResolver;
 import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import com.github.lucbui.fracktail3.magic.utils.PresenceUtils;
 import com.github.lucbui.fracktail3.xsd.DTDBot;

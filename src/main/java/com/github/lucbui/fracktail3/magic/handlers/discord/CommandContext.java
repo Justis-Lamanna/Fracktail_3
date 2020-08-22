@@ -1,11 +1,14 @@
 package com.github.lucbui.fracktail3.magic.handlers.discord;
 
+import com.github.lucbui.fracktail3.magic.handlers.NamedParameters;
+
 public class CommandContext {
-    String contents;
-    String command;
-    String normalizedCommand;
-    String parameters;
-    String[] normalizedParameters;
+    private NamedParameters namedParameters;
+    private String contents;
+    private String command;
+    private String normalizedCommand;
+    private String parameters;
+    private String[] normalizedParameters;
 
     public String getContents() {
         return contents;
@@ -33,5 +36,33 @@ public class CommandContext {
 
     public boolean isUnknown() {
         return !isDiscord();
+    }
+
+    public NamedParameters getNamedParameters() {
+        return namedParameters;
+    }
+
+    public void setNamedParameters(NamedParameters namedParameters) {
+        this.namedParameters = namedParameters;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    public void setNormalizedCommand(String normalizedCommand) {
+        this.normalizedCommand = normalizedCommand;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+
+    public void setNormalizedParameters(String[] normalizedParameters) {
+        this.normalizedParameters = normalizedParameters;
     }
 }

@@ -117,7 +117,7 @@ public class CommandListParser {
 
         String role = behavior.getRole() == null ? null : behavior.getRole().getValue();
 
-        return new Behavior(totalParameters, npConfig, role, fromXml(xml, command, behavior, behavior.getAction()));
+        return new Behavior(totalParameters, fromXml(xml, command, behavior, behavior.getAction()), role, npConfig);
     }
 
     private Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {

@@ -18,7 +18,7 @@ public class Behavior {
     private final String role;
     private final Action action;
 
-    public Behavior(int paramCount, NamedParametersConfiguration namedParameters, String role, Action action) {
+    public Behavior(int paramCount, Action action, String role, NamedParametersConfiguration namedParameters) {
         this.paramCount = paramCount;
         this.namedParameters = namedParameters;
         this.role = role;
@@ -56,7 +56,8 @@ public class Behavior {
 
     public Mono<Void> doAction(Bot bot, CommandContext context){
         LOGGER.info("Performing action: {}", action);
-        return action.doAction(bot, context, namedParameters.resolve(context));
+        context.setNamedParameters(namedParameters.resolve(context));
+        return action.doAction(bot, context);
     }
 
     public boolean hasRoleRestriction() {
