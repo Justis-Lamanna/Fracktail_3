@@ -18,6 +18,13 @@
                 </snowflakes>
             </discord>
         </roleset>
+        <roleset name="steven">
+            <discord>
+                <snowflakes>
+                    <snowflake>112005555178000384</snowflake>
+                </snowflakes>
+            </discord>
+        </roleset>
     </rolesets>
     <commands>
         <command>
@@ -33,6 +40,12 @@
         <command>
             <name>hello</name>
             <behaviors>
+                <behavior>
+                    <role>steven</role>
+                    <action>
+                        <respond>No u stink.</respond>
+                    </action>
+                </behavior>
                 <behavior>
                     <action>
                         <respond>Hello, {name}!</respond>

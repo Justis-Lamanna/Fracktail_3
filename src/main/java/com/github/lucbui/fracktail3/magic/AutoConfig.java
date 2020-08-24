@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.parse.xml.DefaultBotParser;
 import com.github.lucbui.fracktail3.magic.resolver.SpringExpressionResolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.ObjectFactory;
@@ -54,15 +55,15 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public BotParser botParser(Environment environment) {
-        BotParser parser = new BotParser();
+    public DefaultBotParser botParser(Environment environment) {
+        DefaultBotParser parser = new DefaultBotParser();
         parser.setExpressionResolver(new SpringExpressionResolver(environment));
         return parser;
     }
 
     @Bean
     @ConditionalOnBean(DTDBot.class)
-    public Bot bot(BotParser parser, DTDBot xmlBot) {
+    public Bot bot(DefaultBotParser parser, DTDBot xmlBot) {
         return parser.fromXml(xmlBot);
     }
 }
