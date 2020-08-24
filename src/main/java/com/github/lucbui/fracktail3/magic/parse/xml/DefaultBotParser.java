@@ -1,11 +1,8 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.RolesetParser;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.discord.CommandListDiscordHandler;
-import com.github.lucbui.fracktail3.magic.resolver.ExpressionResolver;
-import com.github.lucbui.fracktail3.magic.resolver.IdentityExpressionResolver;
 import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import org.slf4j.Logger;
@@ -16,14 +13,14 @@ import java.util.Objects;
 public class DefaultBotParser implements BotParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBotParser.class);
 
-    protected ExpressionResolver expressionResolver;
+    protected ExpressionParser expressionParser;
     protected CommandListParser commandListParser;
     protected RolesetParser rolesetParser;
     protected ConfigParser configParser;
 
     public DefaultBotParser() {
-        expressionResolver = new IdentityExpressionResolver();
-        configParser = new DefaultGlobalConfigParser(expressionResolver);
+        expressionParser = new IdentityExpressionResolver();
+        configParser = new DefaultConfigParser(expressionParser);
         commandListParser = new DefaultCommandListParser(
                 new DefaultCommandParser(
                         new DefaultBehaviorParser(
@@ -32,23 +29,23 @@ public class DefaultBotParser implements BotParser {
     }
 
     protected DefaultBotParser(
-            ExpressionResolver expressionResolver,
+            ExpressionParser expressionParser,
             ConfigParser configParser,
             CommandListParser commandListParser,
             RolesetParser rolesetParser) {
-        this.expressionResolver = expressionResolver;
+        this.expressionParser = expressionParser;
         this.configParser = configParser;
         this.commandListParser = commandListParser;
         this.rolesetParser = rolesetParser;
     }
 
-    public ExpressionResolver getExpressionResolver() {
-        return expressionResolver;
+    public ExpressionParser getExpressionParser() {
+        return expressionParser;
     }
 
-    public void setExpressionResolver(ExpressionResolver expressionResolver) {
-        this.expressionResolver = expressionResolver;
-        this.configParser = new DefaultGlobalConfigParser(expressionResolver);
+    public void setExpressionParser(ExpressionParser expressionParser) {
+        this.expressionParser = expressionParser;
+        this.configParser = new DefaultConfigParser(expressionParser);
     }
 
     public CommandListParser getCommandListParser() {

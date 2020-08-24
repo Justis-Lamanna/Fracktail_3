@@ -1,13 +1,13 @@
-package com.github.lucbui.fracktail3.magic.resolver;
+package com.github.lucbui.fracktail3.magic.parse.xml.spring;
 
+import com.github.lucbui.fracktail3.magic.parse.xml.ExpressionParser;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-public class SpringExpressionResolver implements ExpressionResolver {
-    private static final ExpressionParser PARSER = new SpelExpressionParser();
+public class SpringExpressionResolver implements ExpressionParser {
+    private static final org.springframework.expression.ExpressionParser PARSER = new SpelExpressionParser();
 
     public final Environment environment;
 

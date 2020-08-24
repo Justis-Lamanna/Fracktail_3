@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.resolver.ExpressionResolver;
 import com.github.lucbui.fracktail3.magic.utils.PresenceUtils;
 import com.github.lucbui.fracktail3.xsd.DTDConfiguration;
 import com.github.lucbui.fracktail3.xsd.DTDDiscordConfiguration;
@@ -14,13 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultGlobalConfigParser implements ConfigParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGlobalConfigParser.class);
+public class DefaultConfigParser implements ConfigParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConfigParser.class);
 
-    private final ExpressionResolver expressionResolver;
+    private final ExpressionParser expressionParser;
 
-    public DefaultGlobalConfigParser(ExpressionResolver expressionResolver) {
-        this.expressionResolver = expressionResolver;
+    public DefaultConfigParser(ExpressionParser expressionParser) {
+        this.expressionParser = expressionParser;
     }
 
     @Override
@@ -33,7 +32,7 @@ public class DefaultGlobalConfigParser implements ConfigParser {
 
     @Override
     public DiscordConfiguration discordFromXml(Bot bot, DTDDiscordConfiguration discord) {
-        String token = expressionResolver.parseExpression(discord.getToken());
+        String token = expressionParser.parseExpression(discord.getToken());
         if(StringUtils.isBlank(token)) {
             throw new BotConfigurationException("Token must be non-null and non-blank");
         }

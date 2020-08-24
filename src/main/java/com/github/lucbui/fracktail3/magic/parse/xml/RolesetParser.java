@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic;
+package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.role.DefaultDiscordRolesetValidator;
