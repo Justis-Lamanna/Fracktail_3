@@ -3,13 +3,10 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
-import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDCommand;
-import com.github.lucbui.fracktail3.xsd.I18NString;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +15,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultCommandParser implements CommandParser, SupportsCustom<Command> {
+public class DefaultCommandParser extends AbstractParser<Command> implements CommandParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCommandParser.class);
 
     private final BehaviorParser behaviorParser;
 
     public DefaultCommandParser(BehaviorParser behaviorParser) {
+        super(Command.class);
         this.behaviorParser = behaviorParser;
     }
 
@@ -85,22 +83,5 @@ public class DefaultCommandParser implements CommandParser, SupportsCustom<Comma
             aliases = Resolver.identity(Collections.emptyList());
         }
         return aliases;
-    }
-
-    private static String getDebugString(String type, I18NString string) {
-        return BooleanUtils.isTrue(string.isI18N()) ?
-                type + " From Key: " + string.getValue() :
-                type + ": " + string.getValue();
-    }
-
-    private static Resolver<String> fromI18NString(I18NString string) {
-        return BooleanUtils.isTrue(string.isI18N()) ?
-                new I18NResolver(string.getValue()) :
-                Resolver.identity(string.getValue());
-    }
-
-    @Override
-    public Class<Command> getParsedClass() {
-        return Command.class;
     }
 }

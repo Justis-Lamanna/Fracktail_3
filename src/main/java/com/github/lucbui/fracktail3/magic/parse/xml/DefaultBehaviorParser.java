@@ -8,12 +8,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultBehaviorParser implements BehaviorParser, SupportsCustom<Behavior> {
+public class DefaultBehaviorParser extends AbstractParser<Behavior> implements BehaviorParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBehaviorParser.class);
 
     private final ActionParser actionParser;
 
     public DefaultBehaviorParser(ActionParser actionParser) {
+        super(Behavior.class);
         this.actionParser = actionParser;
     }
 
@@ -80,10 +81,5 @@ public class DefaultBehaviorParser implements BehaviorParser, SupportsCustom<Beh
             LOGGER.debug("Behavior accepts between {} and {} params", start, range.getMax());
             return Range.fromTo(start, Integer.parseInt(range.getMax()));
         }
-    }
-
-    @Override
-    public Class<Behavior> getParsedClass() {
-        return Behavior.class;
     }
 }

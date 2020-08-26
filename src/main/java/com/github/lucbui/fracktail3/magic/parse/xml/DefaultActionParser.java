@@ -4,18 +4,19 @@ import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.action.RandomAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.SequenceAction;
-import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
-import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.*;
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultActionParser implements ActionParser, SupportsCustom<Action> {
+public class DefaultActionParser extends AbstractParser<Action> implements ActionParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultActionParser.class);
+
+    public DefaultActionParser() {
+        super(Action.class);
+    }
 
     @Override
     public Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {
@@ -56,22 +57,5 @@ public class DefaultActionParser implements ActionParser, SupportsCustom<Action>
                 .collect(Collectors.toList());
         LOGGER.debug("Sequence Actions Complete");
         return new SequenceAction(actions);
-    }
-
-    private static String getDebugString(String type, I18NString string) {
-        return BooleanUtils.isTrue(string.isI18N()) ?
-                type + " From Key: " + string.getValue() :
-                type + ": " + string.getValue();
-    }
-
-    private static Resolver<String> fromI18NString(I18NString string) {
-        return BooleanUtils.isTrue(string.isI18N()) ?
-                new I18NResolver(string.getValue()) :
-                Resolver.identity(string.getValue());
-    }
-
-    @Override
-    public Class<Action> getParsedClass() {
-        return Action.class;
     }
 }

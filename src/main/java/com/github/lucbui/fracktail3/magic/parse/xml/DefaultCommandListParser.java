@@ -13,12 +13,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultCommandListParser implements CommandListParser, SupportsCustom<CommandList>{
+public class DefaultCommandListParser extends AbstractParser<CommandList> implements CommandListParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCommandListParser.class);
 
     private final CommandParser commandParser;
 
     public DefaultCommandListParser(CommandParser commandParser) {
+        super(CommandList.class);
         this.commandParser = commandParser;
     }
 
@@ -59,10 +60,5 @@ public class DefaultCommandListParser implements CommandListParser, SupportsCust
             bot.getRolesets().flatMap(r -> r.getRoleset(b.getRole()))
                     .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getName() + " contains unknown role " + b.getRole()));
         }
-    }
-
-    @Override
-    public Class<CommandList> getParsedClass() {
-        return CommandList.class;
     }
 }
