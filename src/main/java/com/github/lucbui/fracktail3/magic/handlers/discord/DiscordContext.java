@@ -43,18 +43,19 @@ public class DiscordContext extends CommandContext {
     }
 
     @Override
-    public Map<String, String> getVariableMap() {
-        Map<String, String> map = super.getVariableMap();
-        map.put(USERNAME, message.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY));
+    public Map<String, Object> getVariableMap() {
+        Map<String, Object> map = super.getVariableMap();
+        String username = message.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY);
+        map.put(USERNAME, username);
         map.put(NICKNAME, message.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
-        map.put(NAME, message.getMember().map(Member::getDisplayName).orElse(map.get("username")));
+        map.put(NAME, message.getMember().map(Member::getDisplayName).orElse(username));
         map.put(LOCALE, locale.getDisplayName());
 
         return map;
     }
 
-    public Mono<Map<String, String>> getExtendedVariableMap() {
-        Map<String, String> map = this.getVariableMap();
+    public Mono<Map<String, Object>> getExtendedVariableMap() {
+        Map<String, Object> map = this.getVariableMap();
         return Mono.just(map)
                 .zipWith(message.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator(SELF))
                 .zipWith(message.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator(GUILD));
@@ -64,7 +65,7 @@ public class DiscordContext extends CommandContext {
         return StringUtils.containsAny(msg, "{" + SELF, "{" + GUILD);
     }
 
-    private <T> BiFunction<Map<String, String>, String, Map<String, String>> mapCombinator(String name) {
+    private <T> BiFunction<Map<String, Object>, String, Map<String, Object>> mapCombinator(String name) {
         return (map, input) -> {
             if(StringUtils.isNotEmpty(input)) {
                 map.put(name, input);

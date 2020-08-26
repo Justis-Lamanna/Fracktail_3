@@ -28,7 +28,7 @@ public class DefaultBotParser implements BotParser {
         rolesetParser = new RolesetParser();
     }
 
-    protected DefaultBotParser(
+    public DefaultBotParser(
             ExpressionParser expressionParser,
             ConfigParser configParser,
             CommandListParser commandListParser,

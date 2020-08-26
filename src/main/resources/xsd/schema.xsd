@@ -186,6 +186,14 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="sequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="action" type="tns:DTDAction" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="custom" type="DTDCustomClass"/>
         </xs:choice>
     </xs:complexType>
 
@@ -195,6 +203,16 @@
                 <xs:attribute name="weight" type="xs:float" default="1.0"/>
             </xs:extension>
         </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DTDCustomClass">
+        <xs:choice>
+            <xs:element name="spring" type="xs:string"/>
+            <xs:sequence>
+                <xs:element name="class" type="xs:string"/>
+                <xs:element name="method" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="DTDDiscordConfiguration" >

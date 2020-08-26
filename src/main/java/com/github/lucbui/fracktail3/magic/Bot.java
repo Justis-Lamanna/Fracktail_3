@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,8 @@ public class Bot {
     private DiscordConfiguration discordConfig;
     private DiscordHandler discordHandler;
     private Rolesets rolesets;
+
+    private transient DiscordClient discordClient;
 
     public Optional<GlobalConfiguration> getGlobalConfiguration() {
         return Optional.ofNullable(globalConfig);
@@ -66,7 +69,7 @@ public class Bot {
     public Mono<Boolean> start() {
         List<Mono<Boolean>> starters = new ArrayList<>();
         if(discordConfig != null) {
-            DiscordClient discordClient = new DiscordClientBuilder(discordConfig.getToken())
+            discordClient = new DiscordClientBuilder(discordConfig.getToken())
                     .setInitialPresence(discordConfig.getPresence())
                     .build();
 
@@ -81,6 +84,21 @@ public class Bot {
             throw new BotConfigurationException("No specific Bot Configurations specified.");
         }
         return Flux.merge(starters)
-                .then(Mono.just(true));
+                .last()
+                .thenReturn(true);
+    }
+
+    public Mono<Boolean> stop() {
+        List<Mono<Boolean>> starters = new ArrayList<>();
+        if(discordClient != null) {
+            starters.add(discordClient.logout().thenReturn(true));
+        }
+        return Flux.merge(starters)
+                .last()
+                .thenReturn(true);
+    }
+
+    public Mono<Boolean> restart(Duration duration) {
+        return stop().delayElement(duration).then(start());
     }
 }

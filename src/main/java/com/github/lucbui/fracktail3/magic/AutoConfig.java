@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.parse.xml.DefaultBotParser;
-import com.github.lucbui.fracktail3.magic.parse.xml.spring.SpringExpressionResolver;
+import com.github.lucbui.fracktail3.magic.parse.xml.*;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.ObjectFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -55,10 +53,13 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public DefaultBotParser botParser(Environment environment) {
-        DefaultBotParser parser = new DefaultBotParser();
-        parser.setExpressionParser(new SpringExpressionResolver(environment));
-        return parser;
+    public DefaultBotParser botParser(ExpressionParser expressionParser, CommandListParser commandListParser) {
+        return new DefaultBotParser(
+                expressionParser,
+                new DefaultConfigParser(expressionParser),
+                commandListParser,
+                new RolesetParser()
+        );
     }
 
     @Bean
