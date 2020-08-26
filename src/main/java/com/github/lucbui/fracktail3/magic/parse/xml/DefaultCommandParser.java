@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
@@ -8,6 +9,7 @@ import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDCommand;
+import com.github.lucbui.fracktail3.xsd.DTDCustomClass;
 import com.github.lucbui.fracktail3.xsd.I18NString;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultCommandParser implements CommandParser {
+public class DefaultCommandParser implements CommandParser, SupportsCustom<Command> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCommandParser.class);
 
     private final BehaviorParser behaviorParser;
@@ -39,20 +41,50 @@ public class DefaultCommandParser implements CommandParser {
 
     @Override
     public Command fromXml(DTDBot xml, DTDCommand command) {
+        if(command.getCustom() != null) {
+            DTDCustomClass customClass = command.getCustom();
+            if(customClass.getClazz() != null) {
+                return getFromClassElement(customClass.getClazz(), customClass.getMethod());
+            } else if(customClass.getSpring() != null) {
+                return getCustomCommandBySpringBean(customClass.getSpring());
+            }
+            throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
+        } else {
+            return getCommandFromXml(xml, command);
+        }
+    }
+
+    protected Command getCommandFromXml(DTDBot xml, DTDCommand command) {
         Resolver<String> name = fromI18NString(command.getName());
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(getDebugString("Name", command.getName()));
         }
 
+        Resolver<List<String>> aliases = getAliasResolver(command);
+
+        String role = command.getRole() == null ? null : command.getRole().getValue();
+
+        List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
+                .map(s -> behaviorParser.fromXml(xml, command, s))
+                .collect(Collectors.toList());
+        if (command.getBehaviors().getOrElse() != null) {
+            return new Command(name, aliases, role, behaviors,
+                    getActionParser().fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
+        } else {
+            return new Command(name, aliases, role, behaviors, null);
+        }
+    }
+
+    protected Resolver<List<String>> getAliasResolver(DTDCommand command) {
         Resolver<List<String>> aliases;
-        if(StringUtils.isNotBlank(command.getAliasesFrom())) {
+        if (StringUtils.isNotBlank(command.getAliasesFrom())) {
             aliases = new ListFromI18NResolver(command.getAliasesFrom());
             LOGGER.debug("Aliases From Key: {}", command.getAliasesFrom());
-        } else if(command.getAliases() != null){
+        } else if (command.getAliases() != null) {
             aliases = command.getAliases().getAlias().stream()
                     .map(DefaultCommandParser::fromI18NString)
                     .collect(Collectors.collectingAndThen(Collectors.toList(), CompositeResolver::new));
-            if(LOGGER.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(command.getAliases().getAlias().stream()
                         .map(i18n -> getDebugString("Alias", i18n))
                         .collect(Collectors.joining(",")));
@@ -60,18 +92,11 @@ public class DefaultCommandParser implements CommandParser {
         } else {
             aliases = Resolver.identity(Collections.emptyList());
         }
+        return aliases;
+    }
 
-        String role = command.getRole() == null ? null : command.getRole().getValue();
-
-        List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
-                .map(s -> behaviorParser.fromXml(xml, command, s))
-                .collect(Collectors.toList());
-        if(command.getBehaviors().getOrElse() != null) {
-            return new Command(name, aliases, role, behaviors,
-                    getActionParser().fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
-        } else {
-            return new Command(name, aliases, role, behaviors, null);
-        }
+    protected Command getCustomCommandBySpringBean(String spring) {
+        throw new BotConfigurationException("Spring bean commands are not permitted");
     }
 
     private static String getDebugString(String type, I18NString string) {
@@ -84,5 +109,10 @@ public class DefaultCommandParser implements CommandParser {
         return BooleanUtils.isTrue(string.isI18N()) ?
                 new I18NResolver(string.getValue()) :
                 Resolver.identity(string.getValue());
+    }
+
+    @Override
+    public Class<Command> getParsedClass() {
+        return Command.class;
     }
 }
