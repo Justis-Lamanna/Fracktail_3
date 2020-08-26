@@ -57,11 +57,9 @@
             <name>sleep</name>
             <behaviors>
                 <behavior>
-                    <action>
-                        <custom>
-                            <spring>sleep</spring>
-                        </custom>
-                    </action>
+                    <custom>
+                        <spring>sleep</spring>
+                    </custom>
                 </behavior>
             </behaviors>
         </command>

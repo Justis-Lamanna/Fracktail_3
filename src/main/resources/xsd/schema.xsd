@@ -153,11 +153,14 @@
     </xs:complexType>
 
     <xs:complexType name="DTDBehavior">
-        <xs:sequence>
-            <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
-            <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
-            <xs:element name="action" type="tns:DTDAction"/>
-        </xs:sequence>
+        <xs:choice>
+            <xs:element name="custom" type="tns:DTDCustomClass"/>
+            <xs:sequence>
+                <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
+                <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+                <xs:element name="action" type="tns:DTDAction"/>
+            </xs:sequence>
+        </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="DTDElseBehavior">

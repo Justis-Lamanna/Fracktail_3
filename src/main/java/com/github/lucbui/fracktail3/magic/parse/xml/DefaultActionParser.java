@@ -9,17 +9,13 @@ import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.*;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultActionParser implements ActionParser {
+public class DefaultActionParser implements ActionParser, SupportsCustom<Action> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultActionParser.class);
 
     @Override
@@ -65,54 +61,15 @@ public class DefaultActionParser implements ActionParser {
 
     protected Action getCustomAction(DTDCustomClass custom) {
         if(custom.getClazz() != null) {
-            return getCustomActionByClassElement(custom.getClazz(), custom.getMethod());
+            return getFromClassElement(custom.getClazz(), custom.getMethod());
         } else if(custom.getSpring() != null) {
             return getCustomActionBySpringBean(custom.getSpring());
         }
-        throw new BotConfigurationException("Custom actions must be specified by <class> element");
+        throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
     }
 
     protected Action getCustomActionBySpringBean(String spring) {
         throw new BotConfigurationException("Spring bean actions are not permitted");
-    }
-
-    protected Action getCustomActionByClassElement(String className, String methodName) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            if(StringUtils.isEmpty(methodName)) {
-                return getCustomActionByClass(clazz);
-            } else {
-                return getCustomActionByStaticMethod(clazz, methodName);
-            }
-        } catch (ClassNotFoundException e) {
-            throw new BotConfigurationException("Unknown class " + className, e);
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new BotConfigurationException("Unable to instantiate class type " + className, e);
-        } catch (NoSuchMethodException e) {
-            throw new BotConfigurationException("Unknown zero-param method " + className + "." + methodName, e);
-        } catch (InvocationTargetException e) {
-            throw new BotConfigurationException("Unable to invoke method " + className + "." + methodName, e);
-        }
-    }
-
-    protected Action getCustomActionByClass(Class<?> clazz) throws InstantiationException, IllegalAccessException {
-        if(!Action.class.isAssignableFrom(clazz)) {
-            throw new BotConfigurationException("Class " + clazz + " is not a subtype of Action");
-        }
-        LOGGER.debug("Instantiating Action by creating a new instance of class {}", clazz.getCanonicalName());
-        return (Action) clazz.newInstance();
-    }
-
-    protected Action getCustomActionByStaticMethod(Class<?> clazz, String methodName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method method = clazz.getMethod(methodName);
-        if(!Modifier.isStatic(method.getModifiers())) {
-            throw new BotConfigurationException("Method " + clazz.getCanonicalName() + "." + methodName + " is not static");
-        }
-        if(!Action.class.isAssignableFrom(method.getReturnType())) {
-            throw new BotConfigurationException("Return type " + method.getReturnType() + " is not a subtype of Action");
-        }
-        LOGGER.debug("Instantiating Action by invoking {}", method.getName());
-        return (Action) method.invoke(null);
     }
 
     private static String getDebugString(String type, I18NString string) {
@@ -125,5 +82,10 @@ public class DefaultActionParser implements ActionParser {
         return BooleanUtils.isTrue(string.isI18N()) ?
                 new I18NResolver(string.getValue()) :
                 Resolver.identity(string.getValue());
+    }
+
+    @Override
+    public Class<Action> getParsedClass() {
+        return Action.class;
     }
 }
