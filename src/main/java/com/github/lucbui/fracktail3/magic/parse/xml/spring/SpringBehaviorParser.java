@@ -30,7 +30,7 @@ public class SpringBehaviorParser extends DefaultBehaviorParser implements Appli
     }
 
     @Override
-    protected Behavior getCustomBehaviorBySpringBean(String spring) {
+    public Behavior getFromSpringBean(String spring) {
         try {
             LOGGER.debug("Creating Behavior by retrieving bean {}", spring);
             return applicationContext.getBean(spring, Behavior.class);

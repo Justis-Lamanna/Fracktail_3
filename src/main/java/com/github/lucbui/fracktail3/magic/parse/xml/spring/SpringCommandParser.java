@@ -30,7 +30,7 @@ public class SpringCommandParser extends DefaultCommandParser implements Applica
     }
 
     @Override
-    protected Command getCustomCommandBySpringBean(String spring){
+    public Command getFromSpringBean(String spring){
         try {
             LOGGER.debug("Creating Command by retrieving bean {}", spring);
             return applicationContext.getBean(spring, Command.class);

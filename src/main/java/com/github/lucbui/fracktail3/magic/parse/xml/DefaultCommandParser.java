@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
@@ -9,7 +8,6 @@ import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDCommand;
-import com.github.lucbui.fracktail3.xsd.DTDCustomClass;
 import com.github.lucbui.fracktail3.xsd.I18NString;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,13 +40,7 @@ public class DefaultCommandParser implements CommandParser, SupportsCustom<Comma
     @Override
     public Command fromXml(DTDBot xml, DTDCommand command) {
         if(command.getCustom() != null) {
-            DTDCustomClass customClass = command.getCustom();
-            if(customClass.getClazz() != null) {
-                return getFromClassElement(customClass.getClazz(), customClass.getMethod());
-            } else if(customClass.getSpring() != null) {
-                return getCustomCommandBySpringBean(customClass.getSpring());
-            }
-            throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
+            return getFromCustom(command.getCustom());
         } else {
             return getCommandFromXml(xml, command);
         }
@@ -93,10 +85,6 @@ public class DefaultCommandParser implements CommandParser, SupportsCustom<Comma
             aliases = Resolver.identity(Collections.emptyList());
         }
         return aliases;
-    }
-
-    protected Command getCustomCommandBySpringBean(String spring) {
-        throw new BotConfigurationException("Spring bean commands are not permitted");
     }
 
     private static String getDebugString(String type, I18NString string) {

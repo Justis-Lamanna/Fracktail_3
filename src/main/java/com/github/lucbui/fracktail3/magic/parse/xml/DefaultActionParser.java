@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.action.RandomAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
@@ -30,7 +29,7 @@ public class DefaultActionParser implements ActionParser, SupportsCustom<Action>
             return getSequenceAction(xml, command, behavior, action.getSequence());
         }
         if(action.getCustom() != null) {
-            return getCustomAction(action.getCustom());
+            return getFromCustom(action.getCustom());
         }
         return null;
     }
@@ -57,19 +56,6 @@ public class DefaultActionParser implements ActionParser, SupportsCustom<Action>
                 .collect(Collectors.toList());
         LOGGER.debug("Sequence Actions Complete");
         return new SequenceAction(actions);
-    }
-
-    protected Action getCustomAction(DTDCustomClass custom) {
-        if(custom.getClazz() != null) {
-            return getFromClassElement(custom.getClazz(), custom.getMethod());
-        } else if(custom.getSpring() != null) {
-            return getCustomActionBySpringBean(custom.getSpring());
-        }
-        throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
-    }
-
-    protected Action getCustomActionBySpringBean(String spring) {
-        throw new BotConfigurationException("Spring bean actions are not permitted");
     }
 
     private static String getDebugString(String type, I18NString string) {

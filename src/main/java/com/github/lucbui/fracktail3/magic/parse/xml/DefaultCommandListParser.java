@@ -6,13 +6,14 @@ import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
+import com.github.lucbui.fracktail3.xsd.DTDCommandList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DefaultCommandListParser implements CommandListParser {
+public class DefaultCommandListParser implements CommandListParser, SupportsCustom<CommandList>{
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCommandListParser.class);
 
     private final CommandParser commandParser;
@@ -23,12 +24,21 @@ public class DefaultCommandListParser implements CommandListParser {
 
     @Override
     public CommandList fromXml(Bot bot, DTDBot xml) {
+        DTDCommandList commandList = xml.getCommands();
+        if(commandList.getCustom() != null) {
+            return getFromCustom(commandList.getCustom());
+        } else {
+            return getCommandListFromXml(bot, xml);
+        }
+    }
+
+    protected CommandList getCommandListFromXml(Bot bot, DTDBot xml) {
         LOGGER.debug("Parsing command list");
         List<Command> commands = xml.getCommands().getCommand().stream()
                 .map(dtdCommand -> commandParser.fromXml(xml, dtdCommand))
                 .collect(Collectors.toList());
         commands.forEach(c -> validateCommand(bot, c));
-        if(xml.getCommands().getOrElse() != null) {
+        if (xml.getCommands().getOrElse() != null) {
             return new CommandList(commands, commandParser.getActionParser()
                     .fromXml(xml, null, null, xml.getCommands().getOrElse().getAction()));
         } else {
@@ -49,5 +59,10 @@ public class DefaultCommandListParser implements CommandListParser {
             bot.getRolesets().flatMap(r -> r.getRoleset(b.getRole()))
                     .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getName() + " contains unknown role " + b.getRole()));
         }
+    }
+
+    @Override
+    public Class<CommandList> getParsedClass() {
+        return CommandList.class;
     }
 }

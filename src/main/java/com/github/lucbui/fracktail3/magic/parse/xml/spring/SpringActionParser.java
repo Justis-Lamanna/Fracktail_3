@@ -23,7 +23,7 @@ public class SpringActionParser extends DefaultActionParser implements Applicati
     }
 
     @Override
-    protected Action getCustomActionBySpringBean(String spring) {
+    public Action getFromSpringBean(String spring) {
         try {
             LOGGER.debug("Creating Action by retrieving bean {}", spring);
             return applicationContext.getBean(spring, Action.class);

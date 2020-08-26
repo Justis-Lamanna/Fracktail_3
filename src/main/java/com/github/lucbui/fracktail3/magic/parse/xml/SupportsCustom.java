@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.xsd.DTDCustomClass;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +10,15 @@ import java.lang.reflect.Modifier;
 
 public interface SupportsCustom<T> {
     Class<T> getParsedClass();
+
+    default T getFromCustom(DTDCustomClass custom) {
+        if(custom.getClazz() != null) {
+            return getFromClassElement(custom.getClazz(), custom.getMethod());
+        } else if(custom.getSpring() != null) {
+            return getFromSpringBean(custom.getSpring());
+        }
+        throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
+    }
 
     default T getFromClassElement(String className, String methodName) {
         try {
@@ -45,5 +55,9 @@ public interface SupportsCustom<T> {
             throw new BotConfigurationException("Return type " + method.getReturnType() + " is not a subtype of " + clazz.getCanonicalName());
         }
         return (T) method.invoke(null);
+    }
+
+    default T getFromSpringBean(String spring) {
+        throw new BotConfigurationException("Spring bean " + getClass().getSimpleName() + " are not permitted");
     }
 }

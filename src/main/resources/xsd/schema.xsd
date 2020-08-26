@@ -121,10 +121,13 @@
     </xs:complexType>
 
     <xs:complexType name="DTDCommandList">
-        <xs:sequence>
-            <xs:element name="command" type="tns:DTDCommand" maxOccurs="unbounded"/>
-            <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
-        </xs:sequence>
+        <xs:choice>
+            <xs:element name="custom" type="tns:DTDCustomClass"/>
+            <xs:sequence>
+                <xs:element name="command" type="tns:DTDCommand" maxOccurs="unbounded"/>
+                <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
+            </xs:sequence>
+        </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="DTDCommand">

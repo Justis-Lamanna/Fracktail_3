@@ -25,20 +25,10 @@ public class DefaultBehaviorParser implements BehaviorParser, SupportsCustom<Beh
     @Override
     public Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
         if(behavior.getCustom() != null) {
-            DTDCustomClass customClass = behavior.getCustom();
-            if(customClass.getClazz() != null) {
-                return getFromClassElement(customClass.getClazz(), customClass.getMethod());
-            } else if(customClass.getSpring() != null) {
-                return getCustomBehaviorBySpringBean(customClass.getSpring());
-            }
-            throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
+            return getFromCustom(behavior.getCustom());
         } else {
             return getBehaviorFromXml(xml, command, behavior);
         }
-    }
-
-    protected Behavior getCustomBehaviorBySpringBean(String spring) {
-        throw new BotConfigurationException("Spring bean behaviors are not permitted");
     }
 
     protected Behavior getBehaviorFromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
