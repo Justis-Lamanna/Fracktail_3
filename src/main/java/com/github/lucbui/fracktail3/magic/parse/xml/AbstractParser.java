@@ -7,10 +7,6 @@ import com.github.lucbui.fracktail3.xsd.DTDCustomClass;
 import com.github.lucbui.fracktail3.xsd.I18NString;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -76,18 +72,6 @@ public class AbstractParser<T> implements Parser<T> {
 
     protected T getFromSpringBean(String spring) {
         throw new BotConfigurationException("Spring bean " + parsedClass + " are not permitted");
-    }
-
-    protected T getFromSpringBean(BeanFactory beanFactory, String beanName) {
-        try {
-            return beanFactory.getBean(beanName, parsedClass);
-        } catch (NoSuchBeanDefinitionException e) {
-            throw new BotConfigurationException("No bean with name " + beanName, e);
-        } catch (BeanNotOfRequiredTypeException e) {
-            throw new BotConfigurationException("Bean " + beanName + " is not of type " + parsedClass, e);
-        } catch (BeansException e) {
-            throw new BotConfigurationException("Bean " + beanName + " could not be created", e);
-        }
     }
 
     protected static String getDebugString(String type, I18NString string) {

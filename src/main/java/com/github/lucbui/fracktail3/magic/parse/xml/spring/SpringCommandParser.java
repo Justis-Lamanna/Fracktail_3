@@ -29,6 +29,6 @@ public class SpringCommandParser extends DefaultCommandParser implements Applica
     @Override
     public Command getFromSpringBean(String spring){
         LOGGER.debug("Creating Command by retrieving bean {}", spring);
-        return getFromSpringBean(applicationContext, spring);
+        return SpringUtils.getFromSpringBean(applicationContext, spring, Command.class);
     }
 }

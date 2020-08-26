@@ -29,6 +29,6 @@ public class SpringBehaviorParser extends DefaultBehaviorParser implements Appli
     @Override
     public Behavior getFromSpringBean(String spring) {
         LOGGER.debug("Creating Behavior by retrieving bean {}", spring);
-        return getFromSpringBean(applicationContext, spring);
+        return SpringUtils.getFromSpringBean(applicationContext, spring, Behavior.class);
     }
 }

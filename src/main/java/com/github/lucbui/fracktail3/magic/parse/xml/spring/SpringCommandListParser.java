@@ -29,6 +29,6 @@ public class SpringCommandListParser extends DefaultCommandListParser implements
     @Override
     public CommandList getFromSpringBean(String spring){
         LOGGER.debug("Creating CommandList by retrieving bean {}", spring);
-        return getFromSpringBean(applicationContext, spring);
+        return SpringUtils.getFromSpringBean(applicationContext, spring, CommandList.class);
     }
 }
