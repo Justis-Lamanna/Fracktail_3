@@ -22,6 +22,18 @@ public class Behavior {
         this.action = action;
     }
 
+    public Behavior(Range paramCount, Action action) {
+        this(paramCount, action, null);
+    }
+
+    public Behavior(int paramCount, Action action) {
+        this(Range.single(paramCount), action);
+    }
+
+    public Behavior(Action action) {
+        this(Range.unbounded(), action);
+    }
+
     public Range getParamCount() {
         return paramCount;
     }
