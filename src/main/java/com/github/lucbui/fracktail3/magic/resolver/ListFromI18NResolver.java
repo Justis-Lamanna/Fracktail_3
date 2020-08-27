@@ -6,10 +6,15 @@ import java.util.*;
 
 public class ListFromI18NResolver implements Resolver<List<String>> {
     private static final String DELIMITER = ",";
+
     private final String key;
 
     public ListFromI18NResolver(String key) {
         this.key = key;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     @Override

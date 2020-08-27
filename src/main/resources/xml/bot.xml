@@ -53,15 +53,5 @@
                 </behavior>
             </behaviors>
         </command>
-        <command>
-            <name>sleep</name>
-            <behaviors>
-                <behavior>
-                    <custom>
-                        <spring>sleep</spring>
-                    </custom>
-                </behavior>
-            </behaviors>
-        </command>
     </commands>
 </bot>

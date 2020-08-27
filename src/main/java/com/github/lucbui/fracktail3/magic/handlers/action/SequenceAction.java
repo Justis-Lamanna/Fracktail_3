@@ -15,6 +15,10 @@ public class SequenceAction implements Action {
         this.subActions = subActions;
     }
 
+    public List<Action> getSubActions() {
+        return subActions;
+    }
+
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
         return Flux.fromIterable(subActions)

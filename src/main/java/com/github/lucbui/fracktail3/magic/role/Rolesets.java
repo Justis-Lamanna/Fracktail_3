@@ -11,6 +11,10 @@ public class Rolesets {
         this.rolesets = Collections.unmodifiableMap(rolesets);
     }
 
+    public Map<String, Roleset> getRolesets() {
+        return rolesets;
+    }
+
     public Optional<Roleset> getRoleset(String name) {
         return Optional.ofNullable(rolesets.get(name));
     }

@@ -16,6 +16,10 @@ public class IdentityResolver<T> implements Resolver<T> {
         return returned;
     }
 
+    public T getReturned() {
+        return returned;
+    }
+
     @Override
     public String toString() {
         return "IdentityResolver{" +

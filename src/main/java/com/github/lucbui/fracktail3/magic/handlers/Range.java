@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.OptionalInt;
 
 public class Range {
@@ -39,6 +41,7 @@ public class Range {
         return isUnbounded() ? OptionalInt.empty() : OptionalInt.of(end);
     }
 
+    @JsonIgnore
     public boolean isUnbounded() {
         return end == -1;
     }

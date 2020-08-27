@@ -14,6 +14,10 @@ public class CompositeResolver<T> implements Resolver<List<T>> {
         this.resolvers = resolvers;
     }
 
+    public List<? extends Resolver<? extends T>> getResolvers() {
+        return resolvers;
+    }
+
     @Override
     public List<T> resolve(Config configuration, Locale locale) {
         return resolvers.stream()

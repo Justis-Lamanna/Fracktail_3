@@ -35,6 +35,10 @@ public class CommandListDiscordHandler implements DiscordHandler {
         this.commandList = commandList;
     }
 
+    public CommandList getCommandList() {
+        return commandList;
+    }
+
     @Override
     public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, MessageCreateEvent event) {
         if(event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
@@ -111,12 +115,6 @@ public class CommandListDiscordHandler implements DiscordHandler {
             }
         }
         return Optional.empty();
-    }
-
-    private static class Help {
-        Command command;
-        String name;
-        String normalized;
     }
 
     private String[] parseParameters(String paramString) {

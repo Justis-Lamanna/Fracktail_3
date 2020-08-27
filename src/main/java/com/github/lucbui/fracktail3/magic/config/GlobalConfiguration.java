@@ -4,11 +4,15 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class GlobalConfiguration implements Config{
-    private String i18nPath;
+public class GlobalConfiguration implements Config {
+    private final String i18nPath;
 
     public GlobalConfiguration(String i18nPath) {
         this.i18nPath = i18nPath;
+    }
+
+    public String getI18nPath() {
+        return i18nPath;
     }
 
     public boolean hasI18nEnabled() {

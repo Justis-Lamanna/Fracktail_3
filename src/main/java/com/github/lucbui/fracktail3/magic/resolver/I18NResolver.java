@@ -20,6 +20,14 @@ public class I18NResolver implements Resolver<String> {
         this.defaultValue = defaultValue;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
     @Override
     public String resolve(Config configuration, Locale locale) {
         Optional<String> candidate = configuration.getTextForKey(key, locale);
