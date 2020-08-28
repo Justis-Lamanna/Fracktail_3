@@ -1,9 +1,10 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.role.Roleset;
+import com.github.lucbui.fracktail3.magic.utils.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,22 +47,22 @@ public class Behavior {
         return action;
     }
 
-    public Mono<Boolean> matchesRole(Bot bot, CommandContext context) {
+    public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
         if(hasRoleRestriction()) {
-            Roleset roleset = bot.getRoleset(role)
+            Roleset roleset = botSpec.getRoleset(role)
                     .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
-            return roleset.validateInRole(bot, context);
+            return roleset.validateInRole(botSpec, context);
         }
         return Mono.just(true);
     }
 
-    public Mono<Boolean> matchesParameterCount(Bot bot, CommandContext context) {
+    public Mono<Boolean> matchesParameterCount(BotSpec botSpec, CommandContext context) {
         return Mono.just(paramCount.isInside(context.getNormalizedParameters().length));
     }
 
-    public Mono<Void> doAction(Bot bot, CommandContext context){
+    public Mono<Void> doAction(BotSpec botSpec, CommandContext context){
         LOGGER.info("Performing action: {}", action);
-        return action.doAction(bot, context);
+        return action.doAction(botSpec, context);
     }
 
     public boolean hasRoleRestriction() {

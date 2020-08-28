@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.role;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
 import discord4j.core.object.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,7 +34,7 @@ public class DefaultDiscordRolesetValidator implements DiscordRolesetValidator {
         this.legalRoles = legalRoles;
     }
 
-    public Mono<Boolean> validateInDiscordRole(Bot bot, DiscordContext ctx) {
+    public Mono<Boolean> validateInDiscordRole(BotSpec botSpec, DiscordContext ctx) {
         if(CollectionUtils.isEmpty(legalSnowflakes) && CollectionUtils.isEmpty(legalRoles)) {
             return Mono.just(true);
         }

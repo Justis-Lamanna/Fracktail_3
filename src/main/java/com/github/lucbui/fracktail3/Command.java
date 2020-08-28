@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
-import com.github.lucbui.fracktail3.magic.handlers.Range;
+import com.github.lucbui.fracktail3.magic.utils.Range;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
-import com.github.lucbui.fracktail3.magic.handlers.Range;
+import com.github.lucbui.fracktail3.magic.utils.Range;
 import com.github.lucbui.fracktail3.xsd.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

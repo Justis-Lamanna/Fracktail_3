@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
@@ -80,22 +80,22 @@ public class Command {
         return orElse;
     }
 
-    public Mono<Boolean> matchesRole(Bot bot, CommandContext context) {
+    public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
         if(hasRoleRestriction()) {
-            Roleset roleset = bot.getRoleset(role)
+            Roleset roleset = botSpec.getRoleset(role)
                     .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
-            return roleset.validateInRole(bot, context);
+            return roleset.validateInRole(botSpec, context);
         }
         return Mono.just(true);
     }
 
-    public Mono<Void> doAction(Bot bot, CommandContext context) {
+    public Mono<Void> doAction(BotSpec botSpec, CommandContext context) {
         return Flux.fromIterable(behaviors)
-                .filterWhen(b -> b.matchesRole(bot, context))
-                .filterWhen(b -> b.matchesParameterCount(bot, context))
+                .filterWhen(b -> b.matchesRole(botSpec, context))
+                .filterWhen(b -> b.matchesParameterCount(botSpec, context))
                 .next()
-                .flatMap(behavior -> behavior.doAction(bot, context).thenReturn(true))
-                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(bot, context).thenReturn(true))
+                .flatMap(behavior -> behavior.doAction(botSpec, context).thenReturn(true))
+                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(botSpec, context).thenReturn(true))
                 .then();
     }
 

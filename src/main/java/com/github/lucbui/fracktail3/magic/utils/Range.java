@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -1,104 +1,48 @@
 package com.github.lucbui.fracktail3.magic;
 
-import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordHandler;
-import com.github.lucbui.fracktail3.magic.role.Roleset;
-import com.github.lucbui.fracktail3.magic.role.Rolesets;
-import discord4j.core.DiscordClient;
-import discord4j.core.DiscordClientBuilder;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.lucbui.fracktail3.magic.handlers.PlatformHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class Bot {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bot.class);
+    private final BotSpec botSpec;
+    private final List<PlatformHandler> platformHandlers;
 
-    private GlobalConfiguration globalConfig;
-    private DiscordConfiguration discordConfig;
-    private DiscordHandler discordHandler;
-    private Rolesets rolesets;
-
-    private transient DiscordClient discordClient;
-
-    public Optional<GlobalConfiguration> getGlobalConfiguration() {
-        return Optional.ofNullable(globalConfig);
+    public Bot(BotSpec botSpec, PlatformHandler... handlers) {
+        this.botSpec = botSpec;
+        this.platformHandlers = new ArrayList<>(Arrays.asList(handlers));
     }
 
-    public void setGlobalConfig(@Nullable GlobalConfiguration globalConfig) {
-        this.globalConfig = globalConfig;
+    public Bot addPlatformHandler(PlatformHandler handler) {
+        platformHandlers.add(handler);
+        return this;
     }
 
-    public Optional<DiscordConfiguration> getDiscordConfiguration() {
-        return Optional.ofNullable(discordConfig);
-    }
-
-    public void setDiscordConfig(@Nullable DiscordConfiguration discordConfig) {
-        this.discordConfig = discordConfig;
-    }
-
-    public Optional<DiscordHandler> getDiscordHandler() {
-        return Optional.ofNullable(discordHandler);
-    }
-
-    public void setDiscordHandler(@Nullable DiscordHandler discordHandler) {
-        this.discordHandler = discordHandler;
-    }
-
-    public Optional<Rolesets> getRolesets() {
-        return Optional.ofNullable(rolesets);
-    }
-
-    public Optional<Roleset> getRoleset(String name) {
-        return getRolesets().flatMap(r -> r.getRoleset(name));
-    }
-
-    public void setRolesets(@Nullable Rolesets rolesets) {
-        this.rolesets = rolesets;
+    public BotSpec getBotSpec() {
+        return botSpec;
     }
 
     public Mono<Boolean> start() {
-        List<Mono<Boolean>> starters = new ArrayList<>();
-        if(discordConfig != null) {
-            discordClient = new DiscordClientBuilder(discordConfig.getToken())
-                    .setInitialPresence(discordConfig.getPresence())
-                    .build();
-
-            discordClient.getEventDispatcher().on(MessageCreateEvent.class)
-                    .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                    .flatMap(msg -> discordHandler.execute(this, this.discordConfig, msg))
-                    .subscribe();
-
-            starters.add(discordClient.login().thenReturn(true));
+        if(CollectionUtils.isEmpty(platformHandlers)) {
+            throw new BotConfigurationException("No Handlers specified");
         }
-        if(starters.isEmpty()) {
-            throw new BotConfigurationException("No specific Bot Configurations specified.");
-        }
-        return Flux.merge(starters)
-                .last()
-                .thenReturn(true);
+        return Flux.fromIterable(platformHandlers)
+                .flatMap(handler -> handler.start(botSpec))
+                .last().thenReturn(true);
     }
 
     public Mono<Boolean> stop() {
-        List<Mono<Boolean>> starters = new ArrayList<>();
-        if(discordClient != null) {
-            starters.add(discordClient.logout().thenReturn(true));
+        if(platformHandlers.isEmpty()) {
+            throw new BotConfigurationException("No Handlers specified");
         }
-        return Flux.merge(starters)
-                .last()
-                .thenReturn(true);
-    }
-
-    public Mono<Boolean> restart(Duration duration) {
-        return stop().delayElement(duration).then(start());
+        return Flux.fromIterable(platformHandlers)
+                .flatMap(handler -> handler.stop(botSpec))
+                .last().thenReturn(true);
     }
 }

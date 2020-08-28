@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
@@ -21,8 +21,8 @@ public class RandomAction implements Action {
     }
 
     @Override
-    public Mono<Void> doAction(Bot bot, CommandContext context) {
-        return actions.sample().doAction(bot, context);
+    public Mono<Void> doAction(BotSpec botSpec, CommandContext context) {
+        return actions.sample().doAction(botSpec, context);
     }
 
     public static class Builder {

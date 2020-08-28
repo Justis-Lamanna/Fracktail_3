@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.handlers.discord.CommandListDiscordHandler;
 import com.github.lucbui.fracktail3.magic.role.Rolesets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import org.slf4j.Logger;
@@ -43,11 +42,6 @@ public class DefaultBotParser implements BotParser {
         return expressionParser;
     }
 
-    public void setExpressionParser(ExpressionParser expressionParser) {
-        this.expressionParser = expressionParser;
-        this.configParser = new DefaultConfigParser(expressionParser);
-    }
-
     public CommandListParser getCommandListParser() {
         return commandListParser;
     }
@@ -61,30 +55,29 @@ public class DefaultBotParser implements BotParser {
     }
 
     @Override
-    public Bot fromXml(DTDBot xml) {
+    public BotSpec fromXml(DTDBot xml) {
         Objects.requireNonNull(xml);
-        Bot bot = new Bot();
+        BotSpec botSpec = new BotSpec();
 
         if(xml.getRolesets() != null) {
             Rolesets rolesets = rolesetParser.fromXml(xml);
-            bot.setRolesets(rolesets);
+            botSpec.setRolesets(rolesets);
         }
 
-        CommandList commandList = commandListParser.fromXml(bot, xml);
+        CommandList commandList = commandListParser.fromXml(botSpec, xml);
+        botSpec.setCommandList(commandList);
         if(xml.getConfiguration() != null) {
             if(xml.getConfiguration().getGlobal() != null) {
                 LOGGER.debug("Initializing Global config");
-                bot.setGlobalConfig(
-                        configParser.globalFromXml(bot, xml.getConfiguration().getGlobal()));
+                botSpec.setGlobalConfig(
+                        configParser.globalFromXml(botSpec, xml.getConfiguration().getGlobal()));
             }
             if(xml.getConfiguration().getDiscord() != null) {
                 LOGGER.debug("Initializing Discord config");
-                bot.setDiscordConfig(
-                        configParser.discordFromXml(bot, xml.getConfiguration().getDiscord()));
-
-                bot.setDiscordHandler(new CommandListDiscordHandler(commandList));
+                botSpec.setDiscordConfig(
+                        configParser.discordFromXml(botSpec, xml.getConfiguration().getDiscord()));
             }
         }
-        return bot;
+        return botSpec;
     }
 }

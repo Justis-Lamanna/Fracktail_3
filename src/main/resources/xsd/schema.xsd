@@ -3,7 +3,7 @@
     xmlns:tns="http://github.com/Justis-Lamanna/botSchema.xsd"
     targetNamespace="http://github.com/Justis-Lamanna/botSchema.xsd"
     elementFormDefault="qualified">
-    <xs:element name="bot" type="tns:DTDBot"/>
+    <xs:element name="botSpec" type="tns:DTDBot"/>
 
     <xs:simpleType name="NonEmptyString">
         <xs:annotation>

@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers.discord;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
@@ -40,7 +40,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
     }
 
     @Override
-    public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, MessageCreateEvent event) {
+    public Mono<Void> execute(BotSpec botSpec, DiscordConfiguration configuration, MessageCreateEvent event) {
         if(event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
             return Mono.empty();
         }
@@ -71,7 +71,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                     return Tuples.of(c, context);
                                 }));
                             })
-                            .filterWhen(t -> t.getT1().matchesRole(bot, t.getT2()))
+                            .filterWhen(t -> t.getT1().matchesRole(botSpec, t.getT2()))
                             .next()
                             .flatMap(t -> {
                                 LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {} (Normalized: {})\n\tParameters: {} (Normalized: {})",
@@ -81,7 +81,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                         context.getContents(),
                                         context.getCommand(), context.getNormalizedCommand(),
                                         context.getParameters(), context.getNormalizedParameters());
-                                return t.getT1().doAction(bot, t.getT2()).thenReturn(true);
+                                return t.getT1().doAction(botSpec, t.getT2()).thenReturn(true);
                             })
                             .switchIfEmpty(
                                     Mono.fromRunnable(() -> {
@@ -90,13 +90,13 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                                 context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
                                                 context.getLocale(),
                                                 context.getContents());
-                                    }).then(commandList.doOrElse(bot, context).thenReturn(true))
+                                    }).then(commandList.doOrElse(botSpec, context).thenReturn(true))
                             );
                 })
                 .then();
     }
 
-    private Mono<Boolean> canUseCommand(Bot bot, DiscordConfiguration configuration, Command command, DiscordContext ctx) {
+    private Mono<Boolean> canUseCommand(BotSpec botSpec, DiscordConfiguration configuration, Command command, DiscordContext ctx) {
         String[] names = Stream.concat(
                 Stream.of(command.getName().resolve(configuration, ctx.getLocale())),
                 command.getAliases().resolve(configuration, ctx.getLocale()).stream()

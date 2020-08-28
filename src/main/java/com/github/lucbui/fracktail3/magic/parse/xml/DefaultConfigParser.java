@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -23,7 +23,7 @@ public class DefaultConfigParser implements ConfigParser {
     }
 
     @Override
-    public GlobalConfiguration globalFromXml(Bot bot, DTDConfiguration global) {
+    public GlobalConfiguration globalFromXml(BotSpec botSpec, DTDConfiguration global) {
         if(StringUtils.isNotEmpty(global.getI18N())) {
             LOGGER.debug("I18N: " + global.getI18N());
         }
@@ -31,7 +31,7 @@ public class DefaultConfigParser implements ConfigParser {
     }
 
     @Override
-    public DiscordConfiguration discordFromXml(Bot bot, DTDDiscordConfiguration discord) {
+    public DiscordConfiguration discordFromXml(BotSpec botSpec, DTDDiscordConfiguration discord) {
         String token = expressionParser.parseExpression(discord.getToken());
         if(StringUtils.isBlank(token)) {
             throw new BotConfigurationException("Token must be non-null and non-blank");
@@ -58,7 +58,7 @@ public class DefaultConfigParser implements ConfigParser {
         }
 
         return new DiscordConfiguration(
-                bot.getGlobalConfiguration().orElse(null),
+                botSpec.getGlobalConfiguration().orElse(null),
                 token,
                 discord.getPrefix(),
                 discord.getI18N(),

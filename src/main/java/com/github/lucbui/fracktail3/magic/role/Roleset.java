@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.role;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
@@ -41,30 +41,30 @@ public class Roleset extends AbstractRolesetValidator {
     }
 
     @Override
-    public Mono<Boolean> validateInRole(Bot bot, CommandContext ctx) {
-        Mono<Boolean> matches = super.validateInRole(bot, ctx);
+    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext ctx) {
+        Mono<Boolean> matches = super.validateInRole(botSpec, ctx);
 
         if(blacklist) {
             matches = MonoUtils.not(matches);
         }
 
         if(StringUtils.isNotBlank(extendsRoleset)) {
-            Roleset extension = bot.getRolesets()
+            Roleset extension = botSpec.getRolesets()
                     .flatMap(r -> r.getRoleset(extendsRoleset))
                     .orElseThrow(() -> new CommandUseException("Somehow, roleset stuff failed?"));
-            return MonoUtils.and(extension.validateInRole(bot, ctx), matches);
+            return MonoUtils.and(extension.validateInRole(botSpec, ctx), matches);
         }
 
         return matches;
     }
 
     @Override
-    protected Mono<Boolean> validateInUnknownRole(Bot bot, CommandContext ctx) {
+    protected Mono<Boolean> validateInUnknownRole(BotSpec botSpec, CommandContext ctx) {
         return Mono.just(false);
     }
 
     @Override
-    protected Mono<Boolean> validateInDiscordRole(Bot bot, DiscordContext ctx) {
-        return discordRolesetValidator.validateInDiscordRole(bot, ctx);
+    protected Mono<Boolean> validateInDiscordRole(BotSpec botSpec, DiscordContext ctx) {
+        return discordRolesetValidator.validateInDiscordRole(botSpec, ctx);
     }
 }
