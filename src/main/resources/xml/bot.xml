@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<botSpec xmlns="http://github.com/Justis-Lamanna/botSchema.xsd">
+<bot xmlns="http://github.com/Justis-Lamanna/botSchema.xsd">
     <configuration>
         <discord>
             <token>${token}</token>
@@ -54,4 +54,4 @@
             </behaviors>
         </command>
     </commands>
-</botSpec>
+</bot>

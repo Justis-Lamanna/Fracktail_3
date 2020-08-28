@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -17,12 +18,13 @@ public class DiscordPlatformHandler implements PlatformHandler {
     private DiscordClient discordClient;
 
     @Override
-    public Mono<Boolean> start(BotSpec botSpec) {
+    public Mono<Boolean> start(Bot bot) {
         if(discordClient != null) {
             throw new BotConfigurationException("Bot is already started.");
         }
 
-        if(botSpec.getDiscordConfiguration().isPresent()) {
+        BotSpec botSpec = bot.getSpec();
+        if(!botSpec.getDiscordConfiguration().isPresent()) {
             return Mono.empty();
         }
 
@@ -34,14 +36,14 @@ public class DiscordPlatformHandler implements PlatformHandler {
 
         discordClient.getEventDispatcher().on(MessageCreateEvent.class)
                 .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                .flatMap(msg -> discordHandler.execute(botSpec, discordConfig, msg))
+                .flatMap(msg -> discordHandler.execute(bot, discordConfig, msg))
                 .subscribe();
 
         return discordClient.login().thenReturn(true);
     }
 
     @Override
-    public Mono<Boolean> stop(BotSpec botSpec) {
+    public Mono<Boolean> stop(Bot bot) {
         if(discordClient == null) {
             return Mono.empty();
         }

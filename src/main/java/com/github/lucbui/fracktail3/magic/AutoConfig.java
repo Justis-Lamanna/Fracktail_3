@@ -65,7 +65,7 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnBean(DTDBot.class)
-    public BotSpec bot(DefaultBotParser parser, DTDBot xmlBot) {
+    public BotSpec botSpec(DefaultBotParser parser, DTDBot xmlBot) {
         return parser.fromXml(xmlBot);
     }
 

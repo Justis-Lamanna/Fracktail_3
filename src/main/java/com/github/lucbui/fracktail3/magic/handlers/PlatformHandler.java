@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Bot;
 import reactor.core.publisher.Mono;
 
 public interface PlatformHandler {
-    Mono<Boolean> start(BotSpec botSpec);
-    Mono<Boolean> stop(BotSpec botSpec);
+    Mono<Boolean> start(Bot bot);
+    Mono<Boolean> stop(Bot bot);
 }

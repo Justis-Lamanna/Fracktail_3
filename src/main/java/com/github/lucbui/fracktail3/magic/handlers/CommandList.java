@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import reactor.core.publisher.Mono;
 
@@ -24,10 +24,10 @@ public class CommandList {
         return orElse;
     }
 
-    public Mono<Void> doOrElse(BotSpec botSpec, CommandContext ctx) {
+    public Mono<Void> doOrElse(Bot bot, CommandContext ctx) {
         if(orElse == null) {
             return Mono.empty();
         }
-        return orElse.doAction(botSpec, ctx);
+        return orElse.doAction(bot, ctx);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
@@ -60,9 +61,9 @@ public class Behavior {
         return Mono.just(paramCount.isInside(context.getNormalizedParameters().length));
     }
 
-    public Mono<Void> doAction(BotSpec botSpec, CommandContext context){
+    public Mono<Void> doAction(Bot bot, CommandContext context){
         LOGGER.info("Performing action: {}", action);
-        return action.doAction(botSpec, context);
+        return action.doAction(bot, context);
     }
 
     public boolean hasRoleRestriction() {

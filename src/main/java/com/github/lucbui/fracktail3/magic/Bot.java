@@ -24,7 +24,7 @@ public class Bot {
         return this;
     }
 
-    public BotSpec getBotSpec() {
+    public BotSpec getSpec() {
         return botSpec;
     }
 
@@ -33,8 +33,8 @@ public class Bot {
             throw new BotConfigurationException("No Handlers specified");
         }
         return Flux.fromIterable(platformHandlers)
-                .flatMap(handler -> handler.start(botSpec))
-                .last().thenReturn(true);
+                .flatMap(handler -> handler.start(this))
+                .last(true);
     }
 
     public Mono<Boolean> stop() {
@@ -42,7 +42,7 @@ public class Bot {
             throw new BotConfigurationException("No Handlers specified");
         }
         return Flux.fromIterable(platformHandlers)
-                .flatMap(handler -> handler.stop(botSpec))
-                .last().thenReturn(true);
+                .flatMap(handler -> handler.stop(this))
+                .last(true);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
@@ -89,13 +90,13 @@ public class Command {
         return Mono.just(true);
     }
 
-    public Mono<Void> doAction(BotSpec botSpec, CommandContext context) {
+    public Mono<Void> doAction(Bot bot, CommandContext context) {
         return Flux.fromIterable(behaviors)
-                .filterWhen(b -> b.matchesRole(botSpec, context))
-                .filterWhen(b -> b.matchesParameterCount(botSpec, context))
+                .filterWhen(b -> b.matchesRole(bot.getSpec(), context))
+                .filterWhen(b -> b.matchesParameterCount(bot.getSpec(), context))
                 .next()
-                .flatMap(behavior -> behavior.doAction(botSpec, context).thenReturn(true))
-                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(botSpec, context).thenReturn(true))
+                .flatMap(behavior -> behavior.doAction(bot, context).thenReturn(true))
+                .switchIfEmpty(orElse == null ? Mono.empty() : orElse.doAction(bot, context).thenReturn(true))
                 .then();
     }
 
