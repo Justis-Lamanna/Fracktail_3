@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.platform;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
@@ -25,6 +25,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
 
         BotSpec botSpec = bot.getSpec();
         if(!botSpec.getDiscordConfiguration().isPresent()) {
+            LOGGER.debug("Attempted to start bot with Discord Runner, without a Discord configuration");
             return Mono.empty();
         }
 
@@ -39,14 +40,17 @@ public class DiscordPlatformHandler implements PlatformHandler {
                 .flatMap(msg -> discordHandler.execute(bot, discordConfig, msg))
                 .subscribe();
 
+        LOGGER.debug("Starting bot on Discord");
         return discordClient.login().thenReturn(true);
     }
 
     @Override
     public Mono<Boolean> stop(Bot bot) {
         if(discordClient == null) {
+            LOGGER.debug("Attempted to stop bot with Discord Runner, without a Discord configuration");
             return Mono.empty();
         }
+        LOGGER.debug("Stopping bot on Discord");
         return discordClient.logout().thenReturn(true);
     }
 }

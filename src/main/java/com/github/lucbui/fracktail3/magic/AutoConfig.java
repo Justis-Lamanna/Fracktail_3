@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.DiscordPlatformHandler;
+import com.github.lucbui.fracktail3.magic.handlers.platform.DiscordPlatformHandler;
 import com.github.lucbui.fracktail3.magic.parse.xml.*;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.ObjectFactory;

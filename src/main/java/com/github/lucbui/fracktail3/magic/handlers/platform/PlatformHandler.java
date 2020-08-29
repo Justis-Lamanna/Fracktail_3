@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.platform;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import reactor.core.publisher.Mono;

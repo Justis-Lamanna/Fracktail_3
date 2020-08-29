@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +16,9 @@ public class Bot {
 
     public Bot(BotSpec botSpec, PlatformHandler... handlers) {
         this.botSpec = botSpec;
-        this.platformHandlers = new ArrayList<>(Arrays.asList(handlers));
+        this.platformHandlers = handlers.length == 0 ?
+                new ArrayList<>() :
+                new ArrayList<>(Arrays.asList(handlers));
     }
 
     public Bot addPlatformHandler(PlatformHandler handler) {
