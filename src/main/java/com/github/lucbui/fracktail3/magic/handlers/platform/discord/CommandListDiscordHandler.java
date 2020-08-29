@@ -41,7 +41,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
         }
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .map(msg -> new DiscordContext().setMessage(event).setContents(msg))
+                .map(msg -> new DiscordContext().setEvent(event).setContents(msg).setConfiguration(configuration))
                 .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), DiscordContext::setLocale)
                 .zipWhen(ctx -> {
                     Map<String, List<Command.Resolved>> commands =
@@ -68,15 +68,15 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 .flatMap(ctx -> {
                     if(ctx.getResolvedCommand() == null) {
                         LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
-                                ctx.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                ctx.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
                                 ctx.getLocale(),
                                 ctx.getContents());
                         return commandList.doOrElse(bot, ctx).thenReturn(true);
                     } else {
                         LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
-                                ctx.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                ctx.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
                                 ctx.getLocale(),
                                 ctx.getContents(),
                                 ctx.getResolvedCommand().getId(),

@@ -8,19 +8,13 @@ import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.magic.role.Roleset;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 public class Command {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
-    private static final Resolver<List<String>> EMPTY_LIST_RESOLVER = Resolver.identity(Collections.emptyList());
-
     private final String id;
     private final Resolver<List<String>> names;
     private final String role;
@@ -71,7 +65,7 @@ public class Command {
         this.enabled = enabled;
     }
 
-    public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
+    public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext<?> context) {
         if(hasRoleRestriction()) {
             Roleset roleset = botSpec.getRoleset(role)
                     .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
@@ -80,7 +74,7 @@ public class Command {
         return Mono.just(true);
     }
 
-    public Mono<Void> doAction(Bot bot, CommandContext context) {
+    public Mono<Void> doAction(Bot bot, CommandContext<?> context) {
         return Flux.fromIterable(behaviors)
                 .filter(Behavior::isEnabled)
                 .filterWhen(b -> b.matchesRole(bot.getSpec(), context))
@@ -140,11 +134,11 @@ public class Command {
             return command.isEnabled();
         }
 
-        public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
+        public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext<?> context) {
             return command.matchesRole(botSpec, context);
         }
 
-        public Mono<Void> doAction(Bot bot, CommandContext context) {
+        public Mono<Void> doAction(Bot bot, CommandContext<?> context) {
             return command.doAction(bot, context);
         }
 

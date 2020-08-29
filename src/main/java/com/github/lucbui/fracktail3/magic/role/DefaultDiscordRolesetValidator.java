@@ -40,11 +40,11 @@ public class DefaultDiscordRolesetValidator implements DiscordRolesetValidator {
         }
 
         if(ctx.isDm()) {
-            return Mono.justOrEmpty(ctx.getMessage().getMessage().getAuthor())
+            return Mono.justOrEmpty(ctx.getEvent().getMessage().getAuthor())
                     .map(user -> isLegalUserId(user.getId()) && CollectionUtils.isEmpty(legalRoles))
                     .defaultIfEmpty(false);
         } else {
-            return Mono.justOrEmpty(ctx.getMessage().getMember())
+            return Mono.justOrEmpty(ctx.getEvent().getMember())
                     .map(member -> isLegalUserId(member.getId()) && containsLegalRole(member.getRoleIds()))
                     .defaultIfEmpty(false);
         }

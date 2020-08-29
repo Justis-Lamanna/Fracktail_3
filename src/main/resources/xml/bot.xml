@@ -47,7 +47,7 @@
                 </behavior>
                 <behavior>
                     <action>
-                        <respond>Hello, {name}!</respond>
+                        <respond>Hello, {at_user}!</respond>
                     </action>
                 </behavior>
             </behaviors>

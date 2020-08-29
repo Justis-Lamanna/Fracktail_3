@@ -1,12 +1,13 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommandContext<THIS extends CommandContext<?>> {
+public abstract class CommandContext<THIS extends CommandContext<?>> {
     public static final String MESSAGE = "message";
     public static final String USED_COMMAND = "usedCommand";
     public static final String COMMAND = "command";
@@ -94,4 +95,6 @@ public class CommandContext<THIS extends CommandContext<?>> {
         }
         return map;
     }
+
+    public abstract Mono<Boolean> respond(String message);
 }
