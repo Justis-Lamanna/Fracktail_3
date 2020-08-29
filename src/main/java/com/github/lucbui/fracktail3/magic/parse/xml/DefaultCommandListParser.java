@@ -50,7 +50,7 @@ public class DefaultCommandListParser extends AbstractParser<CommandList> implem
     private void validateCommand(BotSpec botSpec, Command c) {
         if(c.hasRoleRestriction()) {
             botSpec.getRolesets().flatMap(r -> r.getRoleset(c.getRole()))
-                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getName() + " contains unknown role " + c.getRole()));
+                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getId() + " contains unknown role " + c.getRole()));
         }
         c.getBehaviors().forEach(b -> validateBehavior(botSpec, c, b));
     }
@@ -58,7 +58,7 @@ public class DefaultCommandListParser extends AbstractParser<CommandList> implem
     private void validateBehavior(BotSpec botSpec, Command c, Behavior b) {
         if(b.hasRoleRestriction()) {
             botSpec.getRolesets().flatMap(r -> r.getRoleset(b.getRole()))
-                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getName() + " contains unknown role " + b.getRole()));
+                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getId() + " contains unknown role " + b.getRole()));
         }
     }
 }

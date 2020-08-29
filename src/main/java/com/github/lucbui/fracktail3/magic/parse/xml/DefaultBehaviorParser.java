@@ -34,10 +34,8 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
             parsedBehavior = getBehaviorFromXml(xml, command, behavior);
         }
 
-        if(BooleanUtils.isFalse(behavior.isEnabled())) {
-            LOGGER.debug("Behavior is disabled");
-        }
         parsedBehavior.setEnabled(BooleanUtils.isNotFalse(behavior.isEnabled()));
+        LOGGER.debug("Behavior is {}", parsedBehavior.isEnabled() ? "enabled" : "disabled");
 
         return parsedBehavior;
     }

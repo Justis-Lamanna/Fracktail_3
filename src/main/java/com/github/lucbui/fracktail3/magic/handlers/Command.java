@@ -19,8 +19,8 @@ public class Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
     private static final Resolver<List<String>> EMPTY_LIST_RESOLVER = Resolver.identity(Collections.emptyList());
 
-    private final Resolver<String> name;
-    private final Resolver<List<String>> aliases;
+    private final String id;
+    private final Resolver<List<String>> names;
     private final String role;
     private final List<Behavior> behaviors;
     private final Action orElse;
@@ -28,53 +28,25 @@ public class Command {
     private boolean enabled;
 
     public Command(
-            Resolver<String> name,
-            Resolver<List<String>> aliases,
+            String id,
+            Resolver<List<String>> names,
             String role,
             List<Behavior> behaviors,
             Action orElse) {
-        this.name = name;
-        this.aliases = aliases;
+        this.id = id;
+        this.names = names;
         this.role = role;
         this.behaviors = behaviors;
         this.orElse = orElse;
         this.enabled = true;
     }
 
-    public Command(Resolver<String> name, Resolver<List<String>> aliases, List<Behavior> behaviors, Action orElse) {
-        this(name, aliases, null, behaviors, orElse);
+    public String getId() {
+        return id;
     }
 
-    public Command(Resolver<String> name, Resolver<List<String>> aliases, String role, List<Behavior> behaviors) {
-        this(name, aliases, role, behaviors, null);
-    }
-
-    public Command(Resolver<String> name, Resolver<List<String>> aliases, List<Behavior> behaviors) {
-        this(name, aliases, null, behaviors, null);
-    }
-
-    public Command(Resolver<String> name, List<Behavior> behaviors, Action orElse) {
-        this(name, EMPTY_LIST_RESOLVER, null, behaviors, orElse);
-    }
-
-    public Command(Resolver<String> name, List<Behavior> behaviors) {
-        this(name, EMPTY_LIST_RESOLVER, null, behaviors, null);
-    }
-
-    public Command(String name, Behavior behavior) {
-        this(Resolver.identity(name), EMPTY_LIST_RESOLVER, null, Collections.singletonList(behavior), null);
-    }
-
-    public Command(String name, Action action) {
-        this(name, new Behavior(action));
-    }
-
-    public Resolver<String> getName() {
-        return name;
-    }
-
-    public Resolver<List<String>> getAliases() {
-        return aliases;
+    public Resolver<List<String>> getNames() {
+        return names;
     }
 
     public String getRole() {

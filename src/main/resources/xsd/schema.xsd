@@ -124,28 +124,27 @@
         <xs:choice>
             <xs:element name="custom" type="tns:DTDCustomClass"/>
             <xs:sequence>
-                <xs:element name="command" type="tns:DTDCommand" maxOccurs="unbounded"/>
+                <xs:element name="command" type="tns:DTDCommandWithId" maxOccurs="unbounded"/>
                 <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
             </xs:sequence>
         </xs:choice>
     </xs:complexType>
 
-    <xs:complexType name="DTDCommand">
+    <xs:complexType abstract="true" name="DTDCommand">
         <xs:sequence>
             <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
             <xs:choice>
                 <xs:element name="custom" type="tns:DTDCustomClass"/>
                 <xs:sequence>
-                    <xs:element name="name" type="tns:I18NString"/>
                     <xs:choice minOccurs="0">
-                        <xs:element name="aliases">
+                        <xs:element name="names">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="alias" type="tns:I18NString" maxOccurs="unbounded"/>
+                                    <xs:element name="name" type="tns:I18NString" maxOccurs="unbounded"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element name="aliasesFrom" type="tns:NonEmptyString"/>
+                        <xs:element name="namesFrom" type="tns:NonEmptyString"/>
                     </xs:choice>
                     <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
                     <xs:element name="behaviors">
@@ -159,6 +158,14 @@
                 </xs:sequence>
             </xs:choice>
         </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDCommandWithId">
+        <xs:complexContent>
+            <xs:extension base="tns:DTDCommand">
+                <xs:attribute name="id" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="DTDBehavior">

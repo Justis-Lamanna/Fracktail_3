@@ -6,7 +6,7 @@ import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
-import com.github.lucbui.fracktail3.xsd.DTDCommand;
+import com.github.lucbui.fracktail3.xsd.DTDCommandWithId;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
     }
 
     @Override
-    public Command fromXml(DTDBot xml, DTDCommand command) {
+    public Command fromXml(DTDBot xml, DTDCommandWithId command) {
         Command parsedCmd;
         if(command.getCustom() != null) {
             parsedCmd = getFromCustom(command.getCustom());
@@ -45,52 +45,48 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
             parsedCmd = getCommandFromXml(xml, command);
         }
 
-        if(BooleanUtils.isFalse(command.isEnabled())) {
-            LOGGER.debug("Command is disabled");
-        }
         parsedCmd.setEnabled(BooleanUtils.isNotFalse(command.isEnabled()));
+        LOGGER.debug("Command is {}", parsedCmd.isEnabled() ? "enabled" : "disabled");
 
         return parsedCmd;
     }
 
-    protected Command getCommandFromXml(DTDBot xml, DTDCommand command) {
-        Resolver<String> name = fromI18NString(command.getName());
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(getDebugString("Name", command.getName()));
-        }
-
-        Resolver<List<String>> aliases = getAliasResolver(command);
+    protected Command getCommandFromXml(DTDBot xml, DTDCommandWithId command) {
+        Resolver<List<String>> names = getNamesResolver(command);
 
         String role = command.getRole() == null ? null : command.getRole().getValue();
+        if(LOGGER.isDebugEnabled() && role != null) {
+            LOGGER.debug("Role: {}", role);
+        }
 
         List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
                 .map(s -> behaviorParser.fromXml(xml, command, s))
                 .collect(Collectors.toList());
         if (command.getBehaviors().getOrElse() != null) {
-            return new Command(name, aliases, role, behaviors,
+            return new Command(command.getId(), names, role, behaviors,
                     getActionParser().fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
         } else {
-            return new Command(name, aliases, role, behaviors, null);
+            return new Command(command.getId(), names, role, behaviors, null);
         }
     }
 
-    protected Resolver<List<String>> getAliasResolver(DTDCommand command) {
-        Resolver<List<String>> aliases;
-        if (StringUtils.isNotBlank(command.getAliasesFrom())) {
-            aliases = new ListFromI18NResolver(command.getAliasesFrom());
-            LOGGER.debug("Aliases From Key: {}", command.getAliasesFrom());
-        } else if (command.getAliases() != null) {
-            aliases = command.getAliases().getAlias().stream()
+    protected Resolver<List<String>> getNamesResolver(DTDCommandWithId command) {
+        Resolver<List<String>> names;
+        if (StringUtils.isNotBlank(command.getNamesFrom())) {
+            names = new ListFromI18NResolver(command.getNamesFrom());
+            LOGGER.debug("Aliases From Key: {}", command.getNamesFrom());
+        } else if (command.getNames() != null) {
+            names = command.getNames().getName().stream()
                     .map(DefaultCommandParser::fromI18NString)
                     .collect(Collectors.collectingAndThen(Collectors.toList(), CompositeResolver::new));
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(command.getAliases().getAlias().stream()
+                LOGGER.debug(command.getNames().getName().stream()
                         .map(i18n -> getDebugString("Alias", i18n))
                         .collect(Collectors.joining(",")));
             }
         } else {
-            aliases = Resolver.identity(Collections.emptyList());
+            names = Resolver.identity(Collections.singletonList(command.getId()));
         }
-        return aliases;
+        return names;
     }
 }

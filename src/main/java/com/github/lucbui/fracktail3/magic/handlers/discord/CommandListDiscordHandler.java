@@ -1,9 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -22,7 +20,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public class CommandListDiscordHandler implements DiscordHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListDiscordHandler.class);
@@ -59,14 +56,14 @@ public class CommandListDiscordHandler implements DiscordHandler {
 
                     return Flux.fromIterable(commandList.getCommands())
                             .flatMap(c -> {
-                                String[] names = Stream.concat(
-                                        Stream.of(c.getName().resolve(configuration, locale)),
-                                        c.getAliases().resolve(configuration, locale).stream()
-                                ).toArray(String[]::new);
+                                List<String> names = c.getNames().resolve(configuration, locale);
+                                if(names.isEmpty()) {
+                                    LOGGER.debug("Note: Command {} has no names associated.", c.getId());
+                                }
                                 Optional<String> name = startsWithAny(msg, configuration.getPrefix(), names);
                                 return Mono.justOrEmpty(name.map(used -> {
                                     context.setCommand(used);
-                                    context.setNormalizedCommand(names[0]);
+                                    context.setNormalizedCommand(names.get(0));
                                     context.setParameters(StringUtils.removeStart(msg, configuration.getPrefix() + used).trim());
                                     context.setNormalizedParameters(parseParameters(context.getParameters()));
                                     return Tuples.of(c, context);
@@ -98,19 +95,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 .then();
     }
 
-    private Mono<Boolean> canUseCommand(BotSpec botSpec, DiscordConfiguration configuration, Command command, DiscordContext ctx) {
-        String[] names = Stream.concat(
-                Stream.of(command.getName().resolve(configuration, ctx.getLocale())),
-                command.getAliases().resolve(configuration, ctx.getLocale()).stream()
-        ).toArray(String[]::new);
-        Optional<String> name = startsWithAny(ctx.getContents(), configuration.getPrefix(), names);
-        if(name.isPresent()) {
-
-        }
-        return Mono.just(false);
-    }
-
-    private Optional<String> startsWithAny(String value, String prefix, String... choices) {
+    private Optional<String> startsWithAny(String value, String prefix, List<String> choices) {
         for(String choice : choices) {
             if (StringUtils.startsWith(value, prefix + choice)) {
                 return Optional.of(choice);
