@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -12,12 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,65 +40,51 @@ public class CommandListDiscordHandler implements DiscordHandler {
             return Mono.empty();
         }
         return Mono.justOrEmpty(event.getMessage().getContent())
-                .filter(s -> StringUtils.startsWith(s, configuration.getPrefix()))
-                .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH))
-                .flatMap(tuple -> {
-                    String msg = tuple.getT1();
-                    Locale locale = tuple.getT2();
+                .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
+                .map(msg -> new DiscordContext().setMessage(event).setContents(msg))
+                .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), DiscordContext::setLocale)
+                .zipWhen(ctx -> {
+                    Map<String, List<Command.Resolved>> commands =
+                            commandList.getCommandsByName(configuration, ctx.getLocale());
 
-                    DiscordContext context = new DiscordContext();
-                    context.setMessage(event);
-                    context.setLocale(locale);
-                    context.setContents(msg);
-
-                    return Flux.fromIterable(commandList.getCommands())
-                            .flatMap(c -> {
-                                List<String> names = c.getNames().resolve(configuration, locale);
-                                if(names.isEmpty()) {
-                                    LOGGER.debug("Note: Command {} has no names associated.", c.getId());
+                    return Flux.fromIterable(commands.keySet())
+                            .filter(name -> {
+                                String msg = ctx.getContents();
+                                if (commandList.isCaseSensitive()) {
+                                    return StringUtils.startsWith(msg, configuration.getPrefix() + name);
+                                } else {
+                                    return StringUtils.startsWithIgnoreCase(msg, configuration.getPrefix() + name);
                                 }
-                                Optional<String> name = startsWithAny(msg, configuration.getPrefix(), names);
-                                return Mono.justOrEmpty(name.map(used -> {
-                                    context.setCommand(used);
-                                    context.setNormalizedCommand(names.get(0));
-                                    context.setParameters(StringUtils.removeStart(msg, configuration.getPrefix() + used).trim());
-                                    context.setNormalizedParameters(parseParameters(context.getParameters()));
-                                    return Tuples.of(c, context);
-                                }));
                             })
+                            .flatMap(name -> Flux.fromIterable(commands.get(name)).zipWith(Mono.just(name)))
                             .filter(t -> t.getT1().isEnabled())
-                            .filterWhen(t -> t.getT1().matchesRole(bot.getSpec(), t.getT2()))
-                            .next()
-                            .flatMap(t -> {
-                                LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {} (Normalized: {})\n\tParameters: {} (Normalized: {})",
-                                        context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                        context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                                        context.getLocale(),
-                                        context.getContents(),
-                                        context.getCommand(), context.getNormalizedCommand(),
-                                        context.getParameters(), context.getNormalizedParameters());
-                                return t.getT1().doAction(bot, t.getT2()).thenReturn(true);
-                            })
-                            .switchIfEmpty(
-                                    Mono.fromRunnable(() -> {
-                                        LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
-                                                context.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                                context.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                                                context.getLocale(),
-                                                context.getContents());
-                                    }).then(commandList.doOrElse(bot, context).thenReturn(true))
-                            );
+                            .filterWhen(t -> t.getT1().matchesRole(bot.getSpec(), ctx))
+                            .singleOrEmpty()
+                            .map(Optional::of).defaultIfEmpty(Optional.empty());
+                }, (ctx, t) -> t.map(tuple -> ctx
+                        .setResolvedCommand(tuple.getT1())
+                        .setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()))
+                        .setNormalizedParameters(parseParameters(ctx.getParameters()))).orElse(ctx))
+                .flatMap(ctx -> {
+                    if(ctx.getResolvedCommand() == null) {
+                        LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
+                                ctx.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                ctx.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                ctx.getLocale(),
+                                ctx.getContents());
+                        return commandList.doOrElse(bot, ctx).thenReturn(true);
+                    } else {
+                        LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
+                                ctx.getMessage().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                                ctx.getMessage().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                                ctx.getLocale(),
+                                ctx.getContents(),
+                                ctx.getResolvedCommand().getId(),
+                                ctx.getParameters(), ctx.getNormalizedParameters());
+                        return ctx.getResolvedCommand().doAction(bot, ctx).thenReturn(true);
+                    }
                 })
                 .then();
-    }
-
-    private Optional<String> startsWithAny(String value, String prefix, List<String> choices) {
-        for(String choice : choices) {
-            if (StringUtils.startsWith(value, prefix + choice)) {
-                return Optional.of(choice);
-            }
-        }
-        return Optional.empty();
     }
 
     private String[] parseParameters(String paramString) {

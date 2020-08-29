@@ -29,9 +29,6 @@
     <commands>
         <command id="math">
             <enabled>false</enabled>
-            <names>
-                <name>math</name>
-            </names>
             <behaviors>
                 <behavior>
                     <action>

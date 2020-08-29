@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class DiscordContext extends CommandContext {
+public class DiscordContext extends CommandContext<DiscordContext> {
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
     public static final String NAME = "name";
@@ -30,12 +30,14 @@ public class DiscordContext extends CommandContext {
         return locale;
     }
 
-    public void setMessage(MessageCreateEvent message) {
+    public DiscordContext setMessage(MessageCreateEvent message) {
         this.message = message;
+        return this;
     }
 
-    public void setLocale(Locale locale) {
+    public DiscordContext setLocale(Locale locale) {
         this.locale = locale;
+        return this;
     }
 
     public boolean isDm() {

@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
@@ -91,5 +93,63 @@ public class Command {
 
     public boolean hasRoleRestriction() {
         return StringUtils.isNotBlank(role);
+    }
+
+    public Resolved resolve(Config config, Locale locale) {
+        return new Resolved(this, locale, names.resolve(config, locale));
+    }
+
+    public static class Resolved {
+        public static final Resolved NONE = new Resolved(null, null, null);
+
+        private final Command command;
+        private final Locale locale;
+        private final List<String> names;
+
+        public Resolved(Command command, Locale locale, List<String> names) {
+            this.command = command;
+            this.locale = locale;
+            this.names = names;
+        }
+
+        public String getId() {
+            return command.getId();
+        }
+
+        public Locale getLocale() {
+            return locale;
+        }
+
+        public List<String> getNames() {
+            return names;
+        }
+
+        public String getRole() {
+            return command.getRole();
+        }
+
+        public List<Behavior> getBehaviors() {
+            return command.getBehaviors();
+        }
+
+        public Action getOrElse() {
+            return command.getOrElse();
+        }
+
+        public boolean isEnabled() {
+            return command.isEnabled();
+        }
+
+        public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
+            return command.matchesRole(botSpec, context);
+        }
+
+        public Mono<Void> doAction(Bot bot, CommandContext context) {
+            return command.doAction(bot, context);
+        }
+
+        public boolean hasRoleRestriction() {
+            return command.hasRoleRestriction();
+        }
     }
 }

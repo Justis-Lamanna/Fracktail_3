@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommandContext {
+public class CommandContext<THIS extends CommandContext<?>> {
     public static final String MESSAGE = "message";
     public static final String USED_COMMAND = "usedCommand";
     public static final String COMMAND = "command";
@@ -15,22 +15,17 @@ public class CommandContext {
     public static final String RESULT_PREFIX = "result.";
 
     private String contents;
-    private String command;
-    private String normalizedCommand;
+    private Command.Resolved resolvedCommand;
     private String parameters;
     private String[] normalizedParameters;
-    private Map<String, Object> results = new HashMap<>();
+    private final Map<String, Object> results = new HashMap<>();
 
     public String getContents() {
         return contents;
     }
 
-    public String getCommand() {
-        return command;
-    }
-
-    public String getNormalizedCommand() {
-        return normalizedCommand;
+    public Command.Resolved getResolvedCommand() {
+        return resolvedCommand;
     }
 
     public String getParameters() {
@@ -49,24 +44,24 @@ public class CommandContext {
         return !isDiscord();
     }
 
-    public void setContents(String contents) {
+    public THIS setContents(String contents) {
         this.contents = contents;
+        return (THIS) this;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public THIS setResolvedCommand(Command.Resolved resolvedCommand) {
+        this.resolvedCommand = resolvedCommand;
+        return (THIS) this;
     }
 
-    public void setNormalizedCommand(String normalizedCommand) {
-        this.normalizedCommand = normalizedCommand;
-    }
-
-    public void setParameters(String parameters) {
+    public THIS setParameters(String parameters) {
         this.parameters = parameters;
+        return (THIS) this;
     }
 
-    public void setNormalizedParameters(String[] normalizedParameters) {
+    public THIS setNormalizedParameters(String[] normalizedParameters) {
         this.normalizedParameters = normalizedParameters;
+        return (THIS) this;
     }
 
     public Map<String, Object> getResults() {
@@ -88,8 +83,8 @@ public class CommandContext {
     public Map<String, Object> getVariableMap() {
         Map<String, Object> map = new HashMap<>();
         map.put(MESSAGE, contents);
-        map.put(USED_COMMAND, command);
-        map.put(COMMAND, normalizedCommand);
+        map.put(USED_COMMAND, resolvedCommand.getId());
+        //map.put(COMMAND, normalizedCommand);
         map.put(PARAMS, parameters);
         for(int idx = 0; idx < normalizedParameters.length; idx++) {
             map.put(PARAM_PREFIX + idx, normalizedParameters[idx]);
