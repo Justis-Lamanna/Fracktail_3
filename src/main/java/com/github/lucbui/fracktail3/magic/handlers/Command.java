@@ -25,12 +25,20 @@ public class Command {
     private final List<Behavior> behaviors;
     private final Action orElse;
 
-    public Command(Resolver<String> name, Resolver<List<String>> aliases, String role, List<Behavior> behaviors, Action orElse) {
+    private boolean enabled;
+
+    public Command(
+            Resolver<String> name,
+            Resolver<List<String>> aliases,
+            String role,
+            List<Behavior> behaviors,
+            Action orElse) {
         this.name = name;
         this.aliases = aliases;
         this.role = role;
         this.behaviors = behaviors;
         this.orElse = orElse;
+        this.enabled = true;
     }
 
     public Command(Resolver<String> name, Resolver<List<String>> aliases, List<Behavior> behaviors, Action orElse) {
@@ -81,6 +89,14 @@ public class Command {
         return orElse;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
         if(hasRoleRestriction()) {
             Roleset roleset = botSpec.getRoleset(role)
@@ -92,6 +108,7 @@ public class Command {
 
     public Mono<Void> doAction(Bot bot, CommandContext context) {
         return Flux.fromIterable(behaviors)
+                .filter(Behavior::isEnabled)
                 .filterWhen(b -> b.matchesRole(bot.getSpec(), context))
                 .filterWhen(b -> b.matchesParameterCount(bot.getSpec(), context))
                 .next()

@@ -36,7 +36,7 @@ public class Bot {
         }
         return Flux.fromIterable(platformHandlers)
                 .flatMap(handler -> handler.start(this))
-                .last(true);
+                .then().thenReturn(true);
     }
 
     public Mono<Boolean> stop() {
@@ -45,6 +45,6 @@ public class Bot {
         }
         return Flux.fromIterable(platformHandlers)
                 .flatMap(handler -> handler.stop(this))
-                .last(true);
+                .then().thenReturn(true);
     }
 }

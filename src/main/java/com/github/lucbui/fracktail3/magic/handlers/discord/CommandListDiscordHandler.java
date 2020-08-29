@@ -72,6 +72,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                     return Tuples.of(c, context);
                                 }));
                             })
+                            .filter(t -> t.getT1().isEnabled())
                             .filterWhen(t -> t.getT1().matchesRole(bot.getSpec(), t.getT2()))
                             .next()
                             .flatMap(t -> {

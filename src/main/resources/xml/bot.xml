@@ -28,6 +28,7 @@
     </rolesets>
     <commands>
         <command>
+            <enabled>false</enabled>
             <name>math</name>
             <behaviors>
                 <behavior>

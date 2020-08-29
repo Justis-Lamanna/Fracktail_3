@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.utils.Range;
 import com.github.lucbui.fracktail3.xsd.*;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,20 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
 
     @Override
     public Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
+        Behavior parsedBehavior;
+
         if(behavior.getCustom() != null) {
-            return getFromCustom(behavior.getCustom());
+            parsedBehavior = getFromCustom(behavior.getCustom());
         } else {
-            return getBehaviorFromXml(xml, command, behavior);
+            parsedBehavior = getBehaviorFromXml(xml, command, behavior);
         }
+
+        if(BooleanUtils.isFalse(behavior.isEnabled())) {
+            LOGGER.debug("Behavior is disabled");
+        }
+        parsedBehavior.setEnabled(BooleanUtils.isNotFalse(behavior.isEnabled()));
+
+        return parsedBehavior;
     }
 
     protected Behavior getBehaviorFromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {

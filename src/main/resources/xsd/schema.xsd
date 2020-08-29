@@ -131,42 +131,48 @@
     </xs:complexType>
 
     <xs:complexType name="DTDCommand">
-        <xs:choice>
-            <xs:element name="custom" type="tns:DTDCustomClass"/>
-            <xs:sequence>
-                <xs:element name="name" type="tns:I18NString"/>
-                <xs:choice minOccurs="0">
-                    <xs:element name="aliases">
+        <xs:sequence>
+            <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
+            <xs:choice>
+                <xs:element name="custom" type="tns:DTDCustomClass"/>
+                <xs:sequence>
+                    <xs:element name="name" type="tns:I18NString"/>
+                    <xs:choice minOccurs="0">
+                        <xs:element name="aliases">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="alias" type="tns:I18NString" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="aliasesFrom" type="tns:NonEmptyString"/>
+                    </xs:choice>
+                    <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+                    <xs:element name="behaviors">
                         <xs:complexType>
                             <xs:sequence>
-                                <xs:element name="alias" type="tns:I18NString" maxOccurs="unbounded"/>
+                                <xs:element name="behavior" type="tns:DTDBehavior" maxOccurs="unbounded"/>
+                                <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element name="aliasesFrom" type="tns:NonEmptyString"/>
-                </xs:choice>
-                <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
-                <xs:element name="behaviors">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="behavior" type="tns:DTDBehavior" maxOccurs="unbounded"/>
-                            <xs:element name="orElse" type="tns:DTDElseBehavior" minOccurs="0"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:choice>
+                </xs:sequence>
+            </xs:choice>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="DTDBehavior">
-        <xs:choice>
-            <xs:element name="custom" type="tns:DTDCustomClass"/>
-            <xs:sequence>
-                <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
-                <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
-                <xs:element name="action" type="tns:DTDAction"/>
-            </xs:sequence>
-        </xs:choice>
+        <xs:sequence>
+            <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
+            <xs:choice>
+                <xs:element name="custom" type="tns:DTDCustomClass"/>
+                <xs:sequence>
+                    <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
+                    <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+                    <xs:element name="action" type="tns:DTDAction"/>
+                </xs:sequence>
+            </xs:choice>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="DTDElseBehavior">

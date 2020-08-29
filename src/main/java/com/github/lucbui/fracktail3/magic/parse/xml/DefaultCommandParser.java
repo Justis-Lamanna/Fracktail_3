@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDCommand;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +38,19 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
 
     @Override
     public Command fromXml(DTDBot xml, DTDCommand command) {
+        Command parsedCmd;
         if(command.getCustom() != null) {
-            return getFromCustom(command.getCustom());
+            parsedCmd = getFromCustom(command.getCustom());
         } else {
-            return getCommandFromXml(xml, command);
+            parsedCmd = getCommandFromXml(xml, command);
         }
+
+        if(BooleanUtils.isFalse(command.isEnabled())) {
+            LOGGER.debug("Command is disabled");
+        }
+        parsedCmd.setEnabled(BooleanUtils.isNotFalse(command.isEnabled()));
+
+        return parsedCmd;
     }
 
     protected Command getCommandFromXml(DTDBot xml, DTDCommand command) {

@@ -18,10 +18,13 @@ public class Behavior {
     private final String role;
     private final Action action;
 
+    private boolean enabled;
+
     public Behavior(Range paramCount, Action action, String role) {
         this.paramCount = paramCount;
         this.role = role;
         this.action = action;
+        this.enabled = true;
     }
 
     public Behavior(Range paramCount, Action action) {
@@ -46,6 +49,14 @@ public class Behavior {
 
     public Action getAction() {
         return action;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Mono<Boolean> matchesRole(BotSpec botSpec, CommandContext context) {
