@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 
 import java.util.Collections;
 import java.util.HashMap;

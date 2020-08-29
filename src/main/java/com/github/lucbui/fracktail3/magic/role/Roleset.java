@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.role;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;

@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 

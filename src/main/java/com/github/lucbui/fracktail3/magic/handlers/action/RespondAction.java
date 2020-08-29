@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.ibm.icu.text.MessageFormat;
 import reactor.core.publisher.Mono;

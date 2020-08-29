@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers.discord;
+package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;

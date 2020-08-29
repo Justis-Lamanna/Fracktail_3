@@ -1,10 +1,11 @@
-package com.github.lucbui.fracktail3.magic.handlers.discord;
+package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +20,9 @@ public class DiscordContext extends CommandContext<DiscordContext> {
     public static final String LOCALE = "locale";
     public static final String SELF = "self";
     public static final String GUILD = "guild";
+    public static final String GUILD_ID = "guildId";
+    public static final String USER_AT = "@user";
+
     private MessageCreateEvent message;
     private Locale locale;
 
@@ -52,7 +56,8 @@ public class DiscordContext extends CommandContext<DiscordContext> {
         map.put(NICKNAME, message.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
         map.put(NAME, message.getMember().map(Member::getDisplayName).orElse(username));
         map.put(LOCALE, locale.getDisplayName());
-
+        map.put(GUILD_ID, message.getGuildId().map(Snowflake::asString).orElse(StringUtils.EMPTY));
+        map.put(USER_AT, message.getMessage().getAuthor().map(User::getMention));
         return map;
     }
 

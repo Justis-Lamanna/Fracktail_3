@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.role;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.handlers.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import discord4j.core.object.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
