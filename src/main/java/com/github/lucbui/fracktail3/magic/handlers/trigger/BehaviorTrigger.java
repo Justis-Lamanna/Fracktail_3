@@ -1,12 +1,13 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.trigger;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import com.github.lucbui.fracktail3.magic.utils.Range;
 import reactor.core.publisher.Mono;
 
 public class BehaviorTrigger extends BaseTrigger {
-    public static final BehaviorTrigger DEFAULT = new BehaviorTrigger(true,null, null);
+    public static final BehaviorTrigger DEFAULT = new BehaviorTrigger(true, Range.unbounded(), null);
 
     private final Range parameters;
 

@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.CommandTrigger;
+import com.github.lucbui.fracktail3.magic.handlers.trigger.CommandTrigger;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
@@ -48,6 +48,8 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
     }
 
     protected Command getCommandFromXml(DTDBot xml, DTDCommandWithId command) {
+        LOGGER.debug("Parsing Command {}", command.getId());
+
         Resolver<List<String>> names = getNamesResolver(command);
 
         CommandTrigger trigger;
@@ -55,12 +57,16 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
             trigger = CommandTrigger.DEFAULT;
         } else {
             DTDCommandTrigger xmlTrigger = command.getTrigger();
+
             boolean enabled = BooleanUtils.isNotFalse(xmlTrigger.isEnabled());
-            LOGGER.debug("Enabled: {}", enabled);
             String role = xmlTrigger.getRole() == null ? null : xmlTrigger.getRole().getValue();
-            LOGGER.debug("Role: {}", StringUtils.defaultIfBlank(role, "Any"));
+
             trigger = new CommandTrigger(enabled, role);
         }
+
+        LOGGER.debug("\tEnabled: {} | Role: {}",
+                trigger.isEnabled(),
+                StringUtils.defaultString(trigger.getRole(), "Any"));
 
         List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
                 .map(s -> behaviorParser.fromXml(xml, command, s))
@@ -77,18 +83,19 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
         Resolver<List<String>> names;
         if (StringUtils.isNotBlank(command.getNamesFrom())) {
             names = new ListFromI18NResolver(command.getNamesFrom());
-            LOGGER.debug("Aliases From Key: {}", command.getNamesFrom());
+            LOGGER.debug("\tGetting Names From Key: {}", command.getNamesFrom());
         } else if (command.getNames() != null) {
             names = command.getNames().getName().stream()
                     .map(DefaultCommandParser::fromI18NString)
                     .collect(Collectors.collectingAndThen(Collectors.toList(), CompositeResolver::new));
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(command.getNames().getName().stream()
-                        .map(i18n -> getDebugString("Alias", i18n))
-                        .collect(Collectors.joining(",")));
+                        .map(i18n -> getDebugString("Name", i18n))
+                        .collect(Collectors.joining(",", "\t", "")));
             }
         } else {
             names = Resolver.identity(Collections.singletonList(command.getId()));
+            LOGGER.debug("\tAssuming name as {}", command.getId());
         }
         return names;
     }

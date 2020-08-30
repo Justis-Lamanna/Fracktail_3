@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.role.Roleset;
 import com.github.lucbui.fracktail3.magic.role.Rolesets;
@@ -49,5 +50,10 @@ public class BotSpec {
 
     public void setCommandList(CommandList commandList) {
         this.commandList = commandList;
+    }
+
+    public void validate() throws BotConfigurationException {
+        rolesets.validate();
+        commandList.validate(this);
     }
 }

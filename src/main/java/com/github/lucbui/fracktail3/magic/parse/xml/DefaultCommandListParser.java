@@ -1,8 +1,6 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
@@ -29,38 +27,20 @@ public class DefaultCommandListParser extends AbstractParser<CommandList> implem
         if(commandList.getCustom() != null) {
             return getFromCustom(commandList.getCustom());
         } else {
-            return getCommandListFromXml(botSpec, xml);
+            return getCommandListFromXml(xml);
         }
     }
 
-    protected CommandList getCommandListFromXml(BotSpec botSpec, DTDBot xml) {
+    protected CommandList getCommandListFromXml(DTDBot xml) {
         LOGGER.debug("Parsing command list");
         List<Command> commands = xml.getCommands().getCommand().stream()
                 .map(dtdCommand -> commandParser.fromXml(xml, dtdCommand))
                 .collect(Collectors.toList());
-        commands.forEach(c -> validateCommand(botSpec, c));
         if (xml.getCommands().getOrElse() != null) {
             return new CommandList(commands, commandParser.getActionParser()
                     .fromXml(xml, null, null, xml.getCommands().getOrElse().getAction()));
         } else {
             return new CommandList(commands, null);
-        }
-    }
-
-    private void validateCommand(BotSpec botSpec, Command c) {
-        if(c.getCommandTrigger().hasRole()) {
-            String role = c.getCommandTrigger().getRole();
-            botSpec.getRolesets().flatMap(r -> r.getRoleset(role))
-                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getId() + " contains unknown role " + role));
-        }
-        c.getBehaviors().forEach(b -> validateBehavior(botSpec, c, b));
-    }
-
-    private void validateBehavior(BotSpec botSpec, Command c, Behavior b) {
-        if(b.getBehaviorTrigger().hasRole()) {
-            String role = b.getBehaviorTrigger().getRole();
-            botSpec.getRolesets().flatMap(r -> r.getRoleset(role))
-                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getId() + " contains unknown role " + role));
         }
     }
 }

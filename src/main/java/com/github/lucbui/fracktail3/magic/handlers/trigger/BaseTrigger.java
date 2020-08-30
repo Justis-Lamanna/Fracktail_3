@@ -1,9 +1,10 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.trigger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
+import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.role.Roleset;
 import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;

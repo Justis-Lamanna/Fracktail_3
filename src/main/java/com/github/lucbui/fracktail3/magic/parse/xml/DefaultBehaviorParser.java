@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
-import com.github.lucbui.fracktail3.magic.handlers.BehaviorTrigger;
+import com.github.lucbui.fracktail3.magic.handlers.trigger.BehaviorTrigger;
 import com.github.lucbui.fracktail3.magic.utils.Range;
 import com.github.lucbui.fracktail3.xsd.*;
 import org.apache.commons.lang3.BooleanUtils;
@@ -35,21 +35,25 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
     }
 
     protected Behavior getBehaviorFromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
-        BehaviorTrigger behaviorTrigger;
+        BehaviorTrigger trigger;
         if(behavior.getTrigger() == null) {
-            behaviorTrigger = BehaviorTrigger.DEFAULT;
+            trigger = BehaviorTrigger.DEFAULT;
         } else {
             DTDBehaviorTrigger xmlTrigger = behavior.getTrigger();
+
             boolean enabled = BooleanUtils.isNotFalse(xmlTrigger.isEnabled());
-            LOGGER.debug("Enabled: {}", enabled);
             Range parameterRange = getParameterRange(xmlTrigger);
-            LOGGER.debug("Range: {}", parameterRange);
             String role = xmlTrigger.getRole() == null ? null : xmlTrigger.getRole().getValue();
-            LOGGER.debug("Role: {}", StringUtils.defaultIfBlank(role, "Any"));
-            behaviorTrigger = new BehaviorTrigger(enabled, parameterRange, role);
+
+            trigger = new BehaviorTrigger(enabled, parameterRange, role);
         }
 
-        return new Behavior(behaviorTrigger, actionParser.fromXml(xml, command, behavior, behavior.getAction()));
+        LOGGER.debug("\t\tEnabled: {} | Range: {} | Role: {}",
+                trigger.isEnabled(),
+                trigger.getParameters(),
+                StringUtils.defaultString(trigger.getRole(), "Any"));
+
+        return new Behavior(trigger, actionParser.fromXml(xml, command, behavior, behavior.getAction()));
     }
 
     protected Range getParameterRange(DTDBehaviorTrigger behavior) {
@@ -67,7 +71,6 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
 
     protected Range getUnboundedRange() {
         Range parameterRange;
-        LOGGER.debug("Behavior accepts unlimited params");
         parameterRange = Range.unbounded();
         return parameterRange;
     }
@@ -75,10 +78,8 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
     protected Range getSingleValueRange(DTDValueOrRange valueOrRange) {
         String value = valueOrRange.getValue();
         if(StringUtils.equalsIgnoreCase(value, "unbounded")) {
-            LOGGER.debug("Behavior accepts unlimited params");
             return getUnboundedRange();
         } else {
-            LOGGER.debug("Behavior accepts {} params", value);
             return Range.single(Integer.parseInt(value));
         }
     }
@@ -87,10 +88,8 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
         DTDRange range = valueOrRange.getRange();
         int start = range.getMin().intValue();
         if(StringUtils.equalsIgnoreCase(range.getMax(), "unbounded")) {
-            LOGGER.debug("Behavior accepts {} and more params", start);
             return Range.fromOnward(start);
         } else {
-            LOGGER.debug("Behavior accepts between {} and {} params", start, range.getMax());
             return Range.fromTo(start, Integer.parseInt(range.getMax()));
         }
     }

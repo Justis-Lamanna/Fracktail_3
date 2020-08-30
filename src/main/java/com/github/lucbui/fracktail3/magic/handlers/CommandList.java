@@ -1,7 +1,9 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.Config;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
@@ -85,10 +87,14 @@ public class CommandList {
         return orElse;
     }
 
-    public Mono<Void> doOrElse(Bot bot, CommandContext ctx) {
+    public Mono<Void> doOrElse(Bot bot, CommandContext<?> ctx) {
         if(orElse == null) {
             return Mono.empty();
         }
         return orElse.doAction(bot, ctx);
+    }
+
+    public void validate(BotSpec spec) throws BotConfigurationException {
+        commands.forEach(c -> c.validate(spec));
     }
 }

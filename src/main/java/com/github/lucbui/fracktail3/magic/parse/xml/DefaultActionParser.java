@@ -36,26 +36,26 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
     }
 
     protected Action getRespondAction(I18NString respond) {
-        LOGGER.debug(getDebugString("Response Action", respond));
+        LOGGER.debug("\t\t\t" + getDebugString("Response Action", respond));
         return new RespondAction(fromI18NString(respond));
     }
 
     protected Action getRandomAction(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction.Random random) {
-        LOGGER.debug("Random Actions:");
+        LOGGER.debug("\t\t\tRandom Actions:");
         RandomAction.Builder rab = new RandomAction.Builder();
         for(DTDWeightedAction a : random.getAction()) {
             rab.add(fromXml(xml, command, behavior, a), a.getWeight());
         }
-        LOGGER.debug("Random Actions Complete");
+        LOGGER.debug("\t\t\tRandom Actions Complete");
         return rab.build();
     }
 
     private Action getSequenceAction(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction.Sequence sequence) {
-        LOGGER.debug("Sequence Actions:");
+        LOGGER.debug("\t\t\tSequence Actions:");
         List<Action> actions = sequence.getAction().stream()
                 .map(dtd -> fromXml(xml, command, behavior, dtd))
                 .collect(Collectors.toList());
-        LOGGER.debug("Sequence Actions Complete");
+        LOGGER.debug("\t\t\tSequence Actions Complete");
         return new SequenceAction(actions);
     }
 }

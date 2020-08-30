@@ -1,8 +1,11 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.Config;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.trigger.CommandTrigger;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -65,6 +68,15 @@ public class Command {
 
     public Resolved resolve(Config config, Locale locale) {
         return new Resolved(this, locale, names.resolve(config, locale));
+    }
+
+    public void validate(BotSpec spec) throws BotConfigurationException {
+        if(commandTrigger.hasRole()) {
+            String role = commandTrigger.getRole();
+            spec.getRolesets().flatMap(r -> r.getRoleset(role))
+                    .orElseThrow(() -> new BotConfigurationException("Command " + getId() + " contains unknown role " + role));
+        }
+        behaviors.forEach(b -> b.validate(spec, this));
     }
 
     public static class Resolved {

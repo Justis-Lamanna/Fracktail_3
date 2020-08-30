@@ -59,13 +59,6 @@ public class DefaultBotParser implements BotParser {
         Objects.requireNonNull(xml);
         BotSpec botSpec = new BotSpec();
 
-        if(xml.getRolesets() != null) {
-            Rolesets rolesets = rolesetParser.fromXml(xml);
-            botSpec.setRolesets(rolesets);
-        }
-
-        CommandList commandList = commandListParser.fromXml(botSpec, xml);
-        botSpec.setCommandList(commandList);
         if(xml.getConfiguration() != null) {
             if(xml.getConfiguration().getGlobal() != null) {
                 LOGGER.debug("Initializing Global config");
@@ -78,6 +71,16 @@ public class DefaultBotParser implements BotParser {
                         configParser.discordFromXml(botSpec, xml.getConfiguration().getDiscord()));
             }
         }
+
+        if(xml.getRolesets() != null) {
+            Rolesets rolesets = rolesetParser.fromXml(xml);
+            botSpec.setRolesets(rolesets);
+        }
+
+        CommandList commandList = commandListParser.fromXml(botSpec, xml);
+        botSpec.setCommandList(commandList);
+
+        botSpec.validate();
         return botSpec;
     }
 }

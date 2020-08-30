@@ -1,7 +1,10 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.trigger.BehaviorTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -32,5 +35,14 @@ public class Behavior {
     public Mono<Void> doAction(Bot bot, CommandContext<?> context){
         LOGGER.info("Performing action: {}", action);
         return action.doAction(bot, context);
+    }
+
+
+    public void validate(BotSpec spec, Command command) throws BotConfigurationException {
+        if(behaviorTrigger.hasRole()) {
+            String role = behaviorTrigger.getRole();
+            spec.getRolesets().flatMap(r -> r.getRoleset(role))
+                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + command.getId() + " contains unknown role " + role));
+        }
     }
 }

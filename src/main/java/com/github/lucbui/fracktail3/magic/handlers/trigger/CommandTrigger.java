@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.trigger;
 
 public class CommandTrigger extends BaseTrigger {
     public static final CommandTrigger DEFAULT = new CommandTrigger(true, null);
