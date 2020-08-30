@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
+import com.github.lucbui.fracktail3.magic.handlers.BehaviorTrigger;
 import com.github.lucbui.fracktail3.magic.utils.Range;
 import com.github.lucbui.fracktail3.xsd.*;
 import org.apache.commons.lang3.BooleanUtils;
@@ -26,29 +27,32 @@ public class DefaultBehaviorParser extends AbstractParser<Behavior> implements B
 
     @Override
     public Behavior fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
-        Behavior parsedBehavior;
-
         if(behavior.getCustom() != null) {
-            parsedBehavior = getFromCustom(behavior.getCustom());
+            return getFromCustom(behavior.getCustom());
         } else {
-            parsedBehavior = getBehaviorFromXml(xml, command, behavior);
+            return getBehaviorFromXml(xml, command, behavior);
         }
-
-        parsedBehavior.setEnabled(BooleanUtils.isNotFalse(behavior.isEnabled()));
-        LOGGER.debug("Behavior is {}", parsedBehavior.isEnabled() ? "enabled" : "disabled");
-
-        return parsedBehavior;
     }
 
     protected Behavior getBehaviorFromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior) {
-        Range parameterRange = getParameterRange(behavior);
+        BehaviorTrigger behaviorTrigger;
+        if(behavior.getTrigger() == null) {
+            behaviorTrigger = BehaviorTrigger.DEFAULT;
+        } else {
+            DTDBehaviorTrigger xmlTrigger = behavior.getTrigger();
+            boolean enabled = BooleanUtils.isNotFalse(xmlTrigger.isEnabled());
+            LOGGER.debug("Enabled: {}", enabled);
+            Range parameterRange = getParameterRange(xmlTrigger);
+            LOGGER.debug("Range: {}", parameterRange);
+            String role = xmlTrigger.getRole() == null ? null : xmlTrigger.getRole().getValue();
+            LOGGER.debug("Role: {}", StringUtils.defaultIfBlank(role, "Any"));
+            behaviorTrigger = new BehaviorTrigger(enabled, parameterRange, role);
+        }
 
-        String role = behavior.getRole() == null ? null : behavior.getRole().getValue();
-
-        return new Behavior(parameterRange, actionParser.fromXml(xml, command, behavior, behavior.getAction()), role);
+        return new Behavior(behaviorTrigger, actionParser.fromXml(xml, command, behavior, behavior.getAction()));
     }
 
-    protected Range getParameterRange(DTDBehavior behavior) {
+    protected Range getParameterRange(DTDBehaviorTrigger behavior) {
         DTDValueOrRange valueOrRange = behavior.getParameters();
         if(valueOrRange == null) {
             return getUnboundedRange();

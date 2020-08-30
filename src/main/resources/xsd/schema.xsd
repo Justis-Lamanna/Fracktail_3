@@ -120,6 +120,29 @@
         </xs:simpleContent>
     </xs:complexType>
 
+    <xs:complexType abstract="true" name="DTDTrigger">
+        <xs:sequence>
+            <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
+            <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDCommandTrigger">
+        <xs:complexContent>
+            <xs:extension base="DTDTrigger"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DTDBehaviorTrigger">
+        <xs:complexContent>
+            <xs:extension base="DTDTrigger">
+                <xs:sequence>
+                    <xs:element name="parameters" type="tns:DTDValueOrRange" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:complexType name="DTDCommandList">
         <xs:choice>
             <xs:element name="custom" type="tns:DTDCustomClass"/>
@@ -132,7 +155,6 @@
 
     <xs:complexType abstract="true" name="DTDCommand">
         <xs:sequence>
-            <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
             <xs:choice>
                 <xs:element name="custom" type="tns:DTDCustomClass"/>
                 <xs:sequence>
@@ -146,7 +168,7 @@
                         </xs:element>
                         <xs:element name="namesFrom" type="tns:NonEmptyString"/>
                     </xs:choice>
-                    <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+                    <xs:element name="trigger" type="tns:DTDCommandTrigger" minOccurs="0"/>
                     <xs:element name="behaviors">
                         <xs:complexType>
                             <xs:sequence>
@@ -170,12 +192,10 @@
 
     <xs:complexType name="DTDBehavior">
         <xs:sequence>
-            <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
             <xs:choice>
                 <xs:element name="custom" type="tns:DTDCustomClass"/>
                 <xs:sequence>
-                    <xs:element name="parameters" minOccurs="0" type="tns:DTDValueOrRange"/>
-                    <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
+                    <xs:element name="trigger" minOccurs="0" type="tns:DTDBehaviorTrigger"/>
                     <xs:element name="action" type="tns:DTDAction"/>
                 </xs:sequence>
             </xs:choice>
@@ -186,16 +206,6 @@
         <xs:sequence>
             <xs:element name="action" type="tns:DTDAction"/>
         </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="DTDParameter">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="index" type="xs:nonNegativeInteger"/>
-                <xs:attribute name="startIndex" type="xs:nonNegativeInteger" default="0"/>
-                <xs:attribute name="endIndex" type="tns:IntOrUnbounded" default="unbounded"/>
-            </xs:extension>
-        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="DTDAction">

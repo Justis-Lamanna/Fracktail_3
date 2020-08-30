@@ -2,10 +2,12 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.handlers.Behavior;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
+import com.github.lucbui.fracktail3.magic.handlers.CommandTrigger;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
+import com.github.lucbui.fracktail3.xsd.DTDCommandTrigger;
 import com.github.lucbui.fracktail3.xsd.DTDCommandWithId;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,35 +40,36 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
 
     @Override
     public Command fromXml(DTDBot xml, DTDCommandWithId command) {
-        Command parsedCmd;
         if(command.getCustom() != null) {
-            parsedCmd = getFromCustom(command.getCustom());
+            return getFromCustom(command.getCustom());
         } else {
-            parsedCmd = getCommandFromXml(xml, command);
+            return getCommandFromXml(xml, command);
         }
-
-        parsedCmd.setEnabled(BooleanUtils.isNotFalse(command.isEnabled()));
-        LOGGER.debug("Command is {}", parsedCmd.isEnabled() ? "enabled" : "disabled");
-
-        return parsedCmd;
     }
 
     protected Command getCommandFromXml(DTDBot xml, DTDCommandWithId command) {
         Resolver<List<String>> names = getNamesResolver(command);
 
-        String role = command.getRole() == null ? null : command.getRole().getValue();
-        if(LOGGER.isDebugEnabled() && role != null) {
-            LOGGER.debug("Role: {}", role);
+        CommandTrigger trigger;
+        if(command.getTrigger() == null) {
+            trigger = CommandTrigger.DEFAULT;
+        } else {
+            DTDCommandTrigger xmlTrigger = command.getTrigger();
+            boolean enabled = BooleanUtils.isNotFalse(xmlTrigger.isEnabled());
+            LOGGER.debug("Enabled: {}", enabled);
+            String role = xmlTrigger.getRole() == null ? null : xmlTrigger.getRole().getValue();
+            LOGGER.debug("Role: {}", StringUtils.defaultIfBlank(role, "Any"));
+            trigger = new CommandTrigger(enabled, role);
         }
 
         List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
                 .map(s -> behaviorParser.fromXml(xml, command, s))
                 .collect(Collectors.toList());
         if (command.getBehaviors().getOrElse() != null) {
-            return new Command(command.getId(), names, role, behaviors,
+            return new Command(command.getId(), names, trigger, behaviors,
                     getActionParser().fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
         } else {
-            return new Command(command.getId(), names, role, behaviors, null);
+            return new Command(command.getId(), names, trigger, behaviors, null);
         }
     }
 

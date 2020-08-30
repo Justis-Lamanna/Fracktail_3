@@ -28,7 +28,9 @@
     </rolesets>
     <commands>
         <command id="math">
-            <enabled>false</enabled>
+            <trigger>
+                <enabled>false</enabled>
+            </trigger>
             <behaviors>
                 <behavior>
                     <action>
@@ -40,7 +42,9 @@
         <command id="hello">
             <behaviors>
                 <behavior>
-                    <role>steven</role>
+                    <trigger>
+                        <role>steven</role>
+                    </trigger>
                     <action>
                         <respond>No u stink.</respond>
                     </action>

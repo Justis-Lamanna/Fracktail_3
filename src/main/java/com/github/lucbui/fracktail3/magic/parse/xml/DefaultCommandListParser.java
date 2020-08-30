@@ -48,17 +48,19 @@ public class DefaultCommandListParser extends AbstractParser<CommandList> implem
     }
 
     private void validateCommand(BotSpec botSpec, Command c) {
-        if(c.hasRoleRestriction()) {
-            botSpec.getRolesets().flatMap(r -> r.getRoleset(c.getRole()))
-                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getId() + " contains unknown role " + c.getRole()));
+        if(c.getCommandTrigger().hasRole()) {
+            String role = c.getCommandTrigger().getRole();
+            botSpec.getRolesets().flatMap(r -> r.getRoleset(role))
+                    .orElseThrow(() -> new BotConfigurationException("Command " + c.getId() + " contains unknown role " + role));
         }
         c.getBehaviors().forEach(b -> validateBehavior(botSpec, c, b));
     }
 
     private void validateBehavior(BotSpec botSpec, Command c, Behavior b) {
-        if(b.hasRoleRestriction()) {
-            botSpec.getRolesets().flatMap(r -> r.getRoleset(b.getRole()))
-                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getId() + " contains unknown role " + b.getRole()));
+        if(b.getBehaviorTrigger().hasRole()) {
+            String role = b.getBehaviorTrigger().getRole();
+            botSpec.getRolesets().flatMap(r -> r.getRoleset(role))
+                    .orElseThrow(() -> new BotConfigurationException("Behavior in " + c.getId() + " contains unknown role " + role));
         }
     }
 }

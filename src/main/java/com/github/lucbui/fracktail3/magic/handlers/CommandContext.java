@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import reactor.core.publisher.Mono;
 
@@ -35,6 +36,11 @@ public abstract class CommandContext<THIS extends CommandContext<?>> {
 
     public String[] getNormalizedParameters() {
         return normalizedParameters;
+    }
+
+    @JsonIgnore
+    public int getParameterCount() {
+        return normalizedParameters.length;
     }
 
     public boolean isDiscord() {
