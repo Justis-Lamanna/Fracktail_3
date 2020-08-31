@@ -1,5 +1,8 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
+/**
+ * Exception indicating an error occured during command use.
+ */
 public class CommandUseException extends RuntimeException {
     public CommandUseException() {
     }

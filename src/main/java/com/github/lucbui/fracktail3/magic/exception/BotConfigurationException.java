@@ -1,5 +1,8 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
+/**
+ * Exception indicating the bot was incorrectly configured
+ */
 public class BotConfigurationException extends RuntimeException {
     public BotConfigurationException() {
     }

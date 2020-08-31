@@ -2,10 +2,8 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.config.GlobalConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.utils.PresenceUtils;
-import com.github.lucbui.fracktail3.xsd.DTDConfiguration;
 import com.github.lucbui.fracktail3.xsd.DTDDiscordConfiguration;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -21,14 +19,6 @@ public class DefaultConfigParser implements ConfigParser {
 
     public DefaultConfigParser(ExpressionParser expressionParser) {
         this.expressionParser = expressionParser;
-    }
-
-    @Override
-    public GlobalConfiguration globalFromXml(BotSpec botSpec, DTDConfiguration global) {
-        if(StringUtils.isNotEmpty(global.getI18N())) {
-            LOGGER.debug("I18N: " + global.getI18N());
-        }
-        return new GlobalConfiguration(global.getI18N());
     }
 
     @Override
@@ -62,7 +52,6 @@ public class DefaultConfigParser implements ConfigParser {
         }
 
         return new DiscordConfiguration(
-                botSpec.getGlobalConfiguration().orElse(null),
                 token,
                 StringUtils.defaultString(discord.getPrefix()),
                 owner,

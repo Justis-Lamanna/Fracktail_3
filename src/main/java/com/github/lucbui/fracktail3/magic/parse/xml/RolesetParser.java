@@ -37,26 +37,28 @@ public class RolesetParser {
             roles.put(roleset.getName(), roleset);
         }
 
-        for (DTDRoleset set : xml.getRolesets().getRoleset()) {
-            Roleset roleset = new Roleset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
+        if(xml.getRolesets() != null && xml.getRolesets().getRoleset() != null) {
+            for (DTDRoleset set : xml.getRolesets().getRoleset()) {
+                Roleset roleset = new Roleset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
 
-            if(LOGGER.isDebugEnabled()){
-                if(roleset.getExtends() == null) {
-                    LOGGER.debug("Creating {} Roleset {}", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName());
-                } else {
-                    LOGGER.debug("Creating {} Roleset {} (extends {})", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName(), roleset.getExtends());
+                if (LOGGER.isDebugEnabled()) {
+                    if (roleset.getExtends() == null) {
+                        LOGGER.debug("Creating {} Roleset {}", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName());
+                    } else {
+                        LOGGER.debug("Creating {} Roleset {} (extends {})", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName(), roleset.getExtends());
+                    }
                 }
-            }
 
-            if(set.getDiscord() != null) {
-                roleset.setDiscordRolesetValidator(fromXml(xml, set, set.getDiscord()));
-            }
+                if (set.getDiscord() != null) {
+                    roleset.setDiscordRolesetValidator(fromXml(xml, set, set.getDiscord()));
+                }
 
-            Roleset oldSet = roles.put(roleset.getName(), roleset);
-            if(LOGGER.isDebugEnabled() && oldSet != null) {
-                LOGGER.debug("Replacing set {}", oldSet);
+                Roleset oldSet = roles.put(roleset.getName(), roleset);
+                if (LOGGER.isDebugEnabled() && oldSet != null) {
+                    LOGGER.debug("Replacing set {}", oldSet);
+                }
+                validateNonRecursiveExtends(roles, Collections.singleton(roleset.getName()), roleset);
             }
-            validateNonRecursiveExtends(roles, Collections.singleton(roleset.getName()), roleset);
         }
 
         validateRoleExtensionsExist(roles);

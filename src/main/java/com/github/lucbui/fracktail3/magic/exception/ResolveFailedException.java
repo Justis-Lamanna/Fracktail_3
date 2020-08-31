@@ -1,5 +1,8 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
+/**
+ * An exception which indicates ResourceBundle resolution failed.
+ */
 public class ResolveFailedException extends RuntimeException {
     public ResolveFailedException() {
     }
