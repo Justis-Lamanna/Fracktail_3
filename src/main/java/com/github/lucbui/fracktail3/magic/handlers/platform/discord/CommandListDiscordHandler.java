@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.exception.CommandValidationException;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -71,7 +72,17 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                 ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
                                 ctx.getLocale(),
                                 ctx.getContents());
-                        return commandList.doOrElse(bot, ctx).thenReturn(true);
+                        return commandList.doOrElse(bot, ctx)
+                                .onErrorResume(CommandValidationException.class, ex -> {
+                                    String response = ex.getMessage(configuration, ctx.getLocale());
+                                    return ctx.respond(response).then();
+                                })
+                                .onErrorResume(RuntimeException.class, ex -> {
+                                    LOGGER.warn("Encountered exception running or-else command", ex);
+                                    return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
+                                            .then(ctx.alert("Encountered exception: " + ex.getMessage()))
+                                            .then();
+                                });
                     } else {
                         LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
                                 ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
@@ -80,7 +91,17 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                 ctx.getContents(),
                                 ctx.getResolvedCommand().getId(),
                                 ctx.getParameters(), ctx.getNormalizedParameters());
-                        return ctx.getResolvedCommand().doAction(bot, ctx).thenReturn(true);
+                        return ctx.getResolvedCommand().doAction(bot, ctx)
+                                .onErrorResume(CommandValidationException.class, ex -> {
+                                    String response = ex.getMessage(configuration, ctx.getLocale());
+                                    return ctx.respond(response).then();
+                                })
+                                .onErrorResume(RuntimeException.class, ex -> {
+                                    LOGGER.warn("Encountered exception running or-else command", ex);
+                                    return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
+                                            .then(ctx.alert("Encountered exception: " + ex.getMessage()))
+                                            .then();
+                                });
                     }
                 })
                 .then();
