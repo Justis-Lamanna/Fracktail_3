@@ -25,6 +25,7 @@ public class DiscordContext extends CommandContext<DiscordContext> {
     public static final String GUILD = "guild";
     public static final String GUILD_ID = "guildId";
     public static final String USER_AT = "at_user";
+    public static final String OWNER_AT = "at_owner";
 
     private DiscordConfiguration configuration;
     private MessageCreateEvent event;
@@ -67,6 +68,7 @@ public class DiscordContext extends CommandContext<DiscordContext> {
         map.put(LOCALE, locale.getDisplayName());
         map.put(GUILD_ID, event.getGuildId().map(Snowflake::asString).orElse(StringUtils.EMPTY));
         map.put(USER_AT, event.getMessage().getAuthor().map(User::getMention).orElse(StringUtils.EMPTY));
+        configuration.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
         return map;
     }
 
@@ -111,6 +113,11 @@ public class DiscordContext extends CommandContext<DiscordContext> {
         return this.event.getMessage()
                 .addReaction(ReactionEmoji.custom(id, name, animated))
                 .thenReturn(true);
+    }
+
+    public Mono<Boolean> alert(String message) {
+        return Mono.justOrEmpty(configuration.getOwner())
+                .flatMap(owner -> dm(owner, message));
     }
 
     public Mono<Map<String, Object>> getExtendedVariableMap() {

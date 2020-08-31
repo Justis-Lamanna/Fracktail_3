@@ -9,6 +9,7 @@ import com.github.lucbui.fracktail3.xsd.DTDConfiguration;
 import com.github.lucbui.fracktail3.xsd.DTDDiscordConfiguration;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Snowflake;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,9 @@ public class DefaultConfigParser implements ConfigParser {
             throw new BotConfigurationException("Token must be non-null and non-blank");
         }
 
+        Snowflake owner = discord.getOwner() == null ? null : Snowflake.of(discord.getOwner());
+        LOGGER.debug("Owner: {}", owner);
+
         Presence presence = PresenceUtils.getPresence(discord.getPresence());
         if(LOGGER.isDebugEnabled()) {
             LOGGER.debug("Token: {}", token);
@@ -60,7 +64,8 @@ public class DefaultConfigParser implements ConfigParser {
         return new DiscordConfiguration(
                 botSpec.getGlobalConfiguration().orElse(null),
                 token,
-                discord.getPrefix(),
+                StringUtils.defaultString(discord.getPrefix()),
+                owner,
                 discord.getI18N(),
                 presence);
     }

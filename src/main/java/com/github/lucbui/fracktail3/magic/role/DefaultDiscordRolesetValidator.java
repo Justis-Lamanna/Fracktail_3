@@ -7,6 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class DefaultDiscordRolesetValidator implements DiscordRolesetValidator {
@@ -16,6 +17,19 @@ public class DefaultDiscordRolesetValidator implements DiscordRolesetValidator {
     public DefaultDiscordRolesetValidator() {
         legalSnowflakes = null;
         legalRoles = null;
+    }
+
+    public DefaultDiscordRolesetValidator(Set<Snowflake> legalSnowflakes, Set<Snowflake> legalRoles) {
+        this.legalSnowflakes = legalSnowflakes;
+        this.legalRoles = legalRoles;
+    }
+
+    public static DefaultDiscordRolesetValidator forUser(Snowflake user) {
+        return new DefaultDiscordRolesetValidator(Collections.singleton(user), Collections.emptySet());
+    }
+
+    public static DefaultDiscordRolesetValidator forRole(Snowflake role) {
+        return new DefaultDiscordRolesetValidator(Collections.emptySet(), Collections.singleton(role));
     }
 
     public Set<Snowflake> getLegalSnowflakes() {

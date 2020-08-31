@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.config;
 
 import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Snowflake;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -10,13 +11,15 @@ public class DiscordConfiguration extends GlobalConfiguration {
     private final GlobalConfiguration parent;
     private final String token;
     private final String prefix;
+    private final Snowflake owner;
     private final Presence presence;
 
-    public DiscordConfiguration(GlobalConfiguration parent, String token, String prefix, String i18nPath, Presence presence) {
+    public DiscordConfiguration(GlobalConfiguration parent, String token, String prefix, Snowflake owner, String i18nPath, Presence presence) {
         super(i18nPath);
         this.parent = parent;
         this.token = token;
         this.prefix = prefix;
+        this.owner = owner;
         this.presence = presence;
     }
 
@@ -45,5 +48,13 @@ public class DiscordConfiguration extends GlobalConfiguration {
 
     public Presence getPresence() {
         return presence;
+    }
+
+    public GlobalConfiguration getParent() {
+        return parent;
+    }
+
+    public Optional<Snowflake> getOwner() {
+        return Optional.ofNullable(owner);
     }
 }

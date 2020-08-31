@@ -253,6 +253,7 @@
                 <xs:sequence>
                     <xs:element name="token" type="tns:NonEmptyString"/>
                     <xs:element name="prefix" type="tns:NonEmptyString" minOccurs="0"/>
+                    <xs:element name="owner" type="xs:long" minOccurs="0"/>
                     <xs:element name="presence" type="tns:DTDDiscordPresence" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>

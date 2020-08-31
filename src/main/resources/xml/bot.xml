@@ -4,6 +4,7 @@
         <discord>
             <token>${token}</token>
             <prefix>!</prefix>
+            <owner>248612704019808258</owner>
             <presence>
                 <status>DO_NOT_DISTURB</status>
                 <playing>v3!</playing>
@@ -11,13 +12,6 @@
         </discord>
     </configuration>
     <rolesets>
-        <roleset name="admin">
-            <discord>
-                <snowflakes>
-                    <snowflake>248612704019808258</snowflake>
-                </snowflakes>
-            </discord>
-        </roleset>
         <roleset name="steven">
             <discord>
                 <snowflakes>

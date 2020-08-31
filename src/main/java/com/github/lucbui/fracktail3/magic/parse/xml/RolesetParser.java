@@ -27,6 +27,16 @@ public class RolesetParser {
     public Rolesets fromXml(DTDBot xml) {
         Map<String, Roleset> roles = new HashMap<>();
         LOGGER.debug("Parsing Roleset List");
+
+        if(xml.getConfiguration() != null &&
+                xml.getConfiguration().getDiscord() != null &&
+                xml.getConfiguration().getDiscord().getOwner() != null) {
+            Snowflake owner = Snowflake.of(xml.getConfiguration().getDiscord().getOwner());
+            Roleset roleset = new Roleset("owner", DefaultDiscordRolesetValidator.forUser(owner));
+            LOGGER.debug("Creating Roleset owner");
+            roles.put(roleset.getName(), roleset);
+        }
+
         for (DTDRoleset set : xml.getRolesets().getRoleset()) {
             Roleset roleset = new Roleset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
 
@@ -42,7 +52,10 @@ public class RolesetParser {
                 roleset.setDiscordRolesetValidator(fromXml(xml, set, set.getDiscord()));
             }
 
-            roles.put(roleset.getName(), roleset);
+            Roleset oldSet = roles.put(roleset.getName(), roleset);
+            if(LOGGER.isDebugEnabled() && oldSet != null) {
+                LOGGER.debug("Replacing set {}", oldSet);
+            }
             validateNonRecursiveExtends(roles, Collections.singleton(roleset.getName()), roleset);
         }
 

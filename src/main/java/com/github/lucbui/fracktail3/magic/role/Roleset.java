@@ -14,10 +14,21 @@ public class Roleset extends AbstractRolesetValidator {
     private final String extendsRoleset;
     private DiscordRolesetValidator discordRolesetValidator;
 
+    public Roleset(String name, boolean blacklist, String extendsRoleset, DiscordRolesetValidator discordRolesetValidator) {
+        this.name = name;
+        this.blacklist = blacklist;
+        this.extendsRoleset = extendsRoleset;
+        this.discordRolesetValidator = discordRolesetValidator;
+    }
+
     public Roleset(String name, boolean blacklist, String extendsRoleset) {
         this.name = name;
         this.blacklist = blacklist;
         this.extendsRoleset = extendsRoleset;
+    }
+
+    public Roleset(String name, DiscordRolesetValidator discordRolesetValidator) {
+        this(name, false, null, discordRolesetValidator);
     }
 
     public String getName() {
@@ -41,7 +52,7 @@ public class Roleset extends AbstractRolesetValidator {
     }
 
     @Override
-    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext ctx) {
+    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext<?> ctx) {
         Mono<Boolean> matches = super.validateInRole(botSpec, ctx);
 
         if(blacklist) {
@@ -59,7 +70,7 @@ public class Roleset extends AbstractRolesetValidator {
     }
 
     @Override
-    protected Mono<Boolean> validateInUnknownRole(BotSpec botSpec, CommandContext ctx) {
+    protected Mono<Boolean> validateInUnknownRole(BotSpec botSpec, CommandContext<?> ctx) {
         return Mono.just(false);
     }
 
