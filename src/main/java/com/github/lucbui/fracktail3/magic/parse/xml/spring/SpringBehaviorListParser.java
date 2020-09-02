@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.parse.xml.spring;
 
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.parse.xml.CommandParser;
-import com.github.lucbui.fracktail3.magic.parse.xml.DefaultCommandListParser;
+import com.github.lucbui.fracktail3.magic.parse.xml.DefaultBehaviorListParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -12,8 +11,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SpringCommandListParser extends DefaultCommandListParser implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringBehaviorParser.class);
+public class SpringBehaviorListParser extends DefaultBehaviorListParser implements ApplicationContextAware {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringBehaviorListParser.class);
     private ApplicationContext applicationContext;
 
     @Override
@@ -22,13 +21,7 @@ public class SpringCommandListParser extends DefaultCommandListParser implements
     }
 
     @Autowired
-    public SpringCommandListParser(CommandParser commandParser) {
+    public SpringBehaviorListParser(CommandParser commandParser) {
         super(commandParser);
-    }
-
-    @Override
-    public CommandList getFromSpringBean(String spring){
-        LOGGER.debug("Creating CommandList by retrieving bean {}", spring);
-        return SpringUtils.getFromSpringBean(applicationContext, spring, CommandList.class);
     }
 }

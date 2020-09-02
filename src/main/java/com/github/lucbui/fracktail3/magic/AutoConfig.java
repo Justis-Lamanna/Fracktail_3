@@ -54,7 +54,7 @@ public class AutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public DefaultBotParser botParser(ExpressionParser expressionParser, CommandListParser commandListParser) {
+    public DefaultBotParser botParser(ExpressionParser expressionParser, BehaviorListParser commandListParser) {
         return new DefaultBotParser(
                 expressionParser,
                 new DefaultConfigParser(expressionParser),

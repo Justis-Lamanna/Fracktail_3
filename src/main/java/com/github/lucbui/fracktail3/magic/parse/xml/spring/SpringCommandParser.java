@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.parse.xml.spring;
 
 import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.parse.xml.BehaviorParser;
+import com.github.lucbui.fracktail3.magic.parse.xml.ActionParser;
 import com.github.lucbui.fracktail3.magic.parse.xml.DefaultCommandParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpringCommandParser extends DefaultCommandParser implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringBehaviorParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringCommandParser.class);
     private ApplicationContext applicationContext;
 
     @Override
@@ -22,8 +22,8 @@ public class SpringCommandParser extends DefaultCommandParser implements Applica
     }
 
     @Autowired
-    public SpringCommandParser(BehaviorParser behaviorParser) {
-        super(behaviorParser);
+    public SpringCommandParser(ActionParser actionParser) {
+        super(actionParser);
     }
 
     @Override

@@ -1,15 +1,10 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -46,25 +41,20 @@ public class CommandList {
                 .findFirst();
     }
 
-    public List<Command.Resolved> getCommandsByName(String name, Config config, Locale locale) {
-        return commands.stream()
-                .map(c -> c.resolve(config, locale))
-                .filter(c -> getAnyEqualityPredicate().test(name, c.getNames().toArray(new String[0])))
-                .collect(Collectors.toList());
-    }
-
     public Map<String, Command> getCommandsById() {
         return commands.stream()
                 .collect(Collectors.toMap(Command::getId, Function.identity()));
     }
 
-    public Map<String, List<Command.Resolved>> getCommandsByName(Config config, Locale locale) {
-        return commands.stream()
-                .map(c -> c.resolve(config, locale))
-                .flatMap(c -> c.getNames().stream().map(name -> Tuples.of(name, c)))
-                .collect(Collectors.groupingBy(Tuple2::getT1,
-                        caseSensitive ? HashMap::new : CaseInsensitiveMap::new,
-                        Collectors.mapping(Tuple2::getT2, Collectors.toList())));
+    public Map<String, List<Command>> getCommandsByName(Config config, Locale locale) {
+        Map<String, List<Command>> returned = new HashMap<>();
+        for(Command command : commands) {
+            List<String> names = command.getNames().resolve(config, locale);
+            for(String name : names) {
+                returned.computeIfAbsent(name, s -> new ArrayList<>()).add(command);
+            }
+        }
+        return returned;
     }
 
     private BiPredicate<String, String> getEqualityPredicate() {
@@ -72,14 +62,6 @@ public class CommandList {
             return StringUtils::equals;
         } else {
             return StringUtils::equalsIgnoreCase;
-        }
-    }
-
-    private BiPredicate<String, String[]> getAnyEqualityPredicate() {
-        if(caseSensitive) {
-            return StringUtils::equalsAny;
-        } else {
-            return StringUtils::equalsAnyIgnoreCase;
         }
     }
 
@@ -92,9 +74,5 @@ public class CommandList {
             return Mono.empty();
         }
         return orElse.doAction(bot, ctx);
-    }
-
-    public void validate(BotSpec spec) throws BotConfigurationException {
-        commands.forEach(c -> c.validate(spec));
     }
 }

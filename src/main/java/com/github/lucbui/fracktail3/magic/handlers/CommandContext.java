@@ -17,17 +17,12 @@ public abstract class CommandContext<THIS extends CommandContext<?>> {
     public static final String RESULT_PREFIX = "result.";
 
     private String contents;
-    private Command.Resolved resolvedCommand;
     private String parameters;
     private String[] normalizedParameters;
     private final Map<String, Object> results = new HashMap<>();
 
     public String getContents() {
         return contents;
-    }
-
-    public Command.Resolved getResolvedCommand() {
-        return resolvedCommand;
     }
 
     public String getParameters() {
@@ -53,11 +48,6 @@ public abstract class CommandContext<THIS extends CommandContext<?>> {
 
     public THIS setContents(String contents) {
         this.contents = contents;
-        return (THIS) this;
-    }
-
-    public THIS setResolvedCommand(Command.Resolved resolvedCommand) {
-        this.resolvedCommand = resolvedCommand;
         return (THIS) this;
     }
 
@@ -90,7 +80,6 @@ public abstract class CommandContext<THIS extends CommandContext<?>> {
     public Map<String, Object> getVariableMap() {
         Map<String, Object> map = new HashMap<>();
         map.put(MESSAGE, contents);
-        map.put(USED_COMMAND, resolvedCommand.getId());
         //map.put(COMMAND, normalizedCommand);
         map.put(PARAMS, parameters);
         for(int idx = 0; idx < normalizedParameters.length; idx++) {

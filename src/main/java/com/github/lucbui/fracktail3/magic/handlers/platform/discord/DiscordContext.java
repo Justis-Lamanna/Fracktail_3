@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -29,6 +30,7 @@ public class DiscordContext extends CommandContext<DiscordContext> {
 
     private DiscordConfiguration configuration;
     private MessageCreateEvent event;
+    private Command command;
     private Locale locale;
 
     public MessageCreateEvent getEvent() {
@@ -142,5 +144,14 @@ public class DiscordContext extends CommandContext<DiscordContext> {
             }
             return map;
         };
+    }
+
+    public DiscordContext setCommand(Command command) {
+        this.command = command;
+        return this;
+    }
+
+    public Command getCommand() {
+        return command;
     }
 }

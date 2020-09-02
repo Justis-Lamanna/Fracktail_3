@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
+import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.role.Userset;
 import com.github.lucbui.fracktail3.magic.role.Usersets;
 
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class BotSpec {
     private DiscordConfiguration discordConfig;
     private Usersets usersets;
-    private CommandList commandList;
+    private BehaviorList behaviorList;
 
     /**
      * Get the Discord Configuration, if it exists.
@@ -79,16 +79,16 @@ public class BotSpec {
      * Get the list of Commands this bot performs.
      * @return The list of Commands this bot performs.
      */
-    public CommandList getCommandList() {
-        return commandList;
+    public BehaviorList getBehaviorList() {
+        return behaviorList;
     }
 
     /**
      * Set the list of Commands this bot performs.
-     * @param commandList The list of commands this bot should perform.
+     * @param behaviorList The list of commands this bot should perform.
      */
-    public void setCommandList(@Nonnull CommandList commandList) {
-        this.commandList = commandList;
+    public void setBehaviorList(@Nonnull BehaviorList behaviorList) {
+        this.behaviorList = behaviorList;
     }
 
     /**
@@ -97,6 +97,6 @@ public class BotSpec {
      */
     public void validate() throws BotConfigurationException {
         usersets.validate();
-        commandList.validate(this);
+        //commandList.validate(this);
     }
 }

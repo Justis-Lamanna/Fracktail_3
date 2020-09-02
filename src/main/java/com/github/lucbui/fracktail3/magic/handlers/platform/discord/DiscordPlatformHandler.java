@@ -28,7 +28,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
             return Mono.empty();
         }
 
-        DiscordHandler discordHandler = new CommandListDiscordHandler(botSpec.getCommandList());
+        DiscordHandler discordHandler = new CommandListDiscordHandler(botSpec.getBehaviorList().getCommandList());
         DiscordConfiguration discordConfig = botSpec.getDiscordConfiguration().get();
         discordClient = new DiscordClientBuilder(discordConfig.getToken())
                 .setInitialPresence(discordConfig.getPresence())

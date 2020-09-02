@@ -1,14 +1,18 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.handlers.Behavior;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.handlers.ActionOption;
+import com.github.lucbui.fracktail3.magic.handlers.ActionOptions;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.trigger.CommandTrigger;
+import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.filter.CommandFilter;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
-import com.github.lucbui.fracktail3.xsd.DTDCommandTrigger;
-import com.github.lucbui.fracktail3.xsd.DTDCommandWithId;
+import com.github.lucbui.fracktail3.xsd.DTDCommand;
+import com.github.lucbui.fracktail3.xsd.DTDCommandAction;
+import com.github.lucbui.fracktail3.xsd.DTDCommandFilter;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,25 +25,20 @@ import java.util.stream.Collectors;
 public class DefaultCommandParser extends AbstractParser<Command> implements CommandParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCommandParser.class);
 
-    private final BehaviorParser behaviorParser;
+    private final ActionParser actionParser;
 
-    public DefaultCommandParser(BehaviorParser behaviorParser) {
+    public DefaultCommandParser(ActionParser actionParser) {
         super(Command.class);
-        this.behaviorParser = behaviorParser;
-    }
-
-    @Override
-    public BehaviorParser getBehaviorParser() {
-        return behaviorParser;
+        this.actionParser = actionParser;
     }
 
     @Override
     public ActionParser getActionParser() {
-        return behaviorParser.getActionParser();
+        return actionParser;
     }
 
     @Override
-    public Command fromXml(DTDBot xml, DTDCommandWithId command) {
+    public Command fromXml(DTDBot xml, DTDCommand command) {
         if(command.getCustom() != null) {
             return getFromCustom(command.getCustom());
         } else {
@@ -47,39 +46,42 @@ public class DefaultCommandParser extends AbstractParser<Command> implements Com
         }
     }
 
-    protected Command getCommandFromXml(DTDBot xml, DTDCommandWithId command) {
+    protected Command getCommandFromXml(DTDBot xml, DTDCommand command) {
         LOGGER.debug("Parsing Command {}", command.getId());
 
         Resolver<List<String>> names = getNamesResolver(command);
 
-        CommandTrigger trigger;
-        if(command.getTrigger() == null) {
-            trigger = CommandTrigger.DEFAULT;
+        CommandFilter filter;
+        if(command.getFilter() == null) {
+            filter = CommandFilter.DEFAULT;
         } else {
-            DTDCommandTrigger xmlTrigger = command.getTrigger();
+            DTDCommandFilter xmlTrigger = command.getFilter();
 
             boolean enabled = BooleanUtils.isNotFalse(xmlTrigger.isEnabled());
-            String role = xmlTrigger.getRole() == null ? null : xmlTrigger.getRole().getValue();
 
-            trigger = new CommandTrigger(enabled, role);
+            filter = new CommandFilter(enabled);
         }
 
-        LOGGER.debug("\tEnabled: {} | Role: {}",
-                trigger.isEnabled(),
-                StringUtils.defaultString(trigger.getRole(), "Any"));
+        LOGGER.debug("\tEnabled: {}", filter.isEnabled());
 
-        List<Behavior> behaviors = command.getBehaviors().getBehavior().stream()
-                .map(s -> behaviorParser.fromXml(xml, command, s))
-                .collect(Collectors.toList());
-        if (command.getBehaviors().getOrElse() != null) {
-            return new Command(command.getId(), names, trigger, behaviors,
-                    getActionParser().fromXml(xml, command, null, command.getBehaviors().getOrElse().getAction()));
+        ActionOptions actionOptions;
+        if(command.getAction() != null) {
+            actionOptions = getActionFromXml(xml, command, command.getAction());
+        } else if(command.getActions() != null) {
+            actionOptions = null;
         } else {
-            return new Command(command.getId(), names, trigger, behaviors, null);
+            throw new BotConfigurationException("No Action or Actions defined for command " + command.getId());
         }
+
+        return new Command(command.getId(), names, filter, actionOptions);
     }
 
-    protected Resolver<List<String>> getNamesResolver(DTDCommandWithId command) {
+    protected ActionOptions getActionFromXml(DTDBot xml, DTDCommand command, DTDCommandAction action) {
+        Action a = actionParser.fromXml(xml, command, action);
+        return new ActionOptions(Collections.singletonList(new ActionOption(null, a)), null);
+    }
+
+    protected Resolver<List<String>> getNamesResolver(DTDCommand command) {
         Resolver<List<String>> names;
         if (StringUtils.isNotBlank(command.getNamesFrom())) {
             names = new ListFromI18NResolver(command.getNamesFrom());

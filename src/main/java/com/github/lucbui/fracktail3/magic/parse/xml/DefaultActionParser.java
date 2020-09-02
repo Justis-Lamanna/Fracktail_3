@@ -19,15 +19,15 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
     }
 
     @Override
-    public Action fromXml(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction action) {
-        if(action.getRespond() != null) {
-            return getRespondAction(action.getRespond());
+    public Action fromXml(DTDBot xml, DTDCommand command, DTDCommandAction action) {
+        if(action.getMessage() != null) {
+            return getRespondAction(action.getMessage());
         }
         if(action.getRandom() != null) {
-            return getRandomAction(xml, command, behavior, action.getRandom());
+            return getRandomAction(xml, command, action.getRandom());
         }
         if(action.getSequence() != null) {
-            return getSequenceAction(xml, command, behavior, action.getSequence());
+            return getSequenceAction(xml, command, action.getSequence());
         }
         if(action.getCustom() != null) {
             return getFromCustom(action.getCustom());
@@ -40,20 +40,20 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
         return new RespondAction(fromI18NString(respond));
     }
 
-    protected Action getRandomAction(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction.Random random) {
+    protected Action getRandomAction(DTDBot xml, DTDCommand command, DTDWeightedCommandActions random) {
         LOGGER.debug("\t\t\tRandom Actions:");
         RandomAction.Builder rab = new RandomAction.Builder();
-        for(DTDWeightedAction a : random.getAction()) {
-            rab.add(fromXml(xml, command, behavior, a), a.getWeight());
+        for(DTDWeightedCommandAction a : random.getAction()) {
+            rab.add(fromXml(xml, command, a), a.getWeight());
         }
         LOGGER.debug("\t\t\tRandom Actions Complete");
         return rab.build();
     }
 
-    private Action getSequenceAction(DTDBot xml, DTDCommand command, DTDBehavior behavior, DTDAction.Sequence sequence) {
+    private Action getSequenceAction(DTDBot xml, DTDCommand command, DTDCommandActions sequence) {
         LOGGER.debug("\t\t\tSequence Actions:");
         List<Action> actions = sequence.getAction().stream()
-                .map(dtd -> fromXml(xml, command, behavior, dtd))
+                .map(dtd -> fromXml(xml, command, dtd))
                 .collect(Collectors.toList());
         LOGGER.debug("\t\t\tSequence Actions Complete");
         return new SequenceAction(actions);

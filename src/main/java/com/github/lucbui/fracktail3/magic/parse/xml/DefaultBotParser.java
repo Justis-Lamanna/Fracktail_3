@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
+import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.role.Usersets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import org.slf4j.Logger;
@@ -13,24 +13,22 @@ public class DefaultBotParser implements BotParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBotParser.class);
 
     protected ExpressionParser expressionParser;
-    protected CommandListParser commandListParser;
+    protected BehaviorListParser commandListParser;
     protected DefaultUsersetParser rolesetParser;
     protected ConfigParser configParser;
 
     public DefaultBotParser() {
         expressionParser = new IdentityExpressionResolver();
         configParser = new DefaultConfigParser(expressionParser);
-        commandListParser = new DefaultCommandListParser(
-                new DefaultCommandParser(
-                        new DefaultBehaviorParser(
-                                new DefaultActionParser())));
+        commandListParser = new DefaultBehaviorListParser(
+                new DefaultCommandParser(new DefaultActionParser()));
         rolesetParser = new DefaultUsersetParser();
     }
 
     public DefaultBotParser(
             ExpressionParser expressionParser,
             ConfigParser configParser,
-            CommandListParser commandListParser,
+            BehaviorListParser commandListParser,
             DefaultUsersetParser rolesetParser) {
         this.expressionParser = expressionParser;
         this.configParser = configParser;
@@ -42,7 +40,7 @@ public class DefaultBotParser implements BotParser {
         return expressionParser;
     }
 
-    public CommandListParser getCommandListParser() {
+    public BehaviorListParser getCommandListParser() {
         return commandListParser;
     }
 
@@ -70,8 +68,8 @@ public class DefaultBotParser implements BotParser {
         Usersets usersets = rolesetParser.fromXml(xml);
         botSpec.setUsersets(usersets);
 
-        CommandList commandList = commandListParser.fromXml(botSpec, xml);
-        botSpec.setCommandList(commandList);
+        BehaviorList commandList = commandListParser.fromXml(botSpec, xml);
+        botSpec.setBehaviorList(commandList);
 
         botSpec.validate();
         return botSpec;

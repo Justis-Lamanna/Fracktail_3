@@ -45,7 +45,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 .map(msg -> new DiscordContext().setEvent(event).setContents(msg).setConfiguration(configuration))
                 .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), DiscordContext::setLocale)
                 .zipWhen(ctx -> {
-                    Map<String, List<Command.Resolved>> commands =
+                    Map<String, List<Command>> commands =
                             commandList.getCommandsByName(configuration, ctx.getLocale());
 
                     return Flux.fromIterable(commands.keySet())
@@ -62,11 +62,11 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
                 }, (ctx, t) -> t.map(tuple -> ctx
-                        .setResolvedCommand(tuple.getT1())
+                        .setCommand(tuple.getT1())
                         .setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()))
                         .setNormalizedParameters(parseParameters(ctx.getParameters()))).orElse(ctx))
                 .flatMap(ctx -> {
-                    if(ctx.getResolvedCommand() == null) {
+                    if(ctx.getCommand() == null) {
                         LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
                                 ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
                                 ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
@@ -89,9 +89,9 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                 ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
                                 ctx.getLocale(),
                                 ctx.getContents(),
-                                ctx.getResolvedCommand().getId(),
+                                ctx.getCommand().getId(),
                                 ctx.getParameters(), ctx.getNormalizedParameters());
-                        return ctx.getResolvedCommand().doAction(bot, ctx)
+                        return ctx.getCommand().doAction(bot, ctx)
                                 .onErrorResume(CommandValidationException.class, ex -> {
                                     String response = ex.getMessage(configuration, ctx.getLocale());
                                     return ctx.respond(response).then();
