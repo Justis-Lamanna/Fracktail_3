@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.role.Rolesets;
+import com.github.lucbui.fracktail3.magic.role.Usersets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ public class DefaultBotParser implements BotParser {
 
     protected ExpressionParser expressionParser;
     protected CommandListParser commandListParser;
-    protected RolesetParser rolesetParser;
+    protected DefaultUsersetParser rolesetParser;
     protected ConfigParser configParser;
 
     public DefaultBotParser() {
@@ -24,14 +24,14 @@ public class DefaultBotParser implements BotParser {
                 new DefaultCommandParser(
                         new DefaultBehaviorParser(
                                 new DefaultActionParser())));
-        rolesetParser = new RolesetParser();
+        rolesetParser = new DefaultUsersetParser();
     }
 
     public DefaultBotParser(
             ExpressionParser expressionParser,
             ConfigParser configParser,
             CommandListParser commandListParser,
-            RolesetParser rolesetParser) {
+            DefaultUsersetParser rolesetParser) {
         this.expressionParser = expressionParser;
         this.configParser = configParser;
         this.commandListParser = commandListParser;
@@ -46,7 +46,7 @@ public class DefaultBotParser implements BotParser {
         return commandListParser;
     }
 
-    public RolesetParser getRolesetParser() {
+    public DefaultUsersetParser getRolesetParser() {
         return rolesetParser;
     }
 
@@ -67,8 +67,8 @@ public class DefaultBotParser implements BotParser {
             }
         }
 
-        Rolesets rolesets = rolesetParser.fromXml(xml);
-        botSpec.setRolesets(rolesets);
+        Usersets usersets = rolesetParser.fromXml(xml);
+        botSpec.setUsersets(usersets);
 
         CommandList commandList = commandListParser.fromXml(botSpec, xml);
         botSpec.setCommandList(commandList);

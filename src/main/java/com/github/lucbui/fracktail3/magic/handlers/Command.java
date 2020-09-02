@@ -73,7 +73,7 @@ public class Command {
     public void validate(BotSpec spec) throws BotConfigurationException {
         if(commandTrigger.hasRole()) {
             String role = commandTrigger.getRole();
-            spec.getRolesets().flatMap(r -> r.getRoleset(role))
+            spec.getUsersets().flatMap(r -> r.getRoleset(role))
                     .orElseThrow(() -> new BotConfigurationException("Command " + getId() + " contains unknown role " + role));
         }
         behaviors.forEach(b -> b.validate(spec, this));

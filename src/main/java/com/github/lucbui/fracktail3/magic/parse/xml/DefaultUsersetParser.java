@@ -3,11 +3,11 @@ package com.github.lucbui.fracktail3.magic.parse.xml;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.role.DefaultDiscordRolesetValidator;
 import com.github.lucbui.fracktail3.magic.role.DiscordRolesetValidator;
-import com.github.lucbui.fracktail3.magic.role.Roleset;
-import com.github.lucbui.fracktail3.magic.role.Rolesets;
+import com.github.lucbui.fracktail3.magic.role.Userset;
+import com.github.lucbui.fracktail3.magic.role.Usersets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.DTDDiscordRoleset;
-import com.github.lucbui.fracktail3.xsd.DTDRoleset;
+import com.github.lucbui.fracktail3.xsd.DTDUserset;
 import discord4j.core.object.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -20,53 +20,53 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RolesetParser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RolesetParser.class);
+public class DefaultUsersetParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUsersetParser.class);
     private static final ExpressionParser parser = new SpelExpressionParser();
 
-    public Rolesets fromXml(DTDBot xml) {
-        Map<String, Roleset> roles = new HashMap<>();
+    public Usersets fromXml(DTDBot xml) {
+        Map<String, Userset> roles = new HashMap<>();
         LOGGER.debug("Parsing Roleset List");
 
         if(xml.getConfiguration() != null &&
                 xml.getConfiguration().getDiscord() != null &&
                 xml.getConfiguration().getDiscord().getOwner() != null) {
             Snowflake owner = Snowflake.of(xml.getConfiguration().getDiscord().getOwner());
-            Roleset roleset = new Roleset("owner", DefaultDiscordRolesetValidator.forUser(owner));
+            Userset userset = new Userset("owner", DefaultDiscordRolesetValidator.forUser(owner));
             LOGGER.debug("Creating Roleset owner");
-            roles.put(roleset.getName(), roleset);
+            roles.put(userset.getName(), userset);
         }
 
-        if(xml.getRolesets() != null && xml.getRolesets().getRoleset() != null) {
-            for (DTDRoleset set : xml.getRolesets().getRoleset()) {
-                Roleset roleset = new Roleset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
+        if(xml.getUsersets() != null && xml.getUsersets().getUserset() != null) {
+            for (DTDUserset set : xml.getUsersets().getUserset()) {
+                Userset userset = new Userset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
 
                 if (LOGGER.isDebugEnabled()) {
-                    if (roleset.getExtends() == null) {
-                        LOGGER.debug("Creating {} Roleset {}", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName());
+                    if (userset.getExtends() == null) {
+                        LOGGER.debug("Creating {} Roleset {}", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName());
                     } else {
-                        LOGGER.debug("Creating {} Roleset {} (extends {})", roleset.isBlacklist() ? "blacklist" : "whitelist", roleset.getName(), roleset.getExtends());
+                        LOGGER.debug("Creating {} Roleset {} (extends {})", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName(), userset.getExtends());
                     }
                 }
 
                 if (set.getDiscord() != null) {
-                    roleset.setDiscordRolesetValidator(fromXml(xml, set, set.getDiscord()));
+                    userset.setDiscordRolesetValidator(fromXml(xml, set, set.getDiscord()));
                 }
 
-                Roleset oldSet = roles.put(roleset.getName(), roleset);
+                Userset oldSet = roles.put(userset.getName(), userset);
                 if (LOGGER.isDebugEnabled() && oldSet != null) {
                     LOGGER.debug("Replacing set {}", oldSet);
                 }
-                validateNonRecursiveExtends(roles, Collections.singleton(roleset.getName()), roleset);
+                validateNonRecursiveExtends(roles, Collections.singleton(userset.getName()), userset);
             }
         }
 
         validateRoleExtensionsExist(roles);
 
-        return new Rolesets(roles);
+        return new Usersets(roles);
     }
 
-    private DiscordRolesetValidator fromXml(DTDBot xml, DTDRoleset set, DTDDiscordRoleset discord) {
+    private DiscordRolesetValidator fromXml(DTDBot xml, DTDUserset set, DTDDiscordRoleset discord) {
         DefaultDiscordRolesetValidator validator = new DefaultDiscordRolesetValidator();
         if(CollectionUtils.isNotEmpty(discord.getSnowflakes())) {
             validator.setLegalSnowflakes(
@@ -86,21 +86,21 @@ public class RolesetParser {
         return validator;
     }
 
-    private void validateRoleExtensionsExist(Map<String, Roleset> roles) {
-        for(Roleset set : roles.values()) {
+    private void validateRoleExtensionsExist(Map<String, Userset> roles) {
+        for(Userset set : roles.values()) {
             if(StringUtils.isNotBlank(set.getExtends()) && !roles.containsKey(set.getExtends())) {
                 throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends());
             }
         }
     }
 
-    private void validateNonRecursiveExtends(Map<String, Roleset> roles, Set<String> encounteredRolesets, Roleset roleset) {
-        if(StringUtils.isNotBlank(roleset.getExtends())) {
-            Roleset extension = roles.get(roleset.getExtends());
+    private void validateNonRecursiveExtends(Map<String, Userset> roles, Set<String> encounteredRolesets, Userset userset) {
+        if(StringUtils.isNotBlank(userset.getExtends())) {
+            Userset extension = roles.get(userset.getExtends());
             if(extension != null){
                 if(encounteredRolesets.contains(extension.getName())) {
                     String chain = String.join("->", encounteredRolesets);
-                    throw new BotConfigurationException("Circular dependency detected for roleset: " + chain + "->" + roleset.getExtends());
+                    throw new BotConfigurationException("Circular dependency detected for roleset: " + chain + "->" + userset.getExtends());
                 } else {
                     HashSet<String> newSet = new LinkedHashSet<>(encounteredRolesets);
                     newSet.add(extension.getName());

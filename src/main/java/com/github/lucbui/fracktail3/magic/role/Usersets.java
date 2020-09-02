@@ -5,23 +5,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-public class Rolesets {
-    private final Map<String, Roleset> rolesets;
+public class Usersets {
+    private final Map<String, Userset> rolesets;
 
-    public Rolesets(Map<String, Roleset> rolesets) {
+    public Usersets(Map<String, Userset> rolesets) {
         this.rolesets = Collections.unmodifiableMap(rolesets);
     }
 
-    public Map<String, Roleset> getRolesets() {
+    public Map<String, Userset> getUsersets() {
         return rolesets;
     }
 
-    public Optional<Roleset> getRoleset(String name) {
+    public Optional<Userset> getUserset(String name) {
         return Optional.ofNullable(rolesets.get(name));
     }
 
     public void validate() throws BotConfigurationException {
-        for(Roleset set : rolesets.values()) {
+        for(Userset set : rolesets.values()) {
             if(StringUtils.isNotBlank(set.getExtends()) && !rolesets.containsKey(set.getExtends())) {
                 throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends());
             }
@@ -30,13 +30,13 @@ public class Rolesets {
         }
     }
 
-    private void validateNonRecursiveExtends(Map<String, Roleset> roles, Set<String> encounteredRolesets, Roleset roleset) {
-        if(StringUtils.isNotBlank(roleset.getExtends())) {
-            Roleset extension = roles.get(roleset.getExtends());
+    private void validateNonRecursiveExtends(Map<String, Userset> roles, Set<String> encounteredRolesets, Userset userset) {
+        if(StringUtils.isNotBlank(userset.getExtends())) {
+            Userset extension = roles.get(userset.getExtends());
             if(extension != null){
                 if(encounteredRolesets.contains(extension.getName())) {
                     String chain = String.join("->", encounteredRolesets);
-                    throw new BotConfigurationException("Circular dependency detected for roleset: " + chain + "->" + roleset.getExtends());
+                    throw new BotConfigurationException("Circular dependency detected for roleset: " + chain + "->" + userset.getExtends());
                 } else {
                     HashSet<String> newSet = new LinkedHashSet<>(encounteredRolesets);
                     newSet.add(extension.getName());

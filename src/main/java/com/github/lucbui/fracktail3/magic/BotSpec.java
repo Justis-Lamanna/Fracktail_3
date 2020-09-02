@@ -3,8 +3,8 @@ package com.github.lucbui.fracktail3.magic;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.role.Roleset;
-import com.github.lucbui.fracktail3.magic.role.Rolesets;
+import com.github.lucbui.fracktail3.magic.role.Userset;
+import com.github.lucbui.fracktail3.magic.role.Usersets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ import java.util.Optional;
  */
 public class BotSpec {
     private DiscordConfiguration discordConfig;
-    private Rolesets rolesets;
+    private Usersets usersets;
     private CommandList commandList;
 
     /**
@@ -49,10 +49,10 @@ public class BotSpec {
     /**
      * Get the Rolesets defined by the user.
      * @return The rolesets.
-     * @see Rolesets
+     * @see Usersets
      */
-    public Rolesets getRolesets() {
-        return rolesets;
+    public Usersets getUsersets() {
+        return usersets;
     }
 
     /**
@@ -60,19 +60,19 @@ public class BotSpec {
      * If no Roleset of that name exists, an empty Optional is returned.
      * @param name The name to search
      * @return The found Roleset, or empty if none.
-     * @see Roleset
+     * @see Userset
      */
-    public Optional<Roleset> getRoleset(String name) {
-        return getRolesets().getRoleset(name);
+    public Optional<Userset> getUserset(String name) {
+        return getUsersets().getUserset(name);
     }
 
     /**
      * Set the Rolesets defined by the user.
-     * @param rolesets The rolesets.
-     * @see Rolesets
+     * @param usersets The rolesets.
+     * @see Usersets
      */
-    public void setRolesets(@Nonnull Rolesets rolesets) {
-        this.rolesets = Objects.requireNonNull(rolesets);
+    public void setUsersets(@Nonnull Usersets usersets) {
+        this.usersets = Objects.requireNonNull(usersets);
     }
 
     /**
@@ -96,7 +96,7 @@ public class BotSpec {
      * @throws BotConfigurationException An error occurs.
      */
     public void validate() throws BotConfigurationException {
-        rolesets.validate();
+        usersets.validate();
         commandList.validate(this);
     }
 }

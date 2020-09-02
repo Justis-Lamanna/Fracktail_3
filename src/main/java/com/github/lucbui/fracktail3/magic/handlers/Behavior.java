@@ -41,7 +41,7 @@ public class Behavior {
     public void validate(BotSpec spec, Command command) throws BotConfigurationException {
         if(behaviorTrigger.hasRole()) {
             String role = behaviorTrigger.getRole();
-            spec.getRolesets().flatMap(r -> r.getRoleset(role))
+            spec.getUsersets().flatMap(r -> r.getRoleset(role))
                     .orElseThrow(() -> new BotConfigurationException("Behavior in " + command.getId() + " contains unknown role " + role));
         }
     }

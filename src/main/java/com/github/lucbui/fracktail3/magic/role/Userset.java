@@ -8,26 +8,26 @@ import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-public class Roleset extends AbstractRolesetValidator {
+public class Userset extends AbstractUsersetValidator {
     private final String name;
     private final boolean blacklist;
     private final String extendsRoleset;
     private DiscordRolesetValidator discordRolesetValidator;
 
-    public Roleset(String name, boolean blacklist, String extendsRoleset, DiscordRolesetValidator discordRolesetValidator) {
+    public Userset(String name, boolean blacklist, String extendsRoleset, DiscordRolesetValidator discordRolesetValidator) {
         this.name = name;
         this.blacklist = blacklist;
         this.extendsRoleset = extendsRoleset;
         this.discordRolesetValidator = discordRolesetValidator;
     }
 
-    public Roleset(String name, boolean blacklist, String extendsRoleset) {
+    public Userset(String name, boolean blacklist, String extendsRoleset) {
         this.name = name;
         this.blacklist = blacklist;
         this.extendsRoleset = extendsRoleset;
     }
 
-    public Roleset(String name, DiscordRolesetValidator discordRolesetValidator) {
+    public Userset(String name, DiscordRolesetValidator discordRolesetValidator) {
         this(name, false, null, discordRolesetValidator);
     }
 
@@ -60,8 +60,7 @@ public class Roleset extends AbstractRolesetValidator {
         }
 
         if(StringUtils.isNotBlank(extendsRoleset)) {
-            Roleset extension = botSpec.getRolesets()
-                    .flatMap(r -> r.getRoleset(extendsRoleset))
+            Userset extension = botSpec.getUserset(extendsRoleset)
                     .orElseThrow(() -> new CommandUseException("Somehow, roleset stuff failed?"));
             return MonoUtils.and(extension.validateInRole(botSpec, ctx), matches);
         }

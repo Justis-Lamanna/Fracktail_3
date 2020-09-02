@@ -5,7 +5,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.role.Roleset;
+import com.github.lucbui.fracktail3.magic.role.Userset;
 import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -47,8 +47,8 @@ public abstract class BaseTrigger {
         if(!hasRole()) {
             return Mono.just(true);
         }
-        Roleset roleset = spec.getRoleset(role)
+        Userset userset = spec.getUserset(role)
                 .orElseThrow(() -> new CommandUseException("Unknown Roleset: " + role));
-        return roleset.validateInRole(spec, context);
+        return userset.validateInRole(spec, context);
     }
 }

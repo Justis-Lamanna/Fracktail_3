@@ -59,7 +59,7 @@ public class AutoConfig {
                 expressionParser,
                 new DefaultConfigParser(expressionParser),
                 commandListParser,
-                new RolesetParser()
+                new DefaultUsersetParser()
         );
     }
 
