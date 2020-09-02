@@ -21,35 +21,32 @@
             </discord>
         </userset>
     </usersets>
-    <commands>
-        <command id="math">
-            <trigger>
-                <enabled>false</enabled>
-            </trigger>
-            <behaviors>
-                <behavior>
-                    <action>
-                        <respond>The answer is 3.</respond>
-                    </action>
-                </behavior>
-            </behaviors>
-        </command>
-        <command id="hello">
-            <behaviors>
-                <behavior>
-                    <trigger>
-                        <role>steven</role>
-                    </trigger>
-                    <action>
-                        <respond>No u stink.</respond>
-                    </action>
-                </behavior>
-                <behavior>
-                    <action>
-                        <respond>Hello, {at_user}!</respond>
-                    </action>
-                </behavior>
-            </behaviors>
-        </command>
-    </commands>
+    <behaviors>
+        <behavior>
+            <command>
+                <id>math</id>
+                <filter>
+                    <enabled>false</enabled>
+                </filter>
+                <action>
+                    <message>The answer is 3.</message>
+                </action>
+            </command>
+        </behavior>
+        <behavior>
+            <command>
+                <id>hello</id>
+                <actions>
+                    <option>
+                        <filter>
+                            <enabled>false</enabled>
+                        </filter>
+                        <action>
+                            <message>Hello!</message>
+                        </action>
+                    </option>
+                </actions>
+            </command>
+        </behavior>
+    </behaviors>
 </bot>
