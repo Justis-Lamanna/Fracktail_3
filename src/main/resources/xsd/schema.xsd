@@ -52,45 +52,49 @@
         </xs:choice>
     </xs:complexType>
 
+    <xs:complexType name="DTDBot">
+        <xs:sequence>
+            <xs:element name="configuration" type="tns:DTDConfigurationGroup" minOccurs="0"/>
+            <xs:element name="usersets" type="tns:DTDUsersets" minOccurs="0"/>
+            <!--            <xs:element name="commands" type="tns:DTDCommandList"/>-->
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Configuration -->
+    <xs:complexType name="DTDConfigurationGroup">
+        <xs:sequence>
+            <xs:element name="discord" type="tns:DTDDiscordConfiguration" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="DTDConfiguration">
         <xs:sequence>
             <xs:element name="i18n" type="xs:anyURI" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
+    <!-- End Configuration -->
 
-    <xs:complexType name="DTDBot">
+    <!-- Usersets -->
+    <xs:complexType name="DTDUsersets">
         <xs:sequence>
-            <xs:element name="configuration" type="tns:DTDConfigurationGroup" minOccurs="0"/>
-            <xs:element name="rolesets" type="tns:DTDRolesets" minOccurs="0"/>
-            <xs:element name="commands" type="tns:DTDCommandList"/>
+            <xs:element name="userset" type="tns:DTDUserset" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DTDConfigurationGroup">
+    <xs:complexType name="DTDAbstractUserset" abstract="true">
         <xs:sequence>
-            <xs:element name="global" type="tns:DTDConfiguration" minOccurs="0"/>
-            <xs:element name="discord" type="tns:DTDDiscordConfiguration" minOccurs="0"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:choice>
+                <xs:element name="discord" type="tns:DTDDiscordRoleset"/>
+            </xs:choice>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DTDRolesets">
-        <xs:sequence>
-            <xs:element name="roleset" type="tns:DTDRoleset" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="DTDAbstractRoleset" abstract="true">
-        <xs:sequence>
-            <xs:element name="discord" type="tns:DTDDiscordRoleset" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="DTDRoleset">
+    <xs:complexType name="DTDUserset">
         <xs:complexContent>
-            <xs:extension base="tns:DTDAbstractRoleset">
-                <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:extension base="tns:DTDAbstractUserset">
                 <xs:attribute name="blacklist" type="xs:boolean" default="false"/>
-                <xs:attribute name="extends" type="xs:string"/>
+                <xs:attribute name="extends" type="xs:string" default=""/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -113,29 +117,30 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
-
+    <!-- End Usersets -->
+<!--
     <xs:complexType name="DTDCommandRoleset">
         <xs:simpleContent>
             <xs:extension base="xs:string"/>
         </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType abstract="true" name="DTDTrigger">
+    <xs:complexType abstract="true" name="DTDFilter">
         <xs:sequence>
             <xs:element name="enabled" type="xs:boolean" default="true" minOccurs="0"/>
             <xs:element name="role" type="tns:DTDCommandRoleset" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DTDCommandTrigger">
+    <xs:complexType name="DTDCommandFilter">
         <xs:complexContent>
-            <xs:extension base="DTDTrigger"/>
+            <xs:extension base="DTDCommandFilter"/>
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="DTDBehaviorTrigger">
+    <xs:complexType name="DTDBehaviorFilter">
         <xs:complexContent>
-            <xs:extension base="DTDTrigger">
+            <xs:extension base="DTDCommandFilter">
                 <xs:sequence>
                     <xs:element name="parameters" type="tns:DTDValueOrRange" minOccurs="0"/>
                 </xs:sequence>
@@ -168,7 +173,7 @@
                         </xs:element>
                         <xs:element name="namesFrom" type="tns:NonEmptyString"/>
                     </xs:choice>
-                    <xs:element name="trigger" type="tns:DTDCommandTrigger" minOccurs="0"/>
+                    <xs:element name="filter" type="tns:DTDCommandFilter" minOccurs="0"/>
                     <xs:element name="behaviors">
                         <xs:complexType>
                             <xs:sequence>
@@ -195,7 +200,7 @@
             <xs:choice>
                 <xs:element name="custom" type="tns:DTDCustomClass"/>
                 <xs:sequence>
-                    <xs:element name="trigger" minOccurs="0" type="tns:DTDBehaviorTrigger"/>
+                    <xs:element name="filter" minOccurs="0" type="tns:DTDBehaviorFilter"/>
                     <xs:element name="action" type="tns:DTDAction"/>
                 </xs:sequence>
             </xs:choice>
@@ -246,7 +251,7 @@
             </xs:sequence>
         </xs:choice>
     </xs:complexType>
-
+-->
     <xs:complexType name="DTDDiscordConfiguration" >
         <xs:complexContent>
             <xs:extension base="tns:DTDConfiguration">

@@ -11,15 +11,16 @@
             </presence>
         </discord>
     </configuration>
-    <rolesets>
-        <roleset name="steven">
+    <usersets>
+        <userset>
+            <name>steven</name>
             <discord>
                 <snowflakes>
                     <snowflake>112005555178000384</snowflake>
                 </snowflakes>
             </discord>
-        </roleset>
-    </rolesets>
+        </userset>
+    </usersets>
     <commands>
         <command id="math">
             <trigger>
