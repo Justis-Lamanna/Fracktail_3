@@ -25,9 +25,6 @@
         <behavior>
             <command>
                 <id>math</id>
-                <filter>
-                    <enabled>false</enabled>
-                </filter>
                 <action>
                     <message>The answer is 3.</message>
                 </action>
@@ -38,11 +35,8 @@
                 <id>hello</id>
                 <actions>
                     <option>
-                        <filter>
-                            <enabled>false</enabled>
-                        </filter>
                         <action>
-                            <message>Hello!</message>
+                            <message>Hello, {at_user}!</message>
                         </action>
                     </option>
                 </actions>

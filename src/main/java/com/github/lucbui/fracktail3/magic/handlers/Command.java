@@ -2,11 +2,11 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.filter.CommandFilter;
-import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Command {
     private final String id;
@@ -15,10 +15,10 @@ public class Command {
     private final ActionOptions actions;
 
     public Command(String id, Resolver<List<String>> names, CommandFilter commandFilter, ActionOptions actions) {
-        this.id = id;
-        this.names = names;
-        this.commandFilter = commandFilter;
-        this.actions = actions;
+        this.id = Objects.requireNonNull(id);
+        this.names = Objects.requireNonNull(names);
+        this.commandFilter = Objects.requireNonNull(commandFilter);
+        this.actions = Objects.requireNonNull(actions);
     }
 
     public String getId() {
@@ -37,11 +37,11 @@ public class Command {
         return actions;
     }
 
-    public Mono<Boolean> matchesTrigger(Bot bot, DiscordContext ctx) {
-        return Mono.just(true);
+    public Mono<Boolean> matchesTrigger(Bot bot, CommandContext<?> ctx) {
+        return commandFilter.matches(bot, ctx);
     }
 
-    public Mono<Void> doAction(Bot bot, DiscordContext ctx) {
-        return Mono.empty();
+    public Mono<Void> doAction(Bot bot, CommandContext<?> ctx) {
+        return actions.doAction(bot, ctx);
     }
 }

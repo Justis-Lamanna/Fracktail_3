@@ -7,5 +7,7 @@ import reactor.core.publisher.Mono;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS, property = "type")
 public interface Action {
-    Mono<Void> doAction(Bot bot, CommandContext context);
+    Action NOOP = (bot, context) -> Mono.empty();
+
+    Mono<Void> doAction(Bot bot, CommandContext<?> context);
 }
