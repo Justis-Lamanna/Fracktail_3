@@ -27,8 +27,6 @@ public class AbstractParser<T> implements Parser<T> {
     protected T getFromCustom(DTDCustomClass custom) {
         if(custom.getClazz() != null) {
             return getFromClassElement(custom.getClazz(), custom.getMethod());
-        } else if(custom.getSpring() != null) {
-            return getFromSpringBean(custom.getSpring());
         }
         throw new BotConfigurationException("Custom actions must be specified by <class> or <spring> element");
     }
@@ -68,10 +66,6 @@ public class AbstractParser<T> implements Parser<T> {
             throw new BotConfigurationException("Return type " + method.getReturnType() + " is not a subtype of " + parsedClass);
         }
         return (T) method.invoke(null);
-    }
-
-    protected T getFromSpringBean(String spring) {
-        throw new BotConfigurationException("Spring bean " + parsedClass + " are not permitted");
     }
 
     protected static String getDebugString(String type, I18NString string) {

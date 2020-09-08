@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.parse.xml.spring;
 
-import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.parse.xml.ActionParser;
 import com.github.lucbui.fracktail3.magic.parse.xml.DefaultCommandParser;
 import org.slf4j.Logger;
@@ -24,11 +23,5 @@ public class SpringCommandParser extends DefaultCommandParser implements Applica
     @Autowired
     public SpringCommandParser(ActionParser actionParser) {
         super(actionParser);
-    }
-
-    @Override
-    public Command getFromSpringBean(String spring){
-        LOGGER.debug("Creating Command by retrieving bean {}", spring);
-        return SpringUtils.getFromSpringBean(applicationContext, spring, Command.class);
     }
 }

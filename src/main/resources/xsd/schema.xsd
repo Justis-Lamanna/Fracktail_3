@@ -53,13 +53,10 @@
     </xs:complexType>
 
     <xs:complexType name="DTDCustomClass">
-        <xs:choice>
-            <xs:element name="spring" type="xs:string"/>
-            <xs:sequence>
-                <xs:element name="class" type="xs:string"/>
-                <xs:element name="method" type="xs:string" minOccurs="0"/>
-            </xs:sequence>
-        </xs:choice>
+        <xs:sequence>
+            <xs:element name="class" type="xs:string"/>
+            <xs:element name="method" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
     </xs:complexType>
     <!-- End Utility Stuff -->
 

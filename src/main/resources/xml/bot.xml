@@ -33,13 +33,9 @@
         <behavior>
             <command>
                 <id>hello</id>
-                <actions>
-                    <option>
-                        <action>
-                            <message>Hello, {at_user}!</message>
-                        </action>
-                    </option>
-                </actions>
+                <action>
+                    <message>Hello, {at_user}!</message>
+                </action>
             </command>
         </behavior>
     </behaviors>
