@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.github.lucbui.fracktail3.magic.BotSpec;
+
 public class BehaviorList {
     private final CommandList commandList;
 
@@ -9,5 +11,9 @@ public class BehaviorList {
 
     public CommandList getCommandList() {
         return commandList;
+    }
+
+    public void validate(BotSpec botSpec) {
+        commandList.validate(botSpec);
     }
 }

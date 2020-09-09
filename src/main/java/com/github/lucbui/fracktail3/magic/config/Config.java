@@ -15,4 +15,8 @@ public interface Config {
      * @return The localized string, or an empty optional if not found.
      */
     Optional<String> getTextForKey(String key, Locale locale);
+
+    default void validate(){
+        //NOOP for now
+    }
 }

@@ -83,31 +83,31 @@
     <!-- End Configuration -->
 
     <!-- Usersets -->
+    <xs:complexType name="DTDAbstractFilterSet" abstract="true">
+        <xs:attribute name="blacklist" type="xs:boolean" default="false"/>
+        <xs:attribute name="extends" type="xs:string" default=""/>
+    </xs:complexType>
+
     <xs:complexType name="DTDUsersets">
         <xs:sequence>
             <xs:element name="userset" type="tns:DTDUserset" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DTDAbstractUserset" abstract="true">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string"/>
-            <xs:choice>
-                <xs:element name="discord" type="tns:DTDDiscordRoleset"/>
-            </xs:choice>
-        </xs:sequence>
-    </xs:complexType>
-
     <xs:complexType name="DTDUserset">
         <xs:complexContent>
-            <xs:extension base="tns:DTDAbstractUserset">
-                <xs:attribute name="blacklist" type="xs:boolean" default="false"/>
-                <xs:attribute name="extends" type="xs:string" default=""/>
+            <xs:extension base="tns:DTDAbstractFilterSet">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:choice>
+                        <xs:element name="discord" type="tns:DTDDiscordUserset"/>
+                    </xs:choice>
+                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="DTDDiscordRoleset">
+    <xs:complexType name="DTDDiscordUserset">
         <xs:sequence>
             <xs:element name="snowflakes" minOccurs="0" maxOccurs="unbounded">
                 <xs:complexType>

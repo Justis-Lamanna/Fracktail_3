@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.filter.CommandFilter;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import reactor.core.publisher.Mono;
@@ -43,5 +44,10 @@ public class Command {
 
     public Mono<Void> doAction(Bot bot, CommandContext<?> ctx) {
         return actions.doAction(bot, ctx);
+    }
+
+    public void validate(BotSpec botSpec) {
+        commandFilter.validate(botSpec);
+        actions.validate(botSpec);
     }
 }

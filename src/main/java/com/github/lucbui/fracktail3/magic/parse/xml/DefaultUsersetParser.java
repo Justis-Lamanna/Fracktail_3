@@ -6,7 +6,7 @@ import com.github.lucbui.fracktail3.magic.role.DiscordRolesetValidator;
 import com.github.lucbui.fracktail3.magic.role.Userset;
 import com.github.lucbui.fracktail3.magic.role.Usersets;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
-import com.github.lucbui.fracktail3.xsd.DTDDiscordRoleset;
+import com.github.lucbui.fracktail3.xsd.DTDDiscordUserset;
 import com.github.lucbui.fracktail3.xsd.DTDUserset;
 import discord4j.core.object.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,19 +66,19 @@ public class DefaultUsersetParser {
         return new Usersets(roles);
     }
 
-    private DiscordRolesetValidator fromXml(DTDBot xml, DTDUserset set, DTDDiscordRoleset discord) {
+    protected DiscordRolesetValidator fromXml(DTDBot xml, DTDUserset set, DTDDiscordUserset discord) {
         DefaultDiscordRolesetValidator validator = new DefaultDiscordRolesetValidator();
         if(CollectionUtils.isNotEmpty(discord.getSnowflakes())) {
             validator.setLegalSnowflakes(
                     discord.getSnowflakes().stream()
-                        .map(DTDDiscordRoleset.Snowflakes::getSnowflake)
+                        .map(DTDDiscordUserset.Snowflakes::getSnowflake)
                         .map(Snowflake::of)
                         .collect(Collectors.toSet()));
         }
         if(CollectionUtils.isNotEmpty(discord.getRoles())) {
             validator.setLegalRoles(
                     discord.getRoles().stream()
-                            .map(DTDDiscordRoleset.Roles::getRole)
+                            .map(DTDDiscordUserset.Roles::getRole)
                             .map(Snowflake::of)
                             .collect(Collectors.toSet()));
         }
@@ -86,7 +86,7 @@ public class DefaultUsersetParser {
         return validator;
     }
 
-    private void validateRoleExtensionsExist(Map<String, Userset> roles) {
+    protected void validateRoleExtensionsExist(Map<String, Userset> roles) {
         for(Userset set : roles.values()) {
             if(StringUtils.isNotBlank(set.getExtends()) && !roles.containsKey(set.getExtends())) {
                 throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends());
@@ -94,7 +94,7 @@ public class DefaultUsersetParser {
         }
     }
 
-    private void validateNonRecursiveExtends(Map<String, Userset> roles, Set<String> encounteredRolesets, Userset userset) {
+    protected void validateNonRecursiveExtends(Map<String, Userset> roles, Set<String> encounteredRolesets, Userset userset) {
         if(StringUtils.isNotBlank(userset.getExtends())) {
             Userset extension = roles.get(userset.getExtends());
             if(extension != null){

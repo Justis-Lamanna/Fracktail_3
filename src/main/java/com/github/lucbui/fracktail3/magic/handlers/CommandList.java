@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,7 @@ public class CommandList {
 
     public CommandList(List<Command> commands, Action orElse) {
         this.commands = Collections.unmodifiableList(commands);
-        this.orElse = orElse;
+        this.orElse = Objects.requireNonNull(orElse);
         this.caseSensitive = true;
     }
 
@@ -74,5 +75,10 @@ public class CommandList {
             return Mono.empty();
         }
         return orElse.doAction(bot, ctx);
+    }
+
+    public void validate(BotSpec botSpec) {
+        commands.forEach(c -> c.validate(botSpec));
+        orElse.validate(botSpec);
     }
 }

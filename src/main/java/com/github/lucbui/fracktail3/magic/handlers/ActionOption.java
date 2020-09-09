@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.filter.ActionFilter;
 
@@ -26,5 +27,10 @@ public class ActionOption {
 
     public void setAction(Action action) {
         this.action = action;
+    }
+
+    public void validate(BotSpec botSpec) {
+        filter.validate(botSpec);
+        action.validate(botSpec);
     }
 }

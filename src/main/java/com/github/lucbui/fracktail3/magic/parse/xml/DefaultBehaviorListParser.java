@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
+import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.xsd.DTDBehavior;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import org.slf4j.Logger;
@@ -31,6 +32,6 @@ public class DefaultBehaviorListParser implements BehaviorListParser {
                 commands.add(command);
             }
         }
-        return new BehaviorList(new CommandList(commands, null));
+        return new BehaviorList(new CommandList(commands, Action.NOOP));
     }
 }

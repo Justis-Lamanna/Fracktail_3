@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,5 +32,10 @@ public class ActionOptions {
                 .next()
                 .flatMap(ao -> ao.getAction().doAction(bot, ctx))
                 .switchIfEmpty(_default.doAction(bot, ctx));
+    }
+
+    public void validate(BotSpec botSpec) {
+        actions.forEach(a -> a.validate(botSpec));
+        _default.validate(botSpec);
     }
 }
