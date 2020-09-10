@@ -1,10 +1,11 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.filter.ActionFilter;
 
-public class ActionOption {
+public class ActionOption implements Validated {
     private ActionFilter filter;
     private Action action;
 
@@ -29,7 +30,8 @@ public class ActionOption {
         this.action = action;
     }
 
-    public void validate(BotSpec botSpec) {
+    @Override
+    public void validate(BotSpec botSpec) throws BotConfigurationException {
         filter.validate(botSpec);
         action.validate(botSpec);
     }

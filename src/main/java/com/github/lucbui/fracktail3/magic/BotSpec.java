@@ -96,8 +96,8 @@ public class BotSpec {
      * @throws BotConfigurationException An error occurs.
      */
     public void validate() throws BotConfigurationException {
-        discordConfig.validate();
-        usersets.validate();
+        getDiscordConfiguration().ifPresent(c -> c.validate(this));
+        usersets.validate(this);
         behaviorList.validate(this);
     }
 }

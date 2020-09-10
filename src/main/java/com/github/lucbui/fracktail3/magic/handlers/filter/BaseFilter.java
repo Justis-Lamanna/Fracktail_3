@@ -2,10 +2,12 @@ package com.github.lucbui.fracktail3.magic.handlers.filter;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.handlers.Validated;
 import reactor.core.publisher.Mono;
 
-public class BaseFilter {
+public class BaseFilter implements Validated {
     public static final BaseFilter DEFAULT = new BaseFilter(true);
 
     private boolean enabled;
@@ -26,7 +28,8 @@ public class BaseFilter {
         return Mono.just(enabled);
     }
 
-    public void validate(BotSpec botSpec) {
+    @Override
+    public void validate(BotSpec botSpec) throws BotConfigurationException {
         //NOOP for now
     }
 }

@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
-public class ActionOptions {
+public class ActionOptions implements Validated {
     private final List<ActionOption> actions;
     private final Action _default;
 
@@ -34,7 +35,8 @@ public class ActionOptions {
                 .switchIfEmpty(_default.doAction(bot, ctx));
     }
 
-    public void validate(BotSpec botSpec) {
+    @Override
+    public void validate(BotSpec botSpec) throws BotConfigurationException {
         actions.forEach(a -> a.validate(botSpec));
         _default.validate(botSpec);
     }

@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.config.Config;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -12,7 +13,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class CommandList {
+public class CommandList implements Validated {
     private final List<Command> commands;
     private final Action orElse;
 
@@ -77,7 +78,7 @@ public class CommandList {
         return orElse.doAction(bot, ctx);
     }
 
-    public void validate(BotSpec botSpec) {
+    public void validate(BotSpec botSpec) throws BotConfigurationException {
         commands.forEach(c -> c.validate(botSpec));
         orElse.validate(botSpec);
     }

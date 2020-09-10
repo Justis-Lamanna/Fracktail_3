@@ -1,11 +1,13 @@
 package com.github.lucbui.fracktail3.magic.role;
 
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.handlers.Validated;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-public class Usersets {
+public class Usersets implements Validated {
     private final Map<String, Userset> rolesets;
 
     public Usersets(Map<String, Userset> rolesets) {
@@ -20,7 +22,8 @@ public class Usersets {
         return Optional.ofNullable(rolesets.get(name));
     }
 
-    public void validate() throws BotConfigurationException {
+    @Override
+    public void validate(BotSpec spec) throws BotConfigurationException {
         for(Userset set : rolesets.values()) {
             if(StringUtils.isNotBlank(set.getExtends()) && !rolesets.containsKey(set.getExtends())) {
                 throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends());
