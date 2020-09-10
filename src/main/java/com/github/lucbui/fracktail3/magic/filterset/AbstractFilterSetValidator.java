@@ -1,11 +1,11 @@
-package com.github.lucbui.fracktail3.magic.role;
+package com.github.lucbui.fracktail3.magic.filterset;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import reactor.core.publisher.Mono;
 
-public abstract class AbstractUsersetValidator implements UsersetValidator {
+public abstract class AbstractFilterSetValidator implements FilterSetValidator {
     @Override
     public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext<?> ctx) {
         if(ctx.isDiscord()) {

@@ -28,7 +28,7 @@ public class DefaultConfigParser implements ConfigParser {
             throw new BotConfigurationException("Token must be non-null and non-blank");
         }
 
-        Snowflake owner = discord.getOwner() == null ? null : Snowflake.of(discord.getOwner());
+        Snowflake owner = discord.getOwner() == null ? null : Snowflake.of(discord.getOwner().getValue());
         LOGGER.debug("Owner: {}", owner);
 
         Presence presence = PresenceUtils.getPresence(discord.getPresence());

@@ -15,9 +15,9 @@
         <userset>
             <name>steven</name>
             <discord>
-                <snowflakes>
+                <users>
                     <snowflake>112005555178000384</snowflake>
-                </snowflakes>
+                </users>
             </discord>
         </userset>
     </usersets>

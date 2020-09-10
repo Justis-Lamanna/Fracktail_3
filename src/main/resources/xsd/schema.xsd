@@ -63,6 +63,7 @@
     <xs:complexType name="DTDBot">
         <xs:sequence>
             <xs:element name="configuration" type="tns:DTDConfigurationGroup" minOccurs="0"/>
+            <xs:element name="channelsets" type="tns:DTDChannelsets" minOccurs="0"/>
             <xs:element name="usersets" type="tns:DTDUsersets" minOccurs="0"/>
             <xs:element name="behaviors" type="tns:DTDBehaviors"/>
         </xs:sequence>
@@ -109,24 +110,40 @@
 
     <xs:complexType name="DTDDiscordUserset">
         <xs:sequence>
-            <xs:element name="snowflakes" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="snowflake" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="roles" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="role" type="xs:long"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="users" minOccurs="0" type="tns:DTDSnowflakes" />
+            <xs:element name="roles" minOccurs="0" type="tns:DTDSnowflakes" />
         </xs:sequence>
     </xs:complexType>
     <!-- End Usersets -->
 
+    <!-- Channelsets -->
+
+    <!-- End Channelsets -->
+    <xs:complexType name="DTDChannelsets">
+        <xs:sequence>
+            <xs:element name="channelset" type="tns:DTDChannelset" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDChannelset">
+        <xs:complexContent>
+            <xs:extension base="tns:DTDAbstractFilterSet">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:choice>
+                        <xs:element name="discord" type="tns:DTDDiscordChannelset"/>
+                    </xs:choice>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DTDDiscordChannelset">
+        <xs:sequence>
+            <xs:element name="guilds" minOccurs="0" type="tns:DTDSnowflakes"/>
+            <xs:element name="channels" minOccurs="0" type="tns:DTDSnowflakes"/>
+        </xs:sequence>
+    </xs:complexType>
     <!-- Behaviors -->
     <xs:complexType name="DTDBehaviors">
         <xs:sequence>
@@ -225,13 +242,25 @@
     <!-- End Actions -->
 
     <!-- Discord -->
+    <xs:complexType name="DTDSnowflakes">
+        <xs:sequence>
+            <xs:element name="snowflake" type="tns:DTDSnowflake" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DTDSnowflake">
+        <xs:simpleContent>
+            <xs:extension base="xs:long"/>
+        </xs:simpleContent>
+    </xs:complexType>
+
     <xs:complexType name="DTDDiscordConfiguration" >
         <xs:complexContent>
             <xs:extension base="tns:DTDConfiguration">
                 <xs:sequence>
                     <xs:element name="token" type="tns:NonEmptyString"/>
                     <xs:element name="prefix" type="tns:NonEmptyString" minOccurs="0"/>
-                    <xs:element name="owner" type="xs:long" minOccurs="0"/>
+                    <xs:element name="owner" type="tns:DTDSnowflake" minOccurs="0"/>
                     <xs:element name="presence" type="tns:DTDDiscordPresence" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
