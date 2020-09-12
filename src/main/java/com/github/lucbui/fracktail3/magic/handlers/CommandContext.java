@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -107,6 +108,10 @@ public abstract class CommandContext {
             map.put(RESULT_PREFIX + key, results.get(key));
         }
         return map;
+    }
+
+    public <T> T resolve(Resolver<T> resolver) {
+        return resolver.resolve(getConfiguration(), getLocale());
     }
 
     public Mono<Map<String, Object>> getExtendedVariableMap() {
