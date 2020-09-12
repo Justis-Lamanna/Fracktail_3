@@ -1,11 +1,13 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class CommandContext {
@@ -20,17 +22,51 @@ public abstract class CommandContext {
     private String parameters;
     private String[] normalizedParameters;
     private final Map<String, Object> results = new HashMap<>();
+    private Locale locale;
+    private Command command;
 
     public String getContents() {
         return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 
     public String getParameters() {
         return parameters;
     }
 
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+
     public String[] getNormalizedParameters() {
         return normalizedParameters;
+    }
+
+    public void setNormalizedParameters(String[] normalizedParameters) {
+        this.normalizedParameters = normalizedParameters;
+    }
+
+    public Map<String, Object> getResults() {
+        return Collections.unmodifiableMap(results);
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
+    public Command getCommand() {
+        return command;
+    }
+
+    public void setCommand(Command command) {
+        this.command = command;
     }
 
     @JsonIgnore
@@ -46,24 +82,7 @@ public abstract class CommandContext {
         return !isDiscord();
     }
 
-    public CommandContext setContents(String contents) {
-        this.contents = contents;
-        return this;
-    }
-
-    public CommandContext setParameters(String parameters) {
-        this.parameters = parameters;
-        return this;
-    }
-
-    public CommandContext setNormalizedParameters(String[] normalizedParameters) {
-        this.normalizedParameters = normalizedParameters;
-        return this;
-    }
-
-    public Map<String, Object> getResults() {
-        return Collections.unmodifiableMap(results);
-    }
+    public abstract Config getConfiguration();
 
     public Object getResult(String key) {
         return results.get(key);
@@ -77,10 +96,9 @@ public abstract class CommandContext {
         results.put(key, value);
     }
 
-    public Map<String, Object> getVariableMap() {
+    protected Map<String, Object> getVariableMapConstants() {
         Map<String, Object> map = new HashMap<>();
         map.put(MESSAGE, contents);
-        //map.put(COMMAND, normalizedCommand);
         map.put(PARAMS, parameters);
         for(int idx = 0; idx < normalizedParameters.length; idx++) {
             map.put(PARAM_PREFIX + idx, normalizedParameters[idx]);
@@ -91,61 +109,11 @@ public abstract class CommandContext {
         return map;
     }
 
+    public Mono<Map<String, Object>> getExtendedVariableMap() {
+        return Mono.just(getVariableMapConstants());
+    }
+
     public abstract Mono<Boolean> respond(String message);
 
-    public abstract static class Builder<THIS extends Builder<?>> {
-        protected String contents;
-        protected String parameters;
-        protected String[] normalizedParameters;
-        protected Map<String, Object> results = new HashMap<>();
-
-        public THIS setContents(String contents) {
-            this.contents = contents;
-            return (THIS) this;
-        }
-
-        public THIS setParameters(String parameters) {
-            this.parameters = parameters;
-            return (THIS) this;
-        }
-
-        public THIS setNormalizedParameters(String[] normalizedParameters) {
-            this.normalizedParameters = normalizedParameters;
-            return (THIS) this;
-        }
-
-        public THIS setResults(Map<String, Object> results) {
-            this.results = results;
-            return (THIS) this;
-        }
-
-        public THIS setResult(String key, Object value) {
-            this.results.put(key, value);
-            return (THIS) this;
-        }
-
-        public String getContents() {
-            return contents;
-        }
-
-        public String getParameters() {
-            return parameters;
-        }
-
-        public String[] getNormalizedParameters() {
-            return normalizedParameters;
-        }
-
-        public Map<String, Object> getResults() {
-            return results;
-        }
-
-        protected void build(CommandContext ctx) {
-            ctx.setContents(contents);
-            ctx.setNormalizedParameters(normalizedParameters);
-            ctx.setParameters(parameters);
-            ctx.results.clear();
-            ctx.results.putAll(this.results);
-        }
-    }
+    public abstract Mono<Boolean> alert(String message);
 }

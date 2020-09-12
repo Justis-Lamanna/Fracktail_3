@@ -200,6 +200,7 @@
     <xs:complexType name="DTDCommandAction">
         <xs:choice>
             <xs:element name="message" type="tns:I18NString"/>
+            <xs:element name="alert" type="tns:I18NString"/>
             <xs:element name="random" type="tns:DTDWeightedCommandActions"/>
             <xs:element name="sequence" type="DTDCommandActions"/>
             <xs:element name="custom" type="DTDCustomClass"/>

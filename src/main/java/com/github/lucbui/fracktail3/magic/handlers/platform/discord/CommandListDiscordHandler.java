@@ -43,13 +43,14 @@ public class CommandListDiscordHandler implements DiscordHandler {
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
                 .map(msg -> {
-                    DiscordContext ctx = new DiscordContext();
-                    ctx.setEvent(event);
+                    DiscordContext ctx = new DiscordContext(event, configuration);
                     ctx.setContents(msg);
-                    ctx.setConfiguration(configuration);
                     return ctx;
                 })
-                .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), DiscordContext::setLocale)
+                .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), (ctx, locale) -> {
+                    ctx.setLocale(locale);
+                    return ctx;
+                })
                 .zipWhen(ctx -> {
                     Map<String, List<Command>> commands =
                             commandList.getCommandsByName(configuration, ctx.getLocale());

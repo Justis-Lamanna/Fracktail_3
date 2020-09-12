@@ -6,10 +6,10 @@ import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.ibm.icu.text.MessageFormat;
 import reactor.core.publisher.Mono;
 
-public class RespondAction implements Action {
+public class AlertAction implements Action {
     private final Resolver<String> resolver;
 
-    public RespondAction(Resolver<String> resolver) {
+    public AlertAction(Resolver<String> resolver) {
         this.resolver = resolver;
     }
 
@@ -22,8 +22,8 @@ public class RespondAction implements Action {
         String message = resolver.resolve(ctx.getConfiguration(), ctx.getLocale());
         MessageFormat format = new MessageFormat(message, ctx.getLocale());
         return ctx.getExtendedVariableMap()
-                    .map(format::format)
-                    .flatMap(ctx::respond)
-                    .then();
+                .map(format::format)
+                .flatMap(ctx::alert)
+                .then();
     }
 }

@@ -1,19 +1,17 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
+import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -28,32 +26,16 @@ public class DiscordContext extends CommandContext {
     public static final String USER_AT = "at_user";
     public static final String OWNER_AT = "at_owner";
 
-    private DiscordConfiguration configuration;
-    private MessageCreateEvent event;
-    private Command command;
-    private Locale locale;
+    private final MessageCreateEvent event;
+    private final DiscordConfiguration configuration;
+
+    public DiscordContext(MessageCreateEvent event, DiscordConfiguration configuration) {
+        this.event = event;
+        this.configuration = configuration;
+    }
 
     public MessageCreateEvent getEvent() {
         return event;
-    }
-
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public DiscordContext setEvent(MessageCreateEvent message) {
-        this.event = message;
-        return this;
-    }
-
-    public DiscordContext setLocale(Locale locale) {
-        this.locale = locale;
-        return this;
-    }
-
-    public DiscordContext setConfiguration(DiscordConfiguration discordConfiguration) {
-        this.configuration = discordConfiguration;
-        return this;
     }
 
     public boolean isDm() {
@@ -61,22 +43,19 @@ public class DiscordContext extends CommandContext {
     }
 
     @Override
-    public Map<String, Object> getVariableMap() {
-        Map<String, Object> map = super.getVariableMap();
-        String username = event.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY);
-        map.put(USERNAME, username);
-        map.put(NICKNAME, event.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
-        map.put(NAME, event.getMember().map(Member::getDisplayName).orElse(username));
-        map.put(LOCALE, locale.getDisplayName());
-        map.put(GUILD_ID, event.getGuildId().map(Snowflake::asString).orElse(StringUtils.EMPTY));
-        map.put(USER_AT, event.getMessage().getAuthor().map(User::getMention).orElse(StringUtils.EMPTY));
-        configuration.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
-        return map;
+    public Config getConfiguration() {
+        return configuration;
     }
 
     @Override
     public Mono<Boolean> respond(String message) {
         return respond(event.getMessage().getChannelId(), message);
+    }
+
+    @Override
+    public Mono<Boolean> alert(String message) {
+        return Mono.justOrEmpty(configuration.getOwner())
+                .flatMap(owner -> dm(owner, message));
     }
 
     public Mono<Boolean> respond(Snowflake channel, String message) {
@@ -101,39 +80,31 @@ public class DiscordContext extends CommandContext {
                 .thenReturn(true);
     }
 
-    public Mono<Boolean> react(String emoji) {
-        return this.event.getMessage()
-                .addReaction(ReactionEmoji.unicode(emoji))
-                .thenReturn(true);
-    }
-
-    public Mono<Boolean> react(Snowflake id, String name) {
-        return react(id, name, false);
-    }
-
-    public Mono<Boolean> react(Snowflake id, String name, boolean animated) {
-        return this.event.getMessage()
-                .addReaction(ReactionEmoji.custom(id, name, animated))
-                .thenReturn(true);
-    }
-
-    public Mono<Boolean> alert(String message) {
-        return Mono.justOrEmpty(configuration.getOwner())
-                .flatMap(owner -> dm(owner, message));
-    }
-
+    @Override
     public Mono<Map<String, Object>> getExtendedVariableMap() {
-        Map<String, Object> map = this.getVariableMap();
-        return Mono.just(map)
-                .zipWith(event.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator(SELF))
-                .zipWith(event.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator(GUILD));
+        if(containsExtendedVariable(getContents())) {
+            return super.getExtendedVariableMap()
+                    .zipWith(event.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator(SELF))
+                    .zipWith(event.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator(GUILD));
+        } else {
+            return Mono.just(this.getVariableMapConstants());
+        }
     }
 
-    public DiscordConfiguration getConfiguration() {
-        return configuration;
+    @Override
+    protected Map<String, Object> getVariableMapConstants() {
+        Map<String, Object> map = super.getVariableMapConstants();
+        String username = event.getMessage().getAuthor().map(User::getUsername).orElse(StringUtils.EMPTY);
+        map.put(USERNAME, username);
+        map.put(NICKNAME, event.getMember().map(Member::getDisplayName).orElse(StringUtils.EMPTY));
+        map.put(NAME, event.getMember().map(Member::getDisplayName).orElse(username));
+        map.put(GUILD_ID, event.getGuildId().map(Snowflake::asString).orElse(StringUtils.EMPTY));
+        map.put(USER_AT, event.getMessage().getAuthor().map(User::getMention).orElse(StringUtils.EMPTY));
+        configuration.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
+        return map;
     }
 
-    public static boolean containsExtendedVariable(String msg) {
+    private static boolean containsExtendedVariable(String msg) {
         return StringUtils.containsAny(msg, "{" + SELF, "{" + GUILD);
     }
 
@@ -144,67 +115,5 @@ public class DiscordContext extends CommandContext {
             }
             return map;
         };
-    }
-
-    public DiscordContext setCommand(Command command) {
-        this.command = command;
-        return this;
-    }
-
-    public Command getCommand() {
-        return command;
-    }
-
-    public static class Builder extends CommandContext.Builder<Builder> {
-        private DiscordConfiguration configuration;
-        private MessageCreateEvent event;
-        private Command command;
-        private Locale locale;
-
-        public Builder setConfiguration(DiscordConfiguration configuration) {
-            this.configuration = configuration;
-            return this;
-        }
-
-        public Builder setEvent(MessageCreateEvent event) {
-            this.event = event;
-            return this;
-        }
-
-        public Builder setCommand(Command command) {
-            this.command = command;
-            return this;
-        }
-
-        public Builder setLocale(Locale locale) {
-            this.locale = locale;
-            return this;
-        }
-
-        public DiscordConfiguration getConfiguration() {
-            return configuration;
-        }
-
-        public MessageCreateEvent getEvent() {
-            return event;
-        }
-
-        public Command getCommand() {
-            return command;
-        }
-
-        public Locale getLocale() {
-            return locale;
-        }
-
-        public DiscordContext build() {
-            DiscordContext context = new DiscordContext();
-            context.setConfiguration(configuration);
-            context.setEvent(event);
-            context.setCommand(command);
-            context.setLocale(locale);
-            build(context);
-            return context;
-        }
     }
 }

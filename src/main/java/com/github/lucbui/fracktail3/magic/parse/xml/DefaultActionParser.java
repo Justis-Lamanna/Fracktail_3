@@ -1,9 +1,6 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
-import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.handlers.action.RandomAction;
-import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
-import com.github.lucbui.fracktail3.magic.handlers.action.SequenceAction;
+import com.github.lucbui.fracktail3.magic.handlers.action.*;
 import com.github.lucbui.fracktail3.xsd.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +20,9 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
         if(action.getMessage() != null) {
             return getRespondAction(action.getMessage());
         }
+        if(action.getAlert() != null) {
+            return getAlertAction(action.getAlert());
+        }
         if(action.getRandom() != null) {
             return getRandomAction(xml, command, action.getRandom());
         }
@@ -38,6 +38,11 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
     protected Action getRespondAction(I18NString respond) {
         LOGGER.debug("\t\t\t" + getDebugString("Response Action", respond));
         return new RespondAction(fromI18NString(respond));
+    }
+
+    protected Action getAlertAction(I18NString respond) {
+        LOGGER.debug("\t\t\t" + getDebugString("Alert Action", respond));
+        return new AlertAction(fromI18NString(respond));
     }
 
     protected Action getRandomAction(DTDBot xml, DTDCommand command, DTDWeightedCommandActions random) {
