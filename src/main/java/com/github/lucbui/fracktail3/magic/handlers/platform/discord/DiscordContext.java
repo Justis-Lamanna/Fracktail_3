@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class DiscordContext extends CommandContext<DiscordContext> {
+public class DiscordContext extends CommandContext {
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
     public static final String NAME = "name";
@@ -153,5 +153,58 @@ public class DiscordContext extends CommandContext<DiscordContext> {
 
     public Command getCommand() {
         return command;
+    }
+
+    public static class Builder extends CommandContext.Builder<Builder> {
+        private DiscordConfiguration configuration;
+        private MessageCreateEvent event;
+        private Command command;
+        private Locale locale;
+
+        public Builder setConfiguration(DiscordConfiguration configuration) {
+            this.configuration = configuration;
+            return this;
+        }
+
+        public Builder setEvent(MessageCreateEvent event) {
+            this.event = event;
+            return this;
+        }
+
+        public Builder setCommand(Command command) {
+            this.command = command;
+            return this;
+        }
+
+        public Builder setLocale(Locale locale) {
+            this.locale = locale;
+            return this;
+        }
+
+        public DiscordConfiguration getConfiguration() {
+            return configuration;
+        }
+
+        public MessageCreateEvent getEvent() {
+            return event;
+        }
+
+        public Command getCommand() {
+            return command;
+        }
+
+        public Locale getLocale() {
+            return locale;
+        }
+
+        public DiscordContext build() {
+            DiscordContext context = new DiscordContext();
+            context.setConfiguration(configuration);
+            context.setEvent(event);
+            context.setCommand(command);
+            context.setLocale(locale);
+            build(context);
+            return context;
+        }
     }
 }

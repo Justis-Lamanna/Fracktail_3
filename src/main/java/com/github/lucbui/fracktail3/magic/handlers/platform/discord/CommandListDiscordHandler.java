@@ -42,7 +42,13 @@ public class CommandListDiscordHandler implements DiscordHandler {
         }
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .map(msg -> new DiscordContext().setEvent(event).setContents(msg).setConfiguration(configuration))
+                .map(msg -> {
+                    DiscordContext ctx = new DiscordContext();
+                    ctx.setEvent(event);
+                    ctx.setContents(msg);
+                    ctx.setConfiguration(configuration);
+                    return ctx;
+                })
                 .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), DiscordContext::setLocale)
                 .zipWhen(ctx -> {
                     Map<String, List<Command>> commands =
@@ -61,10 +67,12 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             .filterWhen(t -> t.getT1().matchesTrigger(bot, ctx))
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
-                }, (ctx, t) -> t.map(tuple -> ctx
-                        .setCommand(tuple.getT1())
-                        .setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()))
-                        .setNormalizedParameters(parseParameters(ctx.getParameters()))).orElse(ctx))
+                }, (ctx, t) -> t.map(tuple -> {
+                    ctx.setCommand(tuple.getT1());
+                    ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()));
+                    ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
+                    return ctx;
+                }).orElse(ctx))
                 .flatMap(ctx -> {
                     if(ctx.getCommand() == null) {
                         LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",

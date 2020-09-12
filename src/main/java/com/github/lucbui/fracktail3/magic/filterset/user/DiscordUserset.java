@@ -46,7 +46,7 @@ public class DiscordUserset {
         this.roleSnowflakes = roleSnowflakes;
     }
 
-    public Mono<Boolean> validateInDiscordRole(BotSpec botSpec, DiscordContext ctx) {
+    public Mono<Boolean> validate(BotSpec botSpec, DiscordContext ctx) {
         if(userSnowflakes == null && roleSnowflakes == null) {
             return Mono.just(true);
         }

@@ -20,7 +20,7 @@ public abstract class AbstractComplexFilterSetValidator extends AbstractFilterSe
     }
 
     @Override
-    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext<?> ctx) {
+    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext ctx) {
         Mono<Boolean> matches = super.validateInRole(botSpec, ctx);
 
         if(blacklist) {

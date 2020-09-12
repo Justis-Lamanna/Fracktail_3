@@ -31,12 +31,12 @@ public class Userset extends AbstractComplexFilterSetValidator {
     }
 
     @Override
-    protected Mono<Boolean> validateInUnknownRole(BotSpec botSpec, CommandContext<?> ctx) {
+    protected Mono<Boolean> validateInUnknownRole(BotSpec botSpec, CommandContext ctx) {
         return Mono.just(false);
     }
 
     @Override
     protected Mono<Boolean> validateInDiscordRole(BotSpec botSpec, DiscordContext ctx) {
-        return discord.validateInDiscordRole(botSpec, ctx);
+        return discord.validate(botSpec, ctx);
     }
 }

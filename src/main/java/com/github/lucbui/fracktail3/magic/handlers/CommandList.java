@@ -71,7 +71,7 @@ public class CommandList implements Validated {
         return orElse;
     }
 
-    public Mono<Void> doOrElse(Bot bot, CommandContext<?> ctx) {
+    public Mono<Void> doOrElse(Bot bot, CommandContext ctx) {
         if(orElse == null) {
             return Mono.empty();
         }

@@ -39,11 +39,11 @@ public class Command implements Validated {
         return actions;
     }
 
-    public Mono<Boolean> matchesTrigger(Bot bot, CommandContext<?> ctx) {
+    public Mono<Boolean> matchesTrigger(Bot bot, CommandContext ctx) {
         return commandFilter.matches(bot, ctx);
     }
 
-    public Mono<Void> doAction(Bot bot, CommandContext<?> ctx) {
+    public Mono<Void> doAction(Bot bot, CommandContext ctx) {
         return actions.doAction(bot, ctx);
     }
 

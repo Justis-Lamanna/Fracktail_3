@@ -24,7 +24,7 @@ public class BaseFilter implements Validated {
         this.enabled = enabled;
     }
 
-    public Mono<Boolean> matches(Bot bot, CommandContext<?> ctx) {
+    public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
         return Mono.just(enabled);
     }
 
