@@ -44,6 +44,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
                 .map(msg -> {
                     DiscordContext ctx = new DiscordContext(event, configuration);
+                    ctx.setPlatform(DiscordPlatform.INSTANCE);
                     ctx.setContents(msg);
                     return ctx;
                 })
@@ -69,51 +70,43 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
                 }, (ctx, t) -> t.map(tuple -> {
-                    ctx.setCommand(tuple.getT1());
                     ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()));
                     ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
-                    return ctx;
-                }).orElse(ctx))
-                .flatMap(ctx -> {
-                    if(ctx.getCommand() == null) {
-                        LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
-                                ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                                ctx.getLocale(),
-                                ctx.getContents());
-                        return commandList.doOrElse(bot, ctx)
-                                .onErrorResume(CommandValidationException.class, ex -> {
-                                    String response = ex.getMessage(configuration, ctx.getLocale());
-                                    return ctx.respond(response).then();
-                                })
-                                .onErrorResume(RuntimeException.class, ex -> {
-                                    LOGGER.warn("Encountered exception running or-else command", ex);
-                                    return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
-                                            .then(ctx.alert("Encountered exception: " + ex.getMessage()))
-                                            .then();
-                                });
-                    } else {
-                        LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
-                                ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                                ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                                ctx.getLocale(),
-                                ctx.getContents(),
-                                ctx.getCommand().getId(),
-                                ctx.getParameters(), ctx.getNormalizedParameters());
-                        return ctx.getCommand().doAction(bot, ctx)
-                                .onErrorResume(CommandValidationException.class, ex -> {
-                                    String response = ex.getMessage(configuration, ctx.getLocale());
-                                    return ctx.respond(response).then();
-                                })
-                                .onErrorResume(RuntimeException.class, ex -> {
-                                    LOGGER.warn("Encountered exception running or-else command", ex);
-                                    return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
-                                            .then(ctx.alert("Encountered exception: " + ex.getMessage()))
-                                            .then();
-                                });
-                    }
-                })
-                .then();
+                    LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
+                            ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                            ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                            ctx.getLocale(),
+                            ctx.getContents(),
+                            tuple.getT1().getId(),
+                            ctx.getParameters(), ctx.getNormalizedParameters());
+                    return tuple.getT1().doAction(bot, ctx)
+                            .onErrorResume(CommandValidationException.class, ex -> {
+                                String response = ex.getMessage(configuration, ctx.getLocale());
+                                return ctx.respond(response).then();
+                            })
+                            .onErrorResume(RuntimeException.class, ex -> {
+                                LOGGER.warn("Encountered exception running command", ex);
+                                return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
+                                        .then(ctx.alert("Encountered exception: " + ex.getMessage()))
+                                        .then();
+                            });
+                }).orElseGet(() -> {
+                    LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
+                            ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
+                            ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
+                            ctx.getLocale(),
+                            ctx.getContents());
+                    return commandList.doOrElse(bot, ctx)
+                            .onErrorResume(CommandValidationException.class, ex -> {
+                                String response = ex.getMessage(configuration, ctx.getLocale());
+                                return ctx.respond(response).then();
+                            })
+                            .onErrorResume(RuntimeException.class, ex -> {
+                                LOGGER.warn("Encountered exception running or-else command", ex);
+                                return ctx.alert("Encountered exception: " + ex.getMessage()).then();
+                            });
+                }))
+                .flatMap(m -> m); //Since zipping makes a Mono<Mono<Void>>, we need an identity map to unwrap.
     }
 
     private String[] parseParameters(String paramString) {

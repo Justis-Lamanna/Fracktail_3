@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
 import discord4j.core.DiscordClient;
@@ -23,24 +22,24 @@ public class DiscordPlatformHandler implements PlatformHandler {
         }
 
         BotSpec botSpec = bot.getSpec();
-        if(!botSpec.getDiscordConfiguration().isPresent()) {
+
+        return botSpec.getConfig(DiscordPlatform.INSTANCE).map(discordConfig -> {
+            DiscordHandler discordHandler = new CommandListDiscordHandler(botSpec.getBehaviorList().getCommandList());
+            discordClient = new DiscordClientBuilder(discordConfig.getToken())
+                    .setInitialPresence(discordConfig.getPresence())
+                    .build();
+
+            discordClient.getEventDispatcher().on(MessageCreateEvent.class)
+                    .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
+                    .flatMap(msg -> discordHandler.execute(bot, discordConfig, msg))
+                    .subscribe();
+
+            LOGGER.debug("Starting bot on Discord");
+            return discordClient.login().thenReturn(true);
+        }).orElseGet(() -> {
             LOGGER.debug("Attempted to start bot with Discord Runner, without a Discord configuration");
             return Mono.empty();
-        }
-
-        DiscordHandler discordHandler = new CommandListDiscordHandler(botSpec.getBehaviorList().getCommandList());
-        DiscordConfiguration discordConfig = botSpec.getDiscordConfiguration().get();
-        discordClient = new DiscordClientBuilder(discordConfig.getToken())
-                .setInitialPresence(discordConfig.getPresence())
-                .build();
-
-        discordClient.getEventDispatcher().on(MessageCreateEvent.class)
-                .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                .flatMap(msg -> discordHandler.execute(bot, discordConfig, msg))
-                .subscribe();
-
-        LOGGER.debug("Starting bot on Discord");
-        return discordClient.login().thenReturn(true);
+        });
     }
 
     @Override

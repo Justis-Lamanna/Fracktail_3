@@ -1,13 +1,15 @@
 package com.github.lucbui.fracktail3.magic;
 
-import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
+import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,29 +23,16 @@ import java.util.Optional;
  * @see Bot
  */
 public class BotSpec {
-    private DiscordConfiguration discordConfig;
+    private final Map<Platform<?>, Config> configs = new HashMap<>();
     private Usersets usersets;
     private BehaviorList behaviorList;
 
-    /**
-     * Get the Discord Configuration, if it exists.
-     * The Discord Configuration controls configuration of use for the Discord PlatformHandler. The absence of this
-     * Configuration indicates the bot should not be used for Discord.
-     * @return The Discord Configuration, if it exists, or empty if none.
-     * @see DiscordConfiguration
-     */
-    public Optional<DiscordConfiguration> getDiscordConfiguration() {
-        return Optional.ofNullable(discordConfig);
+    public <C extends Config> void addConfig(Platform<C> platform, C config) {
+        configs.put(platform, config);
     }
 
-    /**
-     * Set the Discord Configuration.
-     * Setting this Configuration to null indicates the bot should not be used for Discord.
-     * @param discordConfig The Discord Configuration
-     * @see DiscordConfiguration
-     */
-    public void setDiscordConfig(@Nullable DiscordConfiguration discordConfig) {
-        this.discordConfig = discordConfig;
+    public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
+        return configs.containsKey(platform) ? Optional.of((C)configs.get(platform)) : Optional.empty();
     }
 
     /**
@@ -96,7 +85,7 @@ public class BotSpec {
      * @throws BotConfigurationException An error occurs.
      */
     public void validate() throws BotConfigurationException {
-        getDiscordConfiguration().ifPresent(c -> c.validate(this));
+        configs.values().forEach(c -> c.validate(this));
         usersets.validate(this);
         behaviorList.validate(this);
     }

@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 public abstract class AbstractFilterSetValidator implements FilterSetValidator {
     @Override
     public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext ctx) {
-        if(ctx.isDiscord()) {
+        if(ctx instanceof DiscordContext) {
             return validateInDiscordRole(botSpec, (DiscordContext)ctx);
         } else {
             return validateInUnknownRole(botSpec, ctx);
