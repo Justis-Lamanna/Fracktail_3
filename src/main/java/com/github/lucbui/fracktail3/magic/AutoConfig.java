@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatformHandler;
 import com.github.lucbui.fracktail3.magic.parse.xml.*;
 import com.github.lucbui.fracktail3.xsd.DTDBot;
 import com.github.lucbui.fracktail3.xsd.ObjectFactory;
@@ -72,6 +71,6 @@ public class AutoConfig {
     @Bean
     @ConditionalOnBean(BotSpec.class)
     public Bot bot(BotSpec botSpec) {
-        return new Bot(botSpec, new DiscordPlatformHandler());
+        return new Bot(botSpec);
     }
 }

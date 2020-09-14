@@ -8,10 +8,7 @@ import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The specifications for Bot behavior
@@ -23,16 +20,25 @@ import java.util.Optional;
  * @see Bot
  */
 public class BotSpec {
-    private final Map<Platform<?>, Config> configs = new HashMap<>();
+    private final Map<String, Platform<?>> platforms = new HashMap<>();
+    private final Map<String, Config> configs = new HashMap<>();
     private Usersets usersets;
     private BehaviorList behaviorList;
 
     public <C extends Config> void addConfig(Platform<C> platform, C config) {
-        configs.put(platform, config);
+        if(platforms.containsKey(platform.id())) {
+            throw new BotConfigurationException("Configuration already exists for id " + platform.id());
+        }
+        platforms.put(platform.id(), platform);
+        configs.put(platform.id(), config);
     }
 
     public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
         return configs.containsKey(platform) ? Optional.of((C)configs.get(platform)) : Optional.empty();
+    }
+
+    public Set<Platform<?>> getPlatforms() {
+        return new HashSet<>(platforms.values());
     }
 
     /**

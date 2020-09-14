@@ -1,14 +1,10 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A Bot converts the BotSpec into a working bot, via use of PlatformHandler.
@@ -17,28 +13,13 @@ import java.util.List;
  */
 public class Bot {
     private final BotSpec botSpec;
-    private final List<PlatformHandler> platformHandlers;
 
     /**
      * Initialize the Bot with specific PlatformHandlers.
      * @param botSpec The spec to use.
-     * @param handlers Any number of PlatformHandlers.
      */
-    public Bot(BotSpec botSpec, PlatformHandler... handlers) {
+    public Bot(BotSpec botSpec) {
         this.botSpec = botSpec;
-        this.platformHandlers = handlers.length == 0 ?
-                new ArrayList<>() :
-                new ArrayList<>(Arrays.asList(handlers));
-    }
-
-    /**
-     * Add a PlatformHandler to the list of handlers.
-     * @param handler The handler to add
-     * @return This bot (for chaining)
-     */
-    public Bot addPlatformHandler(PlatformHandler handler) {
-        platformHandlers.add(handler);
-        return this;
     }
 
     /**
@@ -55,10 +36,11 @@ public class Bot {
      * @return A Mono which completes when all bots have started.
      */
     public Mono<Boolean> start() {
-        if(CollectionUtils.isEmpty(platformHandlers)) {
+        if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
-        return Flux.fromIterable(platformHandlers)
+        return Flux.fromIterable(botSpec.getPlatforms())
+                .map(Platform::platformHandler)
                 .flatMap(handler -> handler.start(this))
                 .then().thenReturn(true);
     }
@@ -69,10 +51,11 @@ public class Bot {
      * @return A Mono which completes when all bots have stopped.
      */
     public Mono<Boolean> stop() {
-        if(platformHandlers.isEmpty()) {
+        if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
-        return Flux.fromIterable(platformHandlers)
+        return Flux.fromIterable(botSpec.getPlatforms())
+                .map(Platform::platformHandler)
                 .flatMap(handler -> handler.stop(this))
                 .then().thenReturn(true);
     }
