@@ -29,9 +29,6 @@ public class DefaultActionParser extends AbstractParser<Action> implements Actio
         if(action.getSequence() != null) {
             return getSequenceAction(xml, command, action.getSequence());
         }
-        if(action.getCustom() != null) {
-            return getFromCustom(action.getCustom());
-        }
         return null;
     }
 

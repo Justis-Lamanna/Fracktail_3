@@ -34,7 +34,7 @@ public class BotSpec {
     }
 
     public <C extends Config> Optional<C> getConfig(Platform<C, ?, ?> platform) {
-        return configs.containsKey(platform) ? Optional.of((C)configs.get(platform)) : Optional.empty();
+        return configs.containsKey(platform.id()) ? Optional.of((C)configs.get(platform.id())) : Optional.empty();
     }
 
     public Set<Platform<?, ?, ?>> getPlatforms() {

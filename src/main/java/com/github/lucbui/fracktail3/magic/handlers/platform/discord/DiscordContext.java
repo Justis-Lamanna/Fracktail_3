@@ -26,12 +26,14 @@ public class DiscordContext extends CommandContext {
     public static final String OWNER_AT = "at_owner";
 
     private final MessageCreateEvent event;
+    private final DiscordConfiguration config;
 
     public DiscordContext(
             DiscordPlatform platform,
             DiscordConfiguration config,
             MessageCreateEvent event) {
         super(platform, config, event.getMessage().getContent().orElse(StringUtils.EMPTY));
+        this.config = config;
         this.event = event;
     }
 
