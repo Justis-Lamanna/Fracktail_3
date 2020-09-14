@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public interface Action extends Validated {
     Action NOOP = (bot, context) -> Mono.empty();
 
-    Mono<Void> doAction(Bot bot, CommandContext<?, ?> context);
+    Mono<Void> doAction(Bot bot, CommandContext context);
 
     @Override
     default void validate(BotSpec botSpec) throws BotConfigurationException {

@@ -1,13 +1,14 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
 
 /**
  * A singleton which represents the Discord platform
  */
-public enum DiscordPlatform implements Platform<DiscordConfiguration> {
+public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordContext, DiscordUserset> {
     /**
      * The singleton instance of this platform.
      */
@@ -21,6 +22,16 @@ public enum DiscordPlatform implements Platform<DiscordConfiguration> {
     @Override
     public Class<DiscordConfiguration> getConfigClass() {
         return DiscordConfiguration.class;
+    }
+
+    @Override
+    public Class<DiscordContext> getCommandContextClass() {
+        return DiscordContext.class;
+    }
+
+    @Override
+    public Class<DiscordUserset> getUsersetClass() {
+        return DiscordUserset.class;
     }
 
     @Override

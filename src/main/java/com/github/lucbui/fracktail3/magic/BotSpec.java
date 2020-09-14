@@ -20,12 +20,12 @@ import java.util.*;
  * @see Bot
  */
 public class BotSpec {
-    private final Map<String, Platform<?>> platforms = new HashMap<>();
+    private final Map<String, Platform<?, ?, ?>> platforms = new HashMap<>();
     private final Map<String, Config> configs = new HashMap<>();
     private Usersets usersets;
     private BehaviorList behaviorList;
 
-    public <C extends Config> void addConfig(Platform<C> platform, C config) {
+    public <C extends Config> void addConfig(Platform<C, ?, ?> platform, C config) {
         if(platforms.containsKey(platform.id())) {
             throw new BotConfigurationException("Configuration already exists for id " + platform.id());
         }
@@ -33,11 +33,11 @@ public class BotSpec {
         configs.put(platform.id(), config);
     }
 
-    public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
+    public <C extends Config> Optional<C> getConfig(Platform<C, ?, ?> platform) {
         return configs.containsKey(platform) ? Optional.of((C)configs.get(platform)) : Optional.empty();
     }
 
-    public Set<Platform<?>> getPlatforms() {
+    public Set<Platform<?, ?, ?>> getPlatforms() {
         return new HashSet<>(platforms.values());
     }
 

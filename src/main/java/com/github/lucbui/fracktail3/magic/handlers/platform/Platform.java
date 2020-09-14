@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform;
 
 import com.github.lucbui.fracktail3.magic.config.Config;
+import com.github.lucbui.fracktail3.magic.filterset.FilterSetValidator;
+import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 
 /**
  * An object which encapsulates a particular platform.
@@ -9,7 +11,10 @@ import com.github.lucbui.fracktail3.magic.config.Config;
  * rather than using the CommandContext's class.
  * @param <CONFIG> The type of configuration this platform uses.
  */
-public interface Platform<CONFIG extends Config> {
+public interface Platform<
+        CONFIG extends Config,
+        CONTEXT extends CommandContext,
+        USERSET extends FilterSetValidator> {
     /**
      * The ID of this Platform
      * This ID should be unique between instances (although in most cases, this is
@@ -23,6 +28,18 @@ public interface Platform<CONFIG extends Config> {
      * @return The class of the configuration object
      */
     Class<CONFIG> getConfigClass();
+
+    /**
+     * The class of the command context
+     * @return The class of the command context object
+     */
+    Class<CONTEXT> getCommandContextClass();
+
+    /**
+     * The class of the userset object
+     * @return The class of the userset object.
+     */
+    Class<USERSET> getUsersetClass();
 
     /**
      * Get the platform handler associated with this platform

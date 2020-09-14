@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.parse.xml;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
@@ -29,30 +30,28 @@ public class DefaultUsersetParser {
                 xml.getConfiguration().getDiscord() != null &&
                 xml.getConfiguration().getDiscord().getOwner() != null) {
             Snowflake owner = Snowflake.of(xml.getConfiguration().getDiscord().getOwner().getValue());
-            Userset userset = new Userset("owner", DiscordUserset.forUser(owner));
+            Userset userset = DiscordUserset.forUser("owner", owner);
             LOGGER.debug("Creating Roleset owner");
             roles.put(userset.getName(), userset);
         }
 
         if(xml.getUsersets() != null && xml.getUsersets().getUserset() != null) {
             for (DTDUserset set : xml.getUsersets().getUserset()) {
-                Userset userset = new Userset(set.getName(), BooleanUtils.isTrue(set.isBlacklist()), StringUtils.defaultIfBlank(set.getExtends(), null));
-
-                if (LOGGER.isDebugEnabled()) {
-                    if (userset.getExtends() == null) {
-                        LOGGER.debug("Creating {} Roleset {}", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName());
-                    } else {
-                        LOGGER.debug("Creating {} Roleset {} (extends {})", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName(), userset.getExtends());
-                    }
-                }
-
+                Userset userset;
                 if (set.getDiscord() != null) {
-                    userset.setDiscord(fromXml(xml, set, set.getDiscord()));
+                    userset = fromXml(xml, set, set.getDiscord());
+                } else {
+                    throw new BotConfigurationException("No userset specified");
                 }
 
                 Userset oldSet = roles.put(userset.getName(), userset);
                 if (LOGGER.isDebugEnabled() && oldSet != null) {
                     LOGGER.debug("Replacing set {}", oldSet);
+                    if (userset.getExtends().isPresent()) {
+                        LOGGER.debug("Creating {} Roleset {} (extends {})", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName(), userset.getExtends());
+                    } else {
+                        LOGGER.debug("Creating {} Roleset {}", userset.isBlacklist() ? "blacklist" : "whitelist", userset.getName());
+                    }
                 }
             }
         }
@@ -61,7 +60,10 @@ public class DefaultUsersetParser {
     }
 
     protected DiscordUserset fromXml(DTDBot xml, DTDUserset set, DTDDiscordUserset discord) {
-        DiscordUserset drv = new DiscordUserset();
+        DiscordUserset drv = new DiscordUserset(
+                set.getName(),
+                BooleanUtils.isTrue(set.isBlacklist()),
+                StringUtils.defaultIfBlank(set.getExtends(), null));
         if(discord.getUsers() != null && CollectionUtils.isNotEmpty(discord.getUsers().getSnowflake())) {
             Set<Snowflake> userIds = discord.getUsers().getSnowflake().stream()
                     .map(dtd -> Snowflake.of(dtd.getValue()))

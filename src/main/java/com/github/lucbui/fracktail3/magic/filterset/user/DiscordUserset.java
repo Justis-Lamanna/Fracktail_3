@@ -2,38 +2,62 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Set;
 
-public class DiscordUserset {
+/**
+ * Discord-specific userset, which can filter on some combination of users or roles
+ */
+public class DiscordUserset extends PlatformSpecificUserset<DiscordContext, DiscordPlatform> {
     private Set<Snowflake> userSnowflakes;
     private Set<Snowflake> roleSnowflakes;
 
-    public DiscordUserset() {
-        userSnowflakes = null;
-        roleSnowflakes = null;
+    public DiscordUserset(String name, boolean blacklist, String extendsRoleset) {
+        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
+        this.userSnowflakes = null;
+        this.roleSnowflakes = null;
     }
 
-    public DiscordUserset(Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
+    public DiscordUserset(String name, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
+        super(name, DiscordPlatform.INSTANCE);
         this.userSnowflakes = userSnowflakes;
         this.roleSnowflakes = roleSnowflakes;
     }
 
-    public static DiscordUserset forUser(Snowflake user) {
-        return new DiscordUserset(Collections.singleton(user), Collections.emptySet());
+    public DiscordUserset(String name, boolean blacklist, String extendsRoleset, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
+        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
+        this.userSnowflakes = userSnowflakes;
+        this.roleSnowflakes = roleSnowflakes;
     }
 
-    public static DiscordUserset forRole(Snowflake role) {
-        return new DiscordUserset(Collections.emptySet(), Collections.singleton(role));
+    /**
+     * Factory method to create a userset for one user
+     * @param name The name of the userset
+     * @param user The user to allow
+     * @return The created userset.
+     */
+    public static DiscordUserset forUser(String name, Snowflake user) {
+        return new DiscordUserset(name, Collections.singleton(user), Collections.emptySet());
     }
 
+    /**
+     * Get the list of valid user snowflakes.
+     * If this is null, all users are valid.
+     * @return The set of user snowflakes.
+     */
     public Set<Snowflake> getUserSnowflakes() {
         return userSnowflakes;
     }
 
+    /**
+     * Get the list of valid roles.
+     * If this is null, all roles are valid.
+     * @return The set of role snowflakes
+     */
     public Set<Snowflake> getRoleSnowflakes() {
         return roleSnowflakes;
     }
@@ -46,7 +70,16 @@ public class DiscordUserset {
         this.roleSnowflakes = roleSnowflakes;
     }
 
-    public Mono<Boolean> validate(BotSpec botSpec, DiscordContext ctx) {
+    private boolean isLegalUserId(Snowflake userId) {
+        return userSnowflakes == null || userSnowflakes.contains(userId);
+    }
+
+    private boolean containsLegalRole(Set<Snowflake> roles) {
+        return roleSnowflakes == null || roles.containsAll(roleSnowflakes);
+    }
+
+    @Override
+    protected Mono<Boolean> matchesForPlatform(BotSpec spec, DiscordContext ctx) {
         if(userSnowflakes == null && roleSnowflakes == null) {
             return Mono.just(true);
         }
@@ -60,13 +93,5 @@ public class DiscordUserset {
                     .map(member -> isLegalUserId(member.getId()) && containsLegalRole(member.getRoleIds()))
                     .defaultIfEmpty(false);
         }
-    }
-
-    private boolean isLegalUserId(Snowflake userId) {
-        return userSnowflakes == null || userSnowflakes.contains(userId);
-    }
-
-    private boolean containsLegalRole(Set<Snowflake> roles) {
-        return roleSnowflakes == null || roles.containsAll(roleSnowflakes);
     }
 }

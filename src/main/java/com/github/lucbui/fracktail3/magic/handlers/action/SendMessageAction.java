@@ -18,7 +18,7 @@ public abstract class SendMessageAction implements Action {
     }
 
     @Override
-    public Mono<Void> doAction(Bot bot, CommandContext<?, ?> context) {
+    public Mono<Void> doAction(Bot bot, CommandContext context) {
         String message = context.resolve(resolver);
         MessageFormat format = new MessageFormat(message, context.getLocale());
         return context.getExtendedVariableMap()
@@ -27,5 +27,5 @@ public abstract class SendMessageAction implements Action {
                 .then();
     }
 
-    protected abstract Mono<?> sendMessage(CommandContext<?, ?> context, String message);
+    protected abstract Mono<?> sendMessage(CommandContext context, String message);
 }

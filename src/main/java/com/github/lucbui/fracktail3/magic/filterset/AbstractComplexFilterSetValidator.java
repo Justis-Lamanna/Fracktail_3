@@ -8,11 +8,22 @@ import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
+/**
+ * A specific type of FilterSetValidator which allows for extension and negation
+ */
 public abstract class AbstractComplexFilterSetValidator implements FilterSetValidator {
     private final String name;
     private final boolean blacklist;
     private final String extendsRoleset;
 
+    /**
+     * Create the filter
+     * @param name The name of the filter
+     * @param blacklist If true, negation is applied
+     * @param extendsRoleset If non-null, [this validator] && [other validator] must be true to return true.
+     */
     public AbstractComplexFilterSetValidator(String name, boolean blacklist, String extendsRoleset) {
         this.name = name;
         this.blacklist = blacklist;
@@ -20,7 +31,7 @@ public abstract class AbstractComplexFilterSetValidator implements FilterSetVali
     }
 
     @Override
-    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext<?, ?> ctx) {
+    public Mono<Boolean> validate(BotSpec botSpec, CommandContext ctx) {
         Mono<Boolean> matches = matches(botSpec, ctx);
 
         if(blacklist) {
@@ -30,23 +41,41 @@ public abstract class AbstractComplexFilterSetValidator implements FilterSetVali
         if(StringUtils.isNotBlank(extendsRoleset)) {
             Userset extension = botSpec.getUserset(extendsRoleset)
                     .orElseThrow(() -> new CommandUseException("Somehow, roleset stuff failed?"));
-            return MonoUtils.and(extension.validateInRole(botSpec, ctx), matches);
+            return MonoUtils.and(extension.validate(botSpec, ctx), matches);
         }
 
         return matches;
     }
 
+    /**
+     * Get the name of this filter
+     * @return The name of this filter
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Return if this is a blacklist or not
+     * @return True if this is a blacklist filter
+     */
     public boolean isBlacklist() {
         return blacklist;
     }
 
-    public String getExtends() {
-        return extendsRoleset;
+    /**
+     * Return the extended filter, if applicable.
+     * @return The extended role, or an empty Optional if does not extend.
+     */
+    public Optional<String> getExtends() {
+        return Optional.ofNullable(extendsRoleset);
     }
 
-    public abstract Mono<Boolean> matches(BotSpec spec, CommandContext<?, ?> context);
+    /**
+     * Method called to determine the filter state, without considering complex common functionality
+     * @param spec The spec of the bot
+     * @param context The context of the command usage
+     * @return Asynchronous boolean, true if the subfilter matches, false if not.
+     */
+    public abstract Mono<Boolean> matches(BotSpec spec, CommandContext context);
 }

@@ -10,7 +10,7 @@ public class RespondAction extends SendMessageAction {
     }
 
     @Override
-    protected Mono<?> sendMessage(CommandContext<?, ?> context, String message) {
+    protected Mono<?> sendMessage(CommandContext context, String message) {
         return context.respond(message);
     }
 }

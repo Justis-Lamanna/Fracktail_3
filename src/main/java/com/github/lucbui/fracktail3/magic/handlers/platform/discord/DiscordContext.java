@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class DiscordContext extends CommandContext<DiscordConfiguration, DiscordPlatform> {
+public class DiscordContext extends CommandContext {
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
     public static final String NAME = "name";

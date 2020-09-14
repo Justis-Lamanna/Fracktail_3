@@ -8,23 +8,20 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Context object used when a command is received.
  * Contains relevant fields to be used when a command action is being executed.
  */
-public abstract class CommandContext<C extends Config, P extends Platform<C>> {
+public abstract class CommandContext {
     public static final String MESSAGE = "message";
     public static final String PARAMS = "params";
     public static final String PARAM_PREFIX = "param.";
     public static final String RESULT_PREFIX = "result.";
 
-    protected final P platform;
-    protected final C config;
+    protected final Platform<?, ?, ?> platform;
+    protected final Config config;
     protected final String contents;
     protected final Map<String, Object> vars = new HashMap<>();
 
@@ -32,7 +29,7 @@ public abstract class CommandContext<C extends Config, P extends Platform<C>> {
     protected String parameters;
     protected String[] normalizedParameters;
 
-    public CommandContext(P platform, C config, String contents) {
+    public CommandContext(Platform<?, ?, ?> platform, Config config, String contents) {
         this.platform = platform;
         this.config = config;
         this.contents = contents;
@@ -122,7 +119,7 @@ public abstract class CommandContext<C extends Config, P extends Platform<C>> {
      * Get the configuration corresponding to the platform of this command
      * @return The configuration
      */
-    public C getConfiguration() {
+    public Config getConfiguration() {
         return this.config;
     }
 
@@ -159,8 +156,15 @@ public abstract class CommandContext<C extends Config, P extends Platform<C>> {
      * Get the platform this command originated from.
      * @return The platform
      */
-    public P getPlatform() {
+    public Platform<?, ?, ?> getPlatform() {
         return platform;
+    }
+
+    public <CONTEXT extends CommandContext> Optional<CONTEXT> castContext(Platform<?, CONTEXT, ?> platform) {
+        if(forPlatform(platform)) {
+            return Optional.of((CONTEXT)this);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -168,7 +172,7 @@ public abstract class CommandContext<C extends Config, P extends Platform<C>> {
      * @param testPlatform The platform to test
      * @return True, if the platform matches this one
      */
-    public boolean forPlatform(Platform<?> testPlatform) {
+    public boolean forPlatform(Platform<?, ?, ?> testPlatform) {
         return StringUtils.equals(platform.id(), testPlatform.id());
     }
 

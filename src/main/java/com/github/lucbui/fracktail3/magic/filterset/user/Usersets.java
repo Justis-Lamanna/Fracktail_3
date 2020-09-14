@@ -3,39 +3,46 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Validated;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
+/**
+ * A mapping of all usersets in the bot.
+ */
 public class Usersets implements Validated {
-    private final Map<String, Userset> rolesets;
+    private final Map<String, Userset> usersets;
 
-    public Usersets(Map<String, Userset> rolesets) {
-        this.rolesets = Collections.unmodifiableMap(rolesets);
+    /**
+     * Create usersets from a name-userset map.
+     * @param usersets The map to use.
+     */
+    public Usersets(Map<String, Userset> usersets) {
+        this.usersets = Collections.unmodifiableMap(usersets);
     }
 
-    public Map<String, Userset> getUsersets() {
-        return rolesets;
-    }
-
+    /**
+     * Get a userset, if it exists
+     * @param name The name of the userset
+     * @return The matching userset, if present.
+     */
     public Optional<Userset> getUserset(String name) {
-        return Optional.ofNullable(rolesets.get(name));
+        return Optional.ofNullable(usersets.get(name));
     }
 
     @Override
     public void validate(BotSpec spec) throws BotConfigurationException {
-        for(Userset set : rolesets.values()) {
-            if(StringUtils.isNotBlank(set.getExtends()) && !rolesets.containsKey(set.getExtends())) {
-                throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends());
+        for(Userset set : usersets.values()) {
+            if(set.getExtends().isPresent() && !usersets.containsKey(set.getExtends().get())) {
+                throw new BotConfigurationException("Role " + set.getName() + " extends unknown role " + set.getExtends().get());
             }
 
-            validateNonRecursiveExtends(rolesets, Collections.singleton(set.getName()), set);
+            validateNonRecursiveExtends(usersets, Collections.singleton(set.getName()), set);
         }
     }
 
     private void validateNonRecursiveExtends(Map<String, Userset> roles, Set<String> encounteredRolesets, Userset userset) {
-        if(StringUtils.isNotBlank(userset.getExtends())) {
-            Userset extension = roles.get(userset.getExtends());
+        if(userset.getExtends().isPresent()) {
+            Userset extension = roles.get(userset.getExtends().get());
             if(extension != null){
                 if(encounteredRolesets.contains(extension.getName())) {
                     String chain = String.join("->", encounteredRolesets);

@@ -27,7 +27,7 @@ public class ActionOptions implements Validated {
         return _default;
     }
 
-    public Mono<Void> doAction(Bot bot, CommandContext<?, ?> ctx) {
+    public Mono<Void> doAction(Bot bot, CommandContext ctx) {
         return Flux.fromIterable(actions)
                 .filterWhen(ao -> ao.getFilter().matches(bot, ctx))
                 .next()
