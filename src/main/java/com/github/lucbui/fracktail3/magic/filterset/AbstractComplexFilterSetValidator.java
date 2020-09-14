@@ -8,7 +8,7 @@ import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-public abstract class AbstractComplexFilterSetValidator extends AbstractFilterSetValidator {
+public abstract class AbstractComplexFilterSetValidator implements FilterSetValidator {
     private final String name;
     private final boolean blacklist;
     private final String extendsRoleset;
@@ -20,8 +20,8 @@ public abstract class AbstractComplexFilterSetValidator extends AbstractFilterSe
     }
 
     @Override
-    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext ctx) {
-        Mono<Boolean> matches = super.validateInRole(botSpec, ctx);
+    public Mono<Boolean> validateInRole(BotSpec botSpec, CommandContext<?, ?> ctx) {
+        Mono<Boolean> matches = matches(botSpec, ctx);
 
         if(blacklist) {
             matches = MonoUtils.not(matches);
@@ -47,4 +47,6 @@ public abstract class AbstractComplexFilterSetValidator extends AbstractFilterSe
     public String getExtends() {
         return extendsRoleset;
     }
+
+    public abstract Mono<Boolean> matches(BotSpec spec, CommandContext<?, ?> context);
 }

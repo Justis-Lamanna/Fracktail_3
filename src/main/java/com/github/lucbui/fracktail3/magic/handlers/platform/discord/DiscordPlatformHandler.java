@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+/**
+ * Encapsulates how the Discord platform starts and stops the bot.
+ */
 public class DiscordPlatformHandler implements PlatformHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatformHandler.class);
     private DiscordClient discordClient;

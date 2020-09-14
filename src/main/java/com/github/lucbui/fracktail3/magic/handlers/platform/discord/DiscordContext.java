@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
-import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -15,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class DiscordContext extends CommandContext {
+public class DiscordContext extends CommandContext<DiscordConfiguration, DiscordPlatform> {
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
     public static final String NAME = "name";
@@ -27,11 +26,13 @@ public class DiscordContext extends CommandContext {
     public static final String OWNER_AT = "at_owner";
 
     private final MessageCreateEvent event;
-    private final DiscordConfiguration configuration;
 
-    public DiscordContext(MessageCreateEvent event, DiscordConfiguration configuration) {
+    public DiscordContext(
+            DiscordPlatform platform,
+            DiscordConfiguration config,
+            MessageCreateEvent event) {
+        super(platform, config, event.getMessage().getContent().orElse(StringUtils.EMPTY));
         this.event = event;
-        this.configuration = configuration;
     }
 
     public MessageCreateEvent getEvent() {
@@ -43,18 +44,13 @@ public class DiscordContext extends CommandContext {
     }
 
     @Override
-    public Config getConfiguration() {
-        return configuration;
-    }
-
-    @Override
     public Mono<Boolean> respond(String message) {
         return respond(event.getMessage().getChannelId(), message);
     }
 
     @Override
     public Mono<Boolean> alert(String message) {
-        return Mono.justOrEmpty(configuration.getOwner())
+        return Mono.justOrEmpty(config.getOwner())
                 .flatMap(owner -> dm(owner, message));
     }
 
@@ -100,7 +96,7 @@ public class DiscordContext extends CommandContext {
         map.put(NAME, event.getMember().map(Member::getDisplayName).orElse(username));
         map.put(GUILD_ID, event.getGuildId().map(Snowflake::asString).orElse(StringUtils.EMPTY));
         map.put(USER_AT, event.getMessage().getAuthor().map(User::getMention).orElse(StringUtils.EMPTY));
-        configuration.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
+        config.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
         return map;
     }
 
