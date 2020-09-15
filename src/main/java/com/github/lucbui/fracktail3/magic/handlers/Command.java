@@ -4,9 +4,8 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.handlers.filter.BaseFilter;
-import com.github.lucbui.fracktail3.magic.handlers.filter.Filter;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
@@ -68,7 +67,7 @@ public class Command implements Validated, Id {
         private String id;
         private Resolver<List<String>> explicitResolver = null;
         private List<Resolver<String>> names = new ArrayList<>();
-        private Filter filter = BaseFilter.DEFAULT;
+        private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
 
         public Builder(String id) {

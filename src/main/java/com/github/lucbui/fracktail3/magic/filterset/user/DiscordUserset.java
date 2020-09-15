@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
@@ -80,7 +80,7 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext, Disc
     }
 
     @Override
-    protected Mono<Boolean> matchesForPlatform(BotSpec spec, DiscordContext ctx) {
+    protected Mono<Boolean> matchesForPlatform(Bot bot, DiscordContext ctx) {
         if(CollectionUtils.isEmpty(userSnowflakes) && CollectionUtils.isEmpty(roleSnowflakes)) {
             return Mono.just(true);
         }

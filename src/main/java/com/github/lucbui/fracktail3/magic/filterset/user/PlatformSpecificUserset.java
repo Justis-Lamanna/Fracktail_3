@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 import reactor.core.publisher.Mono;
@@ -37,17 +37,17 @@ public abstract class PlatformSpecificUserset<C extends CommandContext, P extend
     }
 
     @Override
-    public Mono<Boolean> matches(BotSpec spec, CommandContext context) {
+    public Mono<Boolean> matches2(Bot bot, CommandContext context) {
         return context.castContext(platform)
-                .map(c -> matchesForPlatform(spec, c))
+                .map(c -> matchesForPlatform(bot, c))
                 .orElse(Mono.just(false));
     }
 
     /**
      * Called if the platform is correct, using correct casting
-     * @param spec The spec of the bot
+     * @param bot The  bot
      * @param context The context of the bot, as casted
      * @return Asynchronous boolean, true if the filter passes.
      */
-    protected abstract Mono<Boolean> matchesForPlatform(BotSpec spec, C context);
+    protected abstract Mono<Boolean> matchesForPlatform(Bot bot, C context);
 }

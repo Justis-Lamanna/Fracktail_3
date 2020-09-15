@@ -1,13 +1,14 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.filterset.FilterSetValidator;
+import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class UsersetById implements FilterSetValidator {
+public class UsersetById implements Filter {
     private final String id;
 
     public UsersetById(String id) {
@@ -19,9 +20,9 @@ public class UsersetById implements FilterSetValidator {
     }
 
     @Override
-    public Mono<Boolean> validate(BotSpec botSpec, CommandContext ctx) {
-        return Mono.justOrEmpty(retrieve(botSpec))
-                    .flatMap(u -> u.validate(botSpec, ctx))
+    public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
+        return Mono.justOrEmpty(retrieve(bot.getSpec()))
+                    .flatMap(u -> u.matches(bot, ctx))
                     .defaultIfEmpty(true);
     }
 }

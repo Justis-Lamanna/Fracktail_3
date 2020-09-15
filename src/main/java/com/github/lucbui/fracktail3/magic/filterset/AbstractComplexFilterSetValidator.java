@@ -1,11 +1,8 @@
 package com.github.lucbui.fracktail3.magic.filterset;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.exception.CommandUseException;
-import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.MonoUtils;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -13,7 +10,7 @@ import java.util.Optional;
 /**
  * A specific type of FilterSetValidator which allows for extension and negation
  */
-public abstract class AbstractComplexFilterSetValidator implements FilterSetValidator {
+public abstract class AbstractComplexFilterSetValidator implements Filter {
     private final String name;
     private final boolean blacklist;
     private final String extendsRoleset;
@@ -31,18 +28,20 @@ public abstract class AbstractComplexFilterSetValidator implements FilterSetVali
     }
 
     @Override
-    public Mono<Boolean> validate(BotSpec botSpec, CommandContext ctx) {
-        Mono<Boolean> matches = matches(botSpec, ctx);
+    public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
+        Mono<Boolean> matches = matches2(bot, ctx);
 
         if(blacklist) {
             matches = MonoUtils.not(matches);
         }
 
+        /*
         if(StringUtils.isNotBlank(extendsRoleset)) {
-            Userset extension = botSpec.getUserset(extendsRoleset)
+            Userset extension = bot.getSpec().getUserset(extendsRoleset)
                     .orElseThrow(() -> new CommandUseException("Somehow, roleset stuff failed?"));
-            return MonoUtils.and(extension.validate(botSpec, ctx), matches);
+            return MonoUtils.and(extension.matches(bot, ctx), matches);
         }
+        */
 
         return matches;
     }
@@ -77,5 +76,5 @@ public abstract class AbstractComplexFilterSetValidator implements FilterSetVali
      * @param context The context of the command usage
      * @return Asynchronous boolean, true if the subfilter matches, false if not.
      */
-    public abstract Mono<Boolean> matches(BotSpec spec, CommandContext context);
+    public abstract Mono<Boolean> matches2(Bot spec, CommandContext context);
 }
