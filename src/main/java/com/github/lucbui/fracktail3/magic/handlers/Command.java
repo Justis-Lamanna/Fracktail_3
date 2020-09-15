@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.filter.CommandFilter;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
@@ -10,7 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
-public class Command implements Validated {
+public class Command implements Validated, Id {
     private final String id;
     private final Resolver<List<String>> names;
     private final CommandFilter commandFilter;
@@ -23,6 +24,7 @@ public class Command implements Validated {
         this.actions = Objects.requireNonNull(actions);
     }
 
+    @Override
     public String getId() {
         return id;
     }

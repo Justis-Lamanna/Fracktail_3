@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 /**
  * A filter which can be applied to commands to divert their usage.
  */
-public interface FilterSetValidator {
+public interface FilterSetValidator{
     /**
      * Asynchronously validate whether this command can be used for this context
      * @param botSpec The spec being used

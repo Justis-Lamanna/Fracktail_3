@@ -1,11 +1,12 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
+import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.filterset.AbstractComplexFilterSetValidator;
 
 /**
  * A userset, which is specifically for filtering users
  */
-public abstract class Userset extends AbstractComplexFilterSetValidator {
+public abstract class Userset extends AbstractComplexFilterSetValidator implements Id {
     /**
      * Default contructor for Userset
      * @param name name of userset
@@ -22,5 +23,10 @@ public abstract class Userset extends AbstractComplexFilterSetValidator {
      */
     public Userset(String name) {
         this(name, false, null);
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }

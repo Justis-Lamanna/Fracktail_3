@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.handlers.platform;
 
+import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.filterset.FilterSetValidator;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
@@ -14,15 +15,7 @@ import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 public interface Platform<
         CONFIG extends Config,
         CONTEXT extends CommandContext,
-        USERSET extends FilterSetValidator> {
-    /**
-     * The ID of this Platform
-     * This ID should be unique between instances (although in most cases, this is
-     * implemented as a singleton or enum). Platforms with the same ID are assumed to be the same.
-     * @return The ID of the Platform
-     */
-    String id();
-
+        USERSET extends FilterSetValidator> extends Id {
     /**
      * The class of the configuration object
      * @return The class of the configuration object

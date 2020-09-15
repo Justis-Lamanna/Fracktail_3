@@ -7,7 +7,6 @@ import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -22,19 +21,24 @@ import java.util.*;
 public class BotSpec {
     private final Map<String, Platform<?, ?, ?>> platforms = new HashMap<>();
     private final Map<String, Config> configs = new HashMap<>();
-    private Usersets usersets;
-    private BehaviorList behaviorList;
+    private final Usersets usersets;
+    private final BehaviorList behaviorList;
 
-    public <C extends Config> void addConfig(Platform<C, ?, ?> platform, C config) {
-        if(platforms.containsKey(platform.id())) {
-            throw new BotConfigurationException("Configuration already exists for id " + platform.id());
-        }
-        platforms.put(platform.id(), platform);
-        configs.put(platform.id(), config);
+    public BotSpec(Map<Platform<?, ?, ?>, Config> configs, Usersets usersets, BehaviorList behaviorList) {
+        addConfigs(configs);
+        this.usersets = usersets;
+        this.behaviorList = behaviorList;
+    }
+
+    private void addConfigs(Map<Platform<?, ?, ?>, Config> c) {
+        c.forEach(((platform, config) -> {
+            platforms.put(platform.getId(), platform);
+            configs.put(platform.getId(), config);
+        }));
     }
 
     public <C extends Config> Optional<C> getConfig(Platform<C, ?, ?> platform) {
-        return configs.containsKey(platform.id()) ? Optional.of((C)configs.get(platform.id())) : Optional.empty();
+        return configs.containsKey(platform.getId()) ? Optional.of((C)configs.get(platform.getId())) : Optional.empty();
     }
 
     public Set<Platform<?, ?, ?>> getPlatforms() {
@@ -62,28 +66,11 @@ public class BotSpec {
     }
 
     /**
-     * Set the Rolesets defined by the user.
-     * @param usersets The rolesets.
-     * @see Usersets
-     */
-    public void setUsersets(@Nonnull Usersets usersets) {
-        this.usersets = Objects.requireNonNull(usersets);
-    }
-
-    /**
      * Get the list of Commands this bot performs.
      * @return The list of Commands this bot performs.
      */
     public BehaviorList getBehaviorList() {
         return behaviorList;
-    }
-
-    /**
-     * Set the list of Commands this bot performs.
-     * @param behaviorList The list of commands this bot should perform.
-     */
-    public void setBehaviorList(@Nonnull BehaviorList behaviorList) {
-        this.behaviorList = behaviorList;
     }
 
     /**

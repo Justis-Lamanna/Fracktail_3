@@ -173,7 +173,7 @@ public abstract class CommandContext {
      * @return True, if the platform matches this one
      */
     public boolean forPlatform(Platform<?, ?, ?> testPlatform) {
-        return StringUtils.equals(platform.id(), testPlatform.id());
+        return StringUtils.equals(platform.getId(), testPlatform.getId());
     }
 
     /**

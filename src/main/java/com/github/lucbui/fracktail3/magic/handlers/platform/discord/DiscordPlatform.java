@@ -15,7 +15,7 @@ public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordCon
     INSTANCE;
 
     @Override
-    public String id() {
+    public String getId() {
         return "discord";
     }
 
