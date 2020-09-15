@@ -8,7 +8,7 @@ import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
 /**
  * A singleton which represents the Discord platform
  */
-public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordContext, DiscordUserset> {
+public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordContext> {
     /**
      * The singleton instance of this platform.
      */

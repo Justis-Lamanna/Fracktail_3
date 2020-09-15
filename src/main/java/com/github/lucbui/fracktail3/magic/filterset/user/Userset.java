@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.filterset.AbstractComplexFilterSetValidator;
+import com.github.lucbui.fracktail3.magic.filterset.FilterSetValidator;
 
 /**
  * A userset, which is specifically for filtering users
@@ -28,5 +29,9 @@ public abstract class Userset extends AbstractComplexFilterSetValidator implemen
     @Override
     public String getId() {
         return getName();
+    }
+
+    public static FilterSetValidator byId(String id) {
+        return new UsersetById(id);
     }
 }

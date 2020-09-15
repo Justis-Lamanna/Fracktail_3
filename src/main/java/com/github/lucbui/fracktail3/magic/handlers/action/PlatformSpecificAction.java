@@ -10,13 +10,13 @@ import reactor.core.publisher.Mono;
  * @param <C> The context type
  */
 public abstract class PlatformSpecificAction<C extends CommandContext> implements Action {
-    private final Platform<?, C, ?> platform;
+    private final Platform<?, C> platform;
 
     /**
      * Default constructor
      * @param platform The platform to use
      */
-    public PlatformSpecificAction(Platform<?, C, ?> platform) {
+    public PlatformSpecificAction(Platform<?, C> platform) {
         this.platform = platform;
     }
 

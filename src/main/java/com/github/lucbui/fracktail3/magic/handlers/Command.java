@@ -5,7 +5,8 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.handlers.filter.CommandFilter;
+import com.github.lucbui.fracktail3.magic.handlers.filter.BaseFilter;
+import com.github.lucbui.fracktail3.magic.handlers.filter.Filter;
 import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
@@ -21,10 +22,10 @@ import java.util.Objects;
 public class Command implements Validated, Id {
     private final String id;
     private final Resolver<List<String>> names;
-    private final CommandFilter commandFilter;
+    private final Filter commandFilter;
     private final Action action;
 
-    public Command(String id, Resolver<List<String>> names, CommandFilter commandFilter, Action action) {
+    public Command(String id, Resolver<List<String>> names, Filter commandFilter, Action action) {
         this.id = Objects.requireNonNull(id);
         this.names = Objects.requireNonNull(names);
         this.commandFilter = Objects.requireNonNull(commandFilter);
@@ -40,7 +41,7 @@ public class Command implements Validated, Id {
         return names;
     }
 
-    public CommandFilter getCommandFilter() {
+    public Filter getCommandFilter() {
         return commandFilter;
     }
 
@@ -57,7 +58,9 @@ public class Command implements Validated, Id {
     }
 
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        commandFilter.validate(botSpec);
+        if(commandFilter instanceof Validated) {
+            ((Validated) commandFilter).validate(botSpec);
+        }
         action.validate(botSpec);
     }
 
@@ -65,7 +68,7 @@ public class Command implements Validated, Id {
         private String id;
         private Resolver<List<String>> explicitResolver = null;
         private List<Resolver<String>> names = new ArrayList<>();
-        private CommandFilter filter = CommandFilter.DEFAULT;
+        private Filter filter = BaseFilter.DEFAULT;
         private Action action = Action.NOOP;
 
         public Builder(String id) {
@@ -99,8 +102,8 @@ public class Command implements Validated, Id {
             return this;
         }
 
-        public Builder withFilter(CommandFilter commandFilter) {
-            this.filter = commandFilter;
+        public Builder withFilter(Filter filter) {
+            this.filter = filter;
             return this;
         }
 

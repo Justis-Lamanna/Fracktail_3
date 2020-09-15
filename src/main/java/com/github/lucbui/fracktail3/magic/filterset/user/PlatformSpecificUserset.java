@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
  * @param <C> The context type
  * @param <P> The platform type
  */
-public abstract class PlatformSpecificUserset<C extends CommandContext, P extends Platform<?, C, ?>> extends Userset {
+public abstract class PlatformSpecificUserset<C extends CommandContext, P extends Platform<?, C>> extends Userset {
     private final P platform;
 
     /**
@@ -39,7 +39,7 @@ public abstract class PlatformSpecificUserset<C extends CommandContext, P extend
     @Override
     public Mono<Boolean> matches(BotSpec spec, CommandContext context) {
         return context.castContext(platform)
-                .map(c -> matches(spec, c))
+                .map(c -> matchesForPlatform(spec, c))
                 .orElse(Mono.just(false));
     }
 

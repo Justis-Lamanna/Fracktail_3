@@ -15,4 +15,8 @@ public interface FilterSetValidator{
      * @return Asynchronous boolean, indicating if the command can be used or not.
      */
     Mono<Boolean> validate(BotSpec botSpec, CommandContext ctx);
+
+    static FilterSetValidator identity(boolean value) {
+        return (spec, ctx) -> Mono.just(value);
+    }
 }

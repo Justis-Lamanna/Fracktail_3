@@ -20,13 +20,13 @@ import java.util.Map;
 public class BotCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotCreator.class);
 
-    private final Map<Platform<?, ?, ?>, Config> configs = new HashMap<>();
+    private final Map<Platform<?, ?>, Config> configs = new HashMap<>();
     private final Map<String, Userset> usersets = new HashMap<>();
 
     private final List<Command> commands = new ArrayList<>();
     private Action orElse = Action.NOOP;
 
-    public <C extends Config> BotCreator withConfig(Platform<C, ?, ?> platform, C config) {
+    public <C extends Config> BotCreator withConfig(Platform<C, ?> platform, C config) {
         configs.put(platform, config);
         return this;
     }

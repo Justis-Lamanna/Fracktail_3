@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
+import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -71,22 +72,22 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext, Disc
     }
 
     private boolean isLegalUserId(Snowflake userId) {
-        return userSnowflakes == null || userSnowflakes.contains(userId);
+        return CollectionUtils.isEmpty(userSnowflakes) || userSnowflakes.contains(userId);
     }
 
     private boolean containsLegalRole(Set<Snowflake> roles) {
-        return roleSnowflakes == null || roles.containsAll(roleSnowflakes);
+        return CollectionUtils.isEmpty(roleSnowflakes) || roles.containsAll(roleSnowflakes);
     }
 
     @Override
     protected Mono<Boolean> matchesForPlatform(BotSpec spec, DiscordContext ctx) {
-        if(userSnowflakes == null && roleSnowflakes == null) {
+        if(CollectionUtils.isEmpty(userSnowflakes) && CollectionUtils.isEmpty(roleSnowflakes)) {
             return Mono.just(true);
         }
 
         if(ctx.isDm()) {
             return Mono.justOrEmpty(ctx.getEvent().getMessage().getAuthor())
-                    .map(user -> isLegalUserId(user.getId()) && roleSnowflakes == null)
+                    .map(user -> isLegalUserId(user.getId()) && CollectionUtils.isEmpty(roleSnowflakes))
                     .defaultIfEmpty(false);
         } else {
             return Mono.justOrEmpty(ctx.getEvent().getMember())
