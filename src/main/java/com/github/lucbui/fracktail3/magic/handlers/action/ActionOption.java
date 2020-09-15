@@ -1,8 +1,8 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.Validated;
 import com.github.lucbui.fracktail3.magic.handlers.filter.ActionFilter;
 
 public class ActionOption implements Validated {

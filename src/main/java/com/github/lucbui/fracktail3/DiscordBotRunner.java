@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.magic.handlers.Command;
+import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
@@ -20,12 +22,19 @@ public class DiscordBotRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String token = environment.getRequiredProperty("token");
-        Bot bot = new BotCreator().withConfig(DiscordPlatform.INSTANCE,
-                new DiscordConfiguration.Builder(token)
-                        .withPrefix("!")
-                        .withOwner(Snowflake.of(248612704019808258L))
-                        .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
-                        .build())
+        Bot bot = new BotCreator()
+                .withConfig(DiscordPlatform.INSTANCE,
+                    new DiscordConfiguration.Builder(token)
+                            .withPrefix("!")
+                            .withOwner(Snowflake.of(248612704019808258L))
+                            .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
+                            .build()
+                )
+                .withCommand(
+                    new Command.Builder("hello")
+                    .withAction(RespondAction.literal("Hello, {at_user}!"))
+                    .build()
+                )
                 .build();
         bot.start().block();
     }

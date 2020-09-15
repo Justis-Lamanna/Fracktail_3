@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.config;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
+import com.github.lucbui.fracktail3.magic.utils.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
@@ -128,7 +129,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
         }
     }
 
-    public static class Builder implements ConfigBuilder<DiscordConfiguration> {
+    public static class Builder implements IBuilder<DiscordConfiguration> {
         private String token;
         private String prefix;
         private Snowflake owner;

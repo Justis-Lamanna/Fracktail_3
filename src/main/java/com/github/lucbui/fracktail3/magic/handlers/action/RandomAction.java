@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.utils.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import reactor.core.publisher.Mono;
@@ -25,18 +26,23 @@ public class RandomAction implements Action {
         return actions.sample().doAction(bot, context);
     }
 
-    public static class Builder {
+    public static class Builder implements IBuilder<RandomAction> {
         private final List<Pair<Action, Double>> actions;
 
         public Builder() {
             this.actions = new ArrayList<>();
         }
 
-        public Builder add(Action action, double weight) {
+        public Builder with(double weight, Action action) {
             actions.add(Pair.create(action, weight));
             return this;
         }
 
+        public Builder with(Action action) {
+            return with(1, action);
+        }
+
+        @Override
         public RandomAction build() {
             return new RandomAction(new EnumeratedDistribution<>(actions));
         }

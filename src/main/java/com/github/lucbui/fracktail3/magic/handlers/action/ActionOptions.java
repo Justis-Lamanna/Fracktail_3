@@ -1,12 +1,16 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.handlers.Validated;
+import com.github.lucbui.fracktail3.magic.handlers.filter.ActionFilter;
+import com.github.lucbui.fracktail3.magic.utils.IBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,5 +43,25 @@ public class ActionOptions implements Validated {
     public void validate(BotSpec botSpec) throws BotConfigurationException {
         actions.forEach(a -> a.validate(botSpec));
         _default.validate(botSpec);
+    }
+
+    public static class Builder implements IBuilder<ActionOptions> {
+        private final List<ActionOption> actions = new ArrayList<>();
+        private Action _default = Action.NOOP;
+
+        public Builder with(ActionFilter filter, Action action) {
+            actions.add(new ActionOption(filter, action));
+            return this;
+        }
+
+        public Builder ifNoneMatch(Action action) {
+            _default = action;
+            return this;
+        }
+
+        @Override
+        public ActionOptions build() {
+            return new ActionOptions(actions, _default);
+        }
     }
 }
