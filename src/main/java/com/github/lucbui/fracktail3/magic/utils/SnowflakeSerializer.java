@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.utils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import discord4j.core.object.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 import java.io.IOException;
 

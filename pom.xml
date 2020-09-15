@@ -37,22 +37,23 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.0.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.projectreactor.netty</groupId>
-                    <artifactId>reactor-netty</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>3.1.0</version>
         </dependency>
 
         <!--??? Why???-->
         <!--Discord Bot Dependencies-->
         <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.3.10.RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>0.8.15.RELEASE</version>
+            <version>0.9.12.RELEASE</version>
         </dependency>
+
+
 
         <!--Google Dependencies-->
         <dependency>
@@ -110,27 +111,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.2.5.RELEASE</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.5.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- The package of your generated sources -->
-                    <packageName>com.github.lucbui.fracktail3.xsd</packageName>
-                    <sources>
-                        <source>src/main/resources/xsd/schema.xsd</source>
-                    </sources>
-                </configuration>
             </plugin>
         </plugins>
     </build>

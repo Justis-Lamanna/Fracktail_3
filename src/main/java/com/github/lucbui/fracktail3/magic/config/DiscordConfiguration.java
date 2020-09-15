@@ -3,8 +3,9 @@ package com.github.lucbui.fracktail3.magic.config;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Snowflake;
+import discord4j.discordjson.json.gateway.StatusUpdate;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -18,7 +19,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
     private final String token;
     private final String prefix;
     private final Snowflake owner;
-    private final Presence presence;
+    private final StatusUpdate presence;
     private final String i18nPath;
 
     /**
@@ -29,7 +30,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
      * @param i18nPath The path for a Localization bundle.
      * @param presence The presence this bot should have.
      */
-    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, Presence presence) {
+    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
@@ -43,7 +44,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
      * @param prefix The command prefix to use.
      * @param presence The presence this bot should have.
      */
-    public DiscordConfiguration(String token, String prefix, Presence presence) {
+    public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
         this(token, prefix, null, null, presence);
     }
 
@@ -83,7 +84,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
      * Get the presence of this bot.
      * @return The bot's presence.
      */
-    public Presence getPresence() {
+    public StatusUpdate getPresence() {
         return presence;
     }
 
@@ -131,7 +132,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
         private String token;
         private String prefix;
         private Snowflake owner;
-        private Presence presence;
+        private StatusUpdate presence;
         private String i18nPath;
 
         public Builder(String token) {
@@ -148,7 +149,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
             return this;
         }
 
-        public Builder withPresence(Presence presence) {
+        public Builder withPresence(StatusUpdate presence) {
             this.presence = presence;
             return this;
         }

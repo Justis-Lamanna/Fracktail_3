@@ -4,9 +4,9 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.object.util.Snowflake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.env.Environment;
@@ -24,7 +24,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 new DiscordConfiguration.Builder(token)
                         .withPrefix("!")
                         .withOwner(Snowflake.of(248612704019808258L))
-                        .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3!")))
+                        .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
                         .build())
                 .build();
         bot.start().block();

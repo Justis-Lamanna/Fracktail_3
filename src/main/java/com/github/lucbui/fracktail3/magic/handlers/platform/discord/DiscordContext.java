@@ -2,12 +2,12 @@ package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.util.Snowflake;
+import discord4j.core.object.entity.channel.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class DiscordContext extends CommandContext {
             DiscordPlatform platform,
             DiscordConfiguration config,
             MessageCreateEvent event) {
-        super(platform, config, event.getMessage().getContent().orElse(StringUtils.EMPTY));
+        super(platform, config, event.getMessage().getContent());
         this.config = config;
         this.event = event;
     }

@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.utils;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import discord4j.core.object.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 public class BotModule extends SimpleModule {
     public BotModule() {

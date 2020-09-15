@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
-import discord4j.core.object.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
