@@ -8,7 +8,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Context object used when a command is received.
@@ -20,7 +23,7 @@ public abstract class CommandContext {
     public static final String PARAM_PREFIX = "param.";
     public static final String RESULT_PREFIX = "result.";
 
-    protected final Platform<?, ?> platform;
+    protected final Platform<?> platform;
     protected final Config config;
     protected final String contents;
     protected final Map<String, Object> vars = new HashMap<>();
@@ -29,7 +32,7 @@ public abstract class CommandContext {
     protected String parameters;
     protected String[] normalizedParameters;
 
-    public CommandContext(Platform<?, ?> platform, Config config, String contents) {
+    public CommandContext(Platform<?> platform, Config config, String contents) {
         this.platform = platform;
         this.config = config;
         this.contents = contents;
@@ -156,15 +159,8 @@ public abstract class CommandContext {
      * Get the platform this command originated from.
      * @return The platform
      */
-    public Platform<?, ?> getPlatform() {
+    public Platform<?> getPlatform() {
         return platform;
-    }
-
-    public <CONTEXT extends CommandContext> Optional<CONTEXT> castContext(Platform<?, CONTEXT> platform) {
-        if(forPlatform(platform)) {
-            return Optional.of((CONTEXT)this);
-        }
-        return Optional.empty();
     }
 
     /**
@@ -172,7 +168,7 @@ public abstract class CommandContext {
      * @param testPlatform The platform to test
      * @return True, if the platform matches this one
      */
-    public boolean forPlatform(Platform<?, ?> testPlatform) {
+    public boolean forPlatform(Platform<?> testPlatform) {
         return StringUtils.equals(platform.getId(), testPlatform.getId());
     }
 

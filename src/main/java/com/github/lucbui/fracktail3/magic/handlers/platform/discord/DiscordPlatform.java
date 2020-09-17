@@ -7,7 +7,7 @@ import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
 /**
  * A singleton which represents the Discord platform
  */
-public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordContext> {
+public enum DiscordPlatform implements Platform<DiscordConfiguration> {
     /**
      * The singleton instance of this platform.
      */
@@ -21,11 +21,6 @@ public enum DiscordPlatform implements Platform<DiscordConfiguration, DiscordCon
     @Override
     public Class<DiscordConfiguration> getConfigClass() {
         return DiscordConfiguration.class;
-    }
-
-    @Override
-    public Class<DiscordContext> getCommandContextClass() {
-        return DiscordContext.class;
     }
 
     @Override

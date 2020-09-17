@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Discord-specific userset, which can filter on some combination of users or roles
  */
-public class DiscordUserset extends PlatformSpecificUserset<DiscordContext, DiscordPlatform> {
+public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
     private Set<Snowflake> userSnowflakes;
     private Set<Snowflake> roleSnowflakes;
 

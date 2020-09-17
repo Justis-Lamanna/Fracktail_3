@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.handlers.platform;
 
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 
 /**
  * An object which encapsulates a particular platform.
@@ -12,19 +11,13 @@ import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
  * @param <CONFIG> The type of configuration this platform uses.
  */
 public interface Platform<
-        CONFIG extends Config,
-        CONTEXT extends CommandContext> extends Id {
+        CONFIG extends Config
+        > extends Id {
     /**
      * The class of the configuration object
      * @return The class of the configuration object
      */
     Class<CONFIG> getConfigClass();
-
-    /**
-     * The class of the command context
-     * @return The class of the command context object
-     */
-    Class<CONTEXT> getCommandContextClass();
 
     /**
      * Get the platform handler associated with this platform

@@ -10,21 +10,22 @@ import reactor.core.publisher.Mono;
  * @param <C> The context type
  */
 public abstract class PlatformSpecificAction<C extends CommandContext> implements Action {
-    private final Platform<?, C> platform;
+    private final Platform<?> platform;
 
     /**
      * Default constructor
      * @param platform The platform to use
      */
-    public PlatformSpecificAction(Platform<?, C> platform) {
+    public PlatformSpecificAction(Platform<?> platform) {
         this.platform = platform;
     }
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        return context.castContext(platform)
-                .map(c -> doActionForPlatform(bot, c))
-                .orElse(doActionForNonPlatform(bot, context));
+        if(context.forPlatform(platform)) {
+            return doActionForPlatform(bot, (C)context);
+        }
+        return doActionForNonPlatform(bot, context);
     }
 
     /**

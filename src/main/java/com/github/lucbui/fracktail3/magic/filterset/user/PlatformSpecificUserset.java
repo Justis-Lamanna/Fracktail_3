@@ -9,10 +9,9 @@ import reactor.core.publisher.Mono;
  * A userset for a specific platform
  * If a request not of this platform is used, false is returned.
  * @param <C> The context type
- * @param <P> The platform type
  */
-public abstract class PlatformSpecificUserset<C extends CommandContext, P extends Platform<?, C>> extends Userset {
-    private final P platform;
+public abstract class PlatformSpecificUserset<C extends CommandContext> extends Userset {
+    private final Platform<?> platform;
 
     /**
      * Default constructor
@@ -21,7 +20,7 @@ public abstract class PlatformSpecificUserset<C extends CommandContext, P extend
      * @param extendsRoleset If non-null, extension is used
      * @param platform The platform to work for.
      */
-    public PlatformSpecificUserset(String name, boolean blacklist, String extendsRoleset, P platform) {
+    public PlatformSpecificUserset(String name, boolean blacklist, String extendsRoleset, Platform<?> platform) {
         super(name, blacklist, extendsRoleset);
         this.platform = platform;
     }
@@ -31,16 +30,17 @@ public abstract class PlatformSpecificUserset<C extends CommandContext, P extend
      * @param name The name of the userset
      * @param platform The platform of the userset
      */
-    public PlatformSpecificUserset(String name, P platform) {
+    public PlatformSpecificUserset(String name, Platform<?> platform) {
         super(name);
         this.platform = platform;
     }
 
     @Override
     public Mono<Boolean> matches2(Bot bot, CommandContext context) {
-        return context.castContext(platform)
-                .map(c -> matchesForPlatform(bot, c))
-                .orElse(Mono.just(false));
+        if(context.forPlatform(platform)) {
+            return matchesForPlatform(bot, (C)context);
+        }
+        return Mono.just(false);
     }
 
     /**

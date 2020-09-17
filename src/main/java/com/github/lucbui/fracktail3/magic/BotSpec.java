@@ -19,29 +19,29 @@ import java.util.*;
  * @see Bot
  */
 public class BotSpec {
-    private final Map<String, Platform<?, ?>> platforms = new HashMap<>();
+    private final Map<String, Platform<?>> platforms = new HashMap<>();
     private final Map<String, Config> configs = new HashMap<>();
     private final Usersets usersets;
     private final BehaviorList behaviorList;
 
-    public BotSpec(Map<Platform<?, ?>, Config> configs, Usersets usersets, BehaviorList behaviorList) {
+    public BotSpec(Map<Platform<?>, Config> configs, Usersets usersets, BehaviorList behaviorList) {
         addConfigs(configs);
         this.usersets = usersets;
         this.behaviorList = behaviorList;
     }
 
-    private void addConfigs(Map<Platform<?, ?>, Config> c) {
+    private void addConfigs(Map<Platform<?>, Config> c) {
         c.forEach(((platform, config) -> {
             platforms.put(platform.getId(), platform);
             configs.put(platform.getId(), config);
         }));
     }
 
-    public <C extends Config> Optional<C> getConfig(Platform<C, ?> platform) {
+    public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
         return configs.containsKey(platform.getId()) ? Optional.of((C)configs.get(platform.getId())) : Optional.empty();
     }
 
-    public Set<Platform<?, ?>> getPlatforms() {
+    public Set<Platform<?>> getPlatforms() {
         return new HashSet<>(platforms.values());
     }
 
