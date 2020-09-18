@@ -10,7 +10,7 @@ import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
 import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
 import com.github.lucbui.fracktail3.magic.resolver.Resolver;
-import com.github.lucbui.fracktail3.magic.utils.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;

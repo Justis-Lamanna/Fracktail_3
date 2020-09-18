@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.utils.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

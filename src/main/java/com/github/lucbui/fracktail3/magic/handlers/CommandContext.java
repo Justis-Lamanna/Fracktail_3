@@ -192,7 +192,7 @@ public abstract class CommandContext {
     }
 
     public <T> T resolve(Resolver<T> resolver) {
-        return resolver.resolve(getConfiguration(), getLocale());
+        return resolver.resolve(this);
     }
 
     public Mono<Map<String, Object>> getExtendedVariableMap() {

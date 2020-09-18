@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 /**
- * A specific type of FilterSetValidator which allows for extension and negation
+ * A specific type of Filter which allows for extension and negation
  */
 public abstract class AbstractComplexFilterSetValidator implements Filter {
     private final String name;

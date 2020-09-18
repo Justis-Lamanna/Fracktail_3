@@ -6,7 +6,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
 import com.github.lucbui.fracktail3.magic.handlers.Validated;
-import com.github.lucbui.fracktail3.magic.utils.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

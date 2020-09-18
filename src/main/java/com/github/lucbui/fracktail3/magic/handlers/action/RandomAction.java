@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.utils.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 import reactor.core.publisher.Mono;

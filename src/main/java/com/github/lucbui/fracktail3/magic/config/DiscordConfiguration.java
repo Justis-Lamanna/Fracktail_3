@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.config;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
-import com.github.lucbui.fracktail3.magic.utils.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;

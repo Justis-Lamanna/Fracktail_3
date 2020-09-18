@@ -31,6 +31,12 @@ public abstract class Userset extends AbstractComplexFilterSetValidator implemen
         return getName();
     }
 
+    /**
+     * Create a Userset by reference.
+     * The Userset will be retrieved and checked at runtime, rather than statically.
+     * @param id The Userset ID
+     * @return A filter which resolves this Userset at runtime
+     */
     public static Filter byId(String id) {
         return new UsersetById(id);
     }
