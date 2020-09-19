@@ -9,14 +9,25 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Perform several actions in sequence
+ */
 public class SequenceAction implements Action {
 
     private final List<Action> subActions;
 
+    /**
+     * Initialize the sequential actions
+     * @param subActions The actions to perform
+     */
     public SequenceAction(List<Action> subActions) {
         this.subActions = subActions;
     }
 
+    /**
+     * Get the action sequence
+     * @return Action sequence
+     */
     public List<Action> getSubActions() {
         return subActions;
     }
@@ -28,14 +39,26 @@ public class SequenceAction implements Action {
                 .last();
     }
 
+    /**
+     * Builder which creates a sequence action
+     */
     public static class Builder implements IBuilder<SequenceAction> {
         private final List<Action> subActions;
 
+        /**
+         * Initialize the Builder
+         * @param first The first action to perform
+         */
         public Builder(Action first) {
             subActions = new ArrayList<>();
             subActions.add(first);
         }
 
+        /**
+         * Set the next action to be performed
+         * @param next The next action
+         * @return This builder
+         */
         public Builder then(Action next) {
             subActions.add(next);
             return this;

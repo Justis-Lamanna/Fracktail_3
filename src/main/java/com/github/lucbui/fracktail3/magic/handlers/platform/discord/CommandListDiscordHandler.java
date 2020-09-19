@@ -61,7 +61,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                                 }
                             })
                             .flatMap(name -> Flux.fromIterable(commands.get(name)).zipWith(Mono.just(name)))
-                            .filterWhen(t -> t.getT1().matchesTrigger(bot, ctx))
+                            .filterWhen(t -> t.getT1().passesFilter(bot, ctx))
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
                 }, (ctx, t) -> t.map(tuple -> {

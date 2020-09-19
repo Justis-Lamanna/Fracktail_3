@@ -5,29 +5,37 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.Validated;
 
+/**
+ * One potential arm for a parameterized action
+ */
 public class ActionOption implements Validated {
-    private Filter filter;
-    private Action action;
+    private final Filter filter;
+    private final Action action;
 
+    /**
+     * Initialize this action with a filter
+     * @param filter The filter to use
+     * @param action The action to perform if the filter passes
+     */
     public ActionOption(Filter filter, Action action) {
         this.filter = filter;
         this.action = action;
     }
 
+    /**
+     * Get the filter to validate this arm
+     * @return The filter user
+     */
     public Filter getFilter() {
         return filter;
     }
 
-    public void setFilter(Filter filter) {
-        this.filter = filter;
-    }
-
+    /**
+     * Get the action to perform
+     * @return The action
+     */
     public Action getAction() {
         return action;
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
     }
 
     @Override
@@ -35,6 +43,8 @@ public class ActionOption implements Validated {
         if(filter instanceof Validated) {
             ((Validated) filter).validate(botSpec);
         }
-        action.validate(botSpec);
+        if(action instanceof Validated) {
+            ((Validated) action).validate(botSpec);
+        }
     }
 }

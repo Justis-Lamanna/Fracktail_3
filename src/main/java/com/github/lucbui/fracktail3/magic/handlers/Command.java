@@ -54,7 +54,7 @@ public class Command implements Validated, Id {
      * Get the filter this command uses
      * @return The filter
      */
-    public Filter getCommandFilter() {
+    public Filter getFilter() {
         return commandFilter;
     }
 
@@ -62,7 +62,7 @@ public class Command implements Validated, Id {
      * Get the action this command executes
      * @return The action
      */
-    public Action getActions() {
+    public Action getAction() {
         return action;
     }
 
@@ -72,7 +72,7 @@ public class Command implements Validated, Id {
      * @param ctx The context of the commands usage
      * @return Asynchronous boolean indicating if the guard passes
      */
-    public Mono<Boolean> matchesTrigger(Bot bot, CommandContext ctx) {
+    public Mono<Boolean> passesFilter(Bot bot, CommandContext ctx) {
         return commandFilter.matches(bot, ctx);
     }
 
@@ -93,7 +93,7 @@ public class Command implements Validated, Id {
      * @return Asynchronous marker indicating the action finished
      */
     public Mono<Void> doActionIfPasses(Bot bot, CommandContext ctx) {
-        return matchesTrigger(bot, ctx)
+        return passesFilter(bot, ctx)
                 .flatMap(b -> b ? doAction(bot, ctx) : Mono.empty());
     }
 
@@ -102,7 +102,9 @@ public class Command implements Validated, Id {
         if(commandFilter instanceof Validated) {
             ((Validated) commandFilter).validate(botSpec);
         }
-        action.validate(botSpec);
+        if(action instanceof Validated) {
+            ((Validated) action).validate(botSpec);
+        }
     }
 
     /**
@@ -114,25 +116,49 @@ public class Command implements Validated, Id {
         private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
 
+        /**
+         * Initialize Builder with Command ID
+         * @param id The ID of the command
+         */
         public Builder(String id) {
             this.id = id;
         }
 
+        /**
+         * Add a name to the list of command names.
+         * @param name The name to add
+         * @return This builder
+         */
         public Builder withName(String name) {
             names.add(name);
             return this;
         }
 
+        /**
+         * Set the filter of this command
+         * @param filter The filter to use
+         * @return This builder
+         */
         public Builder withFilter(Filter filter) {
             this.filter = filter;
             return this;
         }
 
+        /**
+         * Set the action of this command
+         * @param action The action to perform
+         * @return This builder
+         */
         public Builder withAction(Action action) {
             this.action = action;
             return this;
         }
 
+        /**
+         * Set the action of this command
+         * @param actionBuilder An ActionBuilder, which is resolved
+         * @return This builder
+         */
         public Builder withAction(IBuilder<? extends Action> actionBuilder) {
             return withAction(actionBuilder.build());
         }

@@ -10,13 +10,26 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Perform one of a number of random actions
+ * Each action is weighted relative to the sum of all weights. If all weights are the same, all actions are equally
+ * likely. When in doubt, weight can be a % value, as long as you maintain a total weight sum of 100
+ */
 public class RandomAction implements Action {
     private final EnumeratedDistribution<Action> actions;
 
+    /**
+     * Initialize this action with a weighted distribution of actions
+     * @param actions The actions to perform
+     */
     public RandomAction(EnumeratedDistribution<Action> actions) {
         this.actions = actions;
     }
 
+    /**
+     * Get the actions that can be performed, and their weights
+     * @return The actions to perform
+     */
     public EnumeratedDistribution<Action> getActions() {
         return actions;
     }
@@ -26,18 +39,35 @@ public class RandomAction implements Action {
         return actions.sample().doAction(bot, context);
     }
 
+    /**
+     * Builder to make RandomAction creation easier
+     */
     public static class Builder implements IBuilder<RandomAction> {
         private final List<Pair<Action, Double>> actions;
 
+        /**
+         * Initialize the builder
+         */
         public Builder() {
             this.actions = new ArrayList<>();
         }
 
+        /**
+         * Add a random action
+         * @param weight The weight of the action, relative to the others
+         * @param action The action to perform
+         * @return This builder
+         */
         public Builder with(double weight, Action action) {
             actions.add(Pair.create(action, weight));
             return this;
         }
 
+        /**
+         * Add a random action with weight 1
+         * @param action The action to perform
+         * @return This builder
+         */
         public Builder with(Action action) {
             return with(1, action);
         }

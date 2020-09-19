@@ -14,6 +14,9 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+/**
+ * Context used when a command is used via Discord
+ */
 public class DiscordContext extends CommandContext {
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
@@ -28,6 +31,12 @@ public class DiscordContext extends CommandContext {
     private final MessageCreateEvent event;
     private final DiscordConfiguration config;
 
+    /**
+     * Initialize the context with basic values
+     * @param platform The platform object
+     * @param config The discord-related configuration of the bot
+     * @param event The event which triggered the command usage
+     */
     public DiscordContext(
             DiscordPlatform platform,
             DiscordConfiguration config,
@@ -37,10 +46,18 @@ public class DiscordContext extends CommandContext {
         this.event = event;
     }
 
+    /**
+     * Get the triggering event
+     * @return The triggering event
+     */
     public MessageCreateEvent getEvent() {
         return event;
     }
 
+    /**
+     * Check if this command was triggered in DMs
+     * @return True, if this command came from DMs
+     */
     public boolean isDm() {
         return !event.getMember().isPresent();
     }
@@ -56,6 +73,12 @@ public class DiscordContext extends CommandContext {
                 .flatMap(owner -> dm(owner, message));
     }
 
+    /**
+     * Send a message in a specific channel
+     * @param channel The channel to send the message
+     * @param message The message to send
+     * @return Asynchronous boolean indicating message was sent
+     */
     public Mono<Boolean> respond(Snowflake channel, String message) {
         return this.event.getClient()
                 .getChannelById(channel)
@@ -64,12 +87,24 @@ public class DiscordContext extends CommandContext {
                 .thenReturn(true);
     }
 
+    /**
+     * Send a DM to the user of the command
+     * @param message The message to send
+     * @return Asynchronous boolean indicating message was sent
+     */
     public Mono<Boolean> dm(String message) {
         return event.getMessage().getAuthor()
                 .map(usr -> dm(usr.getId(), message))
                 .orElse(Mono.empty());
     }
 
+    /**
+     * Send a DM to a specific user.
+     * Note that this user must be in a guild where the bot lives
+     * @param user The user to DM
+     * @param message The message to send
+     * @return Asynchronous boolean indicating message was sent
+     */
     public Mono<Boolean> dm(Snowflake user, String message) {
         return this.event.getClient()
                 .getUserById(user)
@@ -78,6 +113,7 @@ public class DiscordContext extends CommandContext {
                 .thenReturn(true);
     }
 
+    //Mini-optimization: Only retrieve guild name and self name if necessary
     @Override
     public Mono<Map<String, Object>> getExtendedVariableMap() {
         if(containsExtendedVariable(getContents())) {

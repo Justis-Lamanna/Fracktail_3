@@ -121,6 +121,8 @@ public class CommandList implements Validated {
      */
     public void validate(BotSpec botSpec) throws BotConfigurationException {
         commands.forEach(c -> c.validate(botSpec));
-        orElse.validate(botSpec);
+        if(orElse instanceof Validated) {
+            ((Validated) orElse).validate(botSpec);
+        }
     }
 }

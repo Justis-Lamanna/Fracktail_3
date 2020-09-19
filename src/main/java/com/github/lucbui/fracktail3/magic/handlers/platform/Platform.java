@@ -10,9 +10,7 @@ import com.github.lucbui.fracktail3.magic.config.Config;
  * rather than using the CommandContext's class.
  * @param <CONFIG> The type of configuration this platform uses.
  */
-public interface Platform<
-        CONFIG extends Config
-        > extends Id {
+public interface Platform<CONFIG extends Config> extends Id {
     /**
      * The class of the configuration object
      * @return The class of the configuration object
