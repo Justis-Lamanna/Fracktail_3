@@ -190,11 +190,25 @@ public abstract class CommandContext {
         return map;
     }
 
+    /**
+     * Get a possibly-asynchronously generated map of variables
+     * @return Asynchronously-generated map of variables
+     */
     public Mono<Map<String, Object>> getExtendedVariableMap() {
         return Mono.just(getVariableMapConstants());
     }
 
+    /**
+     * Respond to the message which created this context
+     * @param message The message to respond with
+     * @return An asynchronous boolean indicating the message was sent
+     */
     public abstract Mono<Boolean> respond(String message);
 
+    /**
+     * Alert the bot owner with a message
+     * @param message The message to send to the bot owner
+     * @return An asynchronous boolean indicating the message was sent
+     */
     public abstract Mono<Boolean> alert(String message);
 }
