@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.handlers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
-import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -189,10 +188,6 @@ public abstract class CommandContext {
             map.put(RESULT_PREFIX + key, vars.get(key));
         }
         return map;
-    }
-
-    public <T> T resolve(Resolver<T> resolver) {
-        return resolver.resolve(this);
     }
 
     public Mono<Map<String, Object>> getExtendedVariableMap() {

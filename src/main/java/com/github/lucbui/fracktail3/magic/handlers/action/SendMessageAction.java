@@ -2,25 +2,23 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
-import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.ibm.icu.text.MessageFormat;
 import reactor.core.publisher.Mono;
 
 public abstract class SendMessageAction implements Action {
-    private final Resolver<String> resolver;
+    private final String msg;
 
-    public SendMessageAction(Resolver<String> resolver) {
-        this.resolver = resolver;
+    public SendMessageAction(String msg) {
+        this.msg = msg;
     }
 
-    public Resolver<String> getResolver() {
-        return resolver;
+    public String getResolver() {
+        return msg;
     }
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        String message = context.resolve(resolver);
-        MessageFormat format = new MessageFormat(message, context.getLocale());
+        MessageFormat format = new MessageFormat(msg, context.getLocale());
         return context.getExtendedVariableMap()
                 .map(format::format)
                 .flatMap(str -> sendMessage(context, str))

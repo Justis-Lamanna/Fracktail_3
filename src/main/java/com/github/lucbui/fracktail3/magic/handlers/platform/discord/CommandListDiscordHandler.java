@@ -49,7 +49,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 })
                 .zipWhen(ctx -> {
                     Map<String, List<Command>> commands =
-                            commandList.getCommandsByName(configuration, ctx.getLocale());
+                            commandList.getCommandsByName();
 
                     return Flux.fromIterable(commands.keySet())
                             .filter(name -> {
@@ -76,7 +76,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             ctx.getParameters(), ctx.getNormalizedParameters());
                     return tuple.getT1().doAction(bot, ctx)
                             .onErrorResume(CommandValidationException.class, ex -> {
-                                String response = ex.getMessage(configuration, ctx.getLocale());
+                                String response = ex.getMessage();
                                 return ctx.respond(response).then();
                             })
                             .onErrorResume(RuntimeException.class, ex -> {
@@ -93,7 +93,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             ctx.getContents());
                     return commandList.doOrElse(bot, ctx)
                             .onErrorResume(CommandValidationException.class, ex -> {
-                                String response = ex.getMessage(configuration, ctx.getLocale());
+                                String response = ex.getMessage();
                                 return ctx.respond(response).then();
                             })
                             .onErrorResume(RuntimeException.class, ex -> {

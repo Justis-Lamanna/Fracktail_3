@@ -6,10 +6,6 @@ import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.resolver.CompositeResolver;
-import com.github.lucbui.fracktail3.magic.resolver.I18NResolver;
-import com.github.lucbui.fracktail3.magic.resolver.ListFromI18NResolver;
-import com.github.lucbui.fracktail3.magic.resolver.Resolver;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.core.publisher.Mono;
 
@@ -20,11 +16,11 @@ import java.util.Objects;
 
 public class Command implements Validated, Id {
     private final String id;
-    private final Resolver<List<String>> names;
+    private final List<String> names;
     private final Filter commandFilter;
     private final Action action;
 
-    public Command(String id, Resolver<List<String>> names, Filter commandFilter, Action action) {
+    public Command(String id, List<String> names, Filter commandFilter, Action action) {
         this.id = Objects.requireNonNull(id);
         this.names = Objects.requireNonNull(names);
         this.commandFilter = Objects.requireNonNull(commandFilter);
@@ -36,7 +32,7 @@ public class Command implements Validated, Id {
         return id;
     }
 
-    public Resolver<List<String>> getNames() {
+    public List<String> getNames() {
         return names;
     }
 
@@ -65,8 +61,7 @@ public class Command implements Validated, Id {
 
     public static class Builder implements IBuilder<Command> {
         private String id;
-        private Resolver<List<String>> explicitResolver = null;
-        private List<Resolver<String>> names = new ArrayList<>();
+        private List<String> names = new ArrayList<>();
         private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
 
@@ -75,29 +70,7 @@ public class Command implements Validated, Id {
         }
 
         public Builder withName(String name) {
-            names.add(Resolver.identity(name));
-            return this;
-        }
-
-        public Builder withI18NName(String key) {
-            explicitResolver = null;
-            names.add(new I18NResolver(key));
-            return this;
-        }
-
-        public Builder withI18NName(String key, String _default) {
-            explicitResolver = null;
-            names.add(new I18NResolver(key, _default));
-            return this;
-        }
-
-        public Builder withI18NNames(String key) {
-            explicitResolver = new ListFromI18NResolver(key);
-            return this;
-        }
-
-        public Builder withResolver(Resolver<List<String>> resolver) {
-            explicitResolver = resolver;
+            names.add(name);
             return this;
         }
 
@@ -117,14 +90,14 @@ public class Command implements Validated, Id {
 
         @Override
         public Command build() {
-            if(explicitResolver == null && names.isEmpty()) {
-                explicitResolver = Resolver.identity(Collections.singletonList(id));
+            if(names.isEmpty()) {
+                names = Collections.singletonList(id);
             }
             return new Command(
-                    id,
-                    explicitResolver == null ? new CompositeResolver<>(names) : explicitResolver,
-                    filter,
-                    action
+                id,
+                names,
+                filter,
+                action
             );
         }
     }

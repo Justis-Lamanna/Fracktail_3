@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import org.apache.commons.lang3.StringUtils;
@@ -48,10 +47,10 @@ public class CommandList implements Validated {
                 .collect(Collectors.toMap(Command::getId, Function.identity()));
     }
 
-    public Map<String, List<Command>> getCommandsByName(Config config, Locale locale) {
+    public Map<String, List<Command>> getCommandsByName() {
         Map<String, List<Command>> returned = new HashMap<>();
         for(Command command : commands) {
-            List<String> names = command.getNames().resolve(config, locale);
+            List<String> names = command.getNames();
             for(String name : names) {
                 returned.computeIfAbsent(name, s -> new ArrayList<>()).add(command);
             }

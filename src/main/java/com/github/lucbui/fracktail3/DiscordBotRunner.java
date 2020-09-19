@@ -36,7 +36,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 .withCommand(
                     new Command.Builder("hello")
                     .withFilter(new UsersetById("owner"))
-                    .withAction(RespondAction.literal("Hello, {at_user}!"))
+                    .withAction(new RespondAction("Hello, {at_user}!"))
                     .build()
                 )
                 .build();
