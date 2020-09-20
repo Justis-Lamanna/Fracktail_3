@@ -3,7 +3,10 @@ package com.github.lucbui.fracktail3.magic.filterset.channel;
 import com.github.lucbui.fracktail3.magic.filterset.AbstractIdFilter;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 
-public abstract class Channelset extends AbstractIdFilter{
+/**
+ * Defines a named set of channels
+ */
+public abstract class Channelset extends AbstractIdFilter {
     /**
      * Default constructor for Channelset, not using any negation or extension
      * @param name The name of the set.

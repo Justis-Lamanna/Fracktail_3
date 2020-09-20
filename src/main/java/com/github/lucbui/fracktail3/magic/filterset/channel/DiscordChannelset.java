@@ -8,30 +8,26 @@ import discord4j.common.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.Collections;
 import java.util.Set;
 
 public class DiscordChannelset extends PlatformSpecificUserset<DiscordContext> {
     private boolean permitDms;
-    private Set<Snowflake> guildSnowflakes;
     private Set<Snowflake> channelSnowflakes;
 
-    public DiscordChannelset(String name, boolean blacklist, String extendsRoleset) {
-        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
-        this.guildSnowflakes = null;
+    public DiscordChannelset(String name) {
+        super(name, DiscordPlatform.INSTANCE);
         this.channelSnowflakes = null;
     }
 
-    public DiscordChannelset(String name, Set<Snowflake> guildSnowflakes, Set<Snowflake> channelSnowflakes) {
+    public DiscordChannelset(String name, boolean permitDms, Set<Snowflake> channelSnowflakes) {
         super(name, DiscordPlatform.INSTANCE);
-        this.guildSnowflakes = guildSnowflakes;
+        this.permitDms = permitDms;
         this.channelSnowflakes = channelSnowflakes;
     }
 
-    public DiscordChannelset(String name, boolean blacklist, String extendsRoleset, Set<Snowflake> guildSnowflakes, Set<Snowflake> channelSnowflakes) {
-        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
-        this.guildSnowflakes = guildSnowflakes;
-        this.channelSnowflakes = channelSnowflakes;
+    public static DiscordChannelset forChannel(String name, Snowflake id) {
+        return new DiscordChannelset(name, false, Collections.singleton(id));
     }
 
     public boolean isPermitDms() {
@@ -40,14 +36,6 @@ public class DiscordChannelset extends PlatformSpecificUserset<DiscordContext> {
 
     public void setPermitDms(boolean permitDms) {
         this.permitDms = permitDms;
-    }
-
-    public Set<Snowflake> getGuildSnowflakes() {
-        return guildSnowflakes;
-    }
-
-    public void setGuildSnowflakes(Set<Snowflake> guildSnowflakes) {
-        this.guildSnowflakes = guildSnowflakes;
     }
 
     public Set<Snowflake> getChannelSnowflakes() {
@@ -60,17 +48,7 @@ public class DiscordChannelset extends PlatformSpecificUserset<DiscordContext> {
 
     @Override
     protected Mono<Boolean> matchesForPlatform(Bot bot, DiscordContext context) {
-        if(CollectionUtils.isEmpty(guildSnowflakes) && CollectionUtils.isEmpty(channelSnowflakes)) {
-            return Mono.just(true);
-        }
-
-        return Mono.just(isLegalGuild(context) && isLegalChannel(context));
-    }
-
-    private boolean isLegalGuild(DiscordContext context) {
-        Optional<Snowflake> guildId = context.getEvent().getGuildId();
-        return CollectionUtils.isEmpty(guildSnowflakes) ||
-                guildId.map(snowflake -> guildSnowflakes.contains(snowflake)).orElse(permitDms);
+        return Mono.just(isLegalChannel(context));
     }
 
     private boolean isLegalChannel(DiscordContext context) {

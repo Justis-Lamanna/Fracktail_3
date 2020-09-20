@@ -1,10 +1,13 @@
 package com.github.lucbui.fracktail3.magic.filterset.channel;
 
-import com.github.lucbui.fracktail3.magic.filterset.ComplexFilterStore;
+import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 
 import java.util.Map;
 
-public class Channelsets extends ComplexFilterStore<Channelset> {
+/**
+ * A mapping of all Channelsets in the bot
+ */
+public class Channelsets extends IdStore<Channelset> {
     public Channelsets(Map<String, Channelset> store) {
         super(store);
     }

@@ -14,18 +14,6 @@ public abstract class PlatformSpecificChannelset<C extends CommandContext> exten
     private final Platform<?> platform;
 
     /**
-     * Default constructor
-     * @param name Name of the userset
-     * @param blacklist If true, negation is used
-     * @param extendsRoleset If non-null, extension is used
-     * @param platform The platform to work for.
-     */
-    public PlatformSpecificChannelset(String name, boolean blacklist, String extendsRoleset, Platform<?> platform) {
-        super(name, blacklist, extendsRoleset);
-        this.platform = platform;
-    }
-
-    /**
      * Default constructor, using no negation or extension
      * @param name The name of the userset
      * @param platform The platform of the userset
@@ -36,7 +24,7 @@ public abstract class PlatformSpecificChannelset<C extends CommandContext> exten
     }
 
     @Override
-    public Mono<Boolean> matches2(Bot bot, CommandContext context) {
+    public Mono<Boolean> matches(Bot bot, CommandContext context) {
         if(context.forPlatform(platform)) {
             return matchesForPlatform(bot, (C)context);
         }

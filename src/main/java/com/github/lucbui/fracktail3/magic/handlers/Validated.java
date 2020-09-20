@@ -13,4 +13,16 @@ public interface Validated {
      * @throws BotConfigurationException Bot is incorrectly configured+
      */
     void validate(BotSpec spec) throws BotConfigurationException;
+
+    /**
+     * Validate an object, if it implements this interface
+     * @param obj The object to validate
+     * @param spec The spec to validate against
+     * @throws BotConfigurationException Bot was incorrectly configured
+     */
+    static void validate(Object obj, BotSpec spec) throws BotConfigurationException {
+        if(obj instanceof Validated) {
+            ((Validated) obj).validate(spec);
+        }
+    }
 }

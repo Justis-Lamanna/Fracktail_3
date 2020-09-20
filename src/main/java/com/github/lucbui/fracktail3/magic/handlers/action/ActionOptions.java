@@ -59,9 +59,7 @@ public class ActionOptions implements Action, Validated {
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
         actions.forEach(a -> a.validate(botSpec));
-        if(_default instanceof Validated) {
-            ((Validated) _default).validate(botSpec);
-        }
+        Validated.validate(_default, botSpec);
     }
 
     /**

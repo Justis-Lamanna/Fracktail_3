@@ -4,7 +4,7 @@ import com.github.lucbui.fracktail3.magic.filterset.AbstractIdFilter;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 
 /**
- * A userset, which is specifically for filtering users
+ * Defines a named set of users
  */
 public abstract class Userset extends AbstractIdFilter {
     /**

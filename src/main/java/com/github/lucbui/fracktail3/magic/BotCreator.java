@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.filterset.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
@@ -27,6 +29,7 @@ public class BotCreator implements IBuilder<Bot> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotCreator.class);
 
     private final Map<Platform<?>, Config> configs = new HashMap<>();
+    private final Map<String, Channelset> channelsets = new HashMap<>();
     private final Map<String, Userset> usersets = new HashMap<>();
 
     private final List<Command> commands = new ArrayList<>();
@@ -53,6 +56,19 @@ public class BotCreator implements IBuilder<Bot> {
         Userset old = usersets.put(userset.getId(), userset);
         if(old != null) {
             LOGGER.warn("Overwriting userset " + userset.getId());
+        }
+        return this;
+    }
+
+    /**
+     * Add a Channelset to this bot
+     * @param channelset The channelset to add
+     * @return This creator
+     */
+    public BotCreator withChannelset(Channelset channelset) {
+        Channelset old = channelsets.put(channelset.getId(), channelset);
+        if(old != null) {
+            LOGGER.warn("Overwriting channelset " + channelset.getId());
         }
         return this;
     }
@@ -87,6 +103,7 @@ public class BotCreator implements IBuilder<Bot> {
         CommandList commandList = new CommandList(commands, orElse);
         BotSpec spec = new BotSpec(
                 configs,
+                new Channelsets(channelsets),
                 new Usersets(usersets),
                 new BehaviorList(commandList));
 
@@ -97,6 +114,10 @@ public class BotCreator implements IBuilder<Bot> {
         });
 
         usersets.forEach((name, set) -> {
+            callIfBotCreatorAware(set);
+        });
+
+        channelsets.forEach((name, set) -> {
             callIfBotCreatorAware(set);
         });
 

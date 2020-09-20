@@ -40,11 +40,7 @@ public class ActionOption implements Validated {
 
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        if(filter instanceof Validated) {
-            ((Validated) filter).validate(botSpec);
-        }
-        if(action instanceof Validated) {
-            ((Validated) action).validate(botSpec);
-        }
+        Validated.validate(filter, botSpec);
+        Validated.validate(action, botSpec);
     }
 }

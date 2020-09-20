@@ -5,18 +5,20 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
-import org.apache.commons.lang3.StringUtils;
+import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * A list of usable commands.
  */
-public class CommandList implements Validated {
-    private final List<Command> commands;
+public class CommandList extends IdStore<Command> implements Validated {
     private final Action orElse;
 
     /**
@@ -25,7 +27,7 @@ public class CommandList implements Validated {
      * @param orElse An action to execute if no commands match
      */
     public CommandList(List<Command> commands, Action orElse) {
-        this.commands = Collections.unmodifiableList(commands);
+        super(commands);
         this.orElse = Objects.requireNonNull(orElse);
     }
 
@@ -35,7 +37,7 @@ public class CommandList implements Validated {
      * @return The list of commands
      */
     public List<Command> getCommands() {
-        return commands;
+        return getAll();
     }
 
     /**
@@ -44,9 +46,7 @@ public class CommandList implements Validated {
      * @return The command, if it exists
      */
     public Optional<Command> getCommandById(String id) {
-        return commands.stream()
-                .filter(c -> StringUtils.equals(id, c.getId()))
-                .findFirst();
+        return getById(id);
     }
 
     /**
@@ -54,7 +54,7 @@ public class CommandList implements Validated {
      * @return The ID-Command map
      */
     public Map<String, Command> getCommandsById() {
-        return commands.stream()
+        return getAll().stream()
                 .collect(Collectors.toMap(Command::getId, Function.identity()));
     }
 
@@ -85,7 +85,7 @@ public class CommandList implements Validated {
      * @throws BotConfigurationException The bot was incorrectly configured
      */
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        commands.forEach(c -> c.validate(botSpec));
+        getAll().forEach(c -> c.validate(botSpec));
         if(orElse instanceof Validated) {
             ((Validated) orElse).validate(botSpec);
         }
@@ -96,6 +96,6 @@ public class CommandList implements Validated {
      * @return The number of commands
      */
     public int getNumberOfCommands() {
-        return commands.size();
+        return size();
     }
 }

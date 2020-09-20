@@ -23,40 +23,15 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
     private Set<Snowflake> roleSnowflakes;
 
     /**
-     * Initialize a Userset with a name, negation, and extends
-     * @param name The name of the Userset
-     * @param blacklist Whether the Userset is negated or not
-     * @param extendsRoleset If non-null, the Userset extended by this one
-     */
-    public DiscordUserset(String name, boolean blacklist, String extendsRoleset) {
-        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
-        this.userSnowflakes = null;
-        this.roleSnowflakes = null;
-    }
-
-    /**
      * Initialize a Userset with a name, and snowflakes.
      * This Userset is not negated, and extends no other Userset
      * @param name The name of the Userset
      * @param userSnowflakes The list of snowflakes that correspond to User IDs
      * @param roleSnowflakes The list of snowflakes that correspond to Role IDs
      */
-    public DiscordUserset(String name, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
+    public DiscordUserset(String name, boolean permitDms, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
         super(name, DiscordPlatform.INSTANCE);
-        this.userSnowflakes = userSnowflakes;
-        this.roleSnowflakes = roleSnowflakes;
-    }
-
-    /**
-     * Initialize a Userset with a name, negation, and extends
-     * @param name The name of the Userset
-     * @param blacklist Whether the Userset is negated or not
-     * @param extendsRoleset If non-null, the Userset extended by this one
-     * @param userSnowflakes The list of snowflakes that correspond to User IDs
-     * @param roleSnowflakes The list of snowflakes that correspond to Role IDs
-     */
-    public DiscordUserset(String name, boolean blacklist, String extendsRoleset, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
-        super(name, blacklist, extendsRoleset, DiscordPlatform.INSTANCE);
+        this.permitDms = permitDms;
         this.userSnowflakes = userSnowflakes;
         this.roleSnowflakes = roleSnowflakes;
     }
@@ -68,7 +43,7 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
      * @return The created userset.
      */
     public static DiscordUserset forUser(String name, Snowflake user) {
-        return new DiscordUserset(name, Collections.singleton(user), Collections.emptySet());
+        return new DiscordUserset(name, true, Collections.singleton(user), Collections.emptySet());
     }
 
     /**
