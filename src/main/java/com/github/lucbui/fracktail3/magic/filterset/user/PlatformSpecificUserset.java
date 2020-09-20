@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import reactor.core.publisher.Mono;
 

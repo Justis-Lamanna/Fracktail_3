@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
-import com.github.lucbui.fracktail3.magic.handlers.Validated;
 
 /**
  * One potential arm for a parameterized action

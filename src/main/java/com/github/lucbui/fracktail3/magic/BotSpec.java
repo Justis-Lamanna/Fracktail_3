@@ -7,7 +7,6 @@ import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
-import com.github.lucbui.fracktail3.magic.handlers.Validated;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 
 import java.util.*;

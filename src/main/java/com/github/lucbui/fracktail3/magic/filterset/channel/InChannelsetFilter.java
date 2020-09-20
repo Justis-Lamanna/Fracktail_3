@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.filterset.channel;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
-import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
 public class InChannelsetFilter implements Filter {

@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.magic.config;
 
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.Validated;
 
 import java.util.Locale;
 import java.util.Optional;
