@@ -226,11 +226,68 @@ public abstract class CommandContext {
     }
 
     /**
+     * Get a ResourceBundle for this context
+     * If no ResourceBundles exist, an empty Optional is returned.
+     * @return The context of the bundle
+     */
+    public Optional<ResourceBundle> getResourceBundle() {
+        //Enhancment: Per-command localization?
+        if(config instanceof Localizable) {
+            return ((Localizable) config).getBundleIfEnabled(getLocale());
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Translate the key into some value
+     * If no ResourceBundles exist, or no string matches the provided key, then an empty
+     * optional is provided.
+     * @param key The key to translate
+     * @return The translated value
+     */
+    public Optional<String> translate(String key) {
+        return getResourceBundle()
+                .filter(bundle -> bundle.containsKey(key))
+                .map(bundle -> bundle.getString(key));
+    }
+
+    /**
+     * Translate the key into some value
+     * If no ResourceBundles exist, or no string matches the provided key, then the provided default is returned.
+     * @param key The key to translate
+     * @param defaultStr The default value to provide
+     * @return The translated value
+     */
+    public String translate(String key, String defaultStr) {
+        return translate(key).orElse(defaultStr);
+    }
+
+    /**
      * Respond to the message which created this context
      * @param message The message to respond with
      * @return An asynchronous boolean indicating the message was sent
      */
     public abstract Mono<Boolean> respond(String message);
+
+    /**
+     * Respond using a localized message
+     * @param key The key of the message
+     * @param defaultMsg The text to show, if
+     * @return An asynchronous boolean indicating the message was sent
+     */
+    public Mono<Boolean> respondLocalized(String key, String defaultMsg) {
+        return respond(translate(key, defaultMsg));
+    }
+
+    /**
+     * Respond using a localized message
+     * If no ResourceBundles are found, or the key is not found, the key is the response
+     * @param key The key of the message
+     * @return An asynchronous boolean indicating the message was sent
+     */
+    public Mono<Boolean> respondLocalized(String key) {
+        return respondLocalized(key, key);
+    }
 
     /**
      * Alert the bot owner with a message

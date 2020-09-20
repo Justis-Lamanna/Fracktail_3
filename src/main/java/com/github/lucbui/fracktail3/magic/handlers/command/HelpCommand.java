@@ -33,16 +33,17 @@ public class HelpCommand extends Command {
                         Optional<Command> matching = bot.getSpec().getBehaviorList().getCommandList().getCommands().stream()
                                 .filter(c -> c.getNames().contains(commandToLookup))
                                 .findFirst();
-                        return matching.map(Command::getHelp).map(context::respond)
+                        return matching.map(Command::getHelp)
+                                .map(context::respondLocalized)
                                 .orElseGet(() -> {
                                     MessageFormat format = new MessageFormat(noCommandText, context.getLocale());
                                     return context.getExtendedVariableMap()
                                             .doOnNext(map -> map.put("command", commandToLookup))
                                             .map(format::format)
-                                            .flatMap(context::respond);
+                                            .flatMap(context::respondLocalized);
                                 });
                     })
-                    .orElse(context.respond(context.getCommand().getHelp()))
+                    .orElse(context.respondLocalized(context.getCommand().getHelp()))
                     .then();
         }
     }

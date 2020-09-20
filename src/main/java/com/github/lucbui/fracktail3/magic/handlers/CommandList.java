@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,8 +19,6 @@ public class CommandList implements Validated {
     private final List<Command> commands;
     private final Action orElse;
 
-    private boolean caseSensitive;
-
     /**
      * Initializes this CommandList with a list of commands
      * @param commands The commands to use
@@ -30,7 +27,6 @@ public class CommandList implements Validated {
     public CommandList(List<Command> commands, Action orElse) {
         this.commands = Collections.unmodifiableList(commands);
         this.orElse = Objects.requireNonNull(orElse);
-        this.caseSensitive = true;
     }
 
     /**
@@ -49,7 +45,7 @@ public class CommandList implements Validated {
      */
     public Optional<Command> getCommandById(String id) {
         return commands.stream()
-                .filter(c -> getEqualityPredicate().test(id, c.getId()))
+                .filter(c -> StringUtils.equals(id, c.getId()))
                 .findFirst();
     }
 
@@ -60,38 +56,6 @@ public class CommandList implements Validated {
     public Map<String, Command> getCommandsById() {
         return commands.stream()
                 .collect(Collectors.toMap(Command::getId, Function.identity()));
-    }
-
-    /**
-     * If commands are case-sensitive
-     * @return True if case-sensitive
-     */
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
-    /**
-     * Get the list of commands by name
-     * Sorta-deprecated?
-     * @return A mapping between commands and their name.
-     */
-    public Map<String, List<Command>> getCommandsByName() {
-        Map<String, List<Command>> returned = new HashMap<>();
-        for(Command command : commands) {
-            List<String> names = command.getNames();
-            for(String name : names) {
-                returned.computeIfAbsent(name, s -> new ArrayList<>()).add(command);
-            }
-        }
-        return returned;
-    }
-
-    private BiPredicate<String, String> getEqualityPredicate() {
-        if(caseSensitive) {
-            return StringUtils::equals;
-        } else {
-            return StringUtils::equalsIgnoreCase;
-        }
     }
 
     /**
@@ -125,5 +89,13 @@ public class CommandList implements Validated {
         if(orElse instanceof Validated) {
             ((Validated) orElse).validate(botSpec);
         }
+    }
+
+    /**
+     * Get the number of commands in the list
+     * @return The number of commands
+     */
+    public int getNumberOfCommands() {
+        return commands.size();
     }
 }

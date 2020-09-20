@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CommandListDiscordHandler implements DiscordHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListDiscordHandler.class);
@@ -48,18 +49,10 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     return ctx;
                 })
                 .zipWhen(ctx -> {
-                    Map<String, List<Command>> commands =
-                            commandList.getCommandsByName();
+                    Map<String, List<Command>> commands = getCommandsByName(ctx);
 
                     return Flux.fromIterable(commands.keySet())
-                            .filter(name -> {
-                                String msg = ctx.getContents();
-                                if (commandList.isCaseSensitive()) {
-                                    return StringUtils.startsWith(msg, configuration.getPrefix() + name);
-                                } else {
-                                    return StringUtils.startsWithIgnoreCase(msg, configuration.getPrefix() + name);
-                                }
-                            })
+                            .filter(name -> StringUtils.startsWith(ctx.getContents(), configuration.getPrefix() + name))
                             .flatMap(name -> Flux.fromIterable(commands.get(name)).zipWith(Mono.just(name)))
                             .filterWhen(t -> t.getT1().passesFilter(bot, ctx))
                             .singleOrEmpty()
@@ -78,7 +71,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     return tuple.getT1().doAction(bot, ctx)
                             .onErrorResume(CommandValidationException.class, ex -> {
                                 String response = ex.getMessage();
-                                return ctx.respond(response).then();
+                                return ctx.respondLocalized(response).then();
                             })
                             .onErrorResume(RuntimeException.class, ex -> {
                                 LOGGER.warn("Encountered exception running command", ex);
@@ -93,16 +86,27 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             ctx.getLocale(),
                             ctx.getContents());
                     return commandList.doOrElse(bot, ctx)
-                            .onErrorResume(CommandValidationException.class, ex -> {
-                                String response = ex.getMessage();
-                                return ctx.respond(response).then();
-                            })
+                            .onErrorResume(CommandValidationException.class, ex -> ctx.respondLocalized(ex.getMessage()).then())
                             .onErrorResume(RuntimeException.class, ex -> {
                                 LOGGER.warn("Encountered exception running or-else command", ex);
                                 return ctx.alert("Encountered exception: " + ex.getMessage()).then();
                             });
                 }))
                 .flatMap(m -> m); //Since zipping makes a Mono<Mono<Void>>, we need an identity map to unwrap.
+    }
+
+    private Map<String, List<Command>> getCommandsByName(DiscordContext ctx) {
+        Map<String, List<Command>> commands = new HashMap<>(commandList.getNumberOfCommands());
+        for(Command command : commandList.getCommands()) {
+            List<String> names = command.getNames()
+                    .stream()
+                    .map(s -> ctx.translate(s, s))
+                    .collect(Collectors.toList());
+            for(String name : names) {
+                commands.computeIfAbsent(name, key -> new ArrayList<>()).add(command);
+            }
+        }
+        return commands;
     }
 
     private String[] parseParameters(String paramString) {

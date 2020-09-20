@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.config;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
+import com.github.lucbui.fracktail3.magic.handlers.Localizable;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -10,13 +11,14 @@ import discord4j.discordjson.json.gateway.StatusUpdate;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
  * Subclass of a Configuration for a Discord bot.
  */
-public class DiscordConfiguration implements Config, BotCreatorAware {
+public class DiscordConfiguration implements Config, BotCreatorAware, Localizable {
     private final String token;
     private final String prefix;
     private final Snowflake owner;
@@ -127,6 +129,19 @@ public class DiscordConfiguration implements Config, BotCreatorAware {
         if(owner != null) {
             creator.withUserset(DiscordUserset.forUser("owner", owner));
         }
+    }
+
+    @Override
+    public ResourceBundle getBundle(Locale locale) {
+        if(!isEnabled()) {
+            throw new NoSuchElementException("Localization is disabled");
+        }
+        return ResourceBundle.getBundle(i18nPath, locale);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return i18nPath != null;
     }
 
     public static class Builder implements IBuilder<DiscordConfiguration> {
