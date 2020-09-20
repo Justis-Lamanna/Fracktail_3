@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers.commands;
+package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;

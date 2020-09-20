@@ -2,16 +2,13 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
+import com.github.lucbui.fracktail3.magic.handlers.command.Command;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Context object used when a command is received.
@@ -72,6 +69,18 @@ public abstract class CommandContext {
      */
     public String[] getNormalizedParameters() {
         return normalizedParameters;
+    }
+
+    /**
+     * Get the nth parameter, if it exists
+     * @param idx The index of the parameter to retrieve
+     * @return The parameter, or empty if the index doesn't match
+     */
+    public Optional<String> getNormalizedParameter(int idx) {
+        if(idx < 0 || idx >= normalizedParameters.length) {
+            return Optional.empty();
+        }
+        return Optional.of(normalizedParameters[idx]);
     }
 
     /**

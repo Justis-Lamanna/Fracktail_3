@@ -4,7 +4,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.CommandValidationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
+import com.github.lucbui.fracktail3.magic.handlers.command.Command;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
