@@ -5,8 +5,9 @@ import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.filterset.user.UsersetById;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
+import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
+import com.github.lucbui.fracktail3.magic.handlers.commands.HelpCommand;
 import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
@@ -39,6 +40,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                     .withAction(new RespondAction("Hello, {at_user}!"))
                     .build()
                 )
+                .withCommand(new HelpCommand())
                 .build();
         bot.start().block();
     }

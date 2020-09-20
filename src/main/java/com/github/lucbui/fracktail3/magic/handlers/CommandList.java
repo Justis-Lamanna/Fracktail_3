@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 

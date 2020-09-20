@@ -1,12 +1,15 @@
-package com.github.lucbui.fracktail3.magic.handlers;
+package com.github.lucbui.fracktail3.magic.handlers.commands;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.handlers.CommandContext;
+import com.github.lucbui.fracktail3.magic.handlers.Validated;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -20,21 +23,49 @@ import java.util.Objects;
 public class Command implements Validated, Id {
     private final String id;
     private final List<String> names;
+    private final String help;
     private final Filter commandFilter;
     private final Action action;
+
+    /**
+     * Creates a minimal command
+     * The name is the same as the ID, no filter is provided, and help text is "id.help".
+     * @param id The command's ID
+     * @param action The action to perform
+     */
+    public Command(String id, Action action) {
+        this(id, Collections.singletonList(id), Filter.identity(true), action);
+    }
 
     /**
      * Creates a Command
      * @param id The ID of the command
      * @param names The name(s) this command responds to
-     * @param commandFilter A guard, which prevents this command from being used in certain contexts
+     * @param filter A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, List<String> names, Filter commandFilter, Action action) {
+    public Command(String id, List<String> names, Filter filter, Action action) {
         this.id = Objects.requireNonNull(id);
         this.names = Objects.requireNonNull(names);
-        this.commandFilter = Objects.requireNonNull(commandFilter);
+        this.help = this.id + ".help";
+        this.commandFilter = Objects.requireNonNull(filter);
         this.action = Objects.requireNonNull(action);
+    }
+
+    /**
+     * Creates a Command
+     * @param id The ID of the command
+     * @param names The name(s) this command responds to
+     * @param help The help text
+     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param action The action to perform when the command is run
+     */
+    public Command(String id, List<String> names, String help, Filter filter, Action action) {
+        this.id = id;
+        this.names = names;
+        this.help = help;
+        this.commandFilter = filter;
+        this.action = action;
     }
 
     @Override
@@ -64,6 +95,14 @@ public class Command implements Validated, Id {
      */
     public Action getAction() {
         return action;
+    }
+
+    /**
+     * Get the help text of this command
+     * @return The help text
+     */
+    public String getHelp() {
+        return help;
     }
 
     /**
@@ -115,6 +154,7 @@ public class Command implements Validated, Id {
         private List<String> names = new ArrayList<>();
         private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
+        private String help;
 
         /**
          * Initialize Builder with Command ID
@@ -155,6 +195,16 @@ public class Command implements Validated, Id {
         }
 
         /**
+         * Set the help text of this command
+         * @param helpText The help text
+         * @return This builder
+         */
+        public Builder withHelp(String helpText) {
+            this.help = helpText;
+            return this;
+        }
+
+        /**
          * Set the action of this command
          * @param actionBuilder An ActionBuilder, which is resolved
          * @return This builder
@@ -168,12 +218,10 @@ public class Command implements Validated, Id {
             if(names.isEmpty()) {
                 names = Collections.singletonList(id);
             }
-            return new Command(
-                id,
-                names,
-                filter,
-                action
-            );
+            if(StringUtils.isEmpty(help)) {
+                this.help = id + ".help";
+            }
+            return new Command(id, names, help, filter, action);
         }
     }
 }

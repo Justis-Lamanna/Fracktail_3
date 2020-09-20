@@ -3,8 +3,8 @@ package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.CommandValidationException;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
+import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -65,6 +65,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
                 }, (ctx, t) -> t.map(tuple -> {
+                    ctx.setCommand(tuple.getT1());
                     ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()));
                     ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
                     LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",

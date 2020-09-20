@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.config.Config;
+import com.github.lucbui.fracktail3.magic.handlers.commands.Command;
 import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ public abstract class CommandContext {
     protected final Map<String, Object> vars = new HashMap<>();
 
     protected Locale locale;
+    protected Command command;
     protected String parameters;
     protected String[] normalizedParameters;
 
@@ -169,6 +171,22 @@ public abstract class CommandContext {
      */
     public boolean forPlatform(Platform<?> testPlatform) {
         return StringUtils.equals(platform.getId(), testPlatform.getId());
+    }
+
+    /**
+     * Get the command attempting to be used
+     * @return The command
+     */
+    public Command getCommand() {
+        return command;
+    }
+
+    /**
+     * Set the command attempting to be used
+     * @param command The command
+     */
+    public void setCommand(Command command) {
+        this.command = command;
     }
 
     /**
