@@ -1,9 +1,9 @@
-package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
+package com.github.lucbui.fracktail3.magic.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;

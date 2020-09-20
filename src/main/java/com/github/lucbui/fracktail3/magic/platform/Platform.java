@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.handlers.platform;
+package com.github.lucbui.fracktail3.magic.platform;
 
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.config.Config;

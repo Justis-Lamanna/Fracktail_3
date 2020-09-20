@@ -4,11 +4,11 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
-import com.github.lucbui.fracktail3.magic.filterset.user.UsersetById;
+import com.github.lucbui.fracktail3.magic.filterset.user.InUsersetFilter;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
 import com.github.lucbui.fracktail3.magic.handlers.command.HelpCommand;
-import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
+import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -36,7 +36,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 .withUserset(DiscordUserset.forUser("steven", Snowflake.of(0L)))
                 .withCommand(
                     new Command.Builder("hello")
-                    .withFilter(new UsersetById("owner"))
+                    .withFilter(new InUsersetFilter("owner"))
                     .withAction(new RespondAction("Hello, {at_user}!"))
                     .build()
                 )

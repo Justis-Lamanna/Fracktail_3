@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordContext;
-import com.github.lucbui.fracktail3.magic.handlers.platform.discord.DiscordPlatform;
+import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Mono;

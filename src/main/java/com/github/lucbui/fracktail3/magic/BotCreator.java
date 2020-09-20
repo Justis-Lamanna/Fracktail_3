@@ -8,7 +8,7 @@ import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
-import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

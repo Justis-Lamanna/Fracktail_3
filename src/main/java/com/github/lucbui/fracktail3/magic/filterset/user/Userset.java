@@ -38,6 +38,6 @@ public abstract class Userset extends AbstractComplexFilterSetValidator implemen
      * @return A filter which resolves this Userset at runtime
      */
     public static Filter byId(String id) {
-        return new UsersetById(id);
+        return new InUsersetFilter(id);
     }
 }

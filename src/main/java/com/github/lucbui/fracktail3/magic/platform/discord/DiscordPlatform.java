@@ -1,8 +1,8 @@
-package com.github.lucbui.fracktail3.magic.handlers.platform.discord;
+package com.github.lucbui.fracktail3.magic.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.handlers.platform.Platform;
-import com.github.lucbui.fracktail3.magic.handlers.platform.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 
 /**
  * A singleton which represents the Discord platform

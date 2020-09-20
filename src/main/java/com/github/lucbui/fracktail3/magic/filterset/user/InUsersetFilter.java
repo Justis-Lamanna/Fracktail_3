@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * A mock "userset" which has is retrieved from the bot at runtime
  */
-public class UsersetById implements Filter {
+public class InUsersetFilter implements Filter {
     private final String id;
     private final boolean defaultValue;
 
@@ -19,7 +19,7 @@ public class UsersetById implements Filter {
      * Initialize UsersetById
      * @param id The ID of the Userset to retrieve
      */
-    public UsersetById(String id) {
+    public InUsersetFilter(String id) {
         this.id = id;
         this.defaultValue = true;
     }
@@ -29,7 +29,7 @@ public class UsersetById implements Filter {
      * @param id The ID of the Userset to retrieve
      * @param defaultValue A default value, which is returned if the named userset does not exist.
      */
-    public UsersetById(String id, boolean defaultValue) {
+    public InUsersetFilter(String id, boolean defaultValue) {
         this.id = id;
         this.defaultValue = defaultValue;
     }
