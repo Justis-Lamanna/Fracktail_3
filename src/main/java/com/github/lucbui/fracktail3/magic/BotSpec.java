@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.filterset.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
@@ -21,11 +23,13 @@ import java.util.*;
 public class BotSpec {
     private final Map<String, Platform<?>> platforms = new HashMap<>();
     private final Map<String, Config> configs = new HashMap<>();
+    private final Channelsets channelsets;
     private final Usersets usersets;
     private final BehaviorList behaviorList;
 
-    public BotSpec(Map<Platform<?>, Config> configs, Usersets usersets, BehaviorList behaviorList) {
+    public BotSpec(Map<Platform<?>, Config> configs, Channelsets channelsets, Usersets usersets, BehaviorList behaviorList) {
         addConfigs(configs);
+        this.channelsets = channelsets;
         this.usersets = usersets;
         this.behaviorList = behaviorList;
     }
@@ -37,12 +41,39 @@ public class BotSpec {
         }));
     }
 
+    /**
+     * Get the config for a specific platform
+     * @param platform The platform
+     * @param <C> The config type
+     * @return The Configuration, if present for that platform
+     */
     public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
         return configs.containsKey(platform.getId()) ? Optional.of((C)configs.get(platform.getId())) : Optional.empty();
     }
 
+    /**
+     * Get the platforms supported
+     * @return The supported platforms
+     */
     public Set<Platform<?>> getPlatforms() {
         return new HashSet<>(platforms.values());
+    }
+
+    /**
+     * Get the Channelsets defined by the user.
+     * @return The channelsets.
+     */
+    public Channelsets getChannelsets() {
+        return channelsets;
+    }
+
+    /**
+     * Get a specific Channelset, by name
+     * @param name The name to search
+     * @return The found Channelset, or empty if none.
+     */
+    public Optional<Channelset> getChannelset(String name) {
+        return getChannelsets().getById(name);
     }
 
     /**
@@ -62,7 +93,7 @@ public class BotSpec {
      * @see Userset
      */
     public Optional<Userset> getUserset(String name) {
-        return getUsersets().getUserset(name);
+        return getUsersets().getById(name);
     }
 
     /**
@@ -80,6 +111,7 @@ public class BotSpec {
     public void validate() throws BotConfigurationException {
         configs.values().forEach(c -> c.validate(this));
         usersets.validate(this);
+        channelsets.validate(this);
         behaviorList.validate(this);
     }
 }

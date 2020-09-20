@@ -4,16 +4,21 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.User;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * Discord-specific userset, which can filter on some combination of users or roles
  */
 public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
+    private boolean permitDms;
     private Set<Snowflake> userSnowflakes;
     private Set<Snowflake> roleSnowflakes;
 
@@ -92,12 +97,12 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
         this.roleSnowflakes = roleSnowflakes;
     }
 
-    private boolean isLegalUserId(Snowflake userId) {
-        return CollectionUtils.isEmpty(userSnowflakes) || userSnowflakes.contains(userId);
+    public boolean isPermitDms() {
+        return permitDms;
     }
 
-    private boolean containsLegalRole(Set<Snowflake> roles) {
-        return CollectionUtils.isEmpty(roleSnowflakes) || roles.containsAll(roleSnowflakes);
+    public void setPermitDms(boolean permitDms) {
+        this.permitDms = permitDms;
     }
 
     @Override
@@ -106,14 +111,20 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
             return Mono.just(true);
         }
 
-        if(ctx.isDm()) {
-            return Mono.justOrEmpty(ctx.getEvent().getMessage().getAuthor())
-                    .map(user -> isLegalUserId(user.getId()) && CollectionUtils.isEmpty(roleSnowflakes))
-                    .defaultIfEmpty(false);
-        } else {
-            return Mono.justOrEmpty(ctx.getEvent().getMember())
-                    .map(member -> isLegalUserId(member.getId()) && containsLegalRole(member.getRoleIds()))
-                    .defaultIfEmpty(false);
-        }
+        return Mono.just(isLegalUserId(ctx) && isLegalRole(ctx));
+    }
+
+    private boolean isLegalUserId(DiscordContext context) {
+        Optional<Snowflake> user = context.getEvent().getMessage().getAuthor().map(User::getId);
+        return CollectionUtils.isEmpty(userSnowflakes) || user.map(snowflake -> userSnowflakes.contains(snowflake)).orElse(false);
+    }
+
+    private boolean isLegalRole(DiscordContext context) {
+        Optional<Set<Snowflake>> roles = context.getEvent().getMember().map(Member::getRoleIds);
+        return CollectionUtils.isEmpty(roleSnowflakes) || roles.map(set -> hasOverlap(set, roleSnowflakes)).orElse(permitDms);
+    }
+
+    private boolean hasOverlap(Set<?> one, Set<?> two) {
+        return !SetUtils.intersection(one, two).isEmpty();
     }
 }
