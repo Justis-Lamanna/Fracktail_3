@@ -51,9 +51,9 @@ public class ActionOptions implements Action, Validated {
     public Mono<Void> doAction(Bot bot, CommandContext ctx) {
         return Flux.fromIterable(actions)
                 .filterWhen(ao -> ao.getFilter().matches(bot, ctx))
-                .next()
-                .flatMap(ao -> ao.getAction().doAction(bot, ctx))
-                .switchIfEmpty(_default.doAction(bot, ctx));
+                .map(ActionOption::getAction)
+                .single(_default)
+                .flatMap(action -> action.doAction(bot, ctx));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ActionOptions implements Action, Validated {
          * @param action The action to occur
          * @return This builder
          */
-        public Builder ifNoneMatch(Action action) {
+        public Builder orElseDo(Action action) {
             _default = action;
             return this;
         }

@@ -48,6 +48,18 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
+     * Add a configuration for a specific platform
+     * @param platform The platform to add
+     * @param config A builder which will build the configuration of that platform
+     * @param <C> The type of the Config
+     * @return This creator
+     */
+    public <C extends Config> BotCreator withConfig(Platform<C> platform, IBuilder<C> config) {
+        configs.put(platform, config.build());
+        return this;
+    }
+
+    /**
      * Add a Userset to this bot
      * @param userset The userset to add
      * @return This creator
@@ -84,11 +96,21 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
+     * Add a Command to this bot
+     * @param command A builder which will create the command
+     * @return This creator
+     */
+    public BotCreator withCommand(IBuilder<Command> command) {
+        commands.add(command.build());
+        return this;
+    }
+
+    /**
      * Set a default action to execute, if no commands match
      * @param action The action to perform
      * @return This creator
      */
-    public BotCreator withDefaultAction(Action action) {
+    public BotCreator orElseDo(Action action) {
         this.orElse = action;
         return this;
     }

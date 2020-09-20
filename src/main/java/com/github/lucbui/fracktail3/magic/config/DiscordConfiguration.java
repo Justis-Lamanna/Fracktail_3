@@ -2,12 +2,15 @@ package com.github.lucbui.fracktail3.magic.config;
 
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
+import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
+import com.github.lucbui.fracktail3.magic.filterset.user.InUsersetFilter;
 import com.github.lucbui.fracktail3.magic.handlers.Localizable;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
+import org.apache.commons.lang3.ObjectUtils;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -19,6 +22,9 @@ import java.util.ResourceBundle;
  * Subclass of a Configuration for a Discord bot.
  */
 public class DiscordConfiguration implements Config, BotCreatorAware, Localizable {
+    public static final String OWNER_USERSET_ID = "owner";
+    public static final Filter OWNER_FILTER = new InUsersetFilter(OWNER_USERSET_ID);
+
     private final String token;
     private final String prefix;
     private final Snowflake owner;
@@ -127,7 +133,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
     @Override
     public void configure(BotCreator creator) {
         if(owner != null) {
-            creator.withUserset(DiscordUserset.forUser("owner", owner));
+            creator.withUserset(DiscordUserset.forUser(OWNER_USERSET_ID, owner));
         }
     }
 
@@ -145,7 +151,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
     }
 
     public static class Builder implements IBuilder<DiscordConfiguration> {
-        private String token;
+        private final String token;
         private String prefix;
         private Snowflake owner;
         private StatusUpdate presence;
@@ -172,7 +178,12 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
 
         @Override
         public DiscordConfiguration build() {
-            return new DiscordConfiguration(token, prefix, owner, i18nPath, presence);
+            return new DiscordConfiguration(
+                    token,
+                    ObjectUtils.defaultIfNull(prefix, ""),
+                    owner,
+                    i18nPath,
+                    ObjectUtils.defaultIfNull(presence, Presence.online()));
         }
     }
 }
