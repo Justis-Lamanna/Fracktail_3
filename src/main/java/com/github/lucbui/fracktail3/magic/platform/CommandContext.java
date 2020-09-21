@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
+import com.ibm.icu.text.MessageFormat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -17,8 +18,8 @@ import java.util.*;
 public abstract class CommandContext {
     public static final String MESSAGE = "message";
     public static final String PARAMS = "params";
-    public static final String PARAM_PREFIX = "param.";
-    public static final String RESULT_PREFIX = "result.";
+    public static final String PARAM_PREFIX = "param_";
+    public static final String RESULT_PREFIX = "result_";
 
     protected final Platform<?> platform;
     protected final Config config;
@@ -267,26 +268,38 @@ public abstract class CommandContext {
      * @param message The message to respond with
      * @return An asynchronous boolean indicating the message was sent
      */
-    public abstract Mono<Boolean> respond(String message);
+    public abstract Mono<Boolean> respondRaw(String message);
 
     /**
-     * Respond using a localized message
+     * Respond using a localized and formatted message
+     * By default, this goes through a series of several steps:
+     * 1. Resolves the provided key into a localized message, using getLocale().
+     * 2. Formats the localized message, using the results of getExtendedVariableMap() as named parameters
+     * 3. Sends the formatted, localized message using respond()
      * @param key The key of the message
-     * @param defaultMsg The text to show, if
+     * @param defaultMsg The text to show, if key was not found
      * @return An asynchronous boolean indicating the message was sent
      */
-    public Mono<Boolean> respondLocalized(String key, String defaultMsg) {
-        return respond(translate(key, defaultMsg));
+    public Mono<Boolean> respond(String key, String defaultMsg) {
+        return getExtendedVariableMap()
+                .flatMap(vars -> {
+                    MessageFormat formatting = new MessageFormat(translate(key, defaultMsg), getLocale());
+                    return respondRaw(formatting.format(vars));
+                })
+                .thenReturn(true);
     }
 
     /**
-     * Respond using a localized message
-     * If no ResourceBundles are found, or the key is not found, the key is the response
+     * Respond using a localized and formatted message
+     * This goes through a series of several steps:
+     * 1. Resolves the provided key into a localized message, using getLocale().
+     * 2. Formats the localized message, using the results of getExtendedVariableMap() as named parameters
+     * 3. Sends the formatted, localized message using respond()
      * @param key The key of the message
      * @return An asynchronous boolean indicating the message was sent
      */
-    public Mono<Boolean> respondLocalized(String key) {
-        return respondLocalized(key, key);
+    public Mono<Boolean> respond(String key) {
+        return respond(key, key);
     }
 
     /**

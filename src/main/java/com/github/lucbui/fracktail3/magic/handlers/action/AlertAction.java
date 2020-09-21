@@ -1,22 +1,25 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
 /**
  * An action which DMs the owner if something needs their attention
  */
-public class AlertAction extends SendMessageAction {
+public class AlertAction implements Action {
+    private final String msg;
+
     /**
-     * Initialize alert message
-     * @param msg The alert message
+     * Initialize the action
+     * @param msg The message to respond with
      */
     public AlertAction(String msg) {
-        super(msg);
+        this.msg = msg;
     }
 
     @Override
-    protected Mono<?> sendMessage(CommandContext context, String message) {
-        return context.alert(message);
+    public Mono<Void> doAction(Bot bot, CommandContext context) {
+        return context.alert(msg).then();
     }
 }

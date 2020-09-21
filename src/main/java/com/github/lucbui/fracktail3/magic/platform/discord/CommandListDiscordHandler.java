@@ -71,11 +71,11 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     return tuple.getT1().doAction(bot, ctx)
                             .onErrorResume(CommandValidationException.class, ex -> {
                                 String response = ex.getMessage();
-                                return ctx.respondLocalized(response).then();
+                                return ctx.respond(response).then();
                             })
                             .onErrorResume(RuntimeException.class, ex -> {
                                 LOGGER.warn("Encountered exception running command", ex);
-                                return ctx.respond("Sorry, I encountered an exception. Please wait a few moments.")
+                                return ctx.respondRaw("Sorry, I encountered an exception. Please wait a few moments.")
                                         .then(ctx.alert("Encountered exception: " + ex.getMessage()))
                                         .then();
                             });
@@ -86,7 +86,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             ctx.getLocale(),
                             ctx.getContents());
                     return commandList.doOrElse(bot, ctx)
-                            .onErrorResume(CommandValidationException.class, ex -> ctx.respondLocalized(ex.getMessage()).then())
+                            .onErrorResume(CommandValidationException.class, ex -> ctx.respond(ex.getMessage()).then())
                             .onErrorResume(RuntimeException.class, ex -> {
                                 LOGGER.warn("Encountered exception running or-else command", ex);
                                 return ctx.alert("Encountered exception: " + ex.getMessage()).then();

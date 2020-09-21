@@ -3,10 +3,8 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
-import com.ibm.icu.text.MessageFormat;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 public class HelpCommand extends Command {
     private static final String ID = "help";
@@ -16,7 +14,7 @@ public class HelpCommand extends Command {
     }
 
     public HelpCommand() {
-        this("Unable to find command \"{command}\"");
+        this("Unable to find command \"{result_command}\"");
     }
 
     private static class HelpAction implements Action {
@@ -28,22 +26,19 @@ public class HelpCommand extends Command {
 
         @Override
         public Mono<Void> doAction(Bot bot, CommandContext context) {
+            context.setResult("ignore_stateful_checks", true);
             return context.getNormalizedParameter(0)
-                    .map(commandToLookup -> {
-                        Optional<Command> matching = bot.getSpec().getBehaviorList().getCommandList().getCommands().stream()
-                                .filter(c -> c.getNames().contains(commandToLookup))
-                                .findFirst();
-                        return matching.map(Command::getHelp)
-                                .map(context::respondLocalized)
-                                .orElseGet(() -> {
-                                    MessageFormat format = new MessageFormat(noCommandText, context.getLocale());
-                                    return context.getExtendedVariableMap()
-                                            .doOnNext(map -> map.put("command", commandToLookup))
-                                            .map(format::format)
-                                            .flatMap(context::respondLocalized);
-                                });
-                    })
-                    .orElse(context.respondLocalized(context.getCommand().getHelp()))
+                    .map(commandToLookup -> Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
+                            .filter(c -> c.getNames().contains(commandToLookup))
+                            .filterWhen(c -> c.passesFilter(bot, context))
+                            .singleOrEmpty()
+                            .map(Command::getHelp)
+                            .defaultIfEmpty(noCommandText)
+                            .flatMap(msg -> {
+                                context.setResult("command", commandToLookup);
+                                return context.respond(msg);
+                            }))
+                    .orElse(context.respond(context.getCommand().getHelp()))
                     .then();
         }
     }
