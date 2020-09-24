@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic;
 
-import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.channel.Channelset;
 import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
@@ -10,6 +9,8 @@ import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The specifications for Bot behavior
@@ -21,34 +22,16 @@ import java.util.*;
  * @see Bot
  */
 public class BotSpec {
-    private final Map<String, Platform<?>> platforms = new HashMap<>();
-    private final Map<String, Config> configs = new HashMap<>();
+    private final Map<String, Platform<?>> platforms;
     private final Channelsets channelsets;
     private final Usersets usersets;
     private final BehaviorList behaviorList;
 
-    public BotSpec(Map<Platform<?>, Config> configs, Channelsets channelsets, Usersets usersets, BehaviorList behaviorList) {
-        addConfigs(configs);
+    public BotSpec(List<Platform<?>> platforms, Channelsets channelsets, Usersets usersets, BehaviorList behaviorList) {
+        this.platforms = platforms.stream().collect(Collectors.toMap(Id::getId, Function.identity()));
         this.channelsets = channelsets;
         this.usersets = usersets;
         this.behaviorList = behaviorList;
-    }
-
-    private void addConfigs(Map<Platform<?>, Config> c) {
-        c.forEach(((platform, config) -> {
-            platforms.put(platform.getId(), platform);
-            configs.put(platform.getId(), config);
-        }));
-    }
-
-    /**
-     * Get the config for a specific platform
-     * @param platform The platform
-     * @param <C> The config type
-     * @return The Configuration, if present for that platform
-     */
-    public <C extends Config> Optional<C> getConfig(Platform<C> platform) {
-        return configs.containsKey(platform.getId()) ? Optional.of((C)configs.get(platform.getId())) : Optional.empty();
     }
 
     /**
@@ -57,6 +40,15 @@ public class BotSpec {
      */
     public Set<Platform<?>> getPlatforms() {
         return new HashSet<>(platforms.values());
+    }
+
+    /**
+     * Get a platform by its ID
+     * @param id The ID of the platform
+     * @return The platform, or empty if none match
+     */
+    public Optional<Platform<?>> getPlatform(String id) {
+        return Optional.ofNullable(platforms.get(id));
     }
 
     /**
@@ -109,7 +101,6 @@ public class BotSpec {
      * @throws BotConfigurationException An error occurs.
      */
     public void validate() throws BotConfigurationException {
-        configs.values().forEach(c -> c.validate(this));
         Validated.validate(usersets, this);
         Validated.validate(channelsets, this);
         behaviorList.validate(this);

@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
 import reactor.core.publisher.Mono;
 
 /**
@@ -11,22 +10,22 @@ import reactor.core.publisher.Mono;
  * @param <C> The context type
  */
 public abstract class PlatformSpecificUserset<C extends CommandContext> extends Userset {
-    private final Platform<?> platform;
+    private final Class<C> clazz;
 
     /**
      * Default constructor, using no negation or extension
      * @param name The name of the userset
-     * @param platform The platform of the userset
+     * @param clazz The CommandContext type of the userset
      */
-    public PlatformSpecificUserset(String name, Platform<?> platform) {
+    public PlatformSpecificUserset(String name, Class<C> clazz) {
         super(name);
-        this.platform = platform;
+        this.clazz = clazz;
     }
 
     @Override
     public Mono<Boolean> matches(Bot bot, CommandContext context) {
-        if(context.forPlatform(platform)) {
-            return matchesForPlatform(bot, (C)context);
+        if(context.getClass().equals(clazz)) {
+            return matchesForPlatform(bot, clazz.cast(context));
         }
         return Mono.just(false);
     }

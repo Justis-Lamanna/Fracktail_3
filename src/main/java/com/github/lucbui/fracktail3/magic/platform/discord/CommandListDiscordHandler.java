@@ -24,24 +24,26 @@ public class CommandListDiscordHandler implements DiscordHandler {
     private static final Pattern SPACE_NOT_QUOTES = Pattern.compile("([^\"]\\S*|\".+?(?<!\\\\)\")\\s*");
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
 
+    private final DiscordPlatform platform;
     private final CommandList commandList;
     private final DiscordLocaleResolver discordLocaleResolver;
     private final PreDiscordExecutionHandler preExecutionHandler;
     private final PostDiscordExecutionHandler postExecutionHandler;
 
-    public CommandListDiscordHandler(CommandList commandList, DiscordLocaleResolver discordLocaleResolver, PreDiscordExecutionHandler preExecutionHandler, PostDiscordExecutionHandler postExecutionHandler) {
+    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList, DiscordLocaleResolver discordLocaleResolver, PreDiscordExecutionHandler preExecutionHandler, PostDiscordExecutionHandler postExecutionHandler) {
+        this.platform = platform;
         this.commandList = commandList;
         this.discordLocaleResolver = discordLocaleResolver;
         this.preExecutionHandler = preExecutionHandler;
         this.postExecutionHandler = postExecutionHandler;
     }
 
-    public CommandListDiscordHandler(CommandList commandList, DiscordLocaleResolver discordLocaleResolver) {
-        this(commandList, discordLocaleResolver, PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
+    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList, DiscordLocaleResolver discordLocaleResolver) {
+        this(platform, commandList, discordLocaleResolver, PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
     }
 
-    public CommandListDiscordHandler(CommandList commandList) {
-        this(commandList, new LocaleFromGuildResolver());
+    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList) {
+        this(platform, commandList, new LocaleFromGuildResolver());
     }
 
     public CommandList getCommandList() {
@@ -67,7 +69,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
         }
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .map(msg -> new DiscordContext(DiscordPlatform.INSTANCE, configuration, event))
+                .map(msg -> new DiscordContext(platform, configuration, event))
                 .zipWith(discordLocaleResolver.getLocale(event), (ctx, locale) -> {
                     ctx.setLocale(locale);
                     return ctx;

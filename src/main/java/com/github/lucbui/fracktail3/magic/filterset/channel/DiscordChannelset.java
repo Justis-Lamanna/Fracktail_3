@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.filterset.channel;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.filterset.user.PlatformSpecificUserset;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Mono;
@@ -16,12 +15,12 @@ public class DiscordChannelset extends PlatformSpecificUserset<DiscordContext> {
     private Set<Snowflake> channelSnowflakes;
 
     public DiscordChannelset(String name) {
-        super(name, DiscordPlatform.INSTANCE);
+        super(name, DiscordContext.class);
         this.channelSnowflakes = null;
     }
 
     public DiscordChannelset(String name, boolean permitDms, Set<Snowflake> channelSnowflakes) {
-        super(name, DiscordPlatform.INSTANCE);
+        super(name, DiscordContext.class);
         this.permitDms = permitDms;
         this.channelSnowflakes = channelSnowflakes;
     }

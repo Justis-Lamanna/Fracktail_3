@@ -7,11 +7,12 @@ import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 /**
  * A singleton which represents the Discord platform
  */
-public enum DiscordPlatform implements Platform<DiscordConfiguration> {
-    /**
-     * The singleton instance of this platform.
-     */
-    INSTANCE;
+public class DiscordPlatform implements Platform<DiscordConfiguration> {
+    private final DiscordConfiguration configuration;
+
+    public DiscordPlatform(DiscordConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public String getId() {
@@ -19,12 +20,12 @@ public enum DiscordPlatform implements Platform<DiscordConfiguration> {
     }
 
     @Override
-    public Class<DiscordConfiguration> getConfigClass() {
-        return DiscordConfiguration.class;
+    public DiscordConfiguration getConfig() {
+        return configuration;
     }
 
     @Override
     public PlatformHandler platformHandler() {
-        return new DiscordPlatformHandler();
+        return new DiscordPlatformHandler(this);
     }
 }

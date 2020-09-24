@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic;
 
-import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.channel.Channelset;
 import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
@@ -28,7 +27,7 @@ import java.util.Map;
 public class BotCreator implements IBuilder<Bot> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BotCreator.class);
 
-    private final Map<Platform<?>, Config> configs = new HashMap<>();
+    private final List<Platform<?>> platforms = new ArrayList<>();
     private final Map<String, Channelset> channelsets = new HashMap<>();
     private final Map<String, Userset> usersets = new HashMap<>();
 
@@ -38,24 +37,10 @@ public class BotCreator implements IBuilder<Bot> {
     /**
      * Add a configuration for a specific platform
      * @param platform The platform to add
-     * @param config The configuration of that platform
-     * @param <C> The type of the Config
      * @return This creator
      */
-    public <C extends Config> BotCreator withConfig(Platform<C> platform, C config) {
-        configs.put(platform, config);
-        return this;
-    }
-
-    /**
-     * Add a configuration for a specific platform
-     * @param platform The platform to add
-     * @param config A builder which will build the configuration of that platform
-     * @param <C> The type of the Config
-     * @return This creator
-     */
-    public <C extends Config> BotCreator withConfig(Platform<C> platform, IBuilder<C> config) {
-        configs.put(platform, config.build());
+    public BotCreator withPlatform(Platform<?> platform) {
+        platforms.add(platform);
         return this;
     }
 
@@ -124,16 +109,13 @@ public class BotCreator implements IBuilder<Bot> {
     public Bot build() throws BotConfigurationException {
         CommandList commandList = new CommandList(commands, orElse);
         BotSpec spec = new BotSpec(
-                configs,
+                platforms,
                 new Channelsets(channelsets),
                 new Usersets(usersets),
                 new BehaviorList(commandList));
 
         //Awareness checks
-        configs.forEach((p, c) -> {
-            callIfBotCreatorAware(p);
-            callIfBotCreatorAware(c);
-        });
+        platforms.forEach(this::callIfBotCreatorAware);
 
         usersets.forEach((name, set) -> {
             callIfBotCreatorAware(set);

@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.filterset.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
@@ -30,7 +29,7 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
      * @param roleSnowflakes The list of snowflakes that correspond to Role IDs
      */
     public DiscordUserset(String name, boolean permitDms, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
-        super(name, DiscordPlatform.INSTANCE);
+        super(name, DiscordContext.class);
         this.permitDms = permitDms;
         this.userSnowflakes = userSnowflakes;
         this.roleSnowflakes = roleSnowflakes;

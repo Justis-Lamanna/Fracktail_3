@@ -11,11 +11,7 @@ import com.github.lucbui.fracktail3.magic.config.Config;
  * @param <CONFIG> The type of configuration this platform uses.
  */
 public interface Platform<CONFIG extends Config> extends Id {
-    /**
-     * The class of the configuration object
-     * @return The class of the configuration object
-     */
-    Class<CONFIG> getConfigClass();
+    CONFIG getConfig();
 
     /**
      * Get the platform handler associated with this platform

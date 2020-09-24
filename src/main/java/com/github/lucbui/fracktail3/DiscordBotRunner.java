@@ -11,27 +11,20 @@ import com.github.lucbui.fracktail3.magic.handlers.command.Command;
 import com.github.lucbui.fracktail3.magic.handlers.command.HelpCommand;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DiscordBotRunner implements CommandLineRunner {
-    @Value("${token}")
-    private String token;
+    @Autowired
+    private DiscordPlatform platform;
 
     @Override
     public void run(String... args) throws Exception {
         Userset steven = DiscordUserset.forUser("steven", Snowflake.of(112005555178000384L));
         Bot bot = new BotCreator()
-                .withConfig(DiscordPlatform.INSTANCE,
-                    new DiscordConfiguration.Builder(token)
-                            .withPrefix("!")
-                            .withOwner(Snowflake.of(248612704019808258L))
-                            .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
-                )
+                .withPlatform(platform)
                 .withUserset(steven)
                 .withCommand(new HelpCommand())
                 .withCommand(

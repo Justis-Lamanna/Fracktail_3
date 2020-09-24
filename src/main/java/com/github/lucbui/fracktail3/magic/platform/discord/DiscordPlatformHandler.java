@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.platform.discord;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 import discord4j.core.DiscordClient;
@@ -17,7 +18,13 @@ import reactor.core.publisher.Mono;
  */
 public class DiscordPlatformHandler implements PlatformHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatformHandler.class);
+
+    private final DiscordPlatform platform;
     private GatewayDiscordClient gateway;
+
+    public DiscordPlatformHandler(DiscordPlatform platform) {
+        this.platform = platform;
+    }
 
     @Override
     public Mono<Boolean> start(Bot bot) {
@@ -26,31 +33,28 @@ public class DiscordPlatformHandler implements PlatformHandler {
         }
 
         BotSpec botSpec = bot.getSpec();
+        DiscordConfiguration configuration = platform.getConfig();
 
-        return botSpec.getConfig(DiscordPlatform.INSTANCE).map(discordConfig -> {
-            DiscordHandler discordHandler = new CommandListDiscordHandler(botSpec.getBehaviorList().getCommandList());
-            DiscordClient discordClient =
-                    DiscordClientBuilder.create(discordConfig.getToken()).build();
+        DiscordHandler discordHandler = new CommandListDiscordHandler(platform, botSpec.getBehaviorList().getCommandList());
 
-            LOGGER.debug("Starting bot on Discord");
-            gateway = discordClient.login().block();
+        DiscordClient discordClient =
+                DiscordClientBuilder.create(configuration.getToken()).build();
 
-            if(gateway == null) {
-                throw new BotConfigurationException("Gateway was null");
-            }
+        LOGGER.debug("Starting bot on Discord");
+        gateway = discordClient.login().block();
 
-            gateway.updatePresence(discordConfig.getPresence()).block();
+        if(gateway == null) {
+            throw new BotConfigurationException("Gateway was null");
+        }
 
-            gateway.on(MessageCreateEvent.class)
+        gateway.updatePresence(configuration.getPresence()).block();
+
+        gateway.on(MessageCreateEvent.class)
                 .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                .flatMap(msg -> discordHandler.execute(bot, discordConfig, msg))
+                .flatMap(msg -> discordHandler.execute(bot, configuration, msg))
                 .subscribe();
 
-            return gateway.onDisconnect().thenReturn(true);
-        }).orElseGet(() -> {
-            LOGGER.debug("Attempted to start bot with Discord Runner, without a Discord configuration");
-            return Mono.empty();
-        });
+        return gateway.onDisconnect().thenReturn(true);
     }
 
     @Override

@@ -66,13 +66,6 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         this(token, prefix, null, null, Presence.online());
     }
 
-    @Override
-    public Optional<String> getTextForKey(String key, Locale locale) {
-        return getResourceBundle(locale)
-                .filter(bundle -> bundle.containsKey(key))
-                .map(bundle -> bundle.getString(key));
-    }
-
     /**
      * Get the token of this bot.
      * @return The bot's token.
