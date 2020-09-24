@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
@@ -8,6 +9,7 @@ import reactor.core.publisher.Mono;
  * Action which responds to the user of the command in some way
  */
 public class RespondAction implements Action {
+    private final ContextFormatter formatter;
     private final String msg;
 
     /**
@@ -16,10 +18,23 @@ public class RespondAction implements Action {
      */
     public RespondAction(String msg) {
         this.msg = msg;
+        this.formatter = ContextFormatter.DEFAULT;
+    }
+
+    /**
+     * Initialize the action
+     * @param msg The message to respond with
+     * @param formatter Dictates how msg should be formatted
+     */
+    public RespondAction(String msg, ContextFormatter formatter) {
+        this.formatter = formatter;
+        this.msg = msg;
     }
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        return context.respond(msg).then();
+        return formatter.format(msg, context)
+                .flatMap(context::respond)
+                .then();
     }
 }

@@ -63,7 +63,7 @@ public class DiscordContext extends CommandContext {
     }
 
     @Override
-    public Mono<Boolean> respondRaw(String message) {
+    public Mono<Boolean> respond(String message) {
         return respond(event.getMessage().getChannelId(), message);
     }
 

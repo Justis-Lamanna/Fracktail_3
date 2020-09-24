@@ -5,9 +5,7 @@ import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.exception.CommandValidationException;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
-import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,13 +25,39 @@ public class CommandListDiscordHandler implements DiscordHandler {
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
 
     private final CommandList commandList;
+    private final DiscordLocaleResolver discordLocaleResolver;
+    private final PreDiscordExecutionHandler preExecutionHandler;
+    private final PostDiscordExecutionHandler postExecutionHandler;
+
+    public CommandListDiscordHandler(CommandList commandList, DiscordLocaleResolver discordLocaleResolver, PreDiscordExecutionHandler preExecutionHandler, PostDiscordExecutionHandler postExecutionHandler) {
+        this.commandList = commandList;
+        this.discordLocaleResolver = discordLocaleResolver;
+        this.preExecutionHandler = preExecutionHandler;
+        this.postExecutionHandler = postExecutionHandler;
+    }
+
+    public CommandListDiscordHandler(CommandList commandList, DiscordLocaleResolver discordLocaleResolver) {
+        this(commandList, discordLocaleResolver, PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
+    }
 
     public CommandListDiscordHandler(CommandList commandList) {
-        this.commandList = commandList;
+        this(commandList, new LocaleFromGuildResolver());
     }
 
     public CommandList getCommandList() {
         return commandList;
+    }
+
+    public DiscordLocaleResolver getDiscordLocaleResolver() {
+        return discordLocaleResolver;
+    }
+
+    public PreDiscordExecutionHandler getPreExecutionHandler() {
+        return preExecutionHandler;
+    }
+
+    public PostDiscordExecutionHandler getPostExecutionHandler() {
+        return postExecutionHandler;
     }
 
     @Override
@@ -44,7 +68,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
                 .map(msg -> new DiscordContext(DiscordPlatform.INSTANCE, configuration, event))
-                .zipWith(event.getGuild().map(Guild::getPreferredLocale).defaultIfEmpty(Locale.ENGLISH), (ctx, locale) -> {
+                .zipWith(discordLocaleResolver.getLocale(event), (ctx, locale) -> {
                     ctx.setLocale(locale);
                     return ctx;
                 })
@@ -57,42 +81,26 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             .filterWhen(t -> t.getT1().passesFilter(bot, ctx))
                             .singleOrEmpty()
                             .map(Optional::of).defaultIfEmpty(Optional.empty());
-                }, (ctx, t) -> t.map(tuple -> {
-                    ctx.setCommand(tuple.getT1());
-                    ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + tuple.getT2()));
-                    ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
-                    LOGGER.debug("Executing command (User {} in {}):\n\tLocale: {}\n\tContents: {}\n\tCommand: {}\n\tParameters: {} (Normalized: {})",
-                            ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                            ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                            ctx.getLocale(),
-                            ctx.getContents(),
-                            tuple.getT1().getId(),
-                            ctx.getParameters(), ctx.getNormalizedParameters());
-                    return tuple.getT1().doAction(bot, ctx)
-                            .onErrorResume(CommandValidationException.class, ex -> {
-                                String response = ex.getMessage();
-                                return ctx.respond(response).then();
-                            })
-                            .onErrorResume(RuntimeException.class, ex -> {
-                                LOGGER.warn("Encountered exception running command", ex);
-                                return ctx.respondRaw("Sorry, I encountered an exception. Please wait a few moments.")
-                                        .then(ctx.alert("Encountered exception: " + ex.getMessage()))
-                                        .then();
-                            });
-                }).orElseGet(() -> {
-                    LOGGER.debug("Executing unknown command (User {} in {}):\n\tLocale: {}\n\tContents: {}",
-                            ctx.getEvent().getMessage().getAuthor().map(User::getUsername).orElse("???"),
-                            ctx.getEvent().getGuildId().map(Snowflake::asString).map(s -> "Guild " + s).orElse("DMs"),
-                            ctx.getLocale(),
-                            ctx.getContents());
-                    return commandList.doOrElse(bot, ctx)
-                            .onErrorResume(CommandValidationException.class, ex -> ctx.respond(ex.getMessage()).then())
-                            .onErrorResume(RuntimeException.class, ex -> {
-                                LOGGER.warn("Encountered exception running or-else command", ex);
-                                return ctx.alert("Encountered exception: " + ex.getMessage()).then();
-                            });
-                }))
-                .flatMap(m -> m); //Since zipping makes a Mono<Mono<Void>>, we need an identity map to unwrap.
+                }, (ctx, tupleOpt) -> {
+                    tupleOpt.ifPresent(t -> {
+                        ctx.setCommand(t.getT1());
+                        ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + t.getT2()));
+                        ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
+                    });
+
+                    return ctx;
+                })
+                .flatMap(preExecutionHandler::beforeExecution)
+                .flatMap(ctx -> {
+                    boolean noCommandFound = ctx.getCommand() == null;
+                    Mono<Void> action = noCommandFound ?
+                            commandList.doOrElse(bot, ctx) :
+                            ctx.getCommand().doAction(bot, ctx);
+                    return action
+                        .then(postExecutionHandler.afterExecution(ctx))
+                        .onErrorResume(CommandValidationException.class, ex -> ctx.respond(ex.getMessage()).then())
+                        .onErrorResume(RuntimeException.class, ex -> postExecutionHandler.afterError(ctx, ex));
+                });
     }
 
     private Map<String, List<Command>> getCommandsByName(DiscordContext ctx) {

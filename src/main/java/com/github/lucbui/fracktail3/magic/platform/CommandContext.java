@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
-import com.ibm.icu.text.MessageFormat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -268,39 +267,7 @@ public abstract class CommandContext {
      * @param message The message to respond with
      * @return An asynchronous boolean indicating the message was sent
      */
-    public abstract Mono<Boolean> respondRaw(String message);
-
-    /**
-     * Respond using a localized and formatted message
-     * By default, this goes through a series of several steps:
-     * 1. Resolves the provided key into a localized message, using getLocale().
-     * 2. Formats the localized message, using the results of getExtendedVariableMap() as named parameters
-     * 3. Sends the formatted, localized message using respond()
-     * @param key The key of the message
-     * @param defaultMsg The text to show, if key was not found
-     * @return An asynchronous boolean indicating the message was sent
-     */
-    public Mono<Boolean> respond(String key, String defaultMsg) {
-        return getExtendedVariableMap()
-                .flatMap(vars -> {
-                    MessageFormat formatting = new MessageFormat(translate(key, defaultMsg), getLocale());
-                    return respondRaw(formatting.format(vars));
-                })
-                .thenReturn(true);
-    }
-
-    /**
-     * Respond using a localized and formatted message
-     * This goes through a series of several steps:
-     * 1. Resolves the provided key into a localized message, using getLocale().
-     * 2. Formats the localized message, using the results of getExtendedVariableMap() as named parameters
-     * 3. Sends the formatted, localized message using respond()
-     * @param key The key of the message
-     * @return An asynchronous boolean indicating the message was sent
-     */
-    public Mono<Boolean> respond(String key) {
-        return respond(key, key);
-    }
+    public abstract Mono<Boolean> respond(String message);
 
     /**
      * Alert the bot owner with a message
