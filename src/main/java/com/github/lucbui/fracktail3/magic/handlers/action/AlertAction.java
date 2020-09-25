@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 /**
  * An action which DMs the owner if something needs their attention
  */
@@ -15,7 +17,7 @@ public class AlertAction implements Action {
      * @param msg The message to respond with
      */
     public AlertAction(String msg) {
-        this.msg = msg;
+        this.msg = Objects.requireNonNull(msg);
     }
 
     @Override

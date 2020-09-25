@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 import reactor.core.publisher.Mono;
 
@@ -51,13 +52,19 @@ public class RandomAction implements Action, Validated {
      * Builder to make RandomAction creation easier
      */
     public static class Builder implements IBuilder<RandomAction> {
-        private final List<Pair<Action, Double>> actions;
+        private final RandomGenerator random;
+        private final List<Pair<Action, Double>> actions = new ArrayList<>();
 
         /**
          * Initialize the builder
          */
         public Builder() {
-            this.actions = new ArrayList<>();
+            this.random = null;
+        }
+
+        public Builder(RandomGenerator random) {
+            this.random = random;
+
         }
 
         /**
@@ -82,7 +89,7 @@ public class RandomAction implements Action, Validated {
 
         @Override
         public RandomAction build() {
-            return new RandomAction(new EnumeratedDistribution<>(actions));
+            return new RandomAction(random == null ? new EnumeratedDistribution<>(actions) : new EnumeratedDistribution<>(random, actions));
         }
     }
 }

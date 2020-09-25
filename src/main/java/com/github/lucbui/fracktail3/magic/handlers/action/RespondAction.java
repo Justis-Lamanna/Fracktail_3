@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 /**
  * Action which responds to the user of the command in some way
  */
@@ -17,8 +19,7 @@ public class RespondAction implements Action {
      * @param msg The message to respond with
      */
     public RespondAction(String msg) {
-        this.msg = msg;
-        this.formatter = ContextFormatter.DEFAULT;
+        this(msg, ContextFormatter.DEFAULT);
     }
 
     /**
@@ -27,8 +28,8 @@ public class RespondAction implements Action {
      * @param formatter Dictates how msg should be formatted
      */
     public RespondAction(String msg, ContextFormatter formatter) {
-        this.formatter = formatter;
-        this.msg = msg;
+        this.formatter = Objects.requireNonNull(formatter);
+        this.msg = Objects.requireNonNull(msg);
     }
 
     @Override

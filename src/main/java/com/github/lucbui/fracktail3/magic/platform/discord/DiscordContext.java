@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -113,18 +112,6 @@ public class DiscordContext extends CommandContext {
                 .thenReturn(true);
     }
 
-    //Mini-optimization: Only retrieve guild name and self name if necessary
-    @Override
-    public Mono<Map<String, Object>> getExtendedVariableMap() {
-        if(containsExtendedVariable(getContents())) {
-            return super.getExtendedVariableMap()
-                    .zipWith(event.getClient().getSelf().map(User::getUsername).defaultIfEmpty(""), mapCombinator(SELF))
-                    .zipWith(event.getGuild().map(Guild::getName).defaultIfEmpty(""), mapCombinator(GUILD));
-        } else {
-            return Mono.just(this.getVariableMapConstants());
-        }
-    }
-
     @Override
     protected Map<String, Object> getVariableMapConstants() {
         Map<String, Object> map = super.getVariableMapConstants();
@@ -136,10 +123,6 @@ public class DiscordContext extends CommandContext {
         map.put(USER_AT, event.getMessage().getAuthor().map(User::getMention).orElse(StringUtils.EMPTY));
         config.getOwner().ifPresent(owner -> map.put(OWNER_AT, "<@" + owner.asString() + ">"));
         return map;
-    }
-
-    private static boolean containsExtendedVariable(String msg) {
-        return StringUtils.containsAny(msg, "{" + SELF, "{" + GUILD);
     }
 
     private <T> BiFunction<Map<String, Object>, String, Map<String, Object>> mapCombinator(String name) {

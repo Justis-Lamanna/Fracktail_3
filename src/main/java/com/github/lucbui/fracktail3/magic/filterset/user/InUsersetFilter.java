@@ -21,7 +21,7 @@ public class InUsersetFilter implements Filter {
      */
     public InUsersetFilter(String id) {
         this.id = id;
-        this.defaultValue = true;
+        this.defaultValue = false;
     }
 
     /**
@@ -40,8 +40,8 @@ public class InUsersetFilter implements Filter {
 
     @Override
     public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
-        return Mono.justOrEmpty(retrieve(bot.getSpec()))
-                    .flatMap(u -> u.matches(bot, ctx))
-                    .defaultIfEmpty(defaultValue);
+        return retrieve(bot.getSpec())
+                .map(value -> Mono.just(value).flatMap(u -> u.matches(bot, ctx)))
+                .orElseGet(() -> Mono.just(defaultValue));
     }
 }

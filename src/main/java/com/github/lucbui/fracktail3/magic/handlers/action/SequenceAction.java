@@ -39,7 +39,7 @@ public class SequenceAction implements Action, Validated {
     public Mono<Void> doAction(Bot bot, CommandContext context) {
         return Flux.fromIterable(subActions)
                 .concatMap(a -> a.doAction(bot, context))
-                .last();
+                .then();
     }
 
     @Override
