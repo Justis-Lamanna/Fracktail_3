@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class HelpCommand extends Command {
-    private static final String ID = "help";
+    public static final String ID = "help";
 
     public HelpCommand(String noCommandText, ContextFormatter contextFormatter) {
         super(ID, new HelpAction(noCommandText, contextFormatter));

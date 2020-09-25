@@ -38,6 +38,17 @@ public class Command implements Validated, Id {
     }
 
     /**
+     * Creates a minimal command
+     * The name is the same as the ID, no filter is provided, and help text is "id.help".
+     * @param id The command's ID
+     * @param filter A filter for this command
+     * @param action The action to perform
+     */
+    public Command(String id, Filter filter, Action action) {
+        this(id, Collections.singletonList(id), filter, action);
+    }
+
+    /**
      * Creates a Command
      * @param id The ID of the command
      * @param names The name(s) this command responds to

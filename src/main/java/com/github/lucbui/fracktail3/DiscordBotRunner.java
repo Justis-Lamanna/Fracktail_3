@@ -8,6 +8,7 @@ import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
 import com.github.lucbui.fracktail3.magic.handlers.action.ActionOptions;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
 import com.github.lucbui.fracktail3.magic.handlers.command.Command;
+import com.github.lucbui.fracktail3.magic.handlers.command.CommandsCommand;
 import com.github.lucbui.fracktail3.magic.handlers.command.HelpCommand;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
@@ -27,6 +28,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 .withPlatform(platform)
                 .withUserset(steven)
                 .withCommand(new HelpCommand())
+                .withCommand(new CommandsCommand())
                 .withCommand(
                     new Command.Builder("hello")
                     .withAction(new ActionOptions.Builder()
