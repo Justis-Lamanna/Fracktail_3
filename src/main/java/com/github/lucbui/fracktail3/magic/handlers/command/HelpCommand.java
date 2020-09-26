@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
+import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Flux;
@@ -15,7 +16,7 @@ public class HelpCommand extends Command {
     }
 
     public HelpCommand(String noCommandText) {
-        this(noCommandText, ContextFormatter.DEFAULT);
+        this(noCommandText, ContextFormatters.getDefault());
     }
 
     public HelpCommand() {

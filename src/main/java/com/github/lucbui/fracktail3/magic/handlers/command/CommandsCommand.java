@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
+import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
@@ -19,11 +20,11 @@ public class CommandsCommand extends Command {
     }
 
     public CommandsCommand(String message) {
-        super(ID, new CommandsAction(message, ContextFormatter.DEFAULT));
+        super(ID, new CommandsAction(message, ContextFormatters.getDefault()));
     }
 
     public CommandsCommand() {
-        super(ID, new CommandsAction("Commands are: {result_commands}", ContextFormatter.DEFAULT));
+        super(ID, new CommandsAction("Commands are: {result_commands}", ContextFormatters.getDefault()));
     }
 
     private static class CommandsAction implements Action {

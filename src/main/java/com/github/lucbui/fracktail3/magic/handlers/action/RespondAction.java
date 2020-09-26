@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
+import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
@@ -19,7 +20,7 @@ public class RespondAction implements Action {
      * @param msg The message to respond with
      */
     public RespondAction(String msg) {
-        this(msg, ContextFormatter.DEFAULT);
+        this(msg, ContextFormatters.getDefault());
     }
 
     /**
