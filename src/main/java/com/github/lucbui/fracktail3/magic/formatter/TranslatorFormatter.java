@@ -16,6 +16,9 @@ public class TranslatorFormatter implements ContextFormatter {
 
     @Override
     public Mono<String> format(String raw, CommandContext ctx) {
-        return Mono.just(ctx.translate(raw, _default == null ? raw : _default));
+        return Mono.justOrEmpty(ctx.getResourceBundle())
+                .filter(bundle -> bundle.containsKey(raw))
+                .map(bundle -> bundle.getString(raw))
+                .defaultIfEmpty(_default == null ? raw : _default);
     }
 }
