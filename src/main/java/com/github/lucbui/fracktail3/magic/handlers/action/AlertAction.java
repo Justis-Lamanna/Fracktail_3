@@ -23,6 +23,6 @@ public class AlertAction implements Action {
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        return msg.getFor(context).flatMap(context::respond).then();
+        return msg.getFor(context).flatMap(context::alert).then();
     }
 }
