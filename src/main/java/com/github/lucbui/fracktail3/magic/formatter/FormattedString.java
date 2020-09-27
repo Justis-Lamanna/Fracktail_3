@@ -7,6 +7,8 @@ import reactor.core.publisher.Mono;
  * Class which encapsulates a formattable string
  */
 public class FormattedString {
+    private static ContextFormatter _default = new ICU4JDecoratorFormatter();
+
     private final String raw;
     private final ContextFormatter formatter;
 
@@ -30,7 +32,7 @@ public class FormattedString {
      * @return The created FormattedString
      */
     public static FormattedString from(String str) {
-        return from(str, ContextFormatters.getDefault());
+        return from(str, _default);
     }
 
     /**
@@ -66,5 +68,21 @@ public class FormattedString {
      */
     public Mono<String> getFor(CommandContext ctx) {
         return formatter.format(raw, ctx);
+    }
+
+    /**
+     * Set the default formatter to use
+     * @param formatter The new default formatter
+     */
+    public static void setDefaultFormatter(ContextFormatter formatter) {
+        FormattedString._default = formatter;
+    }
+
+    /**
+     * Get the default formatter
+     * @return The default formatter
+     */
+    public static ContextFormatter getDefaultFormatter() {
+        return _default;
     }
 }

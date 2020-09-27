@@ -8,15 +8,18 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-import java.util.function.BiFunction;
 
 /**
  * Context used when a command is used via Discord
  */
 public class DiscordContext extends CommandContext {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiscordContext.class);
+
     public static final String USERNAME = "username";
     public static final String NICKNAME = "nickname";
     public static final String NAME = "name";
@@ -26,6 +29,8 @@ public class DiscordContext extends CommandContext {
     public static final String GUILD_ID = "guildId";
     public static final String USER_AT = "at_user";
     public static final String OWNER_AT = "at_owner";
+
+    private static final int DISCORD_MAX_MESSAGE = 2000;
 
     private final MessageCreateEvent event;
     private final DiscordConfiguration config;
@@ -62,14 +67,14 @@ public class DiscordContext extends CommandContext {
     }
 
     @Override
-    public Mono<Boolean> respond(String message) {
-        return respond(event.getMessage().getChannelId(), message);
-    }
-
-    @Override
     public Mono<Boolean> alert(String message) {
         return Mono.justOrEmpty(config.getOwner())
                 .flatMap(owner -> dm(owner, message));
+    }
+
+    @Override
+    public Mono<Boolean> respond(String message) {
+        return respond(event.getMessage().getChannelId(), message);
     }
 
     /**
@@ -82,7 +87,7 @@ public class DiscordContext extends CommandContext {
         return this.event.getClient()
                 .getChannelById(channel)
                 .cast(MessageChannel.class)
-                .flatMap(tc -> tc.createMessage(message))
+                .flatMap(tc -> tc.createMessage(normalize(message)))
                 .thenReturn(true);
     }
 
@@ -93,7 +98,7 @@ public class DiscordContext extends CommandContext {
      */
     public Mono<Boolean> dm(String message) {
         return event.getMessage().getAuthor()
-                .map(usr -> dm(usr.getId(), message))
+                .map(usr -> dm(usr.getId(), normalize(message)))
                 .orElse(Mono.empty());
     }
 
@@ -125,12 +130,11 @@ public class DiscordContext extends CommandContext {
         return map;
     }
 
-    private <T> BiFunction<Map<String, Object>, String, Map<String, Object>> mapCombinator(String name) {
-        return (map, input) -> {
-            if(StringUtils.isNotEmpty(input)) {
-                map.put(name, input);
-            }
-            return map;
-        };
+    private String normalize(String message) {
+        if(message.length() >= DISCORD_MAX_MESSAGE) {
+            //Log the abbreviated portion, so it can be obtained.
+            LOGGER.info("Chopped off: " + message.substring(DISCORD_MAX_MESSAGE));
+        }
+        return StringUtils.abbreviate(message, DISCORD_MAX_MESSAGE);
     }
 }
