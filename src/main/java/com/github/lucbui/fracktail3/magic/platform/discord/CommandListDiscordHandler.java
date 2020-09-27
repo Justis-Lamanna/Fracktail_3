@@ -30,7 +30,12 @@ public class CommandListDiscordHandler implements DiscordHandler {
     private final PreDiscordExecutionHandler preExecutionHandler;
     private final PostDiscordExecutionHandler postExecutionHandler;
 
-    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList, DiscordLocaleResolver discordLocaleResolver, PreDiscordExecutionHandler preExecutionHandler, PostDiscordExecutionHandler postExecutionHandler) {
+    public CommandListDiscordHandler(
+            DiscordPlatform platform,
+            CommandList commandList,
+            DiscordLocaleResolver discordLocaleResolver,
+            PreDiscordExecutionHandler preExecutionHandler,
+            PostDiscordExecutionHandler postExecutionHandler) {
         this.platform = platform;
         this.commandList = commandList;
         this.discordLocaleResolver = discordLocaleResolver;
@@ -38,12 +43,8 @@ public class CommandListDiscordHandler implements DiscordHandler {
         this.postExecutionHandler = postExecutionHandler;
     }
 
-    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList, DiscordLocaleResolver discordLocaleResolver) {
-        this(platform, commandList, discordLocaleResolver, PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
-    }
-
     public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList) {
-        this(platform, commandList, new LocaleFromGuildResolver());
+        this(platform, commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
     }
 
     public CommandList getCommandList() {
@@ -100,7 +101,10 @@ public class CommandListDiscordHandler implements DiscordHandler {
                             ctx.getCommand().doAction(bot, ctx);
                     return action
                         .then(postExecutionHandler.afterExecution(ctx))
-                        .onErrorResume(CommandValidationException.class, ex -> ctx.respond(ex.getMessage()).then())
+                        .onErrorResume(CommandValidationException.class, ex ->
+                                ex.getFormattedMessage(ctx)
+                                .flatMap(ctx::respond)
+                                .then())
                         .onErrorResume(RuntimeException.class, ex -> postExecutionHandler.afterError(ctx, ex));
                 });
     }

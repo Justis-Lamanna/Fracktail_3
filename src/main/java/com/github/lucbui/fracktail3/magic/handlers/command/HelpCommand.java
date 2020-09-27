@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 public class HelpCommand extends Command {
     public static final String ID = "help";
+    public static final String NO_COMMANDS_TEXT = "Unable to find command \"{result_command}\"";
 
     public HelpCommand(String noCommandText, ContextFormatter contextFormatter) {
         super(ID, new HelpAction(noCommandText, contextFormatter));
@@ -20,7 +21,7 @@ public class HelpCommand extends Command {
     }
 
     public HelpCommand() {
-        this("Unable to find command \"{result_command}\"");
+        this(NO_COMMANDS_TEXT);
     }
 
     private static class HelpAction implements Action {
@@ -41,7 +42,7 @@ public class HelpCommand extends Command {
                         return Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
                                         .filter(c -> c.getNames().contains(commandToLookup))
                                         .filterWhen(c -> c.passesFilter(bot, context))
-                                        .singleOrEmpty()
+                                        .next()
                                         .map(Command::getHelp)
                                         .defaultIfEmpty(noCommandText)
                                         .flatMap(msg -> formatter.format(msg, context))

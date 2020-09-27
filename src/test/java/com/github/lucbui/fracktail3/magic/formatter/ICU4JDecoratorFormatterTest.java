@@ -64,4 +64,14 @@ class ICU4JDecoratorFormatterTest {
                 .expectNext("hello, world")
                 .verifyComplete();
     }
+
+    @Test
+    void testFormatPlaceholders_NoVariables() {
+        ICU4JDecoratorFormatter formatter = new ICU4JDecoratorFormatter();
+        when(context.getExtendedVariableMap()).thenReturn(Mono.empty());
+
+        StepVerifier.create(formatter.format("hello, {planet}", context))
+                .expectNext("hello, {planet}")
+                .verifyComplete();
+    }
 }

@@ -208,8 +208,10 @@ public abstract class CommandContext {
         Map<String, Object> map = new HashMap<>();
         map.put(MESSAGE, contents);
         map.put(PARAMS, parameters);
-        for(int idx = 0; idx < normalizedParameters.length; idx++) {
-            map.put(PARAM_PREFIX + idx, normalizedParameters[idx]);
+        if(normalizedParameters != null) {
+            for (int idx = 0; idx < normalizedParameters.length; idx++) {
+                map.put(PARAM_PREFIX + idx, normalizedParameters[idx]);
+            }
         }
         for(String key : vars.keySet()) {
             map.put(RESULT_PREFIX + key, vars.get(key));
