@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Flux;
@@ -10,14 +9,10 @@ import reactor.core.publisher.Mono;
 
 public class HelpCommand extends Command {
     public static final String ID = "help";
-    public static final String NO_COMMANDS_TEXT = "Unable to find command \"{result_command}\"";
+    public static final FormattedString NO_COMMANDS_TEXT = FormattedString.from("Unable to find command \"{result_command}\"");
 
-    public HelpCommand(String noCommandText, ContextFormatter contextFormatter) {
-        super(ID, new HelpAction(noCommandText, contextFormatter));
-    }
-
-    public HelpCommand(String noCommandText) {
-        this(noCommandText, ContextFormatters.getDefault());
+    public HelpCommand(FormattedString noCommandText) {
+        super(ID, new HelpAction(noCommandText));
     }
 
     public HelpCommand() {
@@ -25,17 +20,14 @@ public class HelpCommand extends Command {
     }
 
     private static class HelpAction implements Action {
-        private final String noCommandText;
-        private final ContextFormatter formatter;
+        private final FormattedString noCommandText;
 
-        public HelpAction(String noCommandText, ContextFormatter formatter) {
+        public HelpAction(FormattedString noCommandText) {
             this.noCommandText = noCommandText;
-            this.formatter = formatter;
         }
 
         @Override
         public Mono<Void> doAction(Bot bot, CommandContext context) {
-            context.setResult("ignore_stateful_checks", true);
             return context.getNormalizedParameter(0)
                     .map(commandToLookup -> {
                         context.setResult("command", commandToLookup);
@@ -44,11 +36,11 @@ public class HelpCommand extends Command {
                                         .filterWhen(c -> c.passesFilter(bot, context))
                                         .next()
                                         .map(Command::getHelp)
-                                        .defaultIfEmpty(noCommandText)
-                                        .flatMap(msg -> formatter.format(msg, context))
+                                        .flatMap(fs -> fs.getFor(context))
+                                        .switchIfEmpty(noCommandText.getFor(context))
                                         .flatMap(context::respond);
                             })
-                    .orElse(formatter.format(context.getCommand().getHelp(), context)
+                    .orElse(context.getCommand().getHelp().getFor(context)
                             .flatMap(context::respond))
                     .then();
         }

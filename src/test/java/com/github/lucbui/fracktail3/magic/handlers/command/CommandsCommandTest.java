@@ -85,6 +85,6 @@ class CommandsCommandTest {
 
         command.doAction(bot, context).block();
 
-        verify(context).respond(CommandsCommand.NO_COMMANDS_TEST);
+        verify(context).respond("You have access to no commands");
     }
 }

@@ -33,8 +33,8 @@ class HelpCommandTest {
     private Command command;
     private AutoCloseable mocks;
 
-    private final Command c = new Command("one", Collections.singletonList("one"), Filter.identity(true), Action.NOOP);
-    private final Command cCopy = new Command("one-copy", Collections.singletonList("one"), Filter.identity(true), Action.NOOP);
+    private final Command c = new Command("one", "one", Filter.identity(true), Action.NOOP);
+    private final Command cCopy = new Command("one-copy", "one", Filter.identity(true), Action.NOOP);
 
     @BeforeEach
     void setUp() {

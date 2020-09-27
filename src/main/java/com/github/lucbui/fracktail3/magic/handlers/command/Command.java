@@ -6,24 +6,23 @@ import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Encapsulation of a bot's command
  */
 public class Command implements Validated, Id {
     private final String id;
-    private final List<String> names;
-    private final String help;
+    private final Set<String> names;
+    private final FormattedString help;
     private final Filter commandFilter;
     private final Action action;
 
@@ -34,7 +33,7 @@ public class Command implements Validated, Id {
      * @param action The action to perform
      */
     public Command(String id, Action action) {
-        this(id, Collections.singletonList(id), Filter.identity(true), action);
+        this(id, Filter.identity(true), action);
     }
 
     /**
@@ -45,7 +44,18 @@ public class Command implements Validated, Id {
      * @param action The action to perform
      */
     public Command(String id, Filter filter, Action action) {
-        this(id, Collections.singletonList(id), filter, action);
+        this(id, Collections.singleton(id), filter, action);
+    }
+
+    /**
+     * Creates a Command
+     * @param id The ID of the command
+     * @param name The name this command responds to
+     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param action The action to perform when the command is run
+     */
+    public Command(String id, String name, Filter filter, Action action) {
+        this(id, Collections.singleton(name), FormattedString.from(id + ".help"), filter, action);
     }
 
     /**
@@ -55,12 +65,8 @@ public class Command implements Validated, Id {
      * @param filter A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, List<String> names, Filter filter, Action action) {
-        this.id = Objects.requireNonNull(id);
-        this.names = Objects.requireNonNull(names);
-        this.help = this.id + ".help";
-        this.commandFilter = Objects.requireNonNull(filter);
-        this.action = Objects.requireNonNull(action);
+    public Command(String id, Set<String> names, Filter filter, Action action) {
+        this(id, names, FormattedString.from(id + ".help"), filter, action);
     }
 
     /**
@@ -71,7 +77,7 @@ public class Command implements Validated, Id {
      * @param filter A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, List<String> names, String help, Filter filter, Action action) {
+    public Command(String id, Set<String> names, FormattedString help, Filter filter, Action action) {
         this.id = id;
         this.names = names;
         this.help = help;
@@ -88,7 +94,7 @@ public class Command implements Validated, Id {
      * Get the command names
      * @return The command names
      */
-    public List<String> getNames() {
+    public Set<String> getNames() {
         return names;
     }
 
@@ -112,7 +118,7 @@ public class Command implements Validated, Id {
      * Get the help text of this command
      * @return The help text
      */
-    public String getHelp() {
+    public FormattedString getHelp() {
         return help;
     }
 
@@ -162,10 +168,10 @@ public class Command implements Validated, Id {
      */
     public static class Builder implements IBuilder<Command> {
         private final String id;
-        private List<String> names = new ArrayList<>();
+        private Set<String> names = new HashSet<>();
         private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
-        private String help;
+        private FormattedString help;
 
         /**
          * Initialize Builder with Command ID
@@ -177,6 +183,7 @@ public class Command implements Validated, Id {
 
         /**
          * Add a name to the list of command names.
+         * By default, this name is formatted with the default formatter
          * @param name The name to add
          * @return This builder
          */
@@ -206,11 +213,22 @@ public class Command implements Validated, Id {
         }
 
         /**
-         * Set the help text of this command
+         * Set the help text of this command.
+         * By default, this help is formatted with the default formatter
          * @param helpText The help text
          * @return This builder
          */
         public Builder withHelp(String helpText) {
+            this.help = FormattedString.from(helpText);
+            return this;
+        }
+
+        /**
+         * Set the help text of this command
+         * @param helpText The help text
+         * @return This builder
+         */
+        public Builder withHelp(FormattedString helpText) {
             this.help = helpText;
             return this;
         }
@@ -227,10 +245,10 @@ public class Command implements Validated, Id {
         @Override
         public Command build() {
             if(names.isEmpty()) {
-                names = Collections.singletonList(id);
+                names = Collections.singleton(id);
             }
-            if(StringUtils.isEmpty(help)) {
-                this.help = id + ".help";
+            if(help == null) {
+                this.help = FormattedString.from(id + ".help");
             }
             return new Command(id, names, help, filter, action);
         }

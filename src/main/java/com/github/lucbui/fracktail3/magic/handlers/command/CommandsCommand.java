@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
@@ -15,30 +14,24 @@ import java.util.stream.Collectors;
 
 public class CommandsCommand extends Command {
     public static final String ID = "commands";
-    public static final String COMMANDS_LIST_TEST = "Commands are: {result_commands}";
-    public static final String NO_COMMANDS_TEST = "You have access to no commands";
+    public static final FormattedString COMMANDS_LIST_TEXT = FormattedString.from("Commands are: {result_commands}");
+    public static final FormattedString NO_COMMANDS_TEXT = FormattedString.literal("You have access to no commands");
 
-    public CommandsCommand(String message, String noCommandsStr, ContextFormatter contextFormatter) {
-        super(ID, new CommandsAction(message, noCommandsStr, contextFormatter));
-    }
-
-    public CommandsCommand(String message) {
-        super(ID, new CommandsAction(message, NO_COMMANDS_TEST, ContextFormatters.getDefault()));
+    public CommandsCommand(FormattedString message, FormattedString noCommandsMessage) {
+        super(ID, new CommandsAction(message, noCommandsMessage));
     }
 
     public CommandsCommand() {
-        super(ID, new CommandsAction(COMMANDS_LIST_TEST, NO_COMMANDS_TEST, ContextFormatters.getDefault()));
+        this(COMMANDS_LIST_TEXT, NO_COMMANDS_TEXT);
     }
 
     private static class CommandsAction implements Action {
-        private final String message;
-        private final String noCommandsMessage;
-        private final ContextFormatter formatter;
+        private final FormattedString message;
+        private final FormattedString noCommandsMessage;
 
-        private CommandsAction(String message, String noCommandsMessage, ContextFormatter formatter) {
+        private CommandsAction(FormattedString message, FormattedString noCommandsMessage) {
             this.message = message;
             this.noCommandsMessage = noCommandsMessage;
-            this.formatter = formatter;
         }
 
         @Override
@@ -48,16 +41,17 @@ public class CommandsCommand extends Command {
                     Optional.empty();
             return Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
                     .filterWhen(c -> c.passesFilter(bot, context))
-                    .map(c -> c.getNames().get(0))
+                    .flatMap(c -> Flux.fromIterable(c.getNames()))
+                    .distinct()
                     .map(c -> prefixOpt.map(prefix -> prefix + c).orElse(c))
                     .sort()
                     .collect(Collectors.joining(", "))
                     .filter(StringUtils::isNotEmpty)
                     .flatMap(c -> {
                         context.setResult("commands", c);
-                        return formatter.format(message, context);
+                        return message.getFor(context);
                     })
-                    .switchIfEmpty(formatter.format(noCommandsMessage, context))
+                    .switchIfEmpty(noCommandsMessage.getFor(context))
                     .flatMap(context::respond)
                     .then();
         }

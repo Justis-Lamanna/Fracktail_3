@@ -12,11 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class CommandListDiscordHandler implements DiscordHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListDiscordHandler.class);
@@ -75,19 +78,14 @@ public class CommandListDiscordHandler implements DiscordHandler {
                     ctx.setLocale(locale);
                     return ctx;
                 })
-                .zipWhen(ctx -> {
-                    Map<String, List<Command>> commands = getCommandsByName(ctx);
-
-                    return Flux.fromIterable(commands.keySet())
-                            .filter(name -> StringUtils.startsWith(ctx.getContents(), configuration.getPrefix() + name))
-                            .flatMap(name -> Flux.fromIterable(commands.get(name)).zipWith(Mono.just(name)))
-                            .filterWhen(t -> t.getT1().passesFilter(bot, ctx))
-                            .singleOrEmpty()
-                            .map(Optional::of).defaultIfEmpty(Optional.empty());
-                }, (ctx, tupleOpt) -> {
+                .zipWhen(ctx -> getCommandsByName()
+                        .filter(t -> StringUtils.startsWith(ctx.getContents(), configuration.getPrefix() + t.getT1()))
+                        .filterWhen(t -> t.getT2().passesFilter(bot, ctx))
+                        .singleOrEmpty()
+                        .map(Optional::of).defaultIfEmpty(Optional.empty()), (ctx, tupleOpt) -> {
                     tupleOpt.ifPresent(t -> {
-                        ctx.setCommand(t.getT1());
-                        ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + t.getT2()));
+                        ctx.setCommand(t.getT2());
+                        ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + t.getT1()));
                         ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
                     });
 
@@ -109,18 +107,10 @@ public class CommandListDiscordHandler implements DiscordHandler {
                 });
     }
 
-    private Map<String, List<Command>> getCommandsByName(DiscordContext ctx) {
-        Map<String, List<Command>> commands = new HashMap<>(commandList.getNumberOfCommands());
-        for(Command command : commandList.getCommands()) {
-            List<String> names = command.getNames()
-                    .stream()
-                    .map(s -> ctx.translate(s, s))
-                    .collect(Collectors.toList());
-            for(String name : names) {
-                commands.computeIfAbsent(name, key -> new ArrayList<>()).add(command);
-            }
-        }
-        return commands;
+    private Flux<Tuple2<String, Command>> getCommandsByName() {
+        return Flux.fromIterable(commandList.getCommands())
+                .flatMap(command -> Flux.fromIterable(command.getNames())
+                    .map(name -> Tuples.of(name, command)));
     }
 
     private String[] parseParameters(String paramString) {

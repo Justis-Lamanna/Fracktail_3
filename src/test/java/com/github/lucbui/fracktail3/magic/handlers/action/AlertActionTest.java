@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class AlertActionTest {
     @Mock
     private CommandContext commandContext;
 
-    private static final String MSG = "Hello, World";
+    private static final FormattedString MSG = FormattedString.literal("Hello, World");
 
     private AlertAction action;
     private AutoCloseable mocks;

@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
-import com.github.lucbui.fracktail3.magic.formatter.ContextFormatters;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
@@ -11,17 +10,14 @@ import reactor.core.publisher.Mono;
  * the indicated message.
  */
 public class CommandValidationException extends RuntimeException {
-    private final String message;
-    private final ContextFormatter formatter;
+    private final FormattedString message;
 
     /**
      * Generate an exception which responds with a potentially formatted message
      * @param message The message to send
-     * @param formatter The formatter to use when parsing the message
      */
-    public CommandValidationException(String message, ContextFormatter formatter) {
+    public CommandValidationException(FormattedString message) {
         this.message = message;
-        this.formatter = formatter;
     }
 
     /**
@@ -29,7 +25,7 @@ public class CommandValidationException extends RuntimeException {
      * @param message The message to respond with.
      */
     public CommandValidationException(String message) {
-        this(message, ContextFormatters.getDefault());
+        this(FormattedString.from(message));
     }
 
     /**
@@ -37,15 +33,7 @@ public class CommandValidationException extends RuntimeException {
      * @return The resolved message
      */
     public String getMessage() {
-        return message;
-    }
-
-    /**
-     * Get the formatter to use with the message
-     * @return The formatter
-     */
-    public ContextFormatter getFormatter() {
-        return formatter;
+        return message.getRaw();
     }
 
     /**
@@ -54,6 +42,6 @@ public class CommandValidationException extends RuntimeException {
      * @return Asynchronous formatted message
      */
     public Mono<String> getFormattedMessage(CommandContext ctx) {
-        return getFormatter().format(getMessage(), ctx);
+        return message.getFor(ctx);
     }
 }
