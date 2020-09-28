@@ -17,24 +17,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class ActionOptionsTest {
-    @Mock
-    private Bot bot;
+    @Mock private Bot bot;
 
-    @Mock
-    private CommandContext commandContext;
+    @Mock private CommandContext commandContext;
 
     @Mock private Action firstAction;
     @Mock private Filter firstFilter;
 
     @Mock private Action defaultAction;
 
+    private ActionOption actionLeg;
     private ActionOptions action;
     private AutoCloseable mocks;
 
     @BeforeEach
     void setUp() {
         mocks = MockitoAnnotations.openMocks(this);
-        action = new ActionOptions(Collections.singletonList(new ActionOption(firstFilter, firstAction)), defaultAction);
+        actionLeg = new ActionOption("1", firstFilter, firstAction);
+        action = new ActionOptions(Collections.singletonList(actionLeg), defaultAction);
     }
 
     @AfterEach
@@ -63,6 +63,23 @@ class ActionOptionsTest {
         PublisherProbe<Void> firstProbe = PublisherProbe.empty();
         PublisherProbe<Void> defaultProbe = PublisherProbe.empty();
         when(firstFilter.matches(any(), any())).thenReturn(Mono.just(false));
+        when(firstAction.doAction(any(), any())).thenReturn(firstProbe.mono());
+        when(defaultAction.doAction(any(), any())).thenReturn(defaultProbe.mono());
+
+        action.doAction(bot, commandContext).block();
+
+        firstProbe.assertWasNotSubscribed();
+        defaultProbe.assertWasSubscribed();
+        defaultProbe.assertWasRequested();
+        defaultProbe.assertWasNotCancelled();
+    }
+
+    @Test
+    void testFilterBranch_Disabled() {
+        PublisherProbe<Void> firstProbe = PublisherProbe.empty();
+        PublisherProbe<Void> defaultProbe = PublisherProbe.empty();
+        actionLeg.setEnabled(false);
+        when(firstFilter.matches(any(), any())).thenReturn(Mono.just(true));
         when(firstAction.doAction(any(), any())).thenReturn(firstProbe.mono());
         when(defaultAction.doAction(any(), any())).thenReturn(defaultProbe.mono());
 
