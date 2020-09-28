@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CommandListDiscordHandler implements DiscordHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandListDiscordHandler.class);
+public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDiscordCommandHandler.class);
 
     private static final Pattern SPACE_NOT_QUOTES = Pattern.compile("([^\"]\\S*|\".+?(?<!\\\\)\")\\s*");
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
@@ -33,7 +33,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
     private final PreDiscordExecutionHandler preExecutionHandler;
     private final PostDiscordExecutionHandler postExecutionHandler;
 
-    public CommandListDiscordHandler(
+    public DefaultDiscordCommandHandler(
             DiscordPlatform platform,
             CommandList commandList,
             DiscordLocaleResolver discordLocaleResolver,
@@ -46,7 +46,7 @@ public class CommandListDiscordHandler implements DiscordHandler {
         this.postExecutionHandler = postExecutionHandler;
     }
 
-    public CommandListDiscordHandler(DiscordPlatform platform, CommandList commandList) {
+    public DefaultDiscordCommandHandler(DiscordPlatform platform, CommandList commandList) {
         this(platform, commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
     }
 

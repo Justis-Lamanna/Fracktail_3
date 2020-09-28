@@ -6,6 +6,7 @@ import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.filterset.user.InUsersetFilter;
+import com.github.lucbui.fracktail3.magic.platform.discord.DiscordEventHandler;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -13,10 +14,7 @@ import discord4j.discordjson.json.gateway.StatusUpdate;
 import org.apache.commons.lang3.ObjectUtils;
 
 import javax.annotation.Nullable;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Subclass of a Configuration for a Discord bot.
@@ -30,6 +28,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
+    private final List<DiscordEventHandler> handlers;
 
     /**
      * Initialize a bot Configuration
@@ -39,12 +38,13 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param i18nPath The path for a Localization bundle.
      * @param presence The presence this bot should have.
      */
-    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence) {
+    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence, List<DiscordEventHandler> handlers) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
+        this.handlers = handlers;
     }
 
     /**
@@ -54,7 +54,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence);
+        this(token, prefix, null, null, presence, Collections.emptyList());
     }
 
     /**
@@ -63,7 +63,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param prefix The command prefix to use.
      */
     public DiscordConfiguration(String token, String prefix) {
-        this(token, prefix, null, null, Presence.online());
+        this(token, prefix, Presence.online());
     }
 
     /**
@@ -138,6 +138,10 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         return ResourceBundle.getBundle(i18nPath, locale);
     }
 
+    public List<DiscordEventHandler> getHandlers() {
+        return Collections.unmodifiableList(handlers);
+    }
+
     @Override
     public boolean isEnabled() {
         return i18nPath != null;
@@ -149,6 +153,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         private Snowflake owner;
         private StatusUpdate presence;
         private String i18nPath;
+        private List<DiscordEventHandler> handlers = new ArrayList<>();
 
         public Builder(String token) {
             this.token = token;
@@ -169,6 +174,11 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
             return this;
         }
 
+        public Builder withHandler(DiscordEventHandler handler) {
+            this.handlers.add(handler);
+            return this;
+        }
+
         @Override
         public DiscordConfiguration build() {
             return new DiscordConfiguration(
@@ -176,7 +186,8 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
                     ObjectUtils.defaultIfNull(prefix, ""),
                     owner,
                     i18nPath,
-                    ObjectUtils.defaultIfNull(presence, Presence.online()));
+                    ObjectUtils.defaultIfNull(presence, Presence.online()),
+                    handlers);
         }
     }
 }

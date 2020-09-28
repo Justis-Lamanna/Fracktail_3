@@ -8,6 +8,7 @@ import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,8 @@ public class DiscordPlatformHandler implements PlatformHandler {
         BotSpec botSpec = bot.getSpec();
         DiscordConfiguration configuration = platform.getConfig();
 
-        DiscordHandler discordHandler = new CommandListDiscordHandler(platform, botSpec.getBehaviorList().getCommandList());
+        DiscordCommandHandler discordCommandHandler = new DefaultDiscordCommandHandler(platform, botSpec.getBehaviorList().getCommandList());
+        DiscordOnEventHandler discordEventHandler = new DefaultDiscordOnEventHandler(platform, configuration.getHandlers());
 
         DiscordClient discordClient =
                 DiscordClientBuilder.create(configuration.getToken()).build();
@@ -50,8 +52,11 @@ public class DiscordPlatformHandler implements PlatformHandler {
         gateway.updatePresence(configuration.getPresence()).block();
 
         gateway.on(MessageCreateEvent.class)
-                .doOnNext(msg -> LOGGER.debug("Received a message: {}", msg.getMessage()))
-                .flatMap(msg -> discordHandler.execute(bot, configuration, msg))
+                .flatMap(msg -> discordCommandHandler.execute(bot, configuration, msg))
+                .subscribe();
+
+        gateway.on(Event.class)
+                .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
                 .subscribe();
 
         return gateway.onDisconnect().thenReturn(true);

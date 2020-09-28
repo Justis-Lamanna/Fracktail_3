@@ -241,30 +241,6 @@ public abstract class CommandContext {
     }
 
     /**
-     * Translate the key into some value
-     * If no ResourceBundles exist, or no string matches the provided key, then an empty
-     * optional is provided.
-     * @param key The key to translate
-     * @return The translated value
-     */
-    public Optional<String> translate(String key) {
-        return getResourceBundle()
-                .filter(bundle -> bundle.containsKey(key))
-                .map(bundle -> bundle.getString(key));
-    }
-
-    /**
-     * Translate the key into some value
-     * If no ResourceBundles exist, or no string matches the provided key, then the provided default is returned.
-     * @param key The key to translate
-     * @param defaultStr The default value to provide
-     * @return The translated value
-     */
-    public String translate(String key, String defaultStr) {
-        return translate(key).orElse(defaultStr);
-    }
-
-    /**
      * Respond to the message which created this context
      * @param message The message to respond with
      * @return An asynchronous boolean indicating the message was sent

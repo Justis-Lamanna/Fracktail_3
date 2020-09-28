@@ -16,6 +16,7 @@ public class DiscordBotConfig {
         return new DiscordPlatform(new DiscordConfiguration.Builder(token)
                 .withPrefix("!")
                 .withOwner(Snowflake.of(248612704019808258L))
-                .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!"))).build());
+                .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
+                .build());
     }
 }
