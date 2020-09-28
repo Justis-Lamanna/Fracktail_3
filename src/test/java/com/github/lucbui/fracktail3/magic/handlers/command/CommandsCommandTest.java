@@ -5,8 +5,10 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.TestContext;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
+import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
+import com.github.lucbui.fracktail3.magic.handlers.action.CommandsAction;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +43,7 @@ class CommandsCommandTest {
 
     @BeforeEach
     void setUp() {
-        command = new CommandsCommand();
+        command = new Command("commands", new CommandsAction());
         context.setCommand(command);
         mocks = MockitoAnnotations.openMocks(this);
         c1 = new Command("one", one, Action.NOOP);

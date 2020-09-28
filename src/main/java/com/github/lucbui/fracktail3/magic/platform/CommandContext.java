@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.platform;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.handlers.command.Command;
+import com.github.lucbui.fracktail3.magic.handlers.Command;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;

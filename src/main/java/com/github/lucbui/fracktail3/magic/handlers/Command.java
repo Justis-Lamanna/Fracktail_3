@@ -1,15 +1,13 @@
-package com.github.lucbui.fracktail3.magic.handlers.command;
+package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.Validated;
+import com.github.lucbui.fracktail3.magic.*;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -19,12 +17,14 @@ import java.util.Set;
 /**
  * Encapsulation of a bot's command
  */
-public class Command implements Validated, Id {
+public class Command implements Validated, Id, Disableable {
     private final String id;
     private final Set<String> names;
     private final FormattedString help;
     private final Filter commandFilter;
     private final Action action;
+
+    private boolean enabled;
 
     /**
      * Creates a minimal command
@@ -78,7 +78,21 @@ public class Command implements Validated, Id {
      * @param action The action to perform when the command is run
      */
     public Command(String id, Set<String> names, FormattedString help, Filter filter, Action action) {
+        this(id, true, names, help, filter, action);
+    }
+
+    /**
+     * Creates a Command
+     * @param id The ID of the command
+     * @param enabled If this command is enabled or not
+     * @param names The name(s) this command responds to
+     * @param help The help text
+     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param action The action to perform when the command is run
+     */
+    public Command(String id, boolean enabled, Set<String> names, FormattedString help, Filter filter, Action action) {
         this.id = id;
+        this.enabled = enabled;
         this.names = names;
         this.help = help;
         this.commandFilter = filter;
@@ -129,7 +143,7 @@ public class Command implements Validated, Id {
      * @return Asynchronous boolean indicating if the guard passes
      */
     public Mono<Boolean> passesFilter(Bot bot, CommandContext ctx) {
-        return commandFilter.matches(bot, ctx);
+        return BooleanUtils.and(Mono.just(enabled), commandFilter.matches(bot, ctx));
     }
 
     /**
@@ -163,11 +177,22 @@ public class Command implements Validated, Id {
         }
     }
 
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     /**
      * Builder class to generate Commands
      */
     public static class Builder implements IBuilder<Command> {
         private final String id;
+        private boolean enabled = true;
         private Set<String> names = new HashSet<>();
         private Filter filter = Filter.identity(true);
         private Action action = Action.NOOP;
@@ -242,6 +267,16 @@ public class Command implements Validated, Id {
             return withAction(actionBuilder.build());
         }
 
+        /**
+         * Set if this command is enabled
+         * @param enabled True if enabled, false if disabled
+         * @return This builder
+         */
+        public Builder isEnabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
         @Override
         public Command build() {
             if(names.isEmpty()) {
@@ -250,7 +285,7 @@ public class Command implements Validated, Id {
             if(help == null) {
                 this.help = FormattedString.from(id + ".help");
             }
-            return new Command(id, names, help, filter, action);
+            return new Command(id, enabled, names, help, filter, action);
         }
     }
 }

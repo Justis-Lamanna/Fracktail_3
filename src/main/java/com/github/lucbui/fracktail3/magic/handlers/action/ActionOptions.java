@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,8 +18,7 @@ import java.util.Objects;
 /**
  * A list of multiple action options, which are chosen based on a filter
  */
-public class ActionOptions implements Action, Validated {
-    private final List<ActionOption> actions;
+public class ActionOptions extends IdStore<ActionOption> implements Action, Validated {
     private final Action _default;
 
     /**
@@ -27,7 +27,7 @@ public class ActionOptions implements Action, Validated {
      * @param _default A default action, if no others match
      */
     public ActionOptions(List<ActionOption> actions, Action _default) {
-        this.actions = Objects.requireNonNull(actions);
+        super(actions);
         this._default = Objects.requireNonNull(_default);
     }
 
@@ -36,7 +36,7 @@ public class ActionOptions implements Action, Validated {
      * @return The list of possible actions
      */
     public List<ActionOption> getActions() {
-        return actions;
+        return getAll();
     }
 
     /**
@@ -49,16 +49,16 @@ public class ActionOptions implements Action, Validated {
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext ctx) {
-        return Flux.fromIterable(actions)
-                .filterWhen(ao -> ao.getFilter().matches(bot, ctx))
+        return Flux.fromIterable(getAll())
+                .filterWhen(ao -> ao.passesFilter(bot, ctx))
                 .map(ActionOption::getAction)
-                .single(_default)
+                .next().defaultIfEmpty(_default)
                 .flatMap(action -> action.doAction(bot, ctx));
     }
 
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        actions.forEach(a -> a.validate(botSpec));
+        getAll().forEach(a -> a.validate(botSpec));
         Validated.validate(_default, botSpec);
     }
 
@@ -76,7 +76,17 @@ public class ActionOptions implements Action, Validated {
          * @return This builder
          */
         public Builder with(Filter filter, Action action) {
-            actions.add(new ActionOption(filter, action));
+            return with(true, filter, action);
+        }
+
+        /**
+         * Add an arm and possible action
+         * @param filter The filter that must pass
+         * @param action The action that should occur
+         * @return This builder
+         */
+        public Builder with(boolean enabled, Filter filter, Action action) {
+            actions.add(new ActionOption("action_" + actions.size(), enabled, filter, action));
             return this;
         }
 
