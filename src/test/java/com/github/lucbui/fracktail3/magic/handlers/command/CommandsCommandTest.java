@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.TestContext;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
@@ -32,8 +32,8 @@ class CommandsCommandTest {
     @Mock private BehaviorList behaviorList;
     @Mock private CommandList commandList;
 
-    @Mock private Filter one;
-    @Mock private Filter two;
+    @Mock private Guard one;
+    @Mock private Guard two;
 
     private Command command;
     private AutoCloseable mocks;

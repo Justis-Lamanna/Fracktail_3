@@ -2,8 +2,8 @@ package com.github.lucbui.fracktail3.magic.handlers;
 
 import com.github.lucbui.fracktail3.magic.*;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
@@ -21,7 +21,7 @@ public class Command implements Validated, Id, Disableable {
     private final String id;
     private final Set<String> names;
     private final FormattedString help;
-    private final Filter commandFilter;
+    private final Guard commandGuard;
     private final Action action;
 
     private boolean enabled;
@@ -33,40 +33,40 @@ public class Command implements Validated, Id, Disableable {
      * @param action The action to perform
      */
     public Command(String id, Action action) {
-        this(id, Filter.identity(true), action);
+        this(id, Guard.identity(true), action);
     }
 
     /**
      * Creates a minimal command
      * The name is the same as the ID, no filter is provided, and help text is "id.help".
      * @param id The command's ID
-     * @param filter A filter for this command
+     * @param guard A filter for this command
      * @param action The action to perform
      */
-    public Command(String id, Filter filter, Action action) {
-        this(id, Collections.singleton(id), filter, action);
+    public Command(String id, Guard guard, Action action) {
+        this(id, Collections.singleton(id), guard, action);
     }
 
     /**
      * Creates a Command
      * @param id The ID of the command
      * @param name The name this command responds to
-     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, String name, Filter filter, Action action) {
-        this(id, Collections.singleton(name), FormattedString.from(id + ".help"), filter, action);
+    public Command(String id, String name, Guard guard, Action action) {
+        this(id, Collections.singleton(name), FormattedString.from(id + ".help"), guard, action);
     }
 
     /**
      * Creates a Command
      * @param id The ID of the command
      * @param names The name(s) this command responds to
-     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, Set<String> names, Filter filter, Action action) {
-        this(id, names, FormattedString.from(id + ".help"), filter, action);
+    public Command(String id, Set<String> names, Guard guard, Action action) {
+        this(id, names, FormattedString.from(id + ".help"), guard, action);
     }
 
     /**
@@ -74,11 +74,11 @@ public class Command implements Validated, Id, Disableable {
      * @param id The ID of the command
      * @param names The name(s) this command responds to
      * @param help The help text
-     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, Set<String> names, FormattedString help, Filter filter, Action action) {
-        this(id, true, names, help, filter, action);
+    public Command(String id, Set<String> names, FormattedString help, Guard guard, Action action) {
+        this(id, true, names, help, guard, action);
     }
 
     /**
@@ -87,15 +87,15 @@ public class Command implements Validated, Id, Disableable {
      * @param enabled If this command is enabled or not
      * @param names The name(s) this command responds to
      * @param help The help text
-     * @param filter A guard, which prevents this command from being used in certain contexts
+     * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, boolean enabled, Set<String> names, FormattedString help, Filter filter, Action action) {
+    public Command(String id, boolean enabled, Set<String> names, FormattedString help, Guard guard, Action action) {
         this.id = id;
         this.enabled = enabled;
         this.names = names;
         this.help = help;
-        this.commandFilter = filter;
+        this.commandGuard = guard;
         this.action = action;
     }
 
@@ -116,8 +116,8 @@ public class Command implements Validated, Id, Disableable {
      * Get the filter this command uses
      * @return The filter
      */
-    public Filter getFilter() {
-        return commandFilter;
+    public Guard getFilter() {
+        return commandGuard;
     }
 
     /**
@@ -143,7 +143,7 @@ public class Command implements Validated, Id, Disableable {
      * @return Asynchronous boolean indicating if the guard passes
      */
     public Mono<Boolean> passesFilter(Bot bot, CommandContext ctx) {
-        return BooleanUtils.and(Mono.just(enabled), commandFilter.matches(bot, ctx));
+        return BooleanUtils.and(Mono.just(enabled), commandGuard.matches(bot, ctx));
     }
 
     /**
@@ -169,8 +169,8 @@ public class Command implements Validated, Id, Disableable {
 
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        if(commandFilter instanceof Validated) {
-            ((Validated) commandFilter).validate(botSpec);
+        if(commandGuard instanceof Validated) {
+            ((Validated) commandGuard).validate(botSpec);
         }
         if(action instanceof Validated) {
             ((Validated) action).validate(botSpec);
@@ -194,7 +194,7 @@ public class Command implements Validated, Id, Disableable {
         private final String id;
         private boolean enabled = true;
         private Set<String> names = new HashSet<>();
-        private Filter filter = Filter.identity(true);
+        private Guard guard = Guard.identity(true);
         private Action action = Action.NOOP;
         private FormattedString help;
 
@@ -219,11 +219,11 @@ public class Command implements Validated, Id, Disableable {
 
         /**
          * Set the filter of this command
-         * @param filter The filter to use
+         * @param guard The filter to use
          * @return This builder
          */
-        public Builder withFilter(Filter filter) {
-            this.filter = filter;
+        public Builder withFilter(Guard guard) {
+            this.guard = guard;
             return this;
         }
 
@@ -285,7 +285,7 @@ public class Command implements Validated, Id, Disableable {
             if(help == null) {
                 this.help = FormattedString.from(id + ".help");
             }
-            return new Command(id, enabled, names, help, filter, action);
+            return new Command(id, enabled, names, help, guard, action);
         }
     }
 }

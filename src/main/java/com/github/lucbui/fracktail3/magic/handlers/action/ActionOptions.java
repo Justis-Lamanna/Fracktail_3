@@ -4,7 +4,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
@@ -71,22 +71,22 @@ public class ActionOptions extends IdStore<ActionOption> implements Action, Vali
 
         /**
          * Add an arm and possible action
-         * @param filter The filter that must pass
+         * @param guard The filter that must pass
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(Filter filter, Action action) {
-            return with(true, filter, action);
+        public Builder with(Guard guard, Action action) {
+            return with(true, guard, action);
         }
 
         /**
          * Add an arm and possible action
-         * @param filter The filter that must pass
+         * @param guard The filter that must pass
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(boolean enabled, Filter filter, Action action) {
-            actions.add(new ActionOption("action_" + actions.size(), enabled, filter, action));
+        public Builder with(boolean enabled, Guard guard, Action action) {
+            actions.add(new ActionOption("action_" + actions.size(), enabled, guard, action));
             return this;
         }
 

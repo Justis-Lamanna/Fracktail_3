@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.*;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
  */
 public class ActionOption implements Validated, Id, Disableable {
     private final String id;
-    private final Filter filter;
+    private final Guard guard;
     private final Action action;
 
     private boolean enabled;
@@ -20,23 +20,23 @@ public class ActionOption implements Validated, Id, Disableable {
     /**
      * Initialize this action with a filter
      * @param id The ID of this branch
-     * @param filter The filter to use
+     * @param guard The filter to use
      * @param action The action to perform if the filter passes
      */
-    public ActionOption(String id, Filter filter, Action action) {
-        this(id, true, filter, action);
+    public ActionOption(String id, Guard guard, Action action) {
+        this(id, true, guard, action);
     }
 
     /**
      * Initialize this action with a filter
      * @param id The ID of this branch
      * @param enabled True, if this branch is enabled
-     * @param filter The filter to use
+     * @param guard The filter to use
      * @param action The action to perform if the filter passes
      */
-    public ActionOption(String id, boolean enabled, Filter filter, Action action) {
+    public ActionOption(String id, boolean enabled, Guard guard, Action action) {
         this.id = id;
-        this.filter = filter;
+        this.guard = guard;
         this.action = action;
         this.enabled = enabled;
     }
@@ -45,8 +45,8 @@ public class ActionOption implements Validated, Id, Disableable {
      * Get the filter to validate this arm
      * @return The filter user
      */
-    public Filter getFilter() {
-        return filter;
+    public Guard getGuard() {
+        return guard;
     }
 
     /**
@@ -64,7 +64,7 @@ public class ActionOption implements Validated, Id, Disableable {
      * @return Asynchronous boolean indicating if the guard passes
      */
     public Mono<Boolean> passesFilter(Bot bot, CommandContext ctx) {
-        return BooleanUtils.and(Mono.just(enabled), filter.matches(bot, ctx));
+        return BooleanUtils.and(Mono.just(enabled), guard.matches(bot, ctx));
     }
 
     /**
@@ -90,7 +90,7 @@ public class ActionOption implements Validated, Id, Disableable {
 
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        Validated.validate(filter, botSpec);
+        Validated.validate(guard, botSpec);
         Validated.validate(action, botSpec);
     }
 

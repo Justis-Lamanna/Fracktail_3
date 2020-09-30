@@ -1,20 +1,20 @@
-package com.github.lucbui.fracktail3.magic.filterset.channel;
+package com.github.lucbui.fracktail3.magic.guards.channel;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
-public class InChannelsetFilter implements Filter {
+public class InChannelsetGuard implements Guard {
     private final String id;
     private final boolean defaultValue;
 
-    public InChannelsetFilter(String id) {
+    public InChannelsetGuard(String id) {
         this.id = id;
         this.defaultValue = true;
     }
 
-    public InChannelsetFilter(String id, boolean defaultValue) {
+    public InChannelsetGuard(String id, boolean defaultValue) {
         this.id = id;
         this.defaultValue = defaultValue;
     }

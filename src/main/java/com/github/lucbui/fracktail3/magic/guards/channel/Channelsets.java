@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.filterset.channel;
+package com.github.lucbui.fracktail3.magic.guards.channel;
 
 import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 

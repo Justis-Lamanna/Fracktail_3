@@ -1,10 +1,10 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.filterset.channel.Channelset;
-import com.github.lucbui.fracktail3.magic.filterset.channel.Channelsets;
-import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
-import com.github.lucbui.fracktail3.magic.filterset.user.Usersets;
+import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
+import com.github.lucbui.fracktail3.magic.guards.user.Userset;
+import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;

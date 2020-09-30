@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
@@ -35,8 +35,8 @@ class HelpCommandTest {
     private Command command;
     private AutoCloseable mocks;
 
-    private final Command c = new Command("one", "one", Filter.identity(true), Action.NOOP);
-    private final Command cCopy = new Command("one-copy", "one", Filter.identity(true), Action.NOOP);
+    private final Command c = new Command("one", "one", Guard.identity(true), Action.NOOP);
+    private final Command cCopy = new Command("one-copy", "one", Guard.identity(true), Action.NOOP);
 
     @BeforeEach
     void setUp() {

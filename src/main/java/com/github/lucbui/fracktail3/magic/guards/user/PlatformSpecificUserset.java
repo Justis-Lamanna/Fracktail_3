@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.filterset.user;
+package com.github.lucbui.fracktail3.magic.guards.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;

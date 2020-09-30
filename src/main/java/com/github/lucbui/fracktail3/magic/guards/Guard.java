@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.filterset;
+package com.github.lucbui.fracktail3.magic.guards;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 /**
  * An abstract filter, or guard, to lock commands in certain contexts.
  */
-public interface Filter {
+public interface Guard {
     /**
      * Check whether a command can be used in this context.
      * @param bot The bot being ran
@@ -22,8 +22,8 @@ public interface Filter {
      * @param other The other filter
      * @return A filter representing this AND other
      */
-    default Filter and(Filter other) {
-        Filter self = this;
+    default Guard and(Guard other) {
+        Guard self = this;
         return (bot, ctx) -> BooleanUtils.and(self.matches(bot, ctx), other.matches(bot, ctx));
     }
 
@@ -32,8 +32,8 @@ public interface Filter {
      * @param other The other filter
      * @return A filter representing this OR other
      */
-    default Filter or(Filter other) {
-        Filter self = this;
+    default Guard or(Guard other) {
+        Guard self = this;
         return (bot, ctx) -> BooleanUtils.or(self.matches(bot, ctx), other.matches(bot, ctx));
     }
 
@@ -41,8 +41,8 @@ public interface Filter {
      * Creates a filter that passes when this filter fails
      * @return A filter representing !this
      */
-    default Filter not() {
-        Filter self = this;
+    default Guard not() {
+        Guard self = this;
         return (bot, ctx) -> BooleanUtils.not(self.matches(bot, ctx));
     }
 
@@ -51,7 +51,7 @@ public interface Filter {
      * @param value The value the filter should return
      * @return The created filter.
      */
-    static Filter identity(boolean value) {
+    static Guard identity(boolean value) {
         return (bot, ctx) -> Mono.just(value);
     }
 }

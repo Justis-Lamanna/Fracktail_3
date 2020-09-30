@@ -3,8 +3,8 @@ package com.github.lucbui.fracktail3;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
-import com.github.lucbui.fracktail3.magic.filterset.user.Userset;
+import com.github.lucbui.fracktail3.magic.guards.user.DiscordUserset;
+import com.github.lucbui.fracktail3.magic.guards.user.Userset;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.action.ActionOptions;
 import com.github.lucbui.fracktail3.magic.handlers.action.CommandsAction;
@@ -32,7 +32,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 .withCommand(
                     new Command.Builder("hello")
                     .withAction(new ActionOptions.Builder()
-                            .with(DiscordConfiguration.OWNER_FILTER, new RespondAction("Hello, beautiful owner."))
+                            .with(DiscordConfiguration.OWNER_GUARD, new RespondAction("Hello, beautiful owner."))
                             .with(steven.byId(), new RespondAction("Hello, stinky."))
                             .orElseDo(new RespondAction("Hello, {at_user}!")))
                 )

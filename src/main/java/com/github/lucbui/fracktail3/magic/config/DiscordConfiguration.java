@@ -3,9 +3,9 @@ package com.github.lucbui.fracktail3.magic.config;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.Localizable;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
-import com.github.lucbui.fracktail3.magic.filterset.user.DiscordUserset;
-import com.github.lucbui.fracktail3.magic.filterset.user.InUsersetFilter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
+import com.github.lucbui.fracktail3.magic.guards.user.DiscordUserset;
+import com.github.lucbui.fracktail3.magic.guards.user.InUsersetGuard;
 import com.github.lucbui.fracktail3.magic.platform.discord.DiscordEventHandler;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class DiscordConfiguration implements Config, BotCreatorAware, Localizable {
     public static final String OWNER_USERSET_ID = "owner";
-    public static final Filter OWNER_FILTER = new InUsersetFilter(OWNER_USERSET_ID);
+    public static final Guard OWNER_GUARD = new InUsersetGuard(OWNER_USERSET_ID);
 
     private final String token;
     private final String prefix;

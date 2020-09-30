@@ -1,8 +1,8 @@
-package com.github.lucbui.fracktail3.magic.filterset.user;
+package com.github.lucbui.fracktail3.magic.guards.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
 
@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * A mock "userset" which has is retrieved from the bot at runtime
  */
-public class InUsersetFilter implements Filter {
+public class InUsersetGuard implements Guard {
     private final String id;
     private final boolean defaultValue;
 
@@ -19,7 +19,7 @@ public class InUsersetFilter implements Filter {
      * Initialize UsersetById
      * @param id The ID of the Userset to retrieve
      */
-    public InUsersetFilter(String id) {
+    public InUsersetGuard(String id) {
         this.id = id;
         this.defaultValue = false;
     }
@@ -29,7 +29,7 @@ public class InUsersetFilter implements Filter {
      * @param id The ID of the Userset to retrieve
      * @param defaultValue A default value, which is returned if the named userset does not exist.
      */
-    public InUsersetFilter(String id, boolean defaultValue) {
+    public InUsersetGuard(String id, boolean defaultValue) {
         this.id = id;
         this.defaultValue = defaultValue;
     }

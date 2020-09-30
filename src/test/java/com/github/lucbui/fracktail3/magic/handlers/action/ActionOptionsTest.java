@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.filterset.Filter;
+import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ class ActionOptionsTest {
     @Mock private CommandContext commandContext;
 
     @Mock private Action firstAction;
-    @Mock private Filter firstFilter;
+    @Mock private Guard firstGuard;
 
     @Mock private Action defaultAction;
 
@@ -33,7 +33,7 @@ class ActionOptionsTest {
     @BeforeEach
     void setUp() {
         mocks = MockitoAnnotations.openMocks(this);
-        actionLeg = new ActionOption("1", firstFilter, firstAction);
+        actionLeg = new ActionOption("1", firstGuard, firstAction);
         action = new ActionOptions(Collections.singletonList(actionLeg), defaultAction);
     }
 
@@ -46,7 +46,7 @@ class ActionOptionsTest {
     void testFilterBranch_FilterMatches() {
         PublisherProbe<Void> firstProbe = PublisherProbe.empty();
         PublisherProbe<Void> defaultProbe = PublisherProbe.empty();
-        when(firstFilter.matches(any(), any())).thenReturn(Mono.just(true));
+        when(firstGuard.matches(any(), any())).thenReturn(Mono.just(true));
         when(firstAction.doAction(any(), any())).thenReturn(firstProbe.mono());
         when(defaultAction.doAction(any(), any())).thenReturn(defaultProbe.mono());
 
@@ -62,7 +62,7 @@ class ActionOptionsTest {
     void testFilterBranch_FilterDoesNotMatches() {
         PublisherProbe<Void> firstProbe = PublisherProbe.empty();
         PublisherProbe<Void> defaultProbe = PublisherProbe.empty();
-        when(firstFilter.matches(any(), any())).thenReturn(Mono.just(false));
+        when(firstGuard.matches(any(), any())).thenReturn(Mono.just(false));
         when(firstAction.doAction(any(), any())).thenReturn(firstProbe.mono());
         when(defaultAction.doAction(any(), any())).thenReturn(defaultProbe.mono());
 
@@ -79,7 +79,7 @@ class ActionOptionsTest {
         PublisherProbe<Void> firstProbe = PublisherProbe.empty();
         PublisherProbe<Void> defaultProbe = PublisherProbe.empty();
         actionLeg.setEnabled(false);
-        when(firstFilter.matches(any(), any())).thenReturn(Mono.just(true));
+        when(firstGuard.matches(any(), any())).thenReturn(Mono.just(true));
         when(firstAction.doAction(any(), any())).thenReturn(firstProbe.mono());
         when(defaultAction.doAction(any(), any())).thenReturn(defaultProbe.mono());
 
