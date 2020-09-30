@@ -1,7 +1,8 @@
 package com.github.lucbui.fracktail3.discord.config;
 
+import com.github.lucbui.fracktail3.discord.guards.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
-import com.github.lucbui.fracktail3.discord.platform.DiscordEventHandler;
+import com.github.lucbui.fracktail3.discord.platform.DiscordEventHook;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.Localizable;
@@ -29,7 +30,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
-    private final List<DiscordEventHandler> handlers;
+    private final List<DiscordEventHook<?>> handlers;
 
     /**
      * Initialize a bot Configuration
@@ -39,7 +40,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param i18nPath The path for a Localization bundle.
      * @param presence The presence this bot should have.
      */
-    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence, List<DiscordEventHandler> handlers) {
+    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence, List<DiscordEventHook<?>> handlers) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
@@ -126,6 +127,10 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
 
     @Override
     public void configure(BotCreator creator) {
+        creator .withUserset(DiscordUserset.ALL_USERS)
+                .withUserset(DiscordUserset.NO_USERS)
+                .withChannelset(DiscordChannelset.ALL_CHANNELS)
+                .withChannelset(DiscordChannelset.NO_CHANNELS);
         if(owner != null) {
             creator.withUserset(DiscordUserset.forUser(OWNER_USERSET_ID, owner));
         }
@@ -139,7 +144,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         return ResourceBundle.getBundle(i18nPath, locale);
     }
 
-    public List<DiscordEventHandler> getHandlers() {
+    public List<DiscordEventHook<?>> getHandlers() {
         return Collections.unmodifiableList(handlers);
     }
 
@@ -154,7 +159,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         private Snowflake owner;
         private StatusUpdate presence;
         private String i18nPath;
-        private List<DiscordEventHandler> handlers = new ArrayList<>();
+        private List<DiscordEventHook<?>> handlers = new ArrayList<>();
 
         public Builder(String token) {
             this.token = token;
@@ -175,7 +180,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
             return this;
         }
 
-        public Builder withHandler(DiscordEventHandler handler) {
+        public Builder withHandler(DiscordEventHook<?> handler) {
             this.handlers.add(handler);
             return this;
         }

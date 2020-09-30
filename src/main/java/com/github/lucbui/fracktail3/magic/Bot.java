@@ -2,9 +2,13 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A Bot converts the BotSpec into a working bot, via use of PlatformHandler.
@@ -13,6 +17,7 @@ import reactor.core.publisher.Mono;
  */
 public class Bot {
     private final BotSpec botSpec;
+    private final List<PlatformHandler> handlers;
 
     /**
      * Initialize the Bot with specific PlatformHandlers.
@@ -20,6 +25,9 @@ public class Bot {
      */
     public Bot(BotSpec botSpec) {
         this.botSpec = botSpec;
+        this.handlers = botSpec.getPlatforms().stream()
+                .map(Platform::platformHandler)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -39,8 +47,7 @@ public class Bot {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
-        return Flux.fromIterable(botSpec.getPlatforms())
-                .map(Platform::platformHandler)
+        return Flux.fromIterable(handlers)
                 .flatMap(handler -> handler.start(this))
                 .then().thenReturn(true);
     }
@@ -54,8 +61,7 @@ public class Bot {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
-        return Flux.fromIterable(botSpec.getPlatforms())
-                .map(Platform::platformHandler)
+        return Flux.fromIterable(handlers)
                 .flatMap(handler -> handler.stop(this))
                 .then().thenReturn(true);
     }

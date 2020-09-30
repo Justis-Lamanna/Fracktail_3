@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * Default handler which executes all sub-handlers
  */
-public class DefaultDiscordOnEventHandler extends IdStore<DiscordEventHandler> implements DiscordOnEventHandler {
+public class DefaultDiscordOnEventHandler extends IdStore<DiscordEventHook<?>> implements DiscordOnEventHandler {
     /**
      * Initialize this handler
      * @param handlers The sub-handlers to use
      */
-    public DefaultDiscordOnEventHandler(List<DiscordEventHandler> handlers) {
+    public DefaultDiscordOnEventHandler(List<DiscordEventHook<?>> handlers) {
         super(handlers);
     }
 
@@ -25,8 +25,8 @@ public class DefaultDiscordOnEventHandler extends IdStore<DiscordEventHandler> i
     public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, Event event) {
         DiscordEventContext ctx = new DiscordEventContext(configuration, event);
         return Flux.fromIterable(getAll())
-                .filterWhen(h -> h.passesGuard(event))
-                .flatMap(h -> h.handleEvent(bot, ctx))
+                .filterWhen(h -> h.passesGuard(bot, ctx))
+                .flatMap(h -> h.doAction(bot, ctx))
                 .then();
     }
 }
