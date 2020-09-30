@@ -5,7 +5,7 @@ import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
 import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guards.user.Userset;
 import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
-import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
+import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 
 import java.util.*;
@@ -25,13 +25,13 @@ public class BotSpec {
     private final Map<String, Platform<?>> platforms;
     private final Channelsets channelsets;
     private final Usersets usersets;
-    private final BehaviorList behaviorList;
+    private final CommandList commandList;
 
-    public BotSpec(List<Platform<?>> platforms, Channelsets channelsets, Usersets usersets, BehaviorList behaviorList) {
+    public BotSpec(List<Platform<?>> platforms, Channelsets channelsets, Usersets usersets, CommandList commandList) {
         this.platforms = platforms.stream().collect(Collectors.toMap(Id::getId, Function.identity()));
         this.channelsets = channelsets;
         this.usersets = usersets;
-        this.behaviorList = behaviorList;
+        this.commandList = commandList;
     }
 
     /**
@@ -92,8 +92,8 @@ public class BotSpec {
      * Get the list of Commands this bot performs.
      * @return The list of Commands this bot performs.
      */
-    public BehaviorList getBehaviorList() {
-        return behaviorList;
+    public CommandList getCommandList() {
+        return commandList;
     }
 
     /**
@@ -103,6 +103,6 @@ public class BotSpec {
     public void validate() throws BotConfigurationException {
         Validated.validate(usersets, this);
         Validated.validate(channelsets, this);
-        behaviorList.validate(this);
+        commandList.validate(this);
     }
 }

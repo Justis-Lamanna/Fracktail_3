@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.handlers.command;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
-import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
@@ -29,7 +28,6 @@ class HelpCommandTest {
 
     @Mock private Bot bot;
     @Mock private BotSpec spec;
-    @Mock private BehaviorList behaviorList;
     @Mock private CommandList commandList;
 
     private Command command;
@@ -43,8 +41,7 @@ class HelpCommandTest {
         command = new Command("help", new HelpAction());
         mocks = MockitoAnnotations.openMocks(this);
         when(bot.getSpec()).thenReturn(spec);
-        when(spec.getBehaviorList()).thenReturn(behaviorList);
-        when(behaviorList.getCommandList()).thenReturn(commandList);
+        when(spec.getCommandList()).thenReturn(commandList);
         when(context.getCommand()).thenReturn(command);
         when(context.getExtendedVariableMap()).thenReturn(Mono.just(Collections.emptyMap()));
         when(context.respond(anyString())).thenReturn(Mono.just(true));

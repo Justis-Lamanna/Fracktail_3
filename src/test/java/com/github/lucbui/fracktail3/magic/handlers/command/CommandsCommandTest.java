@@ -50,7 +50,7 @@ class CommandsCommandTest {
         c2 = new Command("two", two, Action.NOOP);
 
         when(bot.getSpec()).thenReturn(spec);
-        when(spec.getBehaviorList()).thenReturn(behaviorList);
+        when(spec.getCommandList()).thenReturn(commandList);
         when(behaviorList.getCommandList()).thenReturn(commandList);
         when(commandList.getCommands()).thenReturn(Arrays.asList(c1, c2));
     }

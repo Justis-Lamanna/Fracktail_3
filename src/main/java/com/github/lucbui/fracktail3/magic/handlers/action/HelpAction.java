@@ -25,7 +25,7 @@ public class HelpAction implements Action {
         return context.getNormalizedParameter(0)
                 .map(commandToLookup -> {
                     context.setResult("command", commandToLookup);
-                    return Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
+                    return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
                                     .filter(c -> c.getNames().contains(commandToLookup))
                                     .filterWhen(c -> c.passesFilter(bot, context))
                                     .next()

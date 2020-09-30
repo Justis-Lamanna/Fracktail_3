@@ -36,7 +36,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
         BotSpec botSpec = bot.getSpec();
         DiscordConfiguration configuration = platform.getConfig();
 
-        DiscordCommandHandler discordCommandHandler = new DefaultDiscordCommandHandler(botSpec.getBehaviorList().getCommandList());
+        DiscordCommandHandler discordCommandHandler = new DefaultDiscordCommandHandler(botSpec.getCommandList());
         DiscordOnEventHandler discordEventHandler = new DefaultDiscordOnEventHandler(configuration.getHandlers());
 
         DiscordClient discordClient =

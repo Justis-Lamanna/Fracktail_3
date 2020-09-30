@@ -35,7 +35,7 @@ public class CommandsAction implements Action {
                         .map(DiscordContext::getConfiguration)
                         .map(DiscordConfiguration::getPrefix):
                 Optional.empty();
-        return Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
+        return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
                 .filterWhen(c -> c.passesFilter(bot, context))
                 .flatMap(c -> Flux.fromIterable(c.getNames()))
                 .distinct()

@@ -5,7 +5,6 @@ import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
 import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guards.user.Userset;
 import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
-import com.github.lucbui.fracktail3.magic.handlers.BehaviorList;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
@@ -107,12 +106,11 @@ public class BotCreator implements IBuilder<Bot> {
      */
     @Override
     public Bot build() throws BotConfigurationException {
-        CommandList commandList = new CommandList(commands, orElse);
         BotSpec spec = new BotSpec(
                 platforms,
                 new Channelsets(channelsets),
                 new Usersets(usersets),
-                new BehaviorList(commandList));
+                new CommandList(commands, orElse));
 
         //Awareness checks
         platforms.forEach(this::callIfBotCreatorAware);
