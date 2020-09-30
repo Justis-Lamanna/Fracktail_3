@@ -37,15 +37,13 @@ public class DiscordContext extends CommandContext {
 
     /**
      * Initialize the context with basic values
-     * @param platform The platform object
      * @param config The discord-related configuration of the bot
      * @param event The event which triggered the command usage
      */
     public DiscordContext(
-            DiscordPlatform platform,
             DiscordConfiguration config,
             MessageCreateEvent event) {
-        super(platform, config, event.getMessage().getContent());
+        super(config, event.getMessage().getContent());
         this.config = config;
         this.event = event;
     }
@@ -56,6 +54,11 @@ public class DiscordContext extends CommandContext {
      */
     public MessageCreateEvent getEvent() {
         return event;
+    }
+
+    @Override
+    public DiscordConfiguration getConfiguration() {
+        return config;
     }
 
     /**

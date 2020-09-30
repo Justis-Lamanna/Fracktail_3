@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.filterset.channel;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
+import org.apache.commons.lang3.ClassUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -11,22 +11,22 @@ import reactor.core.publisher.Mono;
  * @param <C> The context type
  */
 public abstract class PlatformSpecificChannelset<C extends CommandContext> extends Channelset {
-    private final Platform<?> platform;
+    private final Class<C> clazz;
 
     /**
      * Default constructor, using no negation or extension
-     * @param name The name of the userset
-     * @param platform The platform of the userset
+     * @param name The name of the channelset
+     * @param clazz The type of the channelset
      */
-    public PlatformSpecificChannelset(String name, Platform<?> platform) {
+    public PlatformSpecificChannelset(String name, Class<C> clazz) {
         super(name);
-        this.platform = platform;
+        this.clazz = clazz;
     }
 
     @Override
     public Mono<Boolean> matches(Bot bot, CommandContext context) {
-        if(context.forPlatform(platform)) {
-            return matchesForPlatform(bot, (C)context);
+        if(ClassUtils.isAssignable(context.getClass(), clazz)) {
+            return matchesForPlatform(bot, clazz.cast(context));
         }
         return Mono.just(false);
     }

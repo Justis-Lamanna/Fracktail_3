@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.platform.discord;
 import com.github.lucbui.fracktail3.magic.Bot;
 import discord4j.core.event.domain.Event;
 import org.apache.commons.lang3.ClassUtils;
+import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -21,8 +22,9 @@ public abstract class DiscordSpecificEventHandler<E extends Event> implements Di
     }
 
     @Override
-    public boolean canHandleEvent(Event event) {
-        return ClassUtils.isAssignable(event.getClass(), eventType);
+    public Mono<Boolean> passesGuard(Event event) {
+        boolean matchesEvent = ClassUtils.isAssignable(event.getClass(), eventType);
+        return BooleanUtils.and(Mono.just(matchesEvent), passesSpecificGuard(eventType.cast(event)));
     }
 
     @Override
@@ -38,4 +40,6 @@ public abstract class DiscordSpecificEventHandler<E extends Event> implements Di
      * @return Asynchronous indication of completion
      */
     public abstract Mono<Void> handleSpecificEvent(Bot bot, DiscordEventContext context, E event);
+
+    public abstract Mono<Boolean> passesSpecificGuard(E event);
 }

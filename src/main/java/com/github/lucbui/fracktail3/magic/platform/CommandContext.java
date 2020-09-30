@@ -5,7 +5,6 @@ import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -20,7 +19,6 @@ public abstract class CommandContext {
     public static final String PARAM_PREFIX = "param_";
     public static final String RESULT_PREFIX = "result_";
 
-    protected final Platform<?> platform;
     protected final Config config;
     protected final String contents;
     protected final Map<String, Object> vars = new HashMap<>();
@@ -30,8 +28,7 @@ public abstract class CommandContext {
     protected String parameters;
     protected String[] normalizedParameters;
 
-    public CommandContext(Platform<?> platform, Config config, String contents) {
-        this.platform = platform;
+    public CommandContext(Config config, String contents) {
         this.config = config;
         this.contents = contents;
     }
@@ -163,23 +160,6 @@ public abstract class CommandContext {
      */
     public void setResult(String key, Object value) {
         vars.put(key, value);
-    }
-
-    /**
-     * Get the platform this command originated from.
-     * @return The platform
-     */
-    public Platform<?> getPlatform() {
-        return platform;
-    }
-
-    /**
-     * Test if this command matches the provided platform
-     * @param testPlatform The platform to test
-     * @return True, if the platform matches this one
-     */
-    public boolean forPlatform(Platform<?> testPlatform) {
-        return StringUtils.equals(platform.getId(), testPlatform.getId());
     }
 
     /**

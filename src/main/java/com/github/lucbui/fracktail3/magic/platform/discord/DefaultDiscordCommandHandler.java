@@ -27,27 +27,24 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
     private static final Pattern SPACE_NOT_QUOTES = Pattern.compile("([^\"]\\S*|\".+?(?<!\\\\)\")\\s*");
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
 
-    private final DiscordPlatform platform;
     private final CommandList commandList;
     private final DiscordLocaleResolver discordLocaleResolver;
     private final PreDiscordExecutionHandler preExecutionHandler;
     private final PostDiscordExecutionHandler postExecutionHandler;
 
     public DefaultDiscordCommandHandler(
-            DiscordPlatform platform,
             CommandList commandList,
             DiscordLocaleResolver discordLocaleResolver,
             PreDiscordExecutionHandler preExecutionHandler,
             PostDiscordExecutionHandler postExecutionHandler) {
-        this.platform = platform;
         this.commandList = commandList;
         this.discordLocaleResolver = discordLocaleResolver;
         this.preExecutionHandler = preExecutionHandler;
         this.postExecutionHandler = postExecutionHandler;
     }
 
-    public DefaultDiscordCommandHandler(DiscordPlatform platform, CommandList commandList) {
-        this(platform, commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
+    public DefaultDiscordCommandHandler(CommandList commandList) {
+        this(commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
     }
 
     public CommandList getCommandList() {
@@ -73,7 +70,7 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
         }
         return Mono.justOrEmpty(event.getMessage().getContent())
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .map(msg -> new DiscordContext(platform, configuration, event))
+                .map(msg -> new DiscordContext(configuration, event))
                 .zipWith(discordLocaleResolver.getLocale(event), (ctx, locale) -> {
                     ctx.setLocale(locale);
                     return ctx;

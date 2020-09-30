@@ -1,9 +1,10 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
+import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,8 +30,10 @@ public class CommandsAction implements Action {
 
     @Override
     public Mono<Void> doAction(Bot bot, CommandContext context) {
-        Optional<String> prefixOpt = context.getPlatform() instanceof DiscordPlatform ?
-                Optional.ofNullable(((DiscordPlatform)context.getPlatform()).getConfig().getPrefix()) :
+        Optional<String> prefixOpt = context instanceof DiscordContext ?
+                Optional.of((DiscordContext)context)
+                        .map(DiscordContext::getConfiguration)
+                        .map(DiscordConfiguration::getPrefix):
                 Optional.empty();
         return Flux.fromIterable(bot.getSpec().getBehaviorList().getCommandList().getCommands())
                 .filterWhen(c -> c.passesFilter(bot, context))
