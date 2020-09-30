@@ -1,12 +1,13 @@
-package com.github.lucbui.fracktail3.magic.config;
+package com.github.lucbui.fracktail3.discord.config;
 
+import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.platform.DiscordEventHandler;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.Localizable;
+import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
-import com.github.lucbui.fracktail3.magic.guards.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.guards.user.InUsersetGuard;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordEventHandler;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;

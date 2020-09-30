@@ -1,7 +1,8 @@
-package com.github.lucbui.fracktail3.magic.guards.user;
+package com.github.lucbui.fracktail3.discord.guards;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordContext;
+import com.github.lucbui.fracktail3.magic.guards.user.PlatformSpecificUserset;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;

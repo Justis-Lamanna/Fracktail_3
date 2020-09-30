@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3;
 
-import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
+import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;

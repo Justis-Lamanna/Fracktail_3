@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.platform.discord;
+package com.github.lucbui.fracktail3.discord.platform;
 
 import reactor.core.publisher.Mono;
 

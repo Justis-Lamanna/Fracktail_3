@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.utils;
+package com.github.lucbui.fracktail3.discord.utils;
 
 /**
  * Utility class for formatting text

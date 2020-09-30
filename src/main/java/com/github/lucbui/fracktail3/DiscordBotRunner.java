@@ -1,16 +1,16 @@
 package com.github.lucbui.fracktail3;
 
+import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
-import com.github.lucbui.fracktail3.magic.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.guards.user.DiscordUserset;
 import com.github.lucbui.fracktail3.magic.guards.user.Userset;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.action.ActionOptions;
 import com.github.lucbui.fracktail3.magic.handlers.action.CommandsAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.HelpAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
-import com.github.lucbui.fracktail3.magic.platform.discord.DiscordPlatform;
 import discord4j.common.util.Snowflake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

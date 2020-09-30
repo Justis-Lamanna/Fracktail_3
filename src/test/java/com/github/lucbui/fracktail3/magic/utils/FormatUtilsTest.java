@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.utils;
 
+import com.github.lucbui.fracktail3.discord.utils.FormatUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
