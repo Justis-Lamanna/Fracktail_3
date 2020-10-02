@@ -21,14 +21,16 @@ import java.util.Set;
  */
 public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
     /**
-     * Userset that matches every user
+     * Userset that matches every user.
+     * Note that this userset is automatically included, if DiscordConfigurationBuilder is used.
      */
-    public static final DiscordUserset ALL_USERS = new DiscordUserset("discord_all", null, null);
+    public static final DiscordUserset ALL_USERS = new DiscordUserset("all", null, null);
 
     /**
      * Userset that matches no user
+     * Note that this userset is automatically included, if DiscordConfigurationBuilder is used.
      */
-    public static final DiscordUserset NO_USERS = new DiscordUserset("discord_none", Collections.emptySet(), Collections.emptySet());
+    public static final DiscordUserset NO_USERS = new DiscordUserset("none", Collections.emptySet(), Collections.emptySet());
 
     private final Set<Snowflake> userSnowflakes;
     private final Set<Snowflake> roleSnowflakes;

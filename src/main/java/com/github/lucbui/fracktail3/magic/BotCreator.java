@@ -16,17 +16,27 @@ import java.util.List;
  * Platforms, Configs, Usersets, Commands, and Actions that implement BotCreatorAware are called at the build stage.
  */
 public class BotCreator implements IBuilder<Bot> {
-    private final List<Platform<?>> platforms = new ArrayList<>();
+    private final List<Platform> platforms = new ArrayList<>();
     private final List<Command> commands = new ArrayList<>();
     private Action orElse = Action.NOOP;
 
     /**
-     * Add a configuration for a specific platform
+     * Add a platform to this bot
      * @param platform The platform to add
      * @return This creator
      */
-    public BotCreator withPlatform(Platform<?> platform) {
+    public BotCreator withPlatform(Platform platform) {
         platforms.add(platform);
+        return this;
+    }
+
+    /**
+     * Add multiple platforms to this bot
+     * @param newPlatforms The platforms to add
+     * @return This creator
+     */
+    public BotCreator withPlatform(List<Platform> newPlatforms) {
+        platforms.addAll(newPlatforms);
         return this;
     }
 
@@ -37,6 +47,16 @@ public class BotCreator implements IBuilder<Bot> {
      */
     public BotCreator withCommand(Command command) {
         commands.add(command);
+        return this;
+    }
+
+    /**
+     * Add multiple commands to this bot
+     * @param newCmds The commands to add
+     * @return This creator
+     */
+    public BotCreator withCommands(List<Command> newCmds) {
+        commands.addAll(newCmds);
         return this;
     }
 
@@ -83,8 +103,6 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     private void callIfBotCreatorAware(Object obj) {
-        if(obj instanceof BotCreatorAware) {
-            ((BotCreatorAware) obj).configure(this);
-        }
+        BotCreatorAware.configure(obj, this);
     }
 }

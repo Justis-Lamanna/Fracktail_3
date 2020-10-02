@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
  * @see Bot
  */
 public class BotSpec {
-    private final Map<String, Platform<?>> platforms;
+    private final Map<String, Platform> platforms;
     private final CommandList commandList;
 
-    public BotSpec(List<Platform<?>> platforms, CommandList commandList) {
+    public BotSpec(List<Platform> platforms, CommandList commandList) {
         this.platforms = platforms.stream().collect(Collectors.toMap(Id::getId, Function.identity()));
         this.commandList = commandList;
     }
@@ -30,7 +30,7 @@ public class BotSpec {
      * Get the platforms supported
      * @return The supported platforms
      */
-    public Set<Platform<?>> getPlatforms() {
+    public Set<Platform> getPlatforms() {
         return new HashSet<>(platforms.values());
     }
 
@@ -39,7 +39,7 @@ public class BotSpec {
      * @param id The ID of the platform
      * @return The platform, or empty if none match
      */
-    public Optional<Platform<?>> getPlatform(String id) {
+    public Optional<Platform> getPlatform(String id) {
         return Optional.ofNullable(platforms.get(id));
     }
 

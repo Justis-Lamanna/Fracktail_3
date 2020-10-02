@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
-import com.github.lucbui.fracktail3.discord.platform.DiscordEventContext;
+import com.github.lucbui.fracktail3.discord.hook.DiscordEventContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import discord4j.core.event.domain.Event;
 import reactor.bool.BooleanUtils;

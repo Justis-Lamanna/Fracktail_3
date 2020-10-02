@@ -7,7 +7,7 @@ import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 /**
  * A singleton which represents the Discord platform
  */
-public class DiscordPlatform implements Platform<DiscordConfiguration> {
+public class DiscordPlatform implements Platform {
     private final DiscordConfiguration configuration;
 
     /**

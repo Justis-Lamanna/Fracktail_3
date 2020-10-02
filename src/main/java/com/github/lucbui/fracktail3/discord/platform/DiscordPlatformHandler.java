@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
+import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;

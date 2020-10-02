@@ -21,6 +21,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Default behavior to use when a message occurs
+ */
 public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDiscordCommandHandler.class);
 
@@ -28,13 +31,20 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
 
     private final CommandList commandList;
-    private final DiscordLocaleResolver discordLocaleResolver;
+    private final DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver;
     private final PreDiscordExecutionHandler preExecutionHandler;
     private final PostDiscordExecutionHandler postExecutionHandler;
 
+    /**
+     * Initialize this handler
+     * @param commandList The command list to use
+     * @param discordLocaleResolver The function to resolve the locale of a message
+     * @param preExecutionHandler Code to execute before execution of a command
+     * @param postExecutionHandler Code to execute after execution of a command
+     */
     public DefaultDiscordCommandHandler(
             CommandList commandList,
-            DiscordLocaleResolver discordLocaleResolver,
+            DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver,
             PreDiscordExecutionHandler preExecutionHandler,
             PostDiscordExecutionHandler postExecutionHandler) {
         this.commandList = commandList;
@@ -43,6 +53,11 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
         this.postExecutionHandler = postExecutionHandler;
     }
 
+    /**
+     * Initialize this handler
+     * Default resolvers and handlers are used
+     * @param commandList The command list to use
+     */
     public DefaultDiscordCommandHandler(CommandList commandList) {
         this(commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
     }
@@ -51,7 +66,7 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
         return commandList;
     }
 
-    public DiscordLocaleResolver getDiscordLocaleResolver() {
+    public DiscordLocaleResolver<MessageCreateEvent> getDiscordLocaleResolver() {
         return discordLocaleResolver;
     }
 

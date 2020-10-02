@@ -9,4 +9,15 @@ public interface BotCreatorAware {
      * @param creator The creator currently being used.
      */
     void configure(BotCreator creator);
+
+    /**
+     * Perform additional configurations on the BotCreator, if it implements this interface
+     * @param obj The object to validate
+     * @param creator The creator currently being used.
+     */
+    static void configure(Object obj, BotCreator creator) {
+        if(obj instanceof BotCreatorAware) {
+            ((BotCreatorAware) obj).configure(creator);
+        }
+    }
 }

@@ -9,7 +9,7 @@ import java.util.Locale;
 /**
  * Resolver which extracts the locale from the message's guild
  */
-public class LocaleFromGuildResolver implements DiscordLocaleResolver {
+public class LocaleFromGuildResolver implements DiscordLocaleResolver<MessageCreateEvent> {
     private final Locale defaultLocale;
 
     /**

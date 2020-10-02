@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.discord.platform;
+package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import discord4j.core.event.domain.Event;
