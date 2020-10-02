@@ -1,21 +1,21 @@
 package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import discord4j.core.event.domain.Event;
+import com.github.lucbui.fracktail3.discord.event.DiscordSupportedEvent;
 
 /**
  * A context which contains information about the occured event
  */
 public class DiscordEventContext {
     protected final DiscordConfiguration config;
-    protected final Event event;
+    protected final DiscordSupportedEvent event;
 
     /**
      * Initialize this context
      * @param config The configuration of this platform
      * @param event The event which occured
      */
-    public DiscordEventContext(DiscordConfiguration config, Event event) {
+    public DiscordEventContext(DiscordConfiguration config, DiscordSupportedEvent event) {
         this.config = config;
         this.event = event;
     }
@@ -32,7 +32,7 @@ public class DiscordEventContext {
      * Get the event
      * @return The event processed
      */
-    public Event getEvent() {
+    public DiscordSupportedEvent getEvent() {
         return event;
     }
 }

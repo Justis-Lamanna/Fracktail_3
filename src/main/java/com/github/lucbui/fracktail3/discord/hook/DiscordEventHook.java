@@ -5,44 +5,30 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
-import discord4j.core.event.domain.Event;
-import org.apache.commons.lang3.ClassUtils;
 import reactor.core.publisher.Mono;
 
 /**
  * A hook that activates when a certain type of event is emitted
- * @param <E> The type of event.
  */
-public class DiscordEventHook<E extends Event> implements Id, Disableable {
-    private final Class<E> type;
+public class DiscordEventHook implements Id, Disableable {
     private final String id;
-    private final DiscordEventHookGuard<? super E> guard;
-    private final DiscordEventHandler<? super E> handler;
+    private final DiscordEventHookGuard guard;
+    private final DiscordEventHandler handler;
 
     private boolean enabled;
 
     /**
      * Create an event hook
-     * @param type The type of event to accept.
      * @param id The ID of this hook
      * @param enabled If false, the hook is disabled and does not activate
      * @param guard If resolves as false, the hook is not activated
      * @param handler The code to execute when invoked
      */
-    public DiscordEventHook(Class<E> type, String id, boolean enabled, DiscordEventHookGuard<? super E> guard, DiscordEventHandler<? super E> handler) {
-        this.type = type;
+    public DiscordEventHook(String id, boolean enabled, DiscordEventHookGuard guard, DiscordEventHandler handler) {
         this.id = id;
         this.guard = guard;
         this.handler = handler;
         this.enabled = enabled;
-    }
-
-    /**
-     * Get the type of event accepted
-     * @return The type of event accepted
-     */
-    public Class<E> getType() {
-        return type;
     }
 
     @Override
@@ -54,7 +40,7 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
      * Get the guard to use
      * @return The guard to use
      */
-    public DiscordEventHookGuard<? super E> getGuard() {
+    public DiscordEventHookGuard getGuard() {
         return guard;
     }
 
@@ -62,7 +48,7 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
      * Get the handler to invoke
      * @return The handler to invoke
      */
-    public DiscordEventHandler<? super E> getHandler() {
+    public DiscordEventHandler getHandler() {
         return handler;
     }
 
@@ -73,11 +59,10 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
      * @return Asynchronous boolean, true if passes
      */
     public Mono<Boolean> passesGuard(Bot bot, DiscordEventContext ctx) {
-        boolean enabledAndCorrectType = enabled && ClassUtils.isAssignable(ctx.getEvent().getClass(), type);
-        if(!enabledAndCorrectType) {
+        if(!enabled) {
             return Mono.just(false);
         }
-        return getGuard().matches(bot, ctx, type.cast(ctx.getEvent()));
+        return getGuard().matches(bot, ctx);
     }
 
     /**
@@ -87,7 +72,7 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
      * @return Asynchronous indication of completion
      */
     public Mono<Void> doAction(Bot bot, DiscordEventContext ctx) {
-        return getHandler().handleEvent(bot, ctx, type.cast(ctx.getEvent()));
+        return getHandler().handleEvent(bot, ctx);
     }
 
     @Override
@@ -102,23 +87,19 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
 
     /**
      * Builder which can be used to create an Event Hook
-     * @param <E>
      */
-    public static class Builder<E extends Event> implements IBuilder<DiscordEventHook<E>> {
-        private final Class<E> type;
+    public static class Builder implements IBuilder<DiscordEventHook> {
         private final String id;
-        private DiscordEventHookGuard<? super E> guard = DiscordEventHookGuard.identity(true);
-        private DiscordEventHandler<? super E> handler = DiscordEventHandler.noop();
+        private DiscordEventHookGuard guard = DiscordEventHookGuard.identity(true);
+        private DiscordEventHandler handler = DiscordEventHandler.noop();
         private boolean enabled = true;
 
         /**
          * Initialize this builder
          * @param id The ID to use
-         * @param type The type of event to accept
          */
-        public Builder(String id, Class<E> type) {
+        public Builder(String id) {
             this.id = id;
-            this.type = type;
         }
 
         /**
@@ -126,7 +107,7 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
          * @param guard The guard to use
          * @return This builder
          */
-        public Builder<E> setGuard(DiscordEventHookGuard<? super E> guard) {
+        public Builder setGuard(DiscordEventHookGuard guard) {
             this.guard = guard;
             return this;
         }
@@ -136,7 +117,7 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
          * @param handler The handler to use
          * @return This builder
          */
-        public Builder<E> setHandler(DiscordEventHandler<? super E> handler) {
+        public Builder setHandler(DiscordEventHandler handler) {
             this.handler = handler;
             return this;
         }
@@ -146,14 +127,14 @@ public class DiscordEventHook<E extends Event> implements Id, Disableable {
          * @param enabled True, if enabled
          * @return This builder
          */
-        public Builder<E> isEnabled(boolean enabled) {
+        public Builder isEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
         @Override
-        public DiscordEventHook<E> build() {
-            return new DiscordEventHook<>(type, id, enabled, guard, handler);
+        public DiscordEventHook build() {
+            return new DiscordEventHook(id, enabled, guard, handler);
         }
     }
 }
