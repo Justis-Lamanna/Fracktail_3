@@ -3,12 +3,12 @@ package com.github.lucbui.fracktail3.discord.config;
 import com.github.lucbui.fracktail3.discord.guards.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordEventHook;
-import com.github.lucbui.fracktail3.magic.BotCreator;
-import com.github.lucbui.fracktail3.magic.BotCreatorAware;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
+import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guards.user.InUsersetGuard;
+import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * Subclass of a Configuration for a Discord bot.
  */
-public class DiscordConfiguration implements Config, BotCreatorAware, Localizable {
+public class DiscordConfiguration implements Config, Localizable {
     public static final String OWNER_USERSET_ID = "owner";
     public static final Guard OWNER_GUARD = new InUsersetGuard(OWNER_USERSET_ID);
 
@@ -31,6 +31,8 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
     private final StatusUpdate presence;
     private final String i18nPath;
     private final List<DiscordEventHook<?>> handlers;
+    private final Usersets<DiscordUserset> usersets;
+    private final Channelsets<DiscordChannelset> channelsets;
 
     /**
      * Initialize a bot Configuration
@@ -40,13 +42,18 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param i18nPath The path for a Localization bundle.
      * @param presence The presence this bot should have.
      */
-    public DiscordConfiguration(String token, String prefix, @Nullable Snowflake owner, String i18nPath, StatusUpdate presence, List<DiscordEventHook<?>> handlers) {
+    public DiscordConfiguration(
+            String token, String prefix, @Nullable Snowflake owner, String i18nPath,
+            StatusUpdate presence, List<DiscordEventHook<?>> handlers,
+            Usersets<DiscordUserset> usersets, Channelsets<DiscordChannelset> channelsets) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
         this.handlers = handlers;
+        this.usersets = usersets;
+        this.channelsets = channelsets;
     }
 
     /**
@@ -56,7 +63,7 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence, Collections.emptyList());
+        this(token, prefix, null, null, presence, Collections.emptyList(), Usersets.empty(), Channelsets.empty());
     }
 
     /**
@@ -125,16 +132,16 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         return getI18nPath().map(path -> ResourceBundle.getBundle(path, locale));
     }
 
-    @Override
-    public void configure(BotCreator creator) {
-        creator .withUserset(DiscordUserset.ALL_USERS)
-                .withUserset(DiscordUserset.NO_USERS)
-                .withChannelset(DiscordChannelset.ALL_CHANNELS)
-                .withChannelset(DiscordChannelset.NO_CHANNELS);
-        if(owner != null) {
-            creator.withUserset(DiscordUserset.forUser(OWNER_USERSET_ID, owner));
-        }
-    }
+//    @Override
+//    public void configure(BotCreator creator) {
+//        creator .withUserset(DiscordUserset.ALL_USERS)
+//                .withUserset(DiscordUserset.NO_USERS)
+//                .withChannelset(DiscordChannelset.ALL_CHANNELS)
+//                .withChannelset(DiscordChannelset.NO_CHANNELS);
+//        if(owner != null) {
+//            creator.withUserset(DiscordUserset.forUser(OWNER_USERSET_ID, owner));
+//        }
+//    }
 
     @Override
     public ResourceBundle getBundle(Locale locale) {
@@ -153,13 +160,25 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
         return i18nPath != null;
     }
 
+    @Override
+    public Optional<DiscordUserset> getUserset(String id) {
+        return usersets.getById(id);
+    }
+
+    @Override
+    public Optional<DiscordChannelset> getChannelset(String id) {
+        return channelsets.getById(id);
+    }
+
     public static class Builder implements IBuilder<DiscordConfiguration> {
         private final String token;
         private String prefix;
         private Snowflake owner;
         private StatusUpdate presence;
         private String i18nPath;
-        private List<DiscordEventHook<?>> handlers = new ArrayList<>();
+        private final List<DiscordEventHook<?>> handlers = new ArrayList<>();
+        private final List<DiscordUserset> usersets = new ArrayList<>();
+        private final List<DiscordChannelset> channelsets = new ArrayList<>();
 
         public Builder(String token) {
             this.token = token;
@@ -175,6 +194,11 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
             return this;
         }
 
+        public Builder withOwner(long owner) {
+            this.owner = Snowflake.of(owner);
+            return this;
+        }
+
         public Builder withPresence(StatusUpdate presence) {
             this.presence = presence;
             return this;
@@ -185,15 +209,32 @@ public class DiscordConfiguration implements Config, BotCreatorAware, Localizabl
             return this;
         }
 
+        public Builder withUserset(DiscordUserset userset) {
+            this.usersets.add(userset);
+            return this;
+        }
+
+        public Builder withChannelset(DiscordChannelset channelset) {
+            this.channelsets.add(channelset);
+            return this;
+        }
+
         @Override
         public DiscordConfiguration build() {
+            if(owner != null) {
+                usersets.add(DiscordUserset.forUser("owner", owner));
+            }
+            usersets.add(DiscordUserset.ALL_USERS);
+            usersets.add(DiscordUserset.NO_USERS);
             return new DiscordConfiguration(
                     token,
                     ObjectUtils.defaultIfNull(prefix, ""),
                     owner,
                     i18nPath,
                     ObjectUtils.defaultIfNull(presence, Presence.online()),
-                    handlers);
+                    handlers,
+                    new Usersets<>(usersets),
+                    new Channelsets<>(channelsets));
         }
     }
 }

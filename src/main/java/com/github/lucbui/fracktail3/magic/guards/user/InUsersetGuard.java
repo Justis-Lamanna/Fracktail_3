@@ -1,12 +1,9 @@
 package com.github.lucbui.fracktail3.magic.guards.user;
 
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.platform.CommandContext;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 /**
  * A mock "userset" which has is retrieved from the bot at runtime
@@ -34,13 +31,9 @@ public class InUsersetGuard implements Guard {
         this.defaultValue = defaultValue;
     }
 
-    private Optional<Userset> retrieve(BotSpec spec) {
-        return spec.getUserset(id);
-    }
-
     @Override
     public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
-        return retrieve(bot.getSpec())
+        return ctx.getConfiguration().getUserset(id)
                 .map(value -> Mono.just(value).flatMap(u -> u.matches(bot, ctx)))
                 .orElseGet(() -> Mono.just(defaultValue));
     }

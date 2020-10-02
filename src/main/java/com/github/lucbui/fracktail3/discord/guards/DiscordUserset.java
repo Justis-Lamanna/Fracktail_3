@@ -59,6 +59,16 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
     }
 
     /**
+     * Factory method to create a userset for one user
+     * @param name The name of the userset
+     * @param user The user to allow
+     * @return The created userset.
+     */
+    public static DiscordUserset forUser(String name, long user) {
+        return new DiscordUserset(name, Collections.singleton(Snowflake.of(user)), null);
+    }
+
+    /**
      * Get the list of valid user snowflakes.
      * If this is null, all users are valid.
      * @return The set of user snowflakes.

@@ -20,9 +20,7 @@ public class EventHookByUsersetId implements DiscordEventHookGuard<Event>{
 
     @Override
     public Mono<Boolean> matches(Bot bot, DiscordEventContext ctx, Event event) {
-        return Mono.justOrEmpty(bot.getSpec().getUserset(id))
-                .filter(us -> us instanceof DiscordUserset)
-                .cast(DiscordUserset.class)
+        return Mono.justOrEmpty(ctx.getConfig().getUserset(id))
                 .flatMap(du -> du.matchesForEvent(event))
                 .defaultIfEmpty(_default);
     }

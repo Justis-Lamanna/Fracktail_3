@@ -1,12 +1,13 @@
 package com.github.lucbui.fracktail3.magic.platform;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.Id;
 import reactor.core.publisher.Mono;
 
 /**
  * Encapsulates how a platform should start and stop the bot.
  */
-public interface PlatformHandler {
+public interface PlatformHandler extends Id {
     /**
      * Asynchronously start the bot
      * @param bot The bot to start

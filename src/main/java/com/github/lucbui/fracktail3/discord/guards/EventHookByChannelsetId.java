@@ -20,9 +20,7 @@ public class EventHookByChannelsetId implements DiscordEventHookGuard<Event>{
 
     @Override
     public Mono<Boolean> matches(Bot bot, DiscordEventContext ctx, Event event) {
-        return Mono.justOrEmpty(bot.getSpec().getChannelset(id))
-                .filter(us -> us instanceof DiscordChannelset)
-                .cast(DiscordChannelset.class)
+        return Mono.justOrEmpty(ctx.getConfig().getChannelset(id))
                 .flatMap(du -> du.matchesForEvent(event))
                 .defaultIfEmpty(_default);
     }

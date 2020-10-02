@@ -21,7 +21,7 @@ public class InChannelsetGuard implements Guard {
 
     @Override
     public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
-        return bot.getSpec().getChannelset(id)
+        return ctx.getConfiguration().getChannelset(id)
                 .map(cs -> cs.matches(bot, ctx))
                 .orElse(Mono.just(defaultValue));
     }

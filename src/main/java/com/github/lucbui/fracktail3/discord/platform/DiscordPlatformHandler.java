@@ -28,6 +28,11 @@ public class DiscordPlatformHandler implements PlatformHandler {
     }
 
     @Override
+    public String getId() {
+        return platform.getId();
+    }
+
+    @Override
     public Mono<Boolean> start(Bot bot) {
         if(gateway != null) {
             throw new BotConfigurationException("Bot is already started.");
