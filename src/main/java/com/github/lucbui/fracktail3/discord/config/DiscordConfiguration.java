@@ -28,7 +28,7 @@ public class DiscordConfiguration implements Config, Localizable {
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
-    private final List<DiscordEventHook<?>> handlers;
+    private final List<DiscordEventHook> handlers;
     private final Usersets<DiscordUserset> usersets;
     private final Channelsets<DiscordChannelset> channelsets;
 
@@ -42,7 +42,7 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(
             String token, String prefix, @Nullable Snowflake owner, String i18nPath,
-            StatusUpdate presence, List<DiscordEventHook<?>> handlers,
+            StatusUpdate presence, List<DiscordEventHook> handlers,
             Usersets<DiscordUserset> usersets, Channelsets<DiscordChannelset> channelsets) {
         this.token = token;
         this.prefix = prefix;
@@ -142,7 +142,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * Get the handlers for this configuration
      * @return The handlers used
      */
-    public List<DiscordEventHook<?>> getHandlers() {
+    public List<DiscordEventHook> getHandlers() {
         return Collections.unmodifiableList(handlers);
     }
 

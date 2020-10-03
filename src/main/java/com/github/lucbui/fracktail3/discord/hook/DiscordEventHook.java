@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.hook;
 
+import com.github.lucbui.fracktail3.discord.event.DiscordSupportedEvent;
 import com.github.lucbui.fracktail3.discord.guards.DiscordEventHookGuard;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Disableable;
@@ -7,11 +8,17 @@ import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * A hook that activates when a certain type of event is emitted
  */
 public class DiscordEventHook implements Id, Disableable {
     private final String id;
+    private final Set<DiscordSupportedEvent> supportedEvents;
     private final DiscordEventHookGuard guard;
     private final DiscordEventHandler handler;
 
@@ -20,12 +27,15 @@ public class DiscordEventHook implements Id, Disableable {
     /**
      * Create an event hook
      * @param id The ID of this hook
+     * @param supportedEvents Events supported by this hook
      * @param enabled If false, the hook is disabled and does not activate
      * @param guard If resolves as false, the hook is not activated
      * @param handler The code to execute when invoked
      */
-    public DiscordEventHook(String id, boolean enabled, DiscordEventHookGuard guard, DiscordEventHandler handler) {
+    public DiscordEventHook(String id, Set<DiscordSupportedEvent> supportedEvents, boolean enabled,
+                            DiscordEventHookGuard guard, DiscordEventHandler handler) {
         this.id = id;
+        this.supportedEvents = supportedEvents;
         this.guard = guard;
         this.handler = handler;
         this.enabled = enabled;
@@ -53,13 +63,21 @@ public class DiscordEventHook implements Id, Disableable {
     }
 
     /**
+     * Get the events supported by this hook
+     * @return The supported events
+     */
+    public Set<DiscordSupportedEvent> getSupportedEvents() {
+        return Collections.unmodifiableSet(supportedEvents);
+    }
+
+    /**
      * Test if the hook is enabled + the guard passes
      * @param bot The bot being run
      * @param ctx The context of the event
      * @return Asynchronous boolean, true if passes
      */
     public Mono<Boolean> passesGuard(Bot bot, DiscordEventContext ctx) {
-        if(!enabled) {
+        if(!enabled || !supportedEvents.contains(ctx.getEvent().eventType())) {
             return Mono.just(false);
         }
         return getGuard().matches(bot, ctx);
@@ -90,6 +108,7 @@ public class DiscordEventHook implements Id, Disableable {
      */
     public static class Builder implements IBuilder<DiscordEventHook> {
         private final String id;
+        private final Set<DiscordSupportedEvent> events = EnumSet.noneOf(DiscordSupportedEvent.class);
         private DiscordEventHookGuard guard = DiscordEventHookGuard.identity(true);
         private DiscordEventHandler handler = DiscordEventHandler.noop();
         private boolean enabled = true;
@@ -100,6 +119,26 @@ public class DiscordEventHook implements Id, Disableable {
          */
         public Builder(String id) {
             this.id = id;
+        }
+
+        /**
+         * Set this hook as supporting the provided event
+         * @param event The event to support
+         * @return This builder
+         */
+        public Builder forEvent(DiscordSupportedEvent event) {
+            events.add(event);
+            return this;
+        }
+
+        /**
+         * Set this hook as supporting the provided events
+         * @param events The events to support
+         * @return This builder
+         */
+        public Builder forEvent(DiscordSupportedEvent... events) {
+            this.events.addAll(Arrays.asList(events));
+            return this;
         }
 
         /**
@@ -134,7 +173,7 @@ public class DiscordEventHook implements Id, Disableable {
 
         @Override
         public DiscordEventHook build() {
-            return new DiscordEventHook(id, enabled, guard, handler);
+            return new DiscordEventHook(id, events, enabled, guard, handler);
         }
     }
 }

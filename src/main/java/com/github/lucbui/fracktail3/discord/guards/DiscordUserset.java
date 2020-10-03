@@ -1,11 +1,10 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
+import com.github.lucbui.fracktail3.discord.event.HookEvent;
 import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
-import com.github.lucbui.fracktail3.discord.utils.EventUtils;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.guards.user.PlatformSpecificUserset;
 import discord4j.common.util.Snowflake;
-import discord4j.core.event.domain.Event;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import org.apache.commons.collections4.CollectionUtils;
@@ -114,7 +113,7 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
      * @param event The event
      * @return Asynchronous true, if matches
      */
-    public Mono<Boolean> matchesForEvent(Event event) {
+    public Mono<Boolean> matchesForEvent(HookEvent event) {
         if(CollectionUtils.isEmpty(userSnowflakes) && CollectionUtils.isEmpty(roleSnowflakes)) {
             return Mono.just(true);
         }
@@ -122,23 +121,19 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
         return Mono.just(isLegalUserId(event) && isLegalRole(event));
     }
 
-    private boolean isLegalUserId(Event event) {
-        if(userSnowflakes == null) return true;
-        Optional<Set<Snowflake>> users = EventUtils.getUserSnowflake(event);
-        return CollectionUtils.isEmpty(userSnowflakes) || users.map(set -> hasOverlap(set, userSnowflakes)).orElse(false);
+    private boolean isLegalUserId(HookEvent event) {
+        return userSnowflakes == null;
     }
 
-    private boolean isLegalRole(Event event) {
-        if(roleSnowflakes == null) return true;
-        Optional<Set<Snowflake>> roles = EventUtils.getRoleSnowflake(event);
-        return CollectionUtils.isEmpty(roleSnowflakes) || roles.map(set -> hasOverlap(set, roleSnowflakes)).orElse(false);
+    private boolean isLegalRole(HookEvent event) {
+        return roleSnowflakes == null;
     }
 
     /**
      * Create an Event Hook Guard for this Userset
      * @return A guard which allows usage only from a specific userset
      */
-    public DiscordEventHookGuard<Event> eventForId() {
+    public DiscordEventHookGuard eventForId() {
         return new EventHookByUsersetId(getId());
     }
 }

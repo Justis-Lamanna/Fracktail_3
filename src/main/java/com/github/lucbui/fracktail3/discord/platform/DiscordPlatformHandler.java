@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.event.DefaultHookEventFactory;
+import com.github.lucbui.fracktail3.discord.event.HookEventFactory;
 import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
 import com.github.lucbui.fracktail3.magic.Bot;
@@ -23,10 +25,12 @@ public class DiscordPlatformHandler implements PlatformHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatformHandler.class);
 
     private final DiscordPlatform platform;
+    private final HookEventFactory hookEventFactory;
     private GatewayDiscordClient gateway;
 
     public DiscordPlatformHandler(DiscordPlatform platform) {
         this.platform = platform;
+        this.hookEventFactory = new DefaultHookEventFactory();
     }
 
     @Override
@@ -63,6 +67,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
                 .subscribe();
 
         gateway.on(Event.class)
+                .map(hookEventFactory::fromEvent)
                 .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
                 .subscribe();
 

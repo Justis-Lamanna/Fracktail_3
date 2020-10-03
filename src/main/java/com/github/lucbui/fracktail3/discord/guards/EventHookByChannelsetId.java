@@ -2,10 +2,9 @@ package com.github.lucbui.fracktail3.discord.guards;
 
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventContext;
 import com.github.lucbui.fracktail3.magic.Bot;
-import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
-public class EventHookByChannelsetId implements DiscordEventHookGuard<Event>{
+public class EventHookByChannelsetId implements DiscordEventHookGuard {
     private final String id;
     private final boolean _default;
 
@@ -19,9 +18,9 @@ public class EventHookByChannelsetId implements DiscordEventHookGuard<Event>{
     }
 
     @Override
-    public Mono<Boolean> matches(Bot bot, DiscordEventContext ctx, Event event) {
+    public Mono<Boolean> matches(Bot bot, DiscordEventContext ctx) {
         return Mono.justOrEmpty(ctx.getConfig().getChannelset(id))
-                .flatMap(du -> du.matchesForEvent(event))
+                .flatMap(du -> du.matchesForEvent(ctx.getEvent()))
                 .defaultIfEmpty(_default);
     }
 }
