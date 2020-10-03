@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.event;
 
+import com.github.lucbui.fracktail3.magic.hook.SupportedEvent;
 import discord4j.core.event.domain.*;
 import discord4j.core.event.domain.channel.*;
 import discord4j.core.event.domain.guild.*;
@@ -12,7 +13,7 @@ import discord4j.core.event.domain.role.RoleUpdateEvent;
 /**
  * Marker interface which marks an event as supported
  */
-public enum DiscordSupportedEvent {
+public enum DiscordSupportedEvent implements SupportedEvent {
     //--Lifecycle Events
     CONNECT(ConnectEvent.class),
     DISCONNECT(DisconnectEvent.class),

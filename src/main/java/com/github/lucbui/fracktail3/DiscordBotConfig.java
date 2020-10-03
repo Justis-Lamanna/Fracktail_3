@@ -1,13 +1,17 @@
 package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
+import com.github.lucbui.fracktail3.discord.event.DiscordSupportedEvent;
 import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
+import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class DiscordBotConfig {
@@ -18,6 +22,14 @@ public class DiscordBotConfig {
                 .withOwner(248612704019808258L)
                 .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
                 .withUserset(DiscordUserset.forUser("steven", 112005555178000384L))
+                .withHandler(new DiscordEventHook.Builder("test")
+                        .forEvent(DiscordSupportedEvent.GUILD_CREATE)
+                        .setHandler((bot, ctx) -> {
+                            GuildCreateEvent e = (GuildCreateEvent) ctx.getEvent().getRawEvent();
+                            System.out.println("Joined " + e.getGuild().getName());
+                            return Mono.empty();
+                        })
+                        .build())
                 .build());
     }
 }

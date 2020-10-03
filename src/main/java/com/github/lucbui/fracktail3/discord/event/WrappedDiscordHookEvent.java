@@ -5,7 +5,7 @@ import discord4j.core.event.domain.Event;
 /**
  * Default HookEvent which simply wraps the corresponding DiscordEvent
  */
-public class WrappedHookEvent implements HookEvent {
+public class WrappedDiscordHookEvent implements DiscordHookEvent<Event> {
     private final DiscordSupportedEvent type;
     private final Event event;
 
@@ -14,19 +14,9 @@ public class WrappedHookEvent implements HookEvent {
      * @param type The type of event
      * @param event The event being wrapped
      */
-    public WrappedHookEvent(DiscordSupportedEvent type, Event event) {
+    public WrappedDiscordHookEvent(DiscordSupportedEvent type, Event event) {
         this.type = type;
         this.event = event;
-    }
-
-    @Override
-    public DiscordSupportedEvent eventType() {
-        return type;
-    }
-
-    @Override
-    public Event getOriginalEvent() {
-        return event;
     }
 
     @Override
@@ -35,5 +25,15 @@ public class WrappedHookEvent implements HookEvent {
                 "type=" + type +
                 ", event=" + event +
                 '}';
+    }
+
+    @Override
+    public DiscordSupportedEvent getEventType() {
+        return type;
+    }
+
+    @Override
+    public Event getRawEvent() {
+        return event;
     }
 }

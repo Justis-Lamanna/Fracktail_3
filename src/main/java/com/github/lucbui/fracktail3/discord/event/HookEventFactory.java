@@ -11,5 +11,5 @@ public interface HookEventFactory {
      * @param event The event to convert
      * @return The created event
      */
-    HookEvent fromEvent(Event event);
+    DiscordHookEvent<?> fromEvent(Event event);
 }

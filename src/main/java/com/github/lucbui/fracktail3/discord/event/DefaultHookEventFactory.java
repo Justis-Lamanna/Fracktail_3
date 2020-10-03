@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class DefaultHookEventFactory implements HookEventFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHookEventFactory.class);
 
-    private final Map<Class<? extends Event>, Function<Event, HookEvent>> converters = new HashMap<>();
+    private final Map<Class<? extends Event>, Function<Event, WrappedDiscordHookEvent>> converters = new HashMap<>();
     private final Map<Class<? extends Event>, DiscordSupportedEvent> dseMapper;
 
     /**
@@ -34,12 +34,12 @@ public class DefaultHookEventFactory implements HookEventFactory {
      * @param event The events types to convert
      * @param converter The converter to use instead of the default
      */
-    public void addConverter(DiscordSupportedEvent event, Function<Event, HookEvent> converter) {
+    public void addConverter(DiscordSupportedEvent event, Function<Event, WrappedDiscordHookEvent> converter) {
         this.converters.put(event.getRawEventClass(), converter);
     }
 
     @Override
-    public HookEvent fromEvent(Event event) {
+    public DiscordHookEvent<?> fromEvent(Event event) {
         DiscordSupportedEvent dse = dseMapper.get(event.getClass());
         if(dse == null) {
             LOGGER.warn("Event {} not mapped to any DiscordSupportedEvent. Proceeding with null.", event.getClass().getCanonicalName());
@@ -47,6 +47,6 @@ public class DefaultHookEventFactory implements HookEventFactory {
         if(converters.containsKey(event.getClass())) {
             return converters.get(event.getClass()).apply(event);
         }
-        return new WrappedHookEvent(dse, event);
+        return new WrappedDiscordHookEvent(dse, event);
     }
 }

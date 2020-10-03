@@ -1,13 +1,11 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
-import com.github.lucbui.fracktail3.discord.event.HookEvent;
 import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.guards.user.PlatformSpecificUserset;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import reactor.core.publisher.Mono;
 
@@ -106,34 +104,5 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
 
     private static boolean hasOverlap(Set<?> one, Set<?> two) {
         return !SetUtils.intersection(one, two).isEmpty();
-    }
-
-    /**
-     * Check if this userset matches for the provided event
-     * @param event The event
-     * @return Asynchronous true, if matches
-     */
-    public Mono<Boolean> matchesForEvent(HookEvent event) {
-        if(CollectionUtils.isEmpty(userSnowflakes) && CollectionUtils.isEmpty(roleSnowflakes)) {
-            return Mono.just(true);
-        }
-
-        return Mono.just(isLegalUserId(event) && isLegalRole(event));
-    }
-
-    private boolean isLegalUserId(HookEvent event) {
-        return userSnowflakes == null;
-    }
-
-    private boolean isLegalRole(HookEvent event) {
-        return roleSnowflakes == null;
-    }
-
-    /**
-     * Create an Event Hook Guard for this Userset
-     * @return A guard which allows usage only from a specific userset
-     */
-    public DiscordEventHookGuard eventForId() {
-        return new EventHookByUsersetId(getId());
     }
 }

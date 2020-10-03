@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.event.HookEvent;
+import com.github.lucbui.fracktail3.discord.event.DiscordHookEvent;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 import reactor.core.publisher.Flux;
@@ -22,11 +22,12 @@ public class DefaultDiscordOnEventHandler extends IdStore<DiscordEventHook> impl
     }
 
     @Override
-    public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, HookEvent event) {
+    public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, DiscordHookEvent<?> event) {
         DiscordEventContext ctx = new DiscordEventContext(configuration, event);
         return Flux.fromIterable(getAll())
-                .filterWhen(h -> h.passesGuard(bot, ctx))
-                .flatMap(h -> h.doAction(bot, ctx))
+                .filter(h -> h.getSupportedEvents().contains(event.getEventType()))
+                .filterWhen(h -> h.matches(bot, ctx))
+                .flatMap(h -> h.handleEvent(bot, ctx))
                 .then();
     }
 }

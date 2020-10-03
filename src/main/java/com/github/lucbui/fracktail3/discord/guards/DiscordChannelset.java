@@ -1,11 +1,9 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
-import com.github.lucbui.fracktail3.discord.event.HookEvent;
 import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.guards.channel.PlatformSpecificChannelset;
 import discord4j.common.util.Snowflake;
-import org.apache.commons.collections4.SetUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -60,30 +58,5 @@ public class DiscordChannelset extends PlatformSpecificChannelset<DiscordContext
         if(channelSnowflakes == null) return true;
         Snowflake channelId = context.getEvent().getMessage().getChannelId();
         return channelSnowflakes.contains(channelId);
-    }
-
-    /**
-     * Check if this channelset matches for the provided event
-     * @param event The event
-     * @return Asynchronous true, if matches
-     */
-    public Mono<Boolean> matchesForEvent(HookEvent event) {
-        return Mono.just(isLegalChannel(event));
-    }
-
-    private boolean isLegalChannel(HookEvent event) {
-        return channelSnowflakes == null;
-    }
-
-    private static boolean hasOverlap(Set<?> one, Set<?> two) {
-        return !SetUtils.intersection(one, two).isEmpty();
-    }
-
-    /**
-     * Create an Event Hook Guard for this Channelset
-     * @return A guard which allows usage only from a specific channelset
-     */
-    public DiscordEventHookGuard eventForId() {
-        return new EventHookByChannelsetId(getId());
     }
 }
