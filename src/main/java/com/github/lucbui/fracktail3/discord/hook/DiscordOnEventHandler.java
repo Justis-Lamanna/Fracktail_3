@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.event.DiscordHookEvent;
 import com.github.lucbui.fracktail3.magic.Bot;
+import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
 /**
@@ -16,5 +16,5 @@ public interface DiscordOnEventHandler {
      * @param event The event that came in
      * @return An empty asynchronous value. Result is ignored.
      */
-    Mono<Void> execute(Bot bot, DiscordConfiguration configuration, DiscordHookEvent<?> event);
+    Mono<Void> execute(Bot bot, DiscordConfiguration configuration, Event event);
 }

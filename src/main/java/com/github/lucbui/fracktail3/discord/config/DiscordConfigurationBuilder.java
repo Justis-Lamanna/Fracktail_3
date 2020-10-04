@@ -23,7 +23,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
-    private final List<DiscordEventHook> handlers = new ArrayList<>();
+    private final List<DiscordEventHook<?, ?>> handlers = new ArrayList<>();
     private final List<DiscordUserset> usersets = new ArrayList<>();
     private final List<DiscordChannelset> channelsets = new ArrayList<>();
 
@@ -85,7 +85,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handler The handler to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandler(DiscordEventHook handler) {
+    public DiscordConfigurationBuilder withHandler(DiscordEventHook<?, ?> handler) {
         this.handlers.add(handler);
         return this;
     }
@@ -95,7 +95,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handlers The handlers to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandlers(List<DiscordEventHook> handlers) {
+    public DiscordConfigurationBuilder withHandlers(List<DiscordEventHook<?, ?>> handlers) {
         this.handlers.addAll(handlers);
         return this;
     }
