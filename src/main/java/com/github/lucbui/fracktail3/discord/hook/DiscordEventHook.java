@@ -1,38 +1,45 @@
 package com.github.lucbui.fracktail3.discord.hook;
 
-import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.event.events.DiscordSupportedEvent;
-import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.hook.HookEvent;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
-import discord4j.core.event.domain.Event;
-import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * A hook that activates when a certain type of event is emitted
  */
-public class DiscordEventHook<E extends Event, HE extends HookEvent<E>> implements Id, Disableable {
+public class DiscordEventHook implements Id, Disableable {
     private final String id;
-    private final DiscordSupportedEvent<E, HE> supportedEvent;
-    private final DiscordEventHookGuard<HE> guard;
-    private final DiscordEventHandler<HE> handler;
+    private final Set<DiscordSupportedEvents> events;
+    private final DiscordEventHookGuard guard;
+    private final DiscordEventHandler handler;
 
     private boolean enabled;
 
     /**
      * Create an event hook
      * @param id The ID of this hook
-     * @param supportedEvent Event supported by this hook
      * @param enabled If false, the hook is disabled and does not activate
      * @param guard If resolves as false, the hook is not activated
      * @param handler The code to execute when invoked
      */
-    public DiscordEventHook(String id, DiscordSupportedEvent<E, HE> supportedEvent, boolean enabled,
-                            DiscordEventHookGuard<HE> guard, DiscordEventHandler<HE> handler) {
+    public DiscordEventHook(String id, boolean enabled, DiscordEventHookGuard guard, DiscordEventHandler handler) {
+        this(id, EnumSet.allOf(DiscordSupportedEvents.class), enabled, guard, handler);
+    }
+
+    /**
+     * Create an event hook
+     * @param id The ID of this hook
+     * @param enabled If false, the hook is disabled and does not activate
+     * @param guard If resolves as false, the hook is not activated
+     * @param handler The code to execute when invoked
+     */
+    public DiscordEventHook(String id, Set<DiscordSupportedEvents> events, boolean enabled, DiscordEventHookGuard guard, DiscordEventHandler handler) {
         this.id = id;
-        this.supportedEvent = supportedEvent;
+        this.events = events;
         this.guard = guard;
         this.handler = handler;
         this.enabled = enabled;
@@ -53,43 +60,52 @@ public class DiscordEventHook<E extends Event, HE extends HookEvent<E>> implemen
         return id;
     }
 
-    public DiscordSupportedEvent<E, HE> getSupportedEvent() {
-        return supportedEvent;
+    public Set<DiscordSupportedEvents> getEvents() {
+        return events;
     }
 
-    public DiscordEventHookGuard<HE> getGuard() {
+    public DiscordEventHookGuard getGuard() {
         return guard;
     }
 
-    public DiscordEventHandler<HE> getHandler() {
+    public DiscordEventHandler getHandler() {
         return handler;
-    }
-
-    public Mono<Void> handleEventIfMatches(Bot bot, DiscordConfiguration config, Event event) {
-        if(!enabled) return Mono.empty();
-        return Mono.justOrEmpty(supportedEvent.convertIfSupported(event))
-                .map(hookEvent -> new DiscordEventContext<>(config, hookEvent))
-                .filterWhen(ctx -> getGuard().matches(bot, ctx))
-                .flatMap(ctx -> getHandler().handleEvent(bot, ctx));
     }
 
     /**
      * Builder which can be used to create an Event Hook
      */
-    public static class Builder<E extends Event, HE extends HookEvent<E>> implements IBuilder<DiscordEventHook<E, HE>> {
+    public static class Builder implements IBuilder<DiscordEventHook> {
         private final String id;
-        private final DiscordSupportedEvent<E, HE> event;
-        private DiscordEventHookGuard<HE> guard = DiscordEventHookGuard.identity(true);
-        private DiscordEventHandler<HE> handler = DiscordEventHandler.noop();
+        private Set<DiscordSupportedEvents> supported;
+        private DiscordEventHookGuard guard = DiscordEventHookGuard.identity(true);
+        private DiscordEventHandler handler = DiscordEventHandler.noop();
         private boolean enabled = true;
 
         /**
          * Initialize this builder
          * @param id The ID to use
          */
-        public Builder(String id, DiscordSupportedEvent<E, HE> event) {
+        public Builder(String id) {
             this.id = id;
-            this.event = event;
+        }
+
+        /**
+         * Set the supported events
+         * Optional, for now. If null, assumes all events are supported.
+         * Allows for optimization on the hook side...maybe?
+         * @param event The event type
+         * @param more More event types, if necessary
+         * @return This builder
+         */
+        public Builder supports(DiscordSupportedEvents event, DiscordSupportedEvents... more) {
+            if(supported == null) {
+                supported = EnumSet.of(event, more);
+            } else {
+                supported.add(event);
+                supported.addAll(Arrays.asList(more));
+            }
+            return this;
         }
 
         /**
@@ -97,7 +113,7 @@ public class DiscordEventHook<E extends Event, HE extends HookEvent<E>> implemen
          * @param guard The guard to use
          * @return This builder
          */
-        public Builder<E, HE> setGuard(DiscordEventHookGuard<HE> guard) {
+        public Builder setGuard(DiscordEventHookGuard guard) {
             this.guard = guard;
             return this;
         }
@@ -107,7 +123,7 @@ public class DiscordEventHook<E extends Event, HE extends HookEvent<E>> implemen
          * @param handler The handler to use
          * @return This builder
          */
-        public Builder<E, HE> setHandler(DiscordEventHandler<HE> handler) {
+        public Builder setHandler(DiscordEventHandler handler) {
             this.handler = handler;
             return this;
         }
@@ -117,14 +133,17 @@ public class DiscordEventHook<E extends Event, HE extends HookEvent<E>> implemen
          * @param enabled True, if enabled
          * @return This builder
          */
-        public Builder<E, HE> isEnabled(boolean enabled) {
+        public Builder isEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
         @Override
-        public DiscordEventHook<E, HE> build() {
-            return new DiscordEventHook<>(id, event, enabled, guard, handler);
+        public DiscordEventHook build() {
+            if(supported == null) {
+                supported = EnumSet.allOf(DiscordSupportedEvents.class);
+            }
+            return new DiscordEventHook(id, supported, enabled, guard, handler);
         }
     }
 }
