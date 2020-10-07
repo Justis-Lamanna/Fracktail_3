@@ -15,7 +15,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A default scheduler, using native Java timer implementations
+ */
 public class DefaultScheduler implements Scheduler {
+
     @Override
     public Mono<Instant> wait(Duration duration) {
         return Mono.create(sink -> {
