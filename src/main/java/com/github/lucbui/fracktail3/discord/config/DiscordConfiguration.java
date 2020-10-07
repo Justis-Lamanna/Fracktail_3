@@ -9,6 +9,7 @@ import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guards.user.InUsersetGuard;
 import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
@@ -28,6 +29,7 @@ public class DiscordConfiguration implements Config, Localizable {
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
+    private final ScheduledEvents scheduledEvents;
     private final List<DiscordEventHook> handlers;
     private final Usersets<DiscordUserset> usersets;
     private final Channelsets<DiscordChannelset> channelsets;
@@ -42,13 +44,14 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(
             String token, String prefix, @Nullable Snowflake owner, String i18nPath,
-            StatusUpdate presence, List<DiscordEventHook> handlers,
+            StatusUpdate presence, ScheduledEvents actions, List<DiscordEventHook> handlers,
             Usersets<DiscordUserset> usersets, Channelsets<DiscordChannelset> channelsets) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
+        this.scheduledEvents = actions;
         this.handlers = handlers;
         this.usersets = usersets;
         this.channelsets = channelsets;
@@ -61,7 +64,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence, Collections.emptyList(), Usersets.empty(), Channelsets.empty());
+        this(token, prefix, null, null, presence, ScheduledEvents.empty(), Collections.emptyList(), Usersets.empty(), Channelsets.empty());
     }
 
     /**
@@ -144,6 +147,30 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public List<DiscordEventHook> getHandlers() {
         return Collections.unmodifiableList(handlers);
+    }
+
+    /**
+     * Get the store scheduled actions
+     * @return The scheduled actions
+     */
+    public ScheduledEvents getScheduledEvents() {
+        return scheduledEvents;
+    }
+
+    /**
+     * Get the store of usersets
+     * @return The store of usersets
+     */
+    public Usersets<DiscordUserset> getUsersets() {
+        return usersets;
+    }
+
+    /**
+     * Get the store of channelsets
+     * @return The store of channelsets
+     */
+    public Channelsets<DiscordChannelset> getChannelsets() {
+        return channelsets;
     }
 
     @Override

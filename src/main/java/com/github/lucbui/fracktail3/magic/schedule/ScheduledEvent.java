@@ -21,6 +21,10 @@ public class ScheduledEvent implements Id, Disableable {
         this.action = action;
     }
 
+    public ScheduledEvent(String id, ScheduleEventTrigger trigger, ScheduledAction action) {
+        this(id, true, trigger, action);
+    }
+
     @Override
     public String getId() {
         return this.id;
@@ -34,6 +38,14 @@ public class ScheduledEvent implements Id, Disableable {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * Set the proxy to be used for cancelling
+     * @param proxy The proxy which allows for cancellation
+     */
+    public void setProxy(ScheduleSubscriber.Proxy proxy) {
+        this.proxy = proxy;
     }
 
     /**

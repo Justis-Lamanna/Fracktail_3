@@ -7,6 +7,8 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
@@ -66,7 +68,18 @@ public class DiscordPlatformHandler implements PlatformHandler {
                 .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
                 .subscribe();
 
+        configureScheduledEvents(bot);
+
         return gateway.onDisconnect().thenReturn(true);
+    }
+
+    private void configureScheduledEvents(Bot bot) {
+        DiscordConfiguration configuration = platform.getConfig();
+        for(ScheduledEvent event : configuration.getScheduledEvents().getAll()) {
+            event.getTrigger()
+                    .schedule(bot.getScheduler())
+                    .subscribe(new ScheduleSubscriber(bot, configuration, gateway, event));
+        }
     }
 
     @Override

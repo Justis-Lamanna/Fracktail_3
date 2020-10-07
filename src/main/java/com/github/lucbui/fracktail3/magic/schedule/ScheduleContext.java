@@ -7,7 +7,7 @@ import java.time.Instant;
 /**
  * Context for a scheduled command
  */
-public class ScheduleContext {
+public abstract class ScheduleContext {
     private final Config config;
     private final ScheduledEvent event;
     private final Instant triggerTime;
@@ -44,7 +44,7 @@ public class ScheduleContext {
      * Get the triggered action
      * @return The triggered action
      */
-    public ScheduledEvent getEvent() {
+    public ScheduledEvent getScheduledEvent() {
         return event;
     }
 }

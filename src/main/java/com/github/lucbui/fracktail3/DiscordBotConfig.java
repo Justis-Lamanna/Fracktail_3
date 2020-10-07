@@ -7,6 +7,9 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.handlers.action.LoggingAction;
+import com.github.lucbui.fracktail3.magic.schedule.ExecuteRepeatedlyTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -15,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @Configuration
 @EnableScheduling
@@ -35,6 +40,10 @@ public class DiscordBotConfig {
                             }
                         })
                 )
+                .withScheduledEvent(new ScheduledEvent(
+                        "test",
+                        new ExecuteRepeatedlyTrigger(Duration.ofSeconds(5)),
+                        new LoggingAction("Executing!")))
                 .build());
     }
 }
