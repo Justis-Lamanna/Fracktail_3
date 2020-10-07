@@ -10,6 +10,7 @@ import com.github.lucbui.fracktail3.magic.handlers.action.ActionOptions;
 import com.github.lucbui.fracktail3.magic.handlers.action.CommandsAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.HelpAction;
 import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
+import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -19,10 +20,14 @@ public class DiscordBotRunner implements CommandLineRunner {
     @Autowired
     private DiscordPlatform platform;
 
+    @Autowired
+    private Scheduler scheduler;
+
     @Override
     public void run(String... args) throws Exception {
         Bot bot = new BotCreator()
                 .withPlatform(platform)
+                .withScheduler(scheduler)
                 .withCommand(new Command("help", new HelpAction()))
                 .withCommand(new Command("commands", new CommandsAction()))
                 .withCommand(

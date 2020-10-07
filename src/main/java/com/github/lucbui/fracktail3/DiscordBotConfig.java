@@ -13,9 +13,11 @@ import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import reactor.core.publisher.Mono;
 
 @Configuration
+@EnableScheduling
 public class DiscordBotConfig {
     @Bean
     DiscordPlatform discordPlatform(@Value("${token}") String token) {

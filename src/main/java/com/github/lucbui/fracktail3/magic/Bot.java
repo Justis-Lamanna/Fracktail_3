@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.magic;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
+import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
+import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
@@ -20,16 +22,27 @@ import java.util.stream.Collectors;
  */
 public class Bot extends IdStore<PlatformHandler> {
     private final BotSpec botSpec;
+    private final Scheduler scheduler;
+
+    /**
+     * Initialize the Bot with specific PlatformHandlers.
+     * @param botSpec The spec to use.
+     * @param scheduler The scheduler to use for timer operations
+     */
+    public Bot(BotSpec botSpec, Scheduler scheduler) {
+        super(botSpec.getPlatforms().stream()
+                .map(Platform::platformHandler)
+                .collect(Collectors.toMap(PlatformHandler::getId, Function.identity())));
+        this.botSpec = botSpec;
+        this.scheduler = scheduler;
+    }
 
     /**
      * Initialize the Bot with specific PlatformHandlers.
      * @param botSpec The spec to use.
      */
     public Bot(BotSpec botSpec) {
-        super(botSpec.getPlatforms().stream()
-                .map(Platform::platformHandler)
-                .collect(Collectors.toMap(PlatformHandler::getId, Function.identity())));
-        this.botSpec = botSpec;
+        this(botSpec, new DefaultScheduler());
     }
 
     /**
@@ -38,6 +51,14 @@ public class Bot extends IdStore<PlatformHandler> {
      */
     public BotSpec getSpec() {
         return botSpec;
+    }
+
+    /**
+     * Get the scheduling service used by this bot
+     * @return The scheduler service to use
+     */
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     /**

@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
+import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BotCreator implements IBuilder<Bot> {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<Command> commands = new ArrayList<>();
+    private Scheduler scheduler = new DefaultScheduler();
     private Action orElse = Action.NOOP;
 
     /**
@@ -81,6 +84,16 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
+     * Set the scheduler to use
+     * @param scheduler The scheduler to use
+     * @return This creator
+     */
+    public BotCreator withScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+        return this;
+    }
+
+    /**
      * Builds and validates the bot.
      * @return The created bot
      * @throws BotConfigurationException Validation failed
@@ -99,7 +112,7 @@ public class BotCreator implements IBuilder<Bot> {
         callIfBotCreatorAware(orElse);
 
         spec.validate();
-        return new Bot(spec);
+        return new Bot(spec, scheduler);
     }
 
     private void callIfBotCreatorAware(Object obj) {
