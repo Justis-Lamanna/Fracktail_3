@@ -28,7 +28,7 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
 
     @Override
     public void onSubscribe(Subscription subscription) {
-        event.setProxy(new Proxy(subscription));
+        event.schedule(new Proxy(subscription));
         subscription.request(Long.MAX_VALUE);
     }
 
@@ -36,9 +36,7 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
     public void onNext(Instant instant) {
         if(event.isEnabled()) {
             DiscordScheduleContext ctx = new DiscordScheduleContext(configuration, event, instant, client);
-            event.getAction()
-                    .execute(bot, ctx)
-                    .subscribe();
+            event.execute(bot, ctx).subscribe();
         }
     }
 
@@ -49,6 +47,7 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
 
     @Override
     public void onComplete() {
+        event.complete();
         LOGGER.debug("Scheduled action {} completed", event.getId());
     }
 

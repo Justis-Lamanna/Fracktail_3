@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 /**
  * Encapsulates how the Discord platform starts and stops the bot.
  */
@@ -73,6 +75,14 @@ public class DiscordPlatformHandler implements PlatformHandler {
         return gateway.onDisconnect().thenReturn(true);
     }
 
+    @Override
+    public void scheduleEvent(Bot bot, ScheduledEvent event) {
+        DiscordConfiguration configuration = platform.getConfig();
+        event.getTrigger()
+                .schedule(bot.getScheduler())
+                .subscribe(new ScheduleSubscriber(bot, configuration, gateway, event));
+    }
+
     private void configureScheduledEvents(Bot bot) {
         DiscordConfiguration configuration = platform.getConfig();
         for(ScheduledEvent event : configuration.getScheduledEvents().getAll()) {
@@ -90,5 +100,18 @@ public class DiscordPlatformHandler implements PlatformHandler {
         }
         LOGGER.debug("Stopping bot on Discord");
         return gateway.logout().thenReturn(true);
+    }
+
+    @Override
+    public void cancelEvent(Bot bot, String id) {
+        Optional<ScheduledEvent> event = platform.getConfig().getScheduledEvents().getById(id);
+        event.ifPresent(ScheduledEvent::cancel);
+    }
+
+    private void cancelEvents(Bot bot) {
+        platform.getConfig()
+                .getScheduledEvents()
+                .getAll()
+                .forEach(ScheduledEvent::cancel);
     }
 }

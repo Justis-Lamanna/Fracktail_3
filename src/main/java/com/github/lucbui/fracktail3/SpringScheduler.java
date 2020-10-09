@@ -28,12 +28,7 @@ public class SpringScheduler implements Scheduler {
 
     @Override
     public Mono<Instant> wait(Duration duration) {
-        return Mono.create(sink -> {
-            ScheduledFuture<?> future = taskScheduler.scheduleWithFixedDelay(() -> {
-                sink.success(Instant.now());
-            }, duration);
-            sink.onCancel(() -> future.cancel(false));
-        });
+        return at(Instant.now().plus(duration));
     }
 
     @Override

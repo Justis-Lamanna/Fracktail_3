@@ -7,8 +7,9 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.handlers.action.LoggingAction;
-import com.github.lucbui.fracktail3.magic.schedule.ExecuteRepeatedlyTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.ExecuteAfterDurationTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduleContext;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.object.presence.Activity;
@@ -42,8 +43,15 @@ public class DiscordBotConfig {
                 )
                 .withScheduledEvent(new ScheduledEvent(
                         "test",
-                        new ExecuteRepeatedlyTrigger(Duration.ofSeconds(5)),
-                        new LoggingAction("Executing!")))
+                        new ExecuteAfterDurationTrigger(Duration.ofSeconds(30)),
+                        new ScheduledAction() {
+                            @Override
+                            public Mono<Void> execute(Bot bot, ScheduleContext context) {
+                                System.out.println("Executing, but only once.");
+                                context.getScheduledEvent().cancel();
+                                return Mono.empty();
+                            }
+                        }))
                 .build());
     }
 }
