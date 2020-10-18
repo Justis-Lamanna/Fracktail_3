@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -13,7 +13,7 @@ public interface ContextFormatter {
      * @param ctx The context to use in the formatting
      * @return Asynchronously-determined formatted string
      */
-    Mono<String> format(String raw, CommandContext ctx);
+    Mono<String> format(String raw, BaseContext<?> ctx);
 
     /**
      * Formatter which simply returns the input

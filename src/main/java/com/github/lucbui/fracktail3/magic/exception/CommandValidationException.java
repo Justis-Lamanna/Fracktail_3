@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -41,7 +41,7 @@ public class CommandValidationException extends RuntimeException {
      * @param ctx The context to use
      * @return Asynchronous formatted message
      */
-    public Mono<String> getFormattedMessage(CommandContext ctx) {
+    public Mono<String> getFormattedMessage(BaseContext<?> ctx) {
         return message.getFor(ctx);
     }
 }

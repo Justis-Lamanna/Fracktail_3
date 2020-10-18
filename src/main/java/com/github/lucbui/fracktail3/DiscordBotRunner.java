@@ -5,7 +5,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.action.RespondAction;
+import com.github.lucbui.fracktail3.magic.handlers.action.LoggingAction;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +26,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                 .withScheduler(scheduler)
                 .withCommand(
                     new Command.Builder("hello")
-                    .withAction(new RespondAction(null, FormattedString.literal("Hey!")))
+                    .withAction(new LoggingAction(null, FormattedString.literal("Hey!")))
                 )
                 .build();
         bot.start().block();

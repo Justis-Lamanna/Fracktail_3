@@ -1,10 +1,7 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
-import com.ibm.icu.text.MessageFormat;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
 
 /**
  * Decorator formatter which uses the ICU4J MessageFormat functionality to format a string
@@ -31,12 +28,8 @@ public class ICU4JDecoratorFormatter implements ContextFormatter {
     }
 
     @Override
-    public Mono<String> format(String raw, CommandContext ctx) {
-        return toWrap.format(raw, ctx)
-                .zipWith(ctx.getExtendedVariableMap().defaultIfEmpty(Collections.emptyMap()))
-                .map(t -> {
-                    MessageFormat formatting = new MessageFormat(t.getT1(), ctx.getLocale());
-                    return formatting.format(t.getT2());
-                });
+    public Mono<String> format(String raw, BaseContext<?> ctx) {
+        //Eventually, this can be done  abit better.
+        return Mono.just(raw);
     }
 }
