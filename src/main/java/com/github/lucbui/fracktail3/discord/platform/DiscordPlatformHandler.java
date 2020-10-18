@@ -12,6 +12,7 @@ import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +66,9 @@ public class DiscordPlatformHandler implements PlatformHandler {
                 .flatMap(msg -> discordCommandHandler.execute(bot, platform, msg))
                 .subscribe();
 
-//        gateway.on(Event.class)
-//                .flatMap(evt -> discordEventHandler.execute(bot, platform, evt))
-//                .subscribe();
+        gateway.on(Event.class)
+                .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
+                .subscribe();
 
         configureScheduledEvents(bot);
 
