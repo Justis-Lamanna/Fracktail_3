@@ -1,34 +1,33 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
-import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
 /**
  * Action which responds to the user of the command in some way
  */
-public class RespondAction implements Action {
+public class RespondAction implements BaseAction, Action {
+    private final Channelset channels;
     private final FormattedString msg;
 
-    /**
-     * Initialize the action
-     * @param msg The message to respond with
-     */
-    public RespondAction(FormattedString msg) {
+    public RespondAction(Channelset channels, FormattedString msg) {
+        this.channels = channels;
         this.msg = msg;
     }
 
-    /**
-     * Initialize the action
-     * @param msg The message to respond with
-     */
-    public RespondAction(String msg) {
-        this(FormattedString.from(msg));
+
+    @Override
+    public Mono<Void> doAction(CommandUseContext<?> context) {
+        System.out.println(msg.getRaw());
+        return Mono.empty();
     }
 
     @Override
-    public Mono<Void> doAction(Bot bot, CommandContext context) {
-        return msg.getFor(context).flatMap(context::respond).then();
+    public Mono<Void> doAction(BaseContext<?> context) {
+        System.out.println(msg.getRaw());
+        return Mono.empty();
     }
 }

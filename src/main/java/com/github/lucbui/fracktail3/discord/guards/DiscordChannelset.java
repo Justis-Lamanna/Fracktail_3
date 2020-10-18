@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
-import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
-import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.guards.channel.PlatformSpecificChannelset;
+import com.github.lucbui.fracktail3.discord.context.DiscordCommandSearchContext;
+import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Discord-specific Channelset which encapsulates a set of Discord channels
  */
-public class DiscordChannelset extends PlatformSpecificChannelset<DiscordContext> {
+public class DiscordChannelset extends Channelset {
     /**
      * Channelset that matches every channel
      */
@@ -33,7 +33,7 @@ public class DiscordChannelset extends PlatformSpecificChannelset<DiscordContext
      * @param channelSnowflakes The set of legal channels
      */
     public DiscordChannelset(String name, Set<Snowflake> channelSnowflakes) {
-        super(name, DiscordContext.class);
+        super(name);
         this.channelSnowflakes = channelSnowflakes;
     }
 
@@ -49,14 +49,18 @@ public class DiscordChannelset extends PlatformSpecificChannelset<DiscordContext
         this.channelSnowflakes = channelSnowflakes;
     }
 
-    @Override
-    protected Mono<Boolean> matchesForPlatform(Bot bot, DiscordContext context) {
-        return Mono.just(isLegalChannel(context));
+    private boolean isLegalChannel(DiscordCommandSearchContext context) {
+        if(channelSnowflakes == null) return true;
+        Snowflake channelId = context.getPayload().getMessage().getChannelId();
+        return channelSnowflakes.contains(channelId);
     }
 
-    private boolean isLegalChannel(DiscordContext context) {
-        if(channelSnowflakes == null) return true;
-        Snowflake channelId = context.getEvent().getMessage().getChannelId();
-        return channelSnowflakes.contains(channelId);
+    @Override
+    public Mono<Boolean> matches(BaseContext<?> ctx) {
+        if(ctx instanceof DiscordCommandSearchContext) {
+            DiscordCommandSearchContext dCtx = (DiscordCommandSearchContext) ctx;
+            return Mono.just(isLegalChannel(dCtx));
+        }
+        return Mono.just(false);
     }
 }

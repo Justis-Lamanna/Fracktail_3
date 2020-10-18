@@ -1,11 +1,15 @@
 package com.github.lucbui.fracktail3.magic.handlers;
 
-import com.github.lucbui.fracktail3.magic.*;
+import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Disableable;
+import com.github.lucbui.fracktail3.magic.Id;
+import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
 import com.github.lucbui.fracktail3.magic.handlers.action.Action;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
@@ -138,33 +142,30 @@ public class Command implements Validated, Id, Disableable {
 
     /**
      * Test if this guard matches
-     * @param bot The bot being executed
      * @param ctx The context of the commands usage
      * @return Asynchronous boolean indicating if the guard passes
      */
-    public Mono<Boolean> passesFilter(Bot bot, CommandContext ctx) {
-        return BooleanUtils.and(Mono.just(enabled), commandGuard.matches(bot, ctx));
+    public Mono<Boolean> matches(BaseContext<?> ctx) {
+        return BooleanUtils.and(Mono.just(enabled), commandGuard.matches(ctx));
     }
 
     /**
      * Unconditionally perform the action
-     * @param bot The bot being executed
      * @param ctx The context of the commands usage
      * @return Asynchronous marker indicating the action finished
      */
-    public Mono<Void> doAction(Bot bot, CommandContext ctx) {
-        return action.doAction(bot, ctx);
+    public Mono<Void> doAction(CommandUseContext<?> ctx) {
+        return action.doAction(ctx);
     }
 
     /**
      * Perform action if guard passes
-     * @param bot The bot being executed
      * @param ctx The context of the commands usage
      * @return Asynchronous marker indicating the action finished
      */
-    public Mono<Void> doActionIfPasses(Bot bot, CommandContext ctx) {
-        return passesFilter(bot, ctx)
-                .flatMap(b -> b ? doAction(bot, ctx) : Mono.empty());
+    public Mono<Void> doActionIfPasses(CommandUseContext<?> ctx) {
+        return matches(ctx)
+                .flatMap(b -> b ? doAction(ctx) : Mono.empty());
     }
 
     @Override

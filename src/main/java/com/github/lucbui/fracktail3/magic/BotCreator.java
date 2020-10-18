@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
-import com.github.lucbui.fracktail3.magic.handlers.action.Action;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
@@ -21,7 +20,6 @@ public class BotCreator implements IBuilder<Bot> {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<Command> commands = new ArrayList<>();
     private Scheduler scheduler = new DefaultScheduler();
-    private Action orElse = Action.NOOP;
 
     /**
      * Add a platform to this bot
@@ -74,16 +72,6 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
-     * Set a default action to execute, if no commands match
-     * @param action The action to perform
-     * @return This creator
-     */
-    public BotCreator orElseDo(Action action) {
-        this.orElse = action;
-        return this;
-    }
-
-    /**
      * Set the scheduler to use
      * @param scheduler The scheduler to use
      * @return This creator
@@ -102,14 +90,12 @@ public class BotCreator implements IBuilder<Bot> {
     public Bot build() throws BotConfigurationException {
         BotSpec spec = new BotSpec(
                 platforms,
-                new CommandList(commands, orElse));
+                new CommandList(commands));
 
         //Awareness checks
         platforms.forEach(this::callIfBotCreatorAware);
 
         commands.forEach(this::callIfBotCreatorAware);
-
-        callIfBotCreatorAware(orElse);
 
         spec.validate();
         return new Bot(spec, scheduler);

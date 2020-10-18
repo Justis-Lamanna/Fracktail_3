@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.guards.user;
 
-import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,9 +31,9 @@ public class InUsersetGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
-        return ctx.getConfiguration().getUserset(id)
-                .map(value -> Mono.just(value).flatMap(u -> u.matches(bot, ctx)))
+    public Mono<Boolean> matches(BaseContext<?> ctx) {
+        return ctx.getPlatform().getConfig().getUserset(id)
+                .map(value -> Mono.just(value).flatMap(u -> u.matches(ctx)))
                 .orElseGet(() -> Mono.just(defaultValue));
     }
 }

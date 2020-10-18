@@ -1,8 +1,9 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.context.DiscordCommandSearchContext;
+import com.github.lucbui.fracktail3.discord.context.DiscordCommandUseContext;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.exception.CommandValidationException;
 import com.github.lucbui.fracktail3.magic.handlers.Command;
 import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -17,7 +18,6 @@ import reactor.util.function.Tuples;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,25 +32,21 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
 
     private final CommandList commandList;
     private final DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver;
-    private final PreDiscordExecutionHandler preExecutionHandler;
-    private final PostDiscordExecutionHandler postExecutionHandler;
+    private final DiscordExecutionHook executionHook;
 
     /**
      * Initialize this handler
      * @param commandList The command list to use
      * @param discordLocaleResolver The function to resolve the locale of a message
-     * @param preExecutionHandler Code to execute before execution of a command
-     * @param postExecutionHandler Code to execute after execution of a command
+     * @param executionHook Code to execute before execution of a command
      */
     public DefaultDiscordCommandHandler(
             CommandList commandList,
             DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver,
-            PreDiscordExecutionHandler preExecutionHandler,
-            PostDiscordExecutionHandler postExecutionHandler) {
+            DiscordExecutionHook executionHook) {
         this.commandList = commandList;
         this.discordLocaleResolver = discordLocaleResolver;
-        this.preExecutionHandler = preExecutionHandler;
-        this.postExecutionHandler = postExecutionHandler;
+        this.executionHook = executionHook;
     }
 
     /**
@@ -59,7 +55,7 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
      * @param commandList The command list to use
      */
     public DefaultDiscordCommandHandler(CommandList commandList) {
-        this(commandList, new LocaleFromGuildResolver(), PreDiscordExecutionHandler.identity(), PostDiscordExecutionHandler.identity());
+        this(commandList, new LocaleFromGuildResolver(), DiscordExecutionHook.identity());
     }
 
     public CommandList getCommandList() {
@@ -70,53 +66,46 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
         return discordLocaleResolver;
     }
 
-    public PreDiscordExecutionHandler getPreExecutionHandler() {
-        return preExecutionHandler;
-    }
-
-    public PostDiscordExecutionHandler getPostExecutionHandler() {
-        return postExecutionHandler;
+    public DiscordExecutionHook getExecutionHook() {
+        return executionHook;
     }
 
     @Override
-    public Mono<Void> execute(Bot bot, DiscordConfiguration configuration, MessageCreateEvent event) {
+    public Mono<Void> execute(Bot bot, DiscordPlatform platform, MessageCreateEvent event) {
         if(event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
             return Mono.empty();
         }
-        return Mono.justOrEmpty(event.getMessage().getContent())
+        DiscordConfiguration configuration = platform.getConfig();
+        String contents = event.getMessage().getContent();
+        return Mono.justOrEmpty(contents)
                 .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .map(msg -> new DiscordContext(configuration, event))
-                .zipWith(discordLocaleResolver.getLocale(event), (ctx, locale) -> {
-                    ctx.setLocale(locale);
-                    return ctx;
-                })
-                .zipWhen(ctx -> getCommandsByName()
-                        .filter(t -> StringUtils.startsWith(ctx.getContents(), configuration.getPrefix() + t.getT1()))
-                        .filterWhen(t -> t.getT2().passesFilter(bot, ctx))
-                        .singleOrEmpty()
-                        .map(Optional::of).defaultIfEmpty(Optional.empty()), (ctx, tupleOpt) -> {
-                    tupleOpt.ifPresent(t -> {
-                        ctx.setCommand(t.getT2());
-                        ctx.setParameters(StringUtils.removeStart(ctx.getContents(), configuration.getPrefix() + t.getT1()));
-                        ctx.setNormalizedParameters(parseParameters(ctx.getParameters()));
-                    });
-
-                    return ctx;
-                })
-                .flatMap(preExecutionHandler::beforeExecution)
-                .flatMap(ctx -> {
-                    boolean noCommandFound = ctx.getCommand() == null;
-                    Mono<Void> action = noCommandFound ?
-                            commandList.doOrElse(bot, ctx) :
-                            ctx.getCommand().doAction(bot, ctx);
-                    return action
-                        .then(postExecutionHandler.afterExecution(ctx))
-                        .onErrorResume(CommandValidationException.class, ex ->
-                                ex.getFormattedMessage(ctx)
-                                .flatMap(ctx::respond)
-                                .then())
-                        .onErrorResume(RuntimeException.class, ex -> postExecutionHandler.afterError(ctx, ex));
-                });
+                .then(discordLocaleResolver.getLocale(event))
+                .map(locale -> new DiscordCommandSearchContext(bot, platform, locale, event))
+                .flatMap(ctx -> getCommandsByName()
+                    .filter(t -> {
+                        String commandName = t.getT1();
+                        return StringUtils.startsWith(ctx.getPayload().getMessage().getContent(), configuration.getPrefix() + commandName);
+                    })
+                    .filterWhen(t -> {
+                        Command cmd = t.getT2();
+                        return cmd.matches(ctx);
+                    })
+                    .next()
+                    .map(t -> {
+                        String commandName = t.getT1();
+                        Command cmd = t.getT2();
+                        String rawParamString = StringUtils.removeStart(contents, configuration.getPrefix() + commandName);
+                        return new DiscordCommandUseContext(ctx, cmd, rawParamString, parseParameters(rawParamString));
+                    })
+                    .flatMap(executionHook::beforeExecution)
+                    .flatMap(dCtx -> {
+                        Command cmd = dCtx.getCommand();
+                        return cmd.doAction(dCtx)
+                                .then(executionHook.afterExecution(dCtx))
+                                .onErrorResume(RuntimeException.class, ex -> executionHook.afterError(dCtx, ex));
+                    })
+                    .switchIfEmpty(executionHook.onNoCommandFound(ctx))
+                );
     }
 
     private Flux<Tuple2<String, Command>> getCommandsByName() {

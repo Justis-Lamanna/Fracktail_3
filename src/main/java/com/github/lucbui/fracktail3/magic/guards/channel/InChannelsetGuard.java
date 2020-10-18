@@ -1,8 +1,7 @@
 package com.github.lucbui.fracktail3.magic.guards.channel;
 
-import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.guards.Guard;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 public class InChannelsetGuard implements Guard {
@@ -20,9 +19,9 @@ public class InChannelsetGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(Bot bot, CommandContext ctx) {
-        return ctx.getConfiguration().getChannelset(id)
-                .map(cs -> cs.matches(bot, ctx))
+    public Mono<Boolean> matches(BaseContext<?> ctx) {
+        return ctx.getPlatform().getConfig().getChannelset(id)
+                .map(cs -> cs.matches(ctx))
                 .orElse(Mono.just(defaultValue));
     }
 }

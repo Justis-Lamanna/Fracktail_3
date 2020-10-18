@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.discord.guards;
 
-import com.github.lucbui.fracktail3.discord.platform.DiscordContext;
-import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.guards.user.PlatformSpecificUserset;
+import com.github.lucbui.fracktail3.discord.context.DiscordCommandSearchContext;
+import com.github.lucbui.fracktail3.magic.guards.user.Userset;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Discord-specific userset, which can filter on some combination of users or roles
  */
-public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
+public class DiscordUserset extends Userset {
     /**
      * Userset that matches every user.
      * Note that this userset is automatically included, if DiscordConfigurationBuilder is used.
@@ -42,7 +42,7 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
      * @param roleSnowflakes The list of snowflakes that correspond to Role IDs
      */
     public DiscordUserset(String name, Set<Snowflake> userSnowflakes, Set<Snowflake> roleSnowflakes) {
-        super(name, DiscordContext.class);
+        super(name);
         this.userSnowflakes = userSnowflakes;
         this.roleSnowflakes = roleSnowflakes;
     }
@@ -85,24 +85,28 @@ public class DiscordUserset extends PlatformSpecificUserset<DiscordContext> {
         return roleSnowflakes;
     }
 
-    @Override
-    protected Mono<Boolean> matchesForPlatform(Bot bot, DiscordContext ctx) {
-        return Mono.just(isLegalUserId(ctx) && isLegalRole(ctx));
-    }
-
-    private boolean isLegalUserId(DiscordContext context) {
+    private boolean isLegalUserId(DiscordCommandSearchContext context) {
         if(userSnowflakes == null) return true;
-        Optional<Snowflake> user = context.getEvent().getMessage().getAuthor().map(User::getId);
+        Optional<Snowflake> user = context.getPayload().getMessage().getAuthor().map(User::getId);
         return user.map(userSnowflakes::contains).orElse(false);
     }
 
-    private boolean isLegalRole(DiscordContext context) {
+    private boolean isLegalRole(DiscordCommandSearchContext context) {
         if(roleSnowflakes == null) return true;
-        Optional<Set<Snowflake>> roles = context.getEvent().getMember().map(Member::getRoleIds);
+        Optional<Set<Snowflake>> roles = context.getPayload().getMember().map(Member::getRoleIds);
         return roles.map(set -> hasOverlap(set, roleSnowflakes)).orElse(false);
     }
 
     private static boolean hasOverlap(Set<?> one, Set<?> two) {
         return !SetUtils.intersection(one, two).isEmpty();
+    }
+
+    @Override
+    public Mono<Boolean> matches(BaseContext<?> ctx) {
+        if(ctx instanceof DiscordCommandSearchContext) {
+            DiscordCommandSearchContext dCtx = (DiscordCommandSearchContext) ctx;
+            return Mono.just(isLegalUserId(dCtx) && isLegalRole(dCtx));
+        }
+        return Mono.just(false);
     }
 }

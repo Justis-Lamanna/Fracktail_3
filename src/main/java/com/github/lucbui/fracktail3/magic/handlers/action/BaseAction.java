@@ -1,12 +1,9 @@
 package com.github.lucbui.fracktail3.magic.handlers.action;
 
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
-/**
- * Represents a single action that a bot performs
- */
-public interface Action {
+public interface BaseAction {
     /**
      * Action which does nothing at all
      */
@@ -17,5 +14,5 @@ public interface Action {
      * @param context The context of the command usage
      * @return Asynchronous marker indicating action completed
      */
-    Mono<Void> doAction(CommandUseContext<?> context);
+    Mono<Void> doAction(BaseContext<?> context);
 }

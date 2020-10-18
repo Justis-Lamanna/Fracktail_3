@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic.guards;
 
-import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.platform.CommandContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -11,11 +10,10 @@ import reactor.core.publisher.Mono;
 public interface Guard {
     /**
      * Check whether a command can be used in this context.
-     * @param bot The bot being ran
      * @param ctx The context the command has been run in
      * @return Asynchronous boolean, indicating if the command can be used or not
      */
-    Mono<Boolean> matches(Bot bot, CommandContext ctx);
+    Mono<Boolean> matches(BaseContext<?> ctx);
 
     /**
      * Creates a filter that passes when this filter AND another both pass
@@ -24,7 +22,7 @@ public interface Guard {
      */
     default Guard and(Guard other) {
         Guard self = this;
-        return (bot, ctx) -> BooleanUtils.and(self.matches(bot, ctx), other.matches(bot, ctx));
+        return (ctx) -> BooleanUtils.and(self.matches(ctx), other.matches(ctx));
     }
 
     /**
@@ -34,7 +32,7 @@ public interface Guard {
      */
     default Guard or(Guard other) {
         Guard self = this;
-        return (bot, ctx) -> BooleanUtils.or(self.matches(bot, ctx), other.matches(bot, ctx));
+        return (ctx) -> BooleanUtils.or(self.matches(ctx), other.matches(ctx));
     }
 
     /**
@@ -43,7 +41,7 @@ public interface Guard {
      */
     default Guard not() {
         Guard self = this;
-        return (bot, ctx) -> BooleanUtils.not(self.matches(bot, ctx));
+        return (ctx) -> BooleanUtils.not(self.matches(ctx));
     }
 
     /**
@@ -52,6 +50,6 @@ public interface Guard {
      * @return The created filter.
      */
     static Guard identity(boolean value) {
-        return (bot, ctx) -> Mono.just(value);
+        return (ctx) -> Mono.just(value);
     }
 }
