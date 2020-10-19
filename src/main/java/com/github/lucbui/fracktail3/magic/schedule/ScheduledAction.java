@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
-import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -9,9 +9,8 @@ import reactor.core.publisher.Mono;
 public interface ScheduledAction {
     /**
      * Execute the logic
-     * @param bot The bot being run
      * @param context The context of the execution
      * @return Asynchronous indication of completion
      */
-    Mono<Void> execute(Bot bot, ScheduleContext context);
+    Mono<Void> execute(ScheduledUseContext context);
 }

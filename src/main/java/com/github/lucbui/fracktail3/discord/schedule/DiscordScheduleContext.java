@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.discord.schedule;
 
-import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduleContext;
+import com.github.lucbui.fracktail3.discord.context.DiscordBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import discord4j.core.GatewayDiscordClient;
 
@@ -10,25 +10,14 @@ import java.time.Instant;
 /**
  * Context specific to scheduling with Discord
  */
-public class DiscordScheduleContext extends ScheduleContext {
-    private final DiscordConfiguration config;
+public class DiscordScheduleContext extends DiscordBaseContext<Instant> implements ScheduledUseContext {
+    private final ScheduledEvent scheduledEvent;
     private final GatewayDiscordClient client;
 
-    /**
-     * Initialize this context
-     * @param config The configuration of the platform
-     * @param triggerTime The time the trigger happened
-     * @param client The Discord Client, for making calls
-     */
-    public DiscordScheduleContext(DiscordConfiguration config, ScheduledEvent event, Instant triggerTime, GatewayDiscordClient client) {
-        super(config, event, triggerTime);
-        this.config = config;
+    public DiscordScheduleContext(DiscordBaseContext<Instant> base, ScheduledEvent event, GatewayDiscordClient client) {
+        super(base);
+        this.scheduledEvent = event;
         this.client = client;
-    }
-
-    @Override
-    public DiscordConfiguration getConfig() {
-        return config;
     }
 
     /**
@@ -37,5 +26,10 @@ public class DiscordScheduleContext extends ScheduleContext {
      */
     public GatewayDiscordClient getClient() {
         return client;
+    }
+
+    @Override
+    public ScheduledEvent getScheduledEvent() {
+        return scheduledEvent;
     }
 }

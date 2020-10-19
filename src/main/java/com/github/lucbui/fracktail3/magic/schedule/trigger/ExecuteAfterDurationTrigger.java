@@ -1,5 +1,6 @@
-package com.github.lucbui.fracktail3.magic.schedule;
+package com.github.lucbui.fracktail3.magic.schedule.trigger;
 
+import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import org.reactivestreams.Publisher;
 
 import java.time.Duration;

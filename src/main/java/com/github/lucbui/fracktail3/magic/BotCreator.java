@@ -32,6 +32,16 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
+     * Add a platform to this bot
+     * @param platform The platform to add
+     * @return This creator
+     */
+    public BotCreator withPlatform(IBuilder<? extends Platform> platform) {
+        platforms.add(platform.build());
+        return this;
+    }
+
+    /**
      * Add multiple platforms to this bot
      * @param newPlatforms The platforms to add
      * @return This creator

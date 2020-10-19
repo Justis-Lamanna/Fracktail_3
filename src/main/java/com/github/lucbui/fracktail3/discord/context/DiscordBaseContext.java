@@ -12,6 +12,13 @@ public class DiscordBaseContext<T> implements BaseContext<T> {
     private final Locale locale;
     private final T payload;
 
+    public DiscordBaseContext(BaseContext<T> base) {
+        this.bot = base.getBot();
+        this.platform = base.getPlatform();
+        this.locale = base.getLocale();
+        this.payload = base.getPayload();
+    }
+
     public DiscordBaseContext(Bot bot, Platform platform, T payload) {
         this.bot = bot;
         this.platform = platform;

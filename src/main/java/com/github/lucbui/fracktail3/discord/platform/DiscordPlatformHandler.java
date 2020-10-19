@@ -80,7 +80,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
         DiscordConfiguration configuration = platform.getConfig();
         event.getTrigger()
                 .schedule(bot.getScheduler())
-                .subscribe(new ScheduleSubscriber(bot, configuration, gateway, event));
+                .subscribe(new ScheduleSubscriber(bot, platform, gateway, event));
     }
 
     private void configureScheduledEvents(Bot bot) {
@@ -88,7 +88,7 @@ public class DiscordPlatformHandler implements PlatformHandler {
         for(ScheduledEvent event : configuration.getScheduledEvents().getAll()) {
             event.getTrigger()
                     .schedule(bot.getScheduler())
-                    .subscribe(new ScheduleSubscriber(bot, configuration, gateway, event));
+                    .subscribe(new ScheduleSubscriber(bot, platform, gateway, event));
         }
     }
 
