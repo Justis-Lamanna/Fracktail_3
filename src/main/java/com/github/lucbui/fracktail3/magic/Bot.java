@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.PlatformHandler;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
  * Each PlatformHandler takes the spec, and builds out the bot for that specific platform.
  * The PlatformHandler, in effect, manages the entire lifecycle for that specific platform.
  */
-public class Bot extends IdStore<PlatformHandler> {
+public class Bot extends IdStore<Platform> {
     private final BotSpec botSpec;
     private final Scheduler scheduler;
 
@@ -31,8 +30,7 @@ public class Bot extends IdStore<PlatformHandler> {
      */
     public Bot(BotSpec botSpec, Scheduler scheduler) {
         super(botSpec.getPlatforms().stream()
-                .map(Platform::platformHandler)
-                .collect(Collectors.toMap(PlatformHandler::getId, Function.identity())));
+                .collect(Collectors.toMap(Platform::getId, Function.identity())));
         this.botSpec = botSpec;
         this.scheduler = scheduler;
     }
@@ -93,7 +91,7 @@ public class Bot extends IdStore<PlatformHandler> {
      * Get all handlers for this bot
      * @return All the handlers used in this bot
      */
-    public List<PlatformHandler> getHandlers() {
+    public List<Platform> getPlatforms() {
         return getAll();
     }
 
@@ -102,7 +100,7 @@ public class Bot extends IdStore<PlatformHandler> {
      * @param id The ID of the handler
      * @return The handler, if present
      */
-    public Optional<PlatformHandler> getHandler(String id) {
+    public Optional<Platform> getPlatform(String id) {
         return getById(id);
     }
 }

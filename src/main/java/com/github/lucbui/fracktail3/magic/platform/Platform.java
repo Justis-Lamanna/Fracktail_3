@@ -1,7 +1,9 @@
 package com.github.lucbui.fracktail3.magic.platform;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.config.Config;
+import reactor.core.publisher.Mono;
 
 /**
  * An object which encapsulates a particular platform.
@@ -17,8 +19,16 @@ public interface Platform extends Id {
     Config getConfig();
 
     /**
-     * Get the platform handler associated with this platform
-     * @return The platform handler associated with this platform
+     * Asynchronously start the bot
+     * @param bot The bot to start
+     * @return An asynchronous boolean, whether the bot was started or not. (note, boolean is ignored)
      */
-    PlatformHandler platformHandler();
+    Mono<Boolean> start(Bot bot);
+
+    /**
+     * Asynchronously stop the bot
+     * @param bot The bot to stop
+     * @return An asynchronous boolean, whether the bot was stopped or not. (note, boolean is ignored)
+     */
+    Mono<Boolean> stop(Bot bot);
 }
