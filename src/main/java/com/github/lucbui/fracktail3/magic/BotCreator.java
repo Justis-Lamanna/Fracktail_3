@@ -1,12 +1,12 @@
 package com.github.lucbui.fracktail3.magic;
 
+import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
-import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import com.github.lucbui.fracktail3.magic.util.IBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

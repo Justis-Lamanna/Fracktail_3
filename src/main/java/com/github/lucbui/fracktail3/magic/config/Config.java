@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.config;
 
-import com.github.lucbui.fracktail3.magic.guards.channel.Channelset;
-import com.github.lucbui.fracktail3.magic.guards.user.Userset;
+import com.github.lucbui.fracktail3.magic.guard.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.guard.user.Userset;
 
 import java.util.Optional;
 

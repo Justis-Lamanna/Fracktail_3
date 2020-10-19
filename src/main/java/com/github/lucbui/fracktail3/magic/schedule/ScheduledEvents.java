@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
-import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
+import com.github.lucbui.fracktail3.magic.util.IdStore;
 
 import java.util.Collections;
 import java.util.List;

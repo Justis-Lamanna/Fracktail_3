@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic;
 
+import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.handlers.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 
 import java.util.*;

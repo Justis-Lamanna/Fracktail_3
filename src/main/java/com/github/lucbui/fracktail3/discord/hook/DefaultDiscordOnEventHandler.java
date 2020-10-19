@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.utils.model.IdStore;
+import com.github.lucbui.fracktail3.magic.util.IdStore;
 import discord4j.core.event.domain.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.hook;
 
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import com.github.lucbui.fracktail3.magic.util.IBuilder;
 
 import java.util.Arrays;
 import java.util.EnumSet;

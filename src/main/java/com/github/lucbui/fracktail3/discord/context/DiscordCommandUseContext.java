@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.discord.context;
 
-import com.github.lucbui.fracktail3.magic.handlers.Command;
+import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 

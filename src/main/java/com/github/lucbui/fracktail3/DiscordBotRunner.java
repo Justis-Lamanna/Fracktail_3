@@ -1,12 +1,12 @@
 package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
-import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
-import com.github.lucbui.fracktail3.magic.handlers.Command;
-import com.github.lucbui.fracktail3.magic.handlers.action.LoggingAction;
+import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.command.action.LoggingAction;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;

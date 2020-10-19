@@ -1,13 +1,13 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.discord.guards.DiscordChannelset;
-import com.github.lucbui.fracktail3.discord.guards.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
+import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
-import com.github.lucbui.fracktail3.magic.guards.channel.Channelsets;
-import com.github.lucbui.fracktail3.magic.guards.user.Usersets;
+import com.github.lucbui.fracktail3.magic.guard.channel.Channelsets;
+import com.github.lucbui.fracktail3.magic.guard.user.Usersets;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
-import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;

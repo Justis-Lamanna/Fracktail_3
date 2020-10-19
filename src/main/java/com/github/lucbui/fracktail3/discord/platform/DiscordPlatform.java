@@ -9,7 +9,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
-import com.github.lucbui.fracktail3.magic.utils.model.IBuilder;
+import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
