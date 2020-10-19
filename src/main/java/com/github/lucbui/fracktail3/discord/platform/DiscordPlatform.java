@@ -1,8 +1,10 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.context.DiscordBaseContext;
 import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
+import com.github.lucbui.fracktail3.discord.schedule.DiscordScheduleContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -18,6 +20,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+
+import java.time.Instant;
 
 /**
  * A singleton which represents the Discord platform
@@ -86,7 +90,10 @@ public class DiscordPlatform implements Platform {
         for(ScheduledEvent event : configuration.getScheduledEvents().getAll()) {
             event.getTrigger()
                     .schedule(bot.getScheduler())
-                    .subscribe(new ScheduleSubscriber(bot, this, gateway, event));
+                    .subscribe(new ScheduleSubscriber(event, instant -> {
+                        DiscordBaseContext<Instant> base = new DiscordBaseContext<>(bot, this, instant);
+                        return new DiscordScheduleContext(base, event, gateway);
+                    }));
         }
     }
 

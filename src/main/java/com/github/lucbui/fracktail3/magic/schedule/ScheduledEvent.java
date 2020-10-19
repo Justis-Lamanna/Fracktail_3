@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.BaseAction;
 import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
 import reactor.core.publisher.Mono;
 

@@ -1,30 +1,23 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
-import com.github.lucbui.fracktail3.discord.context.DiscordBaseContext;
-import com.github.lucbui.fracktail3.discord.schedule.DiscordScheduleContext;
-import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
-import discord4j.core.GatewayDiscordClient;
+import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.function.Function;
 
 public class ScheduleSubscriber implements Subscriber<Instant> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleSubscriber.class);
 
-    private final Bot bot;
-    private final Platform platform;
-    private final GatewayDiscordClient client;
     private final ScheduledEvent event;
+    private final Function<Instant, ? extends ScheduledUseContext> contextCreator;
 
-    public ScheduleSubscriber(Bot bot, Platform platform, GatewayDiscordClient client, ScheduledEvent event) {
-        this.bot = bot;
-        this.platform = platform;
-        this.client = client;
+    public ScheduleSubscriber(ScheduledEvent event, Function<Instant, ? extends ScheduledUseContext> contextCreator) {
         this.event = event;
+        this.contextCreator = contextCreator;
     }
 
     @Override
@@ -36,8 +29,7 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
     @Override
     public void onNext(Instant instant) {
         if(event.isEnabled()) {
-            DiscordBaseContext<Instant> base = new DiscordBaseContext<>(bot, platform, instant);
-            DiscordScheduleContext ctx = new DiscordScheduleContext(base, event, client);
+            ScheduledUseContext ctx = contextCreator.apply(instant);
             event.execute(ctx).subscribe();
         }
     }

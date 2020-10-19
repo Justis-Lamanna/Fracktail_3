@@ -1,32 +1,32 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 
 import java.util.Locale;
 
 public class DiscordBaseContext<T> implements BaseContext<T> {
     private final Bot bot;
-    private final Platform platform;
+    private final DiscordPlatform platform;
     private final Locale locale;
     private final T payload;
 
-    public DiscordBaseContext(BaseContext<T> base) {
+    public DiscordBaseContext(DiscordBaseContext<T> base) {
         this.bot = base.getBot();
         this.platform = base.getPlatform();
         this.locale = base.getLocale();
         this.payload = base.getPayload();
     }
 
-    public DiscordBaseContext(Bot bot, Platform platform, T payload) {
+    public DiscordBaseContext(Bot bot, DiscordPlatform platform, T payload) {
         this.bot = bot;
         this.platform = platform;
         this.payload = payload;
         this.locale = Locale.getDefault();
     }
 
-    public DiscordBaseContext(Bot bot, Platform platform, Locale locale, T payload) {
+    public DiscordBaseContext(Bot bot, DiscordPlatform platform, Locale locale, T payload) {
         this.bot = bot;
         this.platform = platform;
         this.locale = locale;
@@ -39,7 +39,7 @@ public class DiscordBaseContext<T> implements BaseContext<T> {
     }
 
     @Override
-    public Platform getPlatform() {
+    public DiscordPlatform getPlatform() {
         return platform;
     }
 

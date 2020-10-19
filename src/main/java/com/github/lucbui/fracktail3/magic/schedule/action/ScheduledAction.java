@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.schedule;
+package com.github.lucbui.fracktail3.magic.schedule.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import reactor.core.publisher.Mono;
