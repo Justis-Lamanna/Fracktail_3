@@ -1,8 +1,5 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.Validated;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import reactor.core.publisher.Flux;
@@ -14,7 +11,7 @@ import java.util.List;
 /**
  * Perform several actions in sequence
  */
-public class SequenceAction implements Action, Validated {
+public class SequenceAction implements Action {
 
     private final List<Action> subActions;
 
@@ -32,11 +29,6 @@ public class SequenceAction implements Action, Validated {
      */
     public List<Action> getSubActions() {
         return subActions;
-    }
-
-    @Override
-    public void validate(BotSpec spec) throws BotConfigurationException {
-        subActions.forEach(action -> Validated.validate(action, spec));
     }
 
     @Override

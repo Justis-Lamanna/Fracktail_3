@@ -3,11 +3,8 @@ package com.github.lucbui.fracktail3.discord.config;
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
-import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Localizable;
-import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.guard.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guard.user.InUsersetGuard;
@@ -23,7 +20,7 @@ import java.util.*;
 /**
  * Subclass of a Configuration for a Discord bot.
  */
-public class DiscordConfiguration implements Config, Localizable, Validated {
+public class DiscordConfiguration implements Config, Localizable {
     public static final String OWNER_USERSET_ID = "owner";
     public static final Guard OWNER_GUARD = new InUsersetGuard(OWNER_USERSET_ID);
 
@@ -189,13 +186,5 @@ public class DiscordConfiguration implements Config, Localizable, Validated {
     @Override
     public Optional<DiscordChannelset> getChannelset(String id) {
         return channelsets.getById(id);
-    }
-
-    @Override
-    public void validate(BotSpec spec) throws BotConfigurationException {
-        Validated.validate(scheduledEvents, spec);
-        Validated.validate(usersets, spec);
-        handlers.forEach(hook -> Validated.validate(hook, spec));
-        Validated.validate(channelsets, spec);
     }
 }

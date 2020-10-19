@@ -1,8 +1,5 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.Validated;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
@@ -18,7 +15,7 @@ import java.util.List;
  * Each action is weighted relative to the sum of all weights. If all weights are the same, all actions are equally
  * likely. When in doubt, weight can be a % value, as long as you maintain a total weight sum of 100
  */
-public class RandomAction implements Action, Validated {
+public class RandomAction implements Action {
     private final EnumeratedDistribution<Action> actions;
 
     /**
@@ -40,11 +37,6 @@ public class RandomAction implements Action, Validated {
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
         return actions.sample().doAction(context);
-    }
-
-    @Override
-    public void validate(BotSpec spec) throws BotConfigurationException {
-        actions.getPmf().forEach(pair -> Validated.validate(pair.getFirst(), spec));
     }
 
     /**

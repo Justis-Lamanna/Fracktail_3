@@ -1,8 +1,5 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
-import com.github.lucbui.fracktail3.magic.Validated;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
@@ -17,7 +14,7 @@ import java.util.Objects;
 /**
  * A list of multiple action options, which are chosen based on a filter
  */
-public class ActionOptions extends IdStore<ActionOption> implements Action, Validated {
+public class ActionOptions extends IdStore<ActionOption> implements Action {
     private final Action _default;
 
     /**
@@ -44,12 +41,6 @@ public class ActionOptions extends IdStore<ActionOption> implements Action, Vali
      */
     public Action getDefault() {
         return _default;
-    }
-
-    @Override
-    public void validate(BotSpec botSpec) throws BotConfigurationException {
-        getAll().forEach(a -> a.validate(botSpec));
-        Validated.validate(_default, botSpec);
     }
 
     @Override

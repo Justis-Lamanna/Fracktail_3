@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.command.CommandList;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 
 import java.util.*;
@@ -49,14 +48,5 @@ public class BotSpec {
      */
     public CommandList getCommandList() {
         return commandList;
-    }
-
-    /**
-     * Validate this BotSpec for errors
-     * @throws BotConfigurationException An error occurs.
-     */
-    public void validate() throws BotConfigurationException {
-        commandList.validate(this);
-        platforms.values().forEach(p -> Validated.validate(p, this));
     }
 }

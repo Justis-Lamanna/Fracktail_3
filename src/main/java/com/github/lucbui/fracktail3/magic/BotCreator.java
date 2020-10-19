@@ -107,7 +107,6 @@ public class BotCreator implements IBuilder<Bot> {
 
         commands.forEach(this::callIfBotCreatorAware);
 
-        spec.validate();
         return new Bot(spec, scheduler);
     }
 

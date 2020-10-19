@@ -1,10 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.Validated;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
@@ -14,7 +11,7 @@ import reactor.core.publisher.Mono;
 /**
  * One potential arm for a parameterized action
  */
-public class ActionOption implements Validated, Id, Disableable {
+public class ActionOption implements Id, Disableable {
     private final String id;
     private final Guard guard;
     private final Action action;
@@ -87,12 +84,6 @@ public class ActionOption implements Validated, Id, Disableable {
     public Mono<Void> doActionIfPasses(CommandUseContext<?> ctx) {
         return matches(ctx)
                 .flatMap(b -> b ? doAction(ctx) : Mono.empty());
-    }
-
-    @Override
-    public void validate(BotSpec botSpec) throws BotConfigurationException {
-        Validated.validate(guard, botSpec);
-        Validated.validate(action, botSpec);
     }
 
     @Override
