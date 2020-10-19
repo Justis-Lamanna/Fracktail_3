@@ -57,5 +57,6 @@ public class BotSpec {
      */
     public void validate() throws BotConfigurationException {
         commandList.validate(this);
+        platforms.values().forEach(p -> Validated.validate(p, this));
     }
 }

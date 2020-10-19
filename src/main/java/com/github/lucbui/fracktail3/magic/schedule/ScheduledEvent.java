@@ -1,8 +1,11 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
+import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
+import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.command.action.BaseAction;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
@@ -11,7 +14,7 @@ import reactor.core.publisher.Mono;
 /**
  * Encapsulates a scheduled event
  */
-public class ScheduledEvent implements Id, Disableable {
+public class ScheduledEvent implements Validated, Id, Disableable {
     private final String id;
     private final ScheduleEventTrigger trigger;
     private final ScheduledAction action;
@@ -116,5 +119,11 @@ public class ScheduledEvent implements Id, Disableable {
      */
     public TriggerState getState() {
         return enabled ? triggerState : TriggerState.DISABLED;
+    }
+
+    @Override
+    public void validate(BotSpec spec) throws BotConfigurationException {
+        Validated.validate(trigger, spec);
+        Validated.validate(action, spec);
     }
 }

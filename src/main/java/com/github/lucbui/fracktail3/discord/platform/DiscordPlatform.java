@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.schedule.DiscordScheduleContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
+import com.github.lucbui.fracktail3.magic.Validated;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
@@ -26,7 +27,7 @@ import java.time.Instant;
 /**
  * A singleton which represents the Discord platform
  */
-public class DiscordPlatform implements Platform {
+public class DiscordPlatform implements Platform, Validated {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
 
     private final DiscordConfiguration configuration;
@@ -114,6 +115,11 @@ public class DiscordPlatform implements Platform {
                 .getScheduledEvents()
                 .getAll()
                 .forEach(ScheduledEvent::cancel);
+    }
+
+    @Override
+    public void validate(BotSpec spec) throws BotConfigurationException {
+        configuration.validate(spec);
     }
 
     public static class Builder implements IBuilder<DiscordPlatform> {

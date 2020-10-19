@@ -170,12 +170,8 @@ public class Command implements Validated, Id, Disableable {
 
     @Override
     public void validate(BotSpec botSpec) throws BotConfigurationException {
-        if(commandGuard instanceof Validated) {
-            ((Validated) commandGuard).validate(botSpec);
-        }
-        if(action instanceof Validated) {
-            ((Validated) action).validate(botSpec);
-        }
+        Validated.validate(commandGuard, botSpec);
+        Validated.validate(action, botSpec);
     }
 
     @Override
