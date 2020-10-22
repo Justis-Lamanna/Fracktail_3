@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class BotCreator implements IBuilder<Bot> {
     private final List<Platform> platforms = new ArrayList<>();
     private final List<Command> commands = new ArrayList<>();
+    private final List<ScheduledEvent> events = new ArrayList<>();
     private Scheduler scheduler = new DefaultScheduler();
 
     /**
@@ -82,6 +85,36 @@ public class BotCreator implements IBuilder<Bot> {
     }
 
     /**
+     * Add a scheduled event to this bot
+     * @param event An event to schedule
+     * @return This creator
+     */
+    public BotCreator withEvent(ScheduledEvent event) {
+        events.add(event);
+        return this;
+    }
+
+    /**
+     * Add scheduled events to this bot
+     * @param newEvents Events to schedule
+     * @return This creator
+     */
+    public BotCreator withEvents(List<ScheduledEvent> newEvents) {
+        events.addAll(newEvents);
+        return this;
+    }
+
+    /**
+     * Add a scheduled event to this bot
+     * @param event An event to schedule
+     * @return This creator
+     */
+    public BotCreator withEvent(IBuilder<ScheduledEvent> event) {
+        events.add(event.build());
+        return this;
+    }
+
+    /**
      * Set the scheduler to use
      * @param scheduler The scheduler to use
      * @return This creator
@@ -100,7 +133,7 @@ public class BotCreator implements IBuilder<Bot> {
     public Bot build() throws BotConfigurationException {
         BotSpec spec = new BotSpec(
                 platforms,
-                new CommandList(commands));
+                new CommandList(commands), new ScheduledEvents(events));
 
         //Awareness checks
         platforms.forEach(this::callIfBotCreatorAware);

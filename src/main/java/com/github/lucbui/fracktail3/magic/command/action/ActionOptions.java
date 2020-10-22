@@ -14,15 +14,15 @@ import java.util.Objects;
 /**
  * A list of multiple action options, which are chosen based on a filter
  */
-public class ActionOptions extends IdStore<ActionOption> implements Action {
-    private final Action _default;
+public class ActionOptions extends IdStore<ActionOption> implements CommandAction {
+    private final CommandAction _default;
 
     /**
      * Initialize this list of options
      * @param actions The different arms of the action
      * @param _default A default action, if no others match
      */
-    public ActionOptions(List<ActionOption> actions, Action _default) {
+    public ActionOptions(List<ActionOption> actions, CommandAction _default) {
         super(actions);
         this._default = Objects.requireNonNull(_default);
     }
@@ -39,7 +39,7 @@ public class ActionOptions extends IdStore<ActionOption> implements Action {
      * Get the default action
      * @return Default action
      */
-    public Action getDefault() {
+    public CommandAction getDefault() {
         return _default;
     }
 
@@ -57,7 +57,7 @@ public class ActionOptions extends IdStore<ActionOption> implements Action {
      */
     public static class Builder implements IBuilder<ActionOptions> {
         private final List<ActionOption> actions = new ArrayList<>();
-        private Action _default = Action.NOOP;
+        private CommandAction _default = CommandAction.NOOP;
 
         /**
          * Add an arm and possible action
@@ -65,7 +65,7 @@ public class ActionOptions extends IdStore<ActionOption> implements Action {
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(Guard guard, Action action) {
+        public Builder with(Guard guard, CommandAction action) {
             return with(true, guard, action);
         }
 
@@ -75,7 +75,7 @@ public class ActionOptions extends IdStore<ActionOption> implements Action {
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(boolean enabled, Guard guard, Action action) {
+        public Builder with(boolean enabled, Guard guard, CommandAction action) {
             actions.add(new ActionOption("action_" + actions.size(), enabled, guard, action));
             return this;
         }
@@ -85,7 +85,7 @@ public class ActionOptions extends IdStore<ActionOption> implements Action {
          * @param action The action to occur
          * @return This builder
          */
-        public Builder orElseDo(Action action) {
+        public Builder orElseDo(CommandAction action) {
             _default = action;
             return this;
         }

@@ -11,15 +11,15 @@ import java.util.List;
 /**
  * Perform several actions in sequence
  */
-public class SequenceAction implements Action {
+public class SequenceAction implements CommandAction {
 
-    private final List<Action> subActions;
+    private final List<CommandAction> subActions;
 
     /**
      * Initialize the sequential actions
      * @param subActions The actions to perform
      */
-    public SequenceAction(List<Action> subActions) {
+    public SequenceAction(List<CommandAction> subActions) {
         this.subActions = subActions;
     }
 
@@ -27,7 +27,7 @@ public class SequenceAction implements Action {
      * Get the action sequence
      * @return Action sequence
      */
-    public List<Action> getSubActions() {
+    public List<CommandAction> getSubActions() {
         return subActions;
     }
 
@@ -42,13 +42,13 @@ public class SequenceAction implements Action {
      * Builder which creates a sequence action
      */
     public static class Builder implements IBuilder<SequenceAction> {
-        private final List<Action> subActions;
+        private final List<CommandAction> subActions;
 
         /**
          * Initialize the Builder
          * @param first The first action to perform
          */
-        public Builder(Action first) {
+        public Builder(CommandAction first) {
             subActions = new ArrayList<>();
             subActions.add(first);
         }
@@ -58,7 +58,7 @@ public class SequenceAction implements Action {
          * @param next The next action
          * @return This builder
          */
-        public Builder then(Action next) {
+        public Builder then(CommandAction next) {
             subActions.add(next);
             return this;
         }

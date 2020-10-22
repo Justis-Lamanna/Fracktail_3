@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.guard;
 
 import com.github.lucbui.fracktail3.discord.context.DiscordCommandSearchContext;
 import com.github.lucbui.fracktail3.magic.guard.user.Userset;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import org.apache.commons.collections4.SetUtils;
@@ -83,7 +83,7 @@ public class DiscordUserset extends Userset {
     }
 
     @Override
-    public Mono<Boolean> matches(BaseContext<?> ctx) {
+    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
         if(ctx instanceof DiscordCommandSearchContext) {
             DiscordCommandSearchContext dCtx = (DiscordCommandSearchContext) ctx;
             return Mono.just(isLegalUserId(dCtx));

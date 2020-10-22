@@ -1,12 +1,10 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.context.DiscordBaseContext;
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
-import com.github.lucbui.fracktail3.discord.schedule.DiscordScheduleContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -15,8 +13,6 @@ import com.github.lucbui.fracktail3.magic.guard.user.Userset;
 import com.github.lucbui.fracktail3.magic.platform.DirectMessagingPlatform;
 import com.github.lucbui.fracktail3.magic.platform.MessagingPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -29,8 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
 
 /**
  * A singleton which represents the Discord platform
@@ -90,20 +84,7 @@ public class DiscordPlatform implements Platform, MessagingPlatform, DirectMessa
                 .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
                 .subscribe();
 
-        configureScheduledEvents(bot);
-
         return gateway.onDisconnect().thenReturn(true);
-    }
-
-    private void configureScheduledEvents(Bot bot) {
-        for(ScheduledEvent event : configuration.getScheduledEvents().getAll()) {
-            event.getTrigger()
-                    .schedule(bot.getScheduler())
-                    .subscribe(new ScheduleSubscriber(event, instant -> {
-                        DiscordBaseContext<Instant> base = new DiscordBaseContext<>(bot, this, instant);
-                        return new DiscordScheduleContext(base, event, gateway);
-                    }));
-        }
     }
 
     @Override
@@ -113,16 +94,8 @@ public class DiscordPlatform implements Platform, MessagingPlatform, DirectMessa
                     new BotConfigurationException("Attempted to stop bot on Discord, but it was never running"));
         }
         LOGGER.debug("Stopping bot on Discord");
-        cancelEvents();
         return gateway.logout()
                 .thenReturn(true);
-    }
-
-    private void cancelEvents() {
-        configuration
-                .getScheduledEvents()
-                .getAll()
-                .forEach(ScheduledEvent::cancel);
     }
 
     @Override

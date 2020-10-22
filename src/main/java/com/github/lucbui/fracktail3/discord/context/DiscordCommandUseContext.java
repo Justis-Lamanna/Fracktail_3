@@ -9,7 +9,7 @@ public class DiscordCommandUseContext extends DiscordCommandSearchContext implem
     private final String rawParameters;
     private final String[] parameters;
 
-    public DiscordCommandUseContext(DiscordBaseContext<MessageCreateEvent> base, Command command, String rawParameters, String[] parameters) {
+    public DiscordCommandUseContext(DiscordBasePlatformContext<MessageCreateEvent> base, Command command, String rawParameters, String[] parameters) {
         super(base.getBot(), base.getPlatform(), base.getLocale(), base.getPayload());
         this.command = command;
         this.rawParameters = rawParameters;

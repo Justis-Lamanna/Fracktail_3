@@ -6,11 +6,12 @@ import reactor.core.publisher.Mono;
 /**
  * Represents a single action that a bot performs
  */
-public interface Action {
+@FunctionalInterface
+public interface CommandAction {
     /**
      * Action which does nothing at all
      */
-    Action NOOP = (context) -> Mono.empty();
+    CommandAction NOOP = (context) -> Mono.empty();
 
     /**
      * Perform the action

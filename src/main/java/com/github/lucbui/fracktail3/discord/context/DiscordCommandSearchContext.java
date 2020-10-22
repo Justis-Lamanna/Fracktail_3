@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
-public class DiscordCommandSearchContext extends DiscordBaseContext<MessageCreateEvent> implements RespondingContext {
+public class DiscordCommandSearchContext extends DiscordBasePlatformContext<MessageCreateEvent> implements RespondingContext {
     public DiscordCommandSearchContext(Bot bot, DiscordPlatform platform, MessageCreateEvent payload) {
         super(bot, platform, payload);
     }

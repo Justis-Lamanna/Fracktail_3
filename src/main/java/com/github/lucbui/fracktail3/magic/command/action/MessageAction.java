@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.magic.command.action;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.guard.channel.Channelset;
 import com.github.lucbui.fracktail3.magic.platform.MessagingPlatform;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
  * The platform should implement "MessagingPlatform" to fully support this action.
  * To simply respond to an event, consider RespondingAction.
  */
-public class MessageAction implements BaseAction {
+public class MessageAction implements PlatformBasicAction {
     private final Channelset channelset;
     private final FormattedString text;
 
@@ -26,7 +26,7 @@ public class MessageAction implements BaseAction {
     }
 
     @Override
-    public Mono<Void> doAction(BaseContext<?> context) {
+    public Mono<Void> doAction(PlatformBaseContext<?> context) {
         if(context.getPlatform() instanceof MessagingPlatform) {
             MessagingPlatform platform = (MessagingPlatform) context.getPlatform();
             return text.getFor(context)

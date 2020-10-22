@@ -5,8 +5,6 @@ import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.magic.guard.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guard.user.Usersets;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -25,7 +23,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
-    private final List<ScheduledEvent> events = new ArrayList<>();
     private final List<DiscordEventHook> handlers = new ArrayList<>();
     private final List<DiscordUserset> usersets = new ArrayList<>();
     private final List<DiscordChannelset> channelsets = new ArrayList<>();
@@ -165,36 +162,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
         return this;
     }
 
-    /**
-     * Add a scheduled event to execute
-     * @param event The event to execute
-     * @return This builder
-     */
-    public DiscordConfigurationBuilder withScheduledEvent(ScheduledEvent event) {
-        this.events.add(event);
-        return this;
-    }
-
-    /**
-     * Add a scheduled event to execute
-     * @param event The event to execute
-     * @return This builder
-     */
-    public DiscordConfigurationBuilder withScheduledEvent(IBuilder<ScheduledEvent> event) {
-        this.events.add(event.build());
-        return this;
-    }
-
-    /**
-     * Add scheduled events to execute
-     * @param events The events to execute
-     * @return This builder
-     */
-    public DiscordConfigurationBuilder withScheduledEvents(List<ScheduledEvent> events) {
-        this.events.addAll(events);
-        return this;
-    }
-
     @Override
     public DiscordConfiguration build() {
         if(owner != null) {
@@ -208,7 +175,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
                 owner,
                 i18nPath,
                 ObjectUtils.defaultIfNull(presence, Presence.online()),
-                new ScheduledEvents(events),
                 handlers,
                 new Usersets<>(usersets),
                 new Channelsets<>(channelsets));

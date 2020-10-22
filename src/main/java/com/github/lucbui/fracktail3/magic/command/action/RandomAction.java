@@ -15,14 +15,14 @@ import java.util.List;
  * Each action is weighted relative to the sum of all weights. If all weights are the same, all actions are equally
  * likely. When in doubt, weight can be a % value, as long as you maintain a total weight sum of 100
  */
-public class RandomAction implements Action {
-    private final EnumeratedDistribution<Action> actions;
+public class RandomAction implements CommandAction {
+    private final EnumeratedDistribution<CommandAction> actions;
 
     /**
      * Initialize this action with a weighted distribution of actions
      * @param actions The actions to perform
      */
-    public RandomAction(EnumeratedDistribution<Action> actions) {
+    public RandomAction(EnumeratedDistribution<CommandAction> actions) {
         this.actions = actions;
     }
 
@@ -30,7 +30,7 @@ public class RandomAction implements Action {
      * Get the actions that can be performed, and their weights
      * @return The actions to perform
      */
-    public EnumeratedDistribution<Action> getActions() {
+    public EnumeratedDistribution<CommandAction> getActions() {
         return actions;
     }
 
@@ -44,7 +44,7 @@ public class RandomAction implements Action {
      */
     public static class Builder implements IBuilder<RandomAction> {
         private final RandomGenerator random;
-        private final List<Pair<Action, Double>> actions = new ArrayList<>();
+        private final List<Pair<CommandAction, Double>> actions = new ArrayList<>();
 
         /**
          * Initialize the builder
@@ -64,7 +64,7 @@ public class RandomAction implements Action {
          * @param action The action to perform
          * @return This builder
          */
-        public Builder with(double weight, Action action) {
+        public Builder with(double weight, CommandAction action) {
             actions.add(Pair.create(action, weight));
             return this;
         }
@@ -74,7 +74,7 @@ public class RandomAction implements Action {
          * @param action The action to perform
          * @return This builder
          */
-        public Builder with(Action action) {
+        public Builder with(CommandAction action) {
             return with(1, action);
         }
 

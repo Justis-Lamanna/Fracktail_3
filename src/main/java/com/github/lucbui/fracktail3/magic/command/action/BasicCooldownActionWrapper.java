@@ -11,16 +11,16 @@ import reactor.core.publisher.Mono;
  * Note that this enforces a global cooldown. Any source which calls this action is treated the same.
  * For greater control, a custom wrapper will be necessary.
  */
-public class BasicCooldownActionWrapper implements Action {
+public class BasicCooldownActionWrapper implements CommandAction {
     private final Cooldown cooldown;
-    private final Action action;
+    private final CommandAction action;
 
     /**
      * Wrap an action with a cooldown
      * @param cooldown The action's cooldown
      * @param action The action to perform, when cooldown is complete.
      */
-    public BasicCooldownActionWrapper(Cooldown cooldown, Action action) {
+    public BasicCooldownActionWrapper(Cooldown cooldown, CommandAction action) {
         this.cooldown = cooldown;
         this.action = action;
     }

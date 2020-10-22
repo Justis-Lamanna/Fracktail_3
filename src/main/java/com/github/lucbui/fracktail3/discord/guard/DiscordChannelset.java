@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.guard;
 
 import com.github.lucbui.fracktail3.discord.context.DiscordCommandSearchContext;
 import com.github.lucbui.fracktail3.magic.guard.channel.Channelset;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
@@ -56,7 +56,7 @@ public class DiscordChannelset extends Channelset {
     }
 
     @Override
-    public Mono<Boolean> matches(BaseContext<?> ctx) {
+    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
         if(ctx instanceof DiscordCommandSearchContext) {
             DiscordCommandSearchContext dCtx = (DiscordCommandSearchContext) ctx;
             return Mono.just(isLegalChannel(dCtx));

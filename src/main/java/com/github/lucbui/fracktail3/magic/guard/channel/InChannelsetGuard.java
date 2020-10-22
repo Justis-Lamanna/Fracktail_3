@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.guard.channel;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 public class InChannelsetGuard implements Guard {
@@ -19,7 +19,7 @@ public class InChannelsetGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(BaseContext<?> ctx) {
+    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
         return ctx.getPlatform().getConfig().getChannelset(id)
                 .map(cs -> cs.matches(ctx))
                 .orElse(Mono.just(defaultValue));

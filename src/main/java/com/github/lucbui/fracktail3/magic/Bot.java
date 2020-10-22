@@ -2,7 +2,10 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 import org.apache.commons.collections4.CollectionUtils;
@@ -10,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,6 +72,13 @@ public class Bot extends IdStore<Platform> {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
+
+        for(ScheduledEvent event : botSpec.getScheduledEvents().getAll()) {
+            event.getTrigger()
+                    .schedule(scheduler)
+                    .subscribe(new ScheduleSubscriber(event, instant -> new ScheduledUseContext(this, Locale.getDefault(), instant, event)));
+        }
+
         return Flux.fromIterable(getAll())
                 .flatMap(handler -> handler.start(this))
                 .then().thenReturn(true);
@@ -82,6 +93,9 @@ public class Bot extends IdStore<Platform> {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
+
+        botSpec.getScheduledEvents().getAll().forEach(ScheduledEvent::cancel);
+
         return Flux.fromIterable(getAll())
                 .flatMap(handler -> handler.stop(this))
                 .then().thenReturn(true);

@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.guard.user;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,7 +31,7 @@ public class InUsersetGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(BaseContext<?> ctx) {
+    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
         return ctx.getPlatform().getConfig().getUserset(id)
                 .map(value -> Mono.just(value).flatMap(u -> u.matches(ctx)))
                 .orElseGet(() -> Mono.just(defaultValue));

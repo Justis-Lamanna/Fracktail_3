@@ -2,12 +2,12 @@ package com.github.lucbui.fracktail3.magic.command;
 
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.command.action.Action;
-import com.github.lucbui.fracktail3.magic.command.action.BaseAction;
+import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
@@ -24,7 +24,7 @@ public class Command implements Id, Disableable {
     private final Set<String> names;
     private final FormattedString help;
     private final Guard commandGuard;
-    private final Action action;
+    private final CommandAction action;
 
     private boolean enabled;
 
@@ -34,7 +34,7 @@ public class Command implements Id, Disableable {
      * @param id The command's ID
      * @param action The action to perform
      */
-    public Command(String id, Action action) {
+    public Command(String id, CommandAction action) {
         this(id, Guard.identity(true), action);
     }
 
@@ -45,7 +45,7 @@ public class Command implements Id, Disableable {
      * @param guard A filter for this command
      * @param action The action to perform
      */
-    public Command(String id, Guard guard, Action action) {
+    public Command(String id, Guard guard, CommandAction action) {
         this(id, Collections.singleton(id), guard, action);
     }
 
@@ -56,7 +56,7 @@ public class Command implements Id, Disableable {
      * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, String name, Guard guard, Action action) {
+    public Command(String id, String name, Guard guard, CommandAction action) {
         this(id, Collections.singleton(name), FormattedString.from(id + ".help"), guard, action);
     }
 
@@ -67,7 +67,7 @@ public class Command implements Id, Disableable {
      * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, Set<String> names, Guard guard, Action action) {
+    public Command(String id, Set<String> names, Guard guard, CommandAction action) {
         this(id, names, FormattedString.from(id + ".help"), guard, action);
     }
 
@@ -79,7 +79,7 @@ public class Command implements Id, Disableable {
      * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, Set<String> names, FormattedString help, Guard guard, Action action) {
+    public Command(String id, Set<String> names, FormattedString help, Guard guard, CommandAction action) {
         this(id, true, names, help, guard, action);
     }
 
@@ -92,7 +92,7 @@ public class Command implements Id, Disableable {
      * @param guard A guard, which prevents this command from being used in certain contexts
      * @param action The action to perform when the command is run
      */
-    public Command(String id, boolean enabled, Set<String> names, FormattedString help, Guard guard, Action action) {
+    public Command(String id, boolean enabled, Set<String> names, FormattedString help, Guard guard, CommandAction action) {
         this.id = id;
         this.enabled = enabled;
         this.names = names;
@@ -126,7 +126,7 @@ public class Command implements Id, Disableable {
      * Get the action this command executes
      * @return The action
      */
-    public Action getAction() {
+    public CommandAction getAction() {
         return action;
     }
 
@@ -143,7 +143,7 @@ public class Command implements Id, Disableable {
      * @param ctx The context of the commands usage
      * @return Asynchronous boolean indicating if the guard passes
      */
-    public Mono<Boolean> matches(BaseContext<?> ctx) {
+    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
         return BooleanUtils.and(Mono.just(enabled), commandGuard.matches(ctx));
     }
 
@@ -184,7 +184,7 @@ public class Command implements Id, Disableable {
         private boolean enabled = true;
         private Set<String> names = new HashSet<>();
         private Guard guard = Guard.identity(true);
-        private Action action = Action.NOOP;
+        private CommandAction action = CommandAction.NOOP;
         private FormattedString help;
 
         /**
@@ -221,7 +221,7 @@ public class Command implements Id, Disableable {
          * @param action The action to perform
          * @return This builder
          */
-        public Builder withAction(Action action) {
+        public Builder withAction(CommandAction action) {
             this.action = action;
             return this;
         }
@@ -231,7 +231,7 @@ public class Command implements Id, Disableable {
          * @param action The action to perform
          * @return This builder
          */
-        public Builder withAction(BaseAction action) {
+        public Builder withAction(PlatformBasicAction action) {
             this.action = action::doAction;
             return this;
         }
@@ -262,7 +262,7 @@ public class Command implements Id, Disableable {
          * @param actionBuilder An ActionBuilder, which is resolved
          * @return This builder
          */
-        public Builder withAction(IBuilder<? extends Action> actionBuilder) {
+        public Builder withAction(IBuilder<? extends CommandAction> actionBuilder) {
             return withAction(actionBuilder.build());
         }
 

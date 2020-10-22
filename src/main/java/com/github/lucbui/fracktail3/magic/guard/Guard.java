@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.guard;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +13,7 @@ public interface Guard {
      * @param ctx The context the command has been run in
      * @return Asynchronous boolean, indicating if the command can be used or not
      */
-    Mono<Boolean> matches(BaseContext<?> ctx);
+    Mono<Boolean> matches(PlatformBaseContext<?> ctx);
 
     /**
      * Creates a filter that passes when this filter AND another both pass
