@@ -4,7 +4,7 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public class DiscordCommandUseContext extends DiscordBaseContext<MessageCreateEvent> implements CommandUseContext<MessageCreateEvent> {
+public class DiscordCommandUseContext extends DiscordCommandSearchContext implements CommandUseContext<MessageCreateEvent> {
     private final Command command;
     private final String rawParameters;
     private final String[] parameters;

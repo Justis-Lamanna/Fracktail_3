@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.magic.command;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.Action;
+import com.github.lucbui.fracktail3.magic.command.action.BaseAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
@@ -222,6 +223,16 @@ public class Command implements Id, Disableable {
          */
         public Builder withAction(Action action) {
             this.action = action;
+            return this;
+        }
+
+        /**
+         * Set the action of this command
+         * @param action The action to perform
+         * @return This builder
+         */
+        public Builder withAction(BaseAction action) {
+            this.action = action::doAction;
             return this;
         }
 

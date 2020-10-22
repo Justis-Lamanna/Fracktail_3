@@ -6,7 +6,8 @@ import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotCreator;
 import com.github.lucbui.fracktail3.magic.command.Command;
-import com.github.lucbui.fracktail3.magic.command.action.LoggingAction;
+import com.github.lucbui.fracktail3.magic.command.action.RespondingAction;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -27,13 +28,14 @@ public class DiscordBotRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Bot bot = new BotCreator()
                 .withPlatform(new DiscordPlatform.Builder()
-                .withConfiguration(new DiscordConfigurationBuilder(token)
-                .withPrefix("!")
-                .withOwner(248612704019808258L)
-                .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
-                .withUserset(DiscordUserset.forUser("steven", 112005555178000384L))))
+                    .withConfiguration(new DiscordConfigurationBuilder(token)
+                    .withPrefix("!")
+                    .withOwner(248612704019808258L)
+                    .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
+                    .withUserset(DiscordUserset.forUser("steven", 112005555178000384L))))
                 .withScheduler(scheduler)
-                .withCommand(new Command.Builder("hello").withAction(new LoggingAction("Hey!")))
+                .withCommand(new Command.Builder("hello")
+                    .withAction(new RespondingAction(FormattedString.literal("Hello!"))))
                 .build();
         bot.start().block();
     }

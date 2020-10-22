@@ -2,12 +2,18 @@ package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.DiscordBaseContext;
+import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
+import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
 import com.github.lucbui.fracktail3.discord.schedule.DiscordScheduleContext;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.guard.channel.Channelset;
+import com.github.lucbui.fracktail3.magic.guard.user.Userset;
+import com.github.lucbui.fracktail3.magic.platform.DirectMessagingPlatform;
+import com.github.lucbui.fracktail3.magic.platform.MessagingPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
@@ -17,8 +23,11 @@ import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -26,7 +35,7 @@ import java.time.Instant;
 /**
  * A singleton which represents the Discord platform
  */
-public class DiscordPlatform implements Platform {
+public class DiscordPlatform implements Platform, MessagingPlatform, DirectMessagingPlatform {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
 
     private final DiscordConfiguration configuration;
@@ -114,6 +123,40 @@ public class DiscordPlatform implements Platform {
                 .getScheduledEvents()
                 .getAll()
                 .forEach(ScheduledEvent::cancel);
+    }
+
+    @Override
+    public Mono<Void> message(Channelset channelset, String message) {
+        if(channelset instanceof DiscordChannelset) {
+            return message((DiscordChannelset)channelset, message);
+        }
+        return Mono.empty();
+    }
+
+    public Mono<Void> message(DiscordChannelset channelset, String message) {
+        return Flux.fromIterable((channelset).getChannelSnowflakes())
+                .flatMap(channel -> gateway.getChannelById(channel))
+                .cast(MessageChannel.class)
+                .flatMap(channel -> channel.createMessage(message))
+                .next()
+                .then();
+    }
+
+    @Override
+    public Mono<Void> dm(Userset userset, String message) {
+        if(userset instanceof DiscordUserset) {
+            return dm((DiscordUserset)userset, message);
+        }
+        return Mono.empty();
+    }
+
+    public Mono<Void> dm(DiscordUserset userset, String message) {
+        return Flux.fromIterable(userset.getUserSnowflakes())
+                .flatMap(user -> gateway.getUserById(user))
+                .flatMap(User::getPrivateChannel)
+                .flatMap(dm -> dm.createMessage(message))
+                .next()
+                .then();
     }
 
     public static class Builder implements IBuilder<DiscordPlatform> {
