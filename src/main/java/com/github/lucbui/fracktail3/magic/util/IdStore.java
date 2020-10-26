@@ -53,4 +53,13 @@ public class IdStore<ITEM extends Id>{
     public int size() {
         return store.size();
     }
+
+    /**
+     * Create an empty IdStore
+     * @param <T> The type of store
+     * @return An empty ID
+     */
+    public static <T extends Id> IdStore<T> emptyIdStore() {
+        return new IdStore<T>(Collections.emptyMap());
+    }
 }

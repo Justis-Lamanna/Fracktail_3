@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.config;
 
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
+import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
@@ -14,7 +14,10 @@ import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Subclass of a Configuration for a Discord bot.
@@ -28,7 +31,7 @@ public class DiscordConfiguration implements Config, Localizable {
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
-    private final List<DiscordEventHook> handlers;
+    private final DiscordEventHookStore handlers;
     private final Usersets<DiscordUserset> usersets;
     private final Channelsets<DiscordChannelset> channelsets;
 
@@ -42,7 +45,7 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(
             String token, String prefix, @Nullable Snowflake owner, String i18nPath,
-            StatusUpdate presence, List<DiscordEventHook> handlers,
+            StatusUpdate presence, DiscordEventHookStore handlers,
             Usersets<DiscordUserset> usersets, Channelsets<DiscordChannelset> channelsets) {
         this.token = token;
         this.prefix = prefix;
@@ -61,7 +64,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence, Collections.emptyList(), Usersets.empty(), Channelsets.empty());
+        this(token, prefix, null, null, presence, new DiscordEventHookStore(), Usersets.empty(), Channelsets.empty());
     }
 
     /**
@@ -142,8 +145,8 @@ public class DiscordConfiguration implements Config, Localizable {
      * Get the handlers for this configuration
      * @return The handlers used
      */
-    public List<DiscordEventHook> getHandlers() {
-        return Collections.unmodifiableList(handlers);
+    public DiscordEventHookStore getHandlers() {
+        return handlers;
     }
 
     /**

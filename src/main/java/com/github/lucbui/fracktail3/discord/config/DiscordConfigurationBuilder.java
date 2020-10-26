@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.discord.config;
 
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
+import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore;
 import com.github.lucbui.fracktail3.magic.guard.channel.Channelsets;
 import com.github.lucbui.fracktail3.magic.guard.user.Usersets;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
@@ -23,7 +23,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
-    private final List<DiscordEventHook> handlers = new ArrayList<>();
+    private DiscordEventHookStore handlers = new DiscordEventHookStore();
     private final List<DiscordUserset> usersets = new ArrayList<>();
     private final List<DiscordChannelset> channelsets = new ArrayList<>();
 
@@ -85,8 +85,8 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handler The handler to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandler(DiscordEventHook handler) {
-        this.handlers.add(handler);
+    public DiscordConfigurationBuilder withHandlers(DiscordEventHookStore handler) {
+        this.handlers = handler;
         return this;
     }
 
@@ -95,18 +95,8 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handler The handler to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandler(IBuilder<DiscordEventHook> handler) {
-        this.handlers.add(handler.build());
-        return this;
-    }
-
-    /**
-     * Add several event hooks, to be used by the PlatformRunner
-     * @param handlers The handlers to use
-     * @return This builder.
-     */
-    public DiscordConfigurationBuilder withHandlers(List<DiscordEventHook> handlers) {
-        this.handlers.addAll(handlers);
+    public DiscordConfigurationBuilder withHandlers(IBuilder<DiscordEventHookStore> handler) {
+        this.handlers = handler.build();
         return this;
     }
 

@@ -62,7 +62,7 @@ public class DiscordPlatform implements Platform, MessagingPlatform, DirectMessa
         BotSpec botSpec = bot.getSpec();
 
         DiscordCommandHandler discordCommandHandler = new DefaultDiscordCommandHandler(botSpec.getCommandList());
-        DiscordOnEventHandler discordEventHandler = new DefaultDiscordOnEventHandler(configuration.getHandlers());
+        DiscordOnEventHandler discordEventHandler = new DefaultDiscordOnEventHandler();
 
         DiscordClient discordClient =
                 DiscordClientBuilder.create(configuration.getToken()).build();
@@ -81,7 +81,7 @@ public class DiscordPlatform implements Platform, MessagingPlatform, DirectMessa
                 .subscribe();
 
         gateway.on(Event.class)
-                .flatMap(evt -> discordEventHandler.execute(bot, configuration, evt))
+                .flatMap(evt -> discordEventHandler.execute(bot, this, evt))
                 .subscribe();
 
         return gateway.onDisconnect().thenReturn(true);
