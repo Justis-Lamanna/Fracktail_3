@@ -13,6 +13,6 @@ public class GuildCreateContext extends DiscordBasePlatformContext<GuildCreateEv
     }
 
     public GuildCreateContext(Bot bot, DiscordPlatform platform, Locale locale, GuildCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

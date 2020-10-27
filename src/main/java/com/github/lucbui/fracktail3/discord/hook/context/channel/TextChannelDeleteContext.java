@@ -13,6 +13,6 @@ public class TextChannelDeleteContext extends DiscordBasePlatformContext<TextCha
     }
 
     public TextChannelDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, TextChannelDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

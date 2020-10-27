@@ -13,6 +13,6 @@ public class MemberChunkContext extends DiscordBasePlatformContext<MemberChunkEv
     }
 
     public MemberChunkContext(Bot bot, DiscordPlatform platform, Locale locale, MemberChunkEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

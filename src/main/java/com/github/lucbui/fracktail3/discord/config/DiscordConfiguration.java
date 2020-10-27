@@ -124,21 +124,17 @@ public class DiscordConfiguration implements Config, Localizable {
         return i18nPath != null;
     }
 
-    /**
-     * Get the ResourceBundle for a particular locale.
-     * @param locale The locale to retrieve.
-     * @return A ResourceBundle, if i18n is supported.
-     */
-    public Optional<ResourceBundle> getResourceBundle(Locale locale) {
-        return getI18nPath().map(path -> ResourceBundle.getBundle(path, locale));
-    }
-
     @Override
-    public ResourceBundle getBundle(Locale locale) {
-        if(!isEnabled()) {
+    public ResourceBundle getResourceBundle(Locale locale) {
+        if(!isLocalizationEnabled()) {
             throw new NoSuchElementException("Localization is disabled");
         }
         return ResourceBundle.getBundle(i18nPath, locale);
+    }
+
+    @Override
+    public boolean isLocalizationEnabled() {
+        return i18nPath != null;
     }
 
     /**
@@ -163,11 +159,6 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public Channelsets<DiscordChannelset> getChannelsets() {
         return channelsets;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return i18nPath != null;
     }
 
     @Override

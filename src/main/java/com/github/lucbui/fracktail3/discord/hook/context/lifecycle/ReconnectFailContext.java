@@ -13,6 +13,6 @@ public class ReconnectFailContext extends DiscordBasePlatformContext<ReconnectFa
     }
 
     public ReconnectFailContext(Bot bot, DiscordPlatform platform, Locale locale, ReconnectFailEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class GuildUpdateContext extends DiscordBasePlatformContext<GuildUpdateEv
     }
 
     public GuildUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, GuildUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

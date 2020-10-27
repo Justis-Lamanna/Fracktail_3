@@ -13,6 +13,6 @@ public class ReadyContext extends DiscordBasePlatformContext<ReadyEvent> {
     }
 
     public ReadyContext(Bot bot, DiscordPlatform platform, Locale locale, ReadyEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

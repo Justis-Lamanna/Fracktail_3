@@ -13,6 +13,6 @@ public class PresenceUpdateContext extends DiscordBasePlatformContext<PresenceUp
     }
 
     public PresenceUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, PresenceUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

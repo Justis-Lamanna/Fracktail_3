@@ -13,6 +13,6 @@ public class DisconnectContext extends DiscordBasePlatformContext<DisconnectEven
     }
 
     public DisconnectContext(Bot bot, DiscordPlatform platform, Locale locale, DisconnectEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

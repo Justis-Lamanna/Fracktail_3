@@ -13,6 +13,6 @@ public class ReactionRemoveEmojiContext extends DiscordBasePlatformContext<React
     }
 
     public ReactionRemoveEmojiContext(Bot bot, DiscordPlatform platform, Locale locale, ReactionRemoveEmojiEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

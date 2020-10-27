@@ -13,6 +13,6 @@ public class PinsUpdateContext extends DiscordBasePlatformContext<PinsUpdateEven
     }
 
     public PinsUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, PinsUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

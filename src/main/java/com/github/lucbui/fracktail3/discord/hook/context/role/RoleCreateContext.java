@@ -13,6 +13,6 @@ public class RoleCreateContext extends DiscordBasePlatformContext<RoleCreateEven
     }
 
     public RoleCreateContext(Bot bot, DiscordPlatform platform, Locale locale, RoleCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class StoreChannelDeleteContext extends DiscordBasePlatformContext<StoreC
     }
 
     public StoreChannelDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, StoreChannelDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

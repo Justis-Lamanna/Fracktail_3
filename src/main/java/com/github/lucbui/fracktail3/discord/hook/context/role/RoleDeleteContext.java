@@ -13,6 +13,6 @@ public class RoleDeleteContext extends DiscordBasePlatformContext<RoleDeleteEven
     }
 
     public RoleDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, RoleDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

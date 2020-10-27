@@ -13,6 +13,6 @@ public class PrivateChannelDeleteContext extends DiscordBasePlatformContext<Priv
     }
 
     public PrivateChannelDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, PrivateChannelDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

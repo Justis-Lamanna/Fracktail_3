@@ -13,6 +13,6 @@ public class CategoryCreateContext extends DiscordBasePlatformContext<CategoryCr
     }
 
     public CategoryCreateContext(Bot bot, DiscordPlatform platform, Locale locale, CategoryCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class MemberUpdateContext extends DiscordBasePlatformContext<MemberUpdate
     }
 
     public MemberUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, MemberUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

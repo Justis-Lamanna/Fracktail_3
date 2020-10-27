@@ -13,6 +13,6 @@ public class CategoryDeleteContext extends DiscordBasePlatformContext<CategoryDe
     }
 
     public CategoryDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, CategoryDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

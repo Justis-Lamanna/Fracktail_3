@@ -13,6 +13,6 @@ public class StoreChannelCreateContext extends DiscordBasePlatformContext<StoreC
     }
 
     public StoreChannelCreateContext(Bot bot, DiscordPlatform platform, Locale locale, StoreChannelCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class ReactionRemoveAllContext extends DiscordBasePlatformContext<Reactio
     }
 
     public ReactionRemoveAllContext(Bot bot, DiscordPlatform platform, Locale locale, ReactionRemoveAllEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

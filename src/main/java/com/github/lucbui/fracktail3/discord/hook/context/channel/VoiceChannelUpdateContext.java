@@ -13,6 +13,6 @@ public class VoiceChannelUpdateContext extends DiscordBasePlatformContext<VoiceC
     }
 
     public VoiceChannelUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, VoiceChannelUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

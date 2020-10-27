@@ -13,6 +13,6 @@ public class GuildDeleteContext extends DiscordBasePlatformContext<GuildDeleteEv
     }
 
     public GuildDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, GuildDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

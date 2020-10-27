@@ -13,6 +13,6 @@ public class MemberLeaveContext extends DiscordBasePlatformContext<MemberLeaveEv
     }
 
     public MemberLeaveContext(Bot bot, DiscordPlatform platform, Locale locale, MemberLeaveEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

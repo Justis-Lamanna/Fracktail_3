@@ -13,6 +13,6 @@ public class VoiceChannelDeleteContext extends DiscordBasePlatformContext<VoiceC
     }
 
     public VoiceChannelDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, VoiceChannelDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

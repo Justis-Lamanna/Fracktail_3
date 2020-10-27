@@ -13,6 +13,6 @@ public class IntegrationsUpdateContext extends DiscordBasePlatformContext<Integr
     }
 
     public IntegrationsUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, IntegrationsUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

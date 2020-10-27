@@ -13,6 +13,6 @@ public class ReconnectContext extends DiscordBasePlatformContext<ReconnectEvent>
     }
 
     public ReconnectContext(Bot bot, DiscordPlatform platform, Locale locale, ReconnectEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -31,21 +31,17 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
     private static final Pattern DOUBLE_QUOTES_NO_BACKSLASH = Pattern.compile("(?<!\\\\)\"");
 
     private final CommandList commandList;
-    private final DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver;
     private final DiscordExecutionHook executionHook;
 
     /**
      * Initialize this handler
      * @param commandList The command list to use
-     * @param discordLocaleResolver The function to resolve the locale of a message
      * @param executionHook Code to execute before execution of a command
      */
     public DefaultDiscordCommandHandler(
             CommandList commandList,
-            DiscordLocaleResolver<MessageCreateEvent> discordLocaleResolver,
             DiscordExecutionHook executionHook) {
         this.commandList = commandList;
-        this.discordLocaleResolver = discordLocaleResolver;
         this.executionHook = executionHook;
     }
 
@@ -55,15 +51,11 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
      * @param commandList The command list to use
      */
     public DefaultDiscordCommandHandler(CommandList commandList) {
-        this(commandList, new LocaleFromGuildResolver(), DiscordExecutionHook.identity());
+        this(commandList, DiscordExecutionHook.identity());
     }
 
     public CommandList getCommandList() {
         return commandList;
-    }
-
-    public DiscordLocaleResolver<MessageCreateEvent> getDiscordLocaleResolver() {
-        return discordLocaleResolver;
     }
 
     public DiscordExecutionHook getExecutionHook() {
@@ -77,10 +69,10 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
         }
         DiscordConfiguration configuration = platform.getConfig();
         String contents = event.getMessage().getContent();
+        DiscordCommandSearchContext searchContext = new DiscordCommandSearchContext(bot, platform, event);
         return Mono.justOrEmpty(contents)
-                .filter(s -> StringUtils.startsWith(s, configuration.getPrefix())) //Remove this?
-                .then(discordLocaleResolver.getLocale(event))
-                .map(locale -> new DiscordCommandSearchContext(bot, platform, locale, event))
+                .filter(s -> StringUtils.startsWith(s, configuration.getPrefix()))
+                .thenReturn(searchContext)
                 .flatMap(ctx -> getCommandsByName()
                     .filter(t -> {
                         String commandName = t.getT1();

@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
 import com.github.lucbui.fracktail3.magic.Localizable;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -28,10 +28,11 @@ public class TranslatorFormatter implements ContextFormatter {
     }
 
     @Override
-    public Mono<String> format(String raw, PlatformBaseContext<?> ctx) {
-        if(ctx.getPlatform().getConfig() instanceof Localizable) {
-            Localizable config = (Localizable) ctx.getPlatform().getConfig();
-            return Mono.justOrEmpty(config.getBundleIfEnabled(ctx.getLocale()))
+    public Mono<String> format(String raw, BaseContext<?> ctx) {
+        if(ctx instanceof Localizable) {
+            Localizable lCtx = (Localizable) ctx;
+            return ctx.getLocale()
+                    .flatMap(locale -> Mono.justOrEmpty(lCtx.getBundleIfEnabled(locale)))
                     .filter(bundle -> bundle.containsKey(raw))
                     .map(bundle -> bundle.getString(raw))
                     .defaultIfEmpty(_default == null ? raw : _default);

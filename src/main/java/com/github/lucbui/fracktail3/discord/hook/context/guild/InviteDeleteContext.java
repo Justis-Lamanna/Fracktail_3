@@ -13,6 +13,6 @@ public class InviteDeleteContext extends DiscordBasePlatformContext<InviteDelete
     }
 
     public InviteDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, InviteDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

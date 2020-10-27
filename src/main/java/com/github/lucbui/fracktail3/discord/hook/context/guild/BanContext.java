@@ -13,6 +13,6 @@ public class BanContext extends DiscordBasePlatformContext<BanEvent> {
     }
 
     public BanContext(Bot bot, DiscordPlatform platform, Locale locale, BanEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

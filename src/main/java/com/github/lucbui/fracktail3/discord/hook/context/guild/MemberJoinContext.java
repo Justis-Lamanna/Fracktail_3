@@ -13,6 +13,6 @@ public class MemberJoinContext extends DiscordBasePlatformContext<MemberJoinEven
     }
 
     public MemberJoinContext(Bot bot, DiscordPlatform platform, Locale locale, MemberJoinEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class ReactionAddContext extends DiscordBasePlatformContext<ReactionAddEv
     }
 
     public ReactionAddContext(Bot bot, DiscordPlatform platform, Locale locale, ReactionAddEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

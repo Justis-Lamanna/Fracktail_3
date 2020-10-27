@@ -13,6 +13,6 @@ public class TypingStartContext extends DiscordBasePlatformContext<TypingStartEv
     }
 
     public TypingStartContext(Bot bot, DiscordPlatform platform, Locale locale, TypingStartEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

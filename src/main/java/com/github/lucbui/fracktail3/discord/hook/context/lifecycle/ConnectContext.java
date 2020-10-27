@@ -13,6 +13,6 @@ public class ConnectContext extends DiscordBasePlatformContext<ConnectEvent> {
     }
 
     public ConnectContext(Bot bot, DiscordPlatform platform, Locale locale, ConnectEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

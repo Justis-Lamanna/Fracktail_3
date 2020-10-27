@@ -13,6 +13,6 @@ public class EmojiUpdateContext extends DiscordBasePlatformContext<EmojisUpdateE
     }
 
     public EmojiUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, EmojisUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

@@ -13,6 +13,6 @@ public class MessageDeleteContext extends DiscordBasePlatformContext<MessageDele
     }
 
     public MessageDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, MessageDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

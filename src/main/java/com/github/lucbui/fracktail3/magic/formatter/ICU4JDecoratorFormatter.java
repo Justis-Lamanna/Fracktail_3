@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -28,7 +28,7 @@ public class ICU4JDecoratorFormatter implements ContextFormatter {
     }
 
     @Override
-    public Mono<String> format(String raw, PlatformBaseContext<?> ctx) {
+    public Mono<String> format(String raw, BaseContext<?> ctx) {
         //Eventually, this can be done  abit better.
         return Mono.just(raw);
     }

@@ -13,6 +13,6 @@ public class MessageCreateContext extends DiscordBasePlatformContext<MessageCrea
     }
 
     public MessageCreateContext(Bot bot, DiscordPlatform platform, Locale locale, MessageCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

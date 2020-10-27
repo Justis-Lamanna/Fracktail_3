@@ -13,13 +13,13 @@ public interface Localizable {
      * @param locale The locale to use
      * @return The ResourceBundle for that locale
      */
-    ResourceBundle getBundle(Locale locale);
+    ResourceBundle getResourceBundle(Locale locale);
 
     /**
      * Return if localization is enabled or disabled
      * @return True, if localization is enabled
      */
-    default boolean isEnabled() {
+    default boolean isLocalizationEnabled() {
         return true;
     }
 
@@ -29,6 +29,6 @@ public interface Localizable {
      * @return The Bundle, or an empty optional if disabled
      */
     default Optional<ResourceBundle> getBundleIfEnabled(Locale locale) {
-        return isEnabled() ? Optional.of(getBundle(locale)) : Optional.empty();
+        return isLocalizationEnabled() ? Optional.of(getResourceBundle(locale)) : Optional.empty();
     }
 }

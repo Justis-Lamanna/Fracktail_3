@@ -13,6 +13,6 @@ public class InviteCreateContext extends DiscordBasePlatformContext<InviteCreate
     }
 
     public InviteCreateContext(Bot bot, DiscordPlatform platform, Locale locale, InviteCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

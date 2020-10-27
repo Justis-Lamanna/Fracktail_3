@@ -13,6 +13,6 @@ public class NewsChannelDeleteContext extends DiscordBasePlatformContext<NewsCha
     }
 
     public NewsChannelDeleteContext(Bot bot, DiscordPlatform platform, Locale locale, NewsChannelDeleteEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

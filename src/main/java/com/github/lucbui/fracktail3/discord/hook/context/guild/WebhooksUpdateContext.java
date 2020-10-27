@@ -13,6 +13,6 @@ public class WebhooksUpdateContext extends DiscordBasePlatformContext<WebhooksUp
     }
 
     public WebhooksUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, WebhooksUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

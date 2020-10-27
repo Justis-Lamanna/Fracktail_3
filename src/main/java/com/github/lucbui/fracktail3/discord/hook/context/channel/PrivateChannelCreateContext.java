@@ -13,6 +13,6 @@ public class PrivateChannelCreateContext extends DiscordBasePlatformContext<Priv
     }
 
     public PrivateChannelCreateContext(Bot bot, DiscordPlatform platform, Locale locale, PrivateChannelCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

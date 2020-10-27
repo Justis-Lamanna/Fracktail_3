@@ -13,6 +13,6 @@ public class RoleUpdateContext extends DiscordBasePlatformContext<RoleUpdateEven
     }
 
     public RoleUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, RoleUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

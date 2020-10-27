@@ -13,7 +13,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -76,7 +75,7 @@ public class Bot extends IdStore<Platform> {
         for(ScheduledEvent event : botSpec.getScheduledEvents().getAll()) {
             event.getTrigger()
                     .schedule(scheduler)
-                    .subscribe(new ScheduleSubscriber(event, instant -> new ScheduledUseContext(this, Locale.getDefault(), instant, event)));
+                    .subscribe(new ScheduleSubscriber(event, instant -> new ScheduledUseContext(this, instant, event)));
         }
 
         return Flux.fromIterable(getAll())

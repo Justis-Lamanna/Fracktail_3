@@ -13,6 +13,6 @@ public class VoiceChannelCreateContext extends DiscordBasePlatformContext<VoiceC
     }
 
     public VoiceChannelCreateContext(Bot bot, DiscordPlatform platform, Locale locale, VoiceChannelCreateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

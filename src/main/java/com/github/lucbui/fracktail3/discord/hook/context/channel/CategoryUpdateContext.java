@@ -13,6 +13,6 @@ public class CategoryUpdateContext extends DiscordBasePlatformContext<CategoryUp
     }
 
     public CategoryUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, CategoryUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

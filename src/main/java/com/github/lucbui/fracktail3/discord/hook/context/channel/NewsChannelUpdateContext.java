@@ -13,6 +13,6 @@ public class NewsChannelUpdateContext extends DiscordBasePlatformContext<NewsCha
     }
 
     public NewsChannelUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, NewsChannelUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

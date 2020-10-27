@@ -13,6 +13,6 @@ public class ResumeContext extends DiscordBasePlatformContext<ResumeEvent> {
     }
 
     public ResumeContext(Bot bot, DiscordPlatform platform, Locale locale, ResumeEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

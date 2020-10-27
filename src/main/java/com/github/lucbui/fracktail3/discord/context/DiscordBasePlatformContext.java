@@ -2,34 +2,26 @@ package com.github.lucbui.fracktail3.discord.context;
 
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
-public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T> {
+public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T>, Localizable {
     private final Bot bot;
     private final DiscordPlatform platform;
-    private final Locale locale;
     private final T payload;
 
     public DiscordBasePlatformContext(DiscordBasePlatformContext<T> base) {
         this.bot = base.getBot();
         this.platform = base.getPlatform();
-        this.locale = base.getLocale();
         this.payload = base.getPayload();
     }
 
     public DiscordBasePlatformContext(Bot bot, DiscordPlatform platform, T payload) {
         this.bot = bot;
         this.platform = platform;
-        this.payload = payload;
-        this.locale = Locale.getDefault();
-    }
-
-    public DiscordBasePlatformContext(Bot bot, DiscordPlatform platform, Locale locale, T payload) {
-        this.bot = bot;
-        this.platform = platform;
-        this.locale = locale;
         this.payload = payload;
     }
 
@@ -49,7 +41,12 @@ public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T> {
     }
 
     @Override
-    public Locale getLocale() {
-        return locale;
+    public ResourceBundle getResourceBundle(Locale locale) {
+        return platform.getConfig().getLocalizationBundle(locale);
+    }
+
+    @Override
+    public boolean isLocalizationEnabled() {
+        return platform.getConfig().isLocalizationEnabled();
     }
 }

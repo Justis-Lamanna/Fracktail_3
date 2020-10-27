@@ -13,6 +13,6 @@ public class UnbanContext extends DiscordBasePlatformContext<UnbanEvent> {
     }
 
     public UnbanContext(Bot bot, DiscordPlatform platform, Locale locale, UnbanEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

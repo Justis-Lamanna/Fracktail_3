@@ -13,6 +13,6 @@ public class TextChannelUpdateContext extends DiscordBasePlatformContext<TextCha
     }
 
     public TextChannelUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, TextChannelUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }

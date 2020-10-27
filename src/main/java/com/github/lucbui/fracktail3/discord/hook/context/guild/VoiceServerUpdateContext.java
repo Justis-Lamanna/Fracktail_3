@@ -13,6 +13,6 @@ public class VoiceServerUpdateContext extends DiscordBasePlatformContext<VoiceSe
     }
 
     public VoiceServerUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, VoiceServerUpdateEvent payload) {
-        super(bot, platform, locale, payload);
+        super(bot, platform, payload);
     }
 }
