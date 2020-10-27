@@ -15,4 +15,12 @@ public class VoiceStateUpdateContext extends DiscordBasePlatformContext<VoiceSta
     public VoiceStateUpdateContext(Bot bot, DiscordPlatform platform, Locale locale, VoiceStateUpdateEvent payload) {
         super(bot, platform, payload);
     }
+
+    public boolean isJoin() {
+        return !getPayload().getOld().isPresent();
+    }
+
+    public boolean isLeave() {
+        return !getPayload().getCurrent().getChannelId().isPresent();
+    }
 }

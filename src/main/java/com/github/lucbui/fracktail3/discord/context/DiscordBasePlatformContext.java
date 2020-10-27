@@ -42,11 +42,20 @@ public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T>, Lo
 
     @Override
     public ResourceBundle getResourceBundle(Locale locale) {
-        return platform.getConfig().getLocalizationBundle(locale);
+        return platform.getConfig().getResourceBundle(locale);
     }
 
     @Override
     public boolean isLocalizationEnabled() {
         return platform.getConfig().isLocalizationEnabled();
+    }
+
+    @Override
+    public String toString() {
+        return "DiscordBasePlatformContext{" +
+                "bot=" + bot +
+                ", platform=" + platform +
+                ", payload=" + payload +
+                '}';
     }
 }
