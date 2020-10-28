@@ -22,4 +22,16 @@ public interface ContextFormatter {
     static ContextFormatter identity() {
         return (raw, ctx) -> Mono.just(raw);
     }
+
+    /**
+     * Combine this ContextFormatter with another.
+     * This ContextFormatter performs some transformation, which is fed into the next formatter
+     * for additional transformations.
+     * @param next The next formatter
+     * @return A new formatter which combines this and next.
+     */
+    default ContextFormatter pipe(ContextFormatter next) {
+        ContextFormatter us = this;
+        return (raw, ctx) -> us.format(raw, ctx).flatMap(s -> next.format(s, ctx));
+    }
 }
