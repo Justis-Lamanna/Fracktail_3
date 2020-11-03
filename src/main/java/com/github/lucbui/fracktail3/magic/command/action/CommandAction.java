@@ -5,7 +5,10 @@ import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 /**
- * Represents a single action that a bot performs
+ * Represents a single action that a bot performs.
+ * The doAction method should contain the actual logic this action performs.
+ * The guard method, if implemented, should contain any preconditions that must be satisfied to run this command. If
+ * a context passes the provided guard, you're basically saying "this action is equipped to handle this particular instance".
  */
 @FunctionalInterface
 public interface CommandAction {
