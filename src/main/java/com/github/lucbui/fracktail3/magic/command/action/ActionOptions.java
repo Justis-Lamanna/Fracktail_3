@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 import reactor.core.publisher.Flux;
@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A list of multiple action options, which are chosen based on a filter
+ * A list of multiple action options, which are chosen based on a filter.
+ * This element's guard returns false if all contained action guards return false (or are disabled).
  */
 public class ActionOptions extends IdStore<ActionOption> implements CommandAction {
     private final CommandAction _default;
@@ -52,6 +53,13 @@ public class ActionOptions extends IdStore<ActionOption> implements CommandActio
                 .flatMap(action -> action.doAction(context));
     }
 
+    @Override
+    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+        return Flux.fromIterable(getAll())
+                .filterWhen(ao -> ao.matches(context))
+                .hasElements();
+    }
+
     /**
      * Builder which allows for easier construction
      */
@@ -61,22 +69,20 @@ public class ActionOptions extends IdStore<ActionOption> implements CommandActio
 
         /**
          * Add an arm and possible action
-         * @param guard The filter that must pass
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(Guard guard, CommandAction action) {
-            return with(true, guard, action);
+        public Builder with(CommandAction action) {
+            return with(true, action);
         }
 
         /**
          * Add an arm and possible action
-         * @param guard The filter that must pass
          * @param action The action that should occur
          * @return This builder
          */
-        public Builder with(boolean enabled, Guard guard, CommandAction action) {
-            actions.add(new ActionOption("action_" + actions.size(), enabled, guard, action));
+        public Builder with(boolean enabled, CommandAction action) {
+            actions.add(new ActionOption("action_" + actions.size(), enabled, action));
             return this;
         }
 

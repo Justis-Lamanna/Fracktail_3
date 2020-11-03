@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.Cooldown;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,9 @@ import reactor.core.publisher.Mono;
  * All remaining calls are dropped.
  * Note that this enforces a global cooldown. Any source which calls this action is treated the same.
  * For greater control, a custom wrapper will be necessary.
+ *
+ * The cooldown is handled at the doAction layer, rather than the guard layer, to allow for the command
+ * to still show up in a command list, even if it is not usable at the given time.
  */
 public class BasicCooldownActionWrapper implements CommandAction {
     private final Cooldown cooldown;
@@ -32,5 +36,10 @@ public class BasicCooldownActionWrapper implements CommandAction {
                     .then(Mono.fromRunnable(cooldown::triggerCooldown));
         }
         return Mono.empty();
+    }
+
+    @Override
+    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+        return action.guard(context);
     }
 }

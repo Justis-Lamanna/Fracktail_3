@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Perform several actions in sequence
+ * Perform several actions in sequence.
+ * If any actions are guarded, they are skipped in the sequence.
+ * This action is guarded if all of its subactions are guarded.
  */
 public class SequenceAction implements CommandAction {
 
@@ -34,8 +37,16 @@ public class SequenceAction implements CommandAction {
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
         return Flux.fromIterable(subActions)
+                .filterWhen(c -> c.guard(context))
                 .concatMap(a -> a.doAction(context))
                 .then();
+    }
+
+    @Override
+    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+        return Flux.fromIterable(getSubActions())
+                .filterWhen(c -> c.guard(context))
+                .hasElements();
     }
 
     /**

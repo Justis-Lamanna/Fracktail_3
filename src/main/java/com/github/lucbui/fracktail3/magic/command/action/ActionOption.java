@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
@@ -13,7 +12,6 @@ import reactor.core.publisher.Mono;
  */
 public class ActionOption implements Id, Disableable {
     private final String id;
-    private final Guard guard;
     private final CommandAction action;
 
     private boolean enabled;
@@ -21,33 +19,22 @@ public class ActionOption implements Id, Disableable {
     /**
      * Initialize this action with a filter
      * @param id The ID of this branch
-     * @param guard The filter to use
      * @param action The action to perform if the filter passes
      */
-    public ActionOption(String id, Guard guard, CommandAction action) {
-        this(id, true, guard, action);
+    public ActionOption(String id, CommandAction action) {
+        this(id, true, action);
     }
 
     /**
      * Initialize this action with a filter
      * @param id The ID of this branch
      * @param enabled True, if this branch is enabled
-     * @param guard The filter to use
      * @param action The action to perform if the filter passes
      */
-    public ActionOption(String id, boolean enabled, Guard guard, CommandAction action) {
+    public ActionOption(String id, boolean enabled, CommandAction action) {
         this.id = id;
-        this.guard = guard;
         this.action = action;
         this.enabled = enabled;
-    }
-
-    /**
-     * Get the filter to validate this arm
-     * @return The filter user
-     */
-    public Guard getGuard() {
-        return guard;
     }
 
     /**
@@ -64,7 +51,7 @@ public class ActionOption implements Id, Disableable {
      * @return Asynchronous boolean indicating if the guard passes
      */
     public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
-        return BooleanUtils.and(Mono.just(enabled), guard.matches(ctx));
+        return BooleanUtils.and(Mono.just(enabled), action.guard(ctx));
     }
 
     /**

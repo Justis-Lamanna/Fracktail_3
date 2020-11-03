@@ -1,10 +1,12 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -13,7 +15,9 @@ import java.util.List;
 /**
  * Perform one of a number of random actions
  * Each action is weighted relative to the sum of all weights. If all weights are the same, all actions are equally
- * likely. When in doubt, weight can be a % value, as long as you maintain a total weight sum of 100
+ * likely. When in doubt, weight can be a % value, as long as you maintain a total weight sum of 100.
+ *
+ * The guard passes if any of the random action guards pass, and are non-zero weight.
  */
 public class RandomAction implements CommandAction {
     private final EnumeratedDistribution<CommandAction> actions;
@@ -37,6 +41,14 @@ public class RandomAction implements CommandAction {
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
         return actions.sample().doAction(context);
+    }
+
+    @Override
+    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+        return Flux.fromIterable(actions.getPmf())
+                .filter(p -> p.getSecond() != null && p.getSecond() != 0.0)
+                .filterWhen(p -> p.getFirst().guard(context))
+                .hasElements();
     }
 
     /**
