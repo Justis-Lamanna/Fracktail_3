@@ -23,7 +23,7 @@ public class RerHook implements VoiceStateUpdateAction, GuildCreateAction {
 
     private static final Snowflake LUCBUILAND = Snowflake.of(423976318082744321L);
     private static final Snowflake DRAGON = Snowflake.of(560500269419331585L);
-    private static final DiscordChannelset BOT_TIME = DiscordChannelset.forChannel("bot_time", Snowflake.of(744390997429059595L));
+    private static final DiscordChannelset BOT_TIME = DiscordChannelset.forChannel(Snowflake.of(744390997429059595L));
 
     private final AtomicInteger dragonCounter = new AtomicInteger(0);
 

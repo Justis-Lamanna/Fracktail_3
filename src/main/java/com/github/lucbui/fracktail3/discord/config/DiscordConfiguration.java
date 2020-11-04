@@ -1,14 +1,8 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
-import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.guard.Guard;
-import com.github.lucbui.fracktail3.magic.guard.channel.Channelsets;
-import com.github.lucbui.fracktail3.magic.guard.user.InUsersetGuard;
-import com.github.lucbui.fracktail3.magic.guard.user.Usersets;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
@@ -23,17 +17,12 @@ import java.util.ResourceBundle;
  * Subclass of a Configuration for a Discord bot.
  */
 public class DiscordConfiguration implements Config, Localizable {
-    public static final String OWNER_USERSET_ID = "owner";
-    public static final Guard OWNER_GUARD = new InUsersetGuard(OWNER_USERSET_ID);
-
     private final String token;
     private final String prefix;
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
     private final DiscordEventHookStore handlers;
-    private final Usersets<DiscordUserset> usersets;
-    private final Channelsets<DiscordChannelset> channelsets;
 
     /**
      * Initialize a bot Configuration
@@ -45,16 +34,13 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(
             String token, String prefix, @Nullable Snowflake owner, String i18nPath,
-            StatusUpdate presence, DiscordEventHookStore handlers,
-            Usersets<DiscordUserset> usersets, Channelsets<DiscordChannelset> channelsets) {
+            StatusUpdate presence, DiscordEventHookStore handlers) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
         this.handlers = handlers;
-        this.usersets = usersets;
-        this.channelsets = channelsets;
     }
 
     /**
@@ -64,7 +50,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence, new DiscordEventHookStore(), Usersets.empty(), Channelsets.empty());
+        this(token, prefix, null, null, presence, new DiscordEventHookStore());
     }
 
     /**
@@ -143,31 +129,5 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordEventHookStore getHandlers() {
         return handlers;
-    }
-
-    /**
-     * Get the store of usersets
-     * @return The store of usersets
-     */
-    public Usersets<DiscordUserset> getUsersets() {
-        return usersets;
-    }
-
-    /**
-     * Get the store of channelsets
-     * @return The store of channelsets
-     */
-    public Channelsets<DiscordChannelset> getChannelsets() {
-        return channelsets;
-    }
-
-    @Override
-    public Optional<DiscordUserset> getUserset(String id) {
-        return usersets.getById(id);
-    }
-
-    @Override
-    public Optional<DiscordChannelset> getChannelset(String id) {
-        return channelsets.getById(id);
     }
 }

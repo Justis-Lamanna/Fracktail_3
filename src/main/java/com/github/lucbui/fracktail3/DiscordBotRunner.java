@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
-import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
@@ -38,8 +37,7 @@ public class DiscordBotRunner implements CommandLineRunner {
                     .withHandlers(new DiscordEventHookStoreBuilder()
                             .withGuildCreateActionHook(new DiscordEventHook<>("rer", hook))
                             .withVoiceStateUpdateActionHook(new DiscordEventHook<>("rer", hook))
-                    )
-                    .withUserset(DiscordUserset.forUser("steven", 112005555178000384L))))
+                    )))
                 .withScheduler(scheduler)
                 .withCommand(new Command.Builder("hello")
                     .withAction(new RespondingAction(FormattedString.literal("Hello!"))))
