@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore;
+import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore2;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -16,7 +16,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
-    private DiscordEventHookStore handlers = new DiscordEventHookStore();
+    private DiscordEventHookStore2 handlers = new DiscordEventHookStore2();
 
     /**
      * Initialize builder with a token
@@ -76,7 +76,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handler The handler to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandlers(DiscordEventHookStore handler) {
+    public DiscordConfigurationBuilder withHandlers(DiscordEventHookStore2 handler) {
         this.handlers = handler;
         return this;
     }
@@ -86,7 +86,7 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      * @param handler The handler to use
      * @return This builder.
      */
-    public DiscordConfigurationBuilder withHandlers(IBuilder<DiscordEventHookStore> handler) {
+    public DiscordConfigurationBuilder withHandlers(IBuilder<DiscordEventHookStore2> handler) {
         this.handlers = handler.build();
         return this;
     }

@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.discord.guard;
 
-import com.github.lucbui.fracktail3.magic.guard.user.Userset;
 import discord4j.common.util.Snowflake;
 
 import java.util.Collections;
@@ -9,7 +8,7 @@ import java.util.Set;
 /**
  * Discord-specific userset, which can filter on some combination of users or roles
  */
-public class DiscordUserset implements Userset {
+public class DiscordUserset {
     /**
      * Userset that matches every user.
      * Note that this userset is automatically included, if DiscordConfigurationBuilder is used.

@@ -27,7 +27,8 @@ public class DiscordCommandSearchContext extends DiscordBasePlatformContext<Mess
 
     @Override
     public Mono<Void> respond(String message) {
-        return getPlatform().message(DiscordChannelset.forChannel(getPayload().getMessage().getChannelId()), message);
+        return getPlatform()
+                .message(DiscordChannelset.forChannel(getPayload().getMessage().getChannelId()), message);
     }
 
     @Override

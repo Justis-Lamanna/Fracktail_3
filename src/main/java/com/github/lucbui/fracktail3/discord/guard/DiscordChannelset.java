@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.discord.guard;
 
-import com.github.lucbui.fracktail3.magic.guard.channel.Channelset;
 import discord4j.common.util.Snowflake;
 
 import java.util.Collections;
@@ -9,7 +8,7 @@ import java.util.Set;
 /**
  * Discord-specific Channelset which encapsulates a set of Discord channels
  */
-public class DiscordChannelset implements Channelset {
+public class DiscordChannelset {
     /**
      * Channelset that matches every channel
      */
