@@ -20,6 +20,14 @@ public class RespondingAction implements PlatformBasicAction {
         this.text = text;
     }
 
+    /**
+     * Initialize this action
+     * @param text The literal text to respond with
+     */
+    public RespondingAction(String text) {
+        this.text = FormattedString.literal(text);
+    }
+
     @Override
     public Mono<Void> doAction(PlatformBaseContext<?> context) {
         if(context instanceof RespondingContext) {

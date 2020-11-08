@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.command;
 
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,5 +54,13 @@ public class CommandList extends IdStore<Command> {
      */
     public int getNumberOfCommands() {
         return size();
+    }
+
+    /**
+     * Create an empty Command List
+     * @return Empty command list
+     */
+    public static CommandList empty() {
+        return new CommandList(Collections.emptyList());
     }
 }

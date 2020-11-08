@@ -17,7 +17,7 @@ public class IdStore<ITEM extends Id>{
      * @param store The store state
      */
     public IdStore(Map<String, ITEM> store) {
-        this.store = Collections.unmodifiableMap(store);
+        this.store = new HashMap<>(store);
     }
 
     /**
@@ -52,6 +52,29 @@ public class IdStore<ITEM extends Id>{
      */
     public int size() {
         return store.size();
+    }
+
+    /**
+     * Add item to the store. Throws an error if already exists.
+     * @param item The item to add
+     */
+    public void add(ITEM item) {
+        Objects.requireNonNull(item);
+        if(store.containsKey(item.getId())) {
+            throw new IllegalArgumentException("Item with ID " + item.getId() + " already exists in-store");
+        }
+        store.put(item.getId(), item);
+    }
+
+    /**
+     * Adds item to the store, replacing if necessary
+     * @param item The item to add
+     * @return The old item, if there was any
+     */
+    public Optional<ITEM> replace(ITEM item) {
+        Objects.requireNonNull(item);
+        ITEM old = store.put(item.getId(), item);
+        return Optional.ofNullable(old);
     }
 
     /**

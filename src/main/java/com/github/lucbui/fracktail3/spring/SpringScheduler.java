@@ -1,12 +1,10 @@
-package com.github.lucbui.fracktail3;
+package com.github.lucbui.fracktail3.spring;
 
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,12 +14,10 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-@Component
 public class SpringScheduler implements Scheduler {
 
     private final TaskScheduler taskScheduler;
 
-    @Autowired
     public SpringScheduler(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
