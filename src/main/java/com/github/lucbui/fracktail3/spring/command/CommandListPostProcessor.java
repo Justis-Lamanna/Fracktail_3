@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
 
 public class CommandListPostProcessor implements BeanPostProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListPostProcessor.class);
@@ -34,12 +37,29 @@ public class CommandListPostProcessor implements BeanPostProcessor {
                     .withAction((PlatformBasicAction)bean)
                     .build();
             commandList.add(c);
+        } else {
+            LOGGER.trace("Investigating Bean {} for command candidates", beanName);
+            ReflectionUtils.doWithMethods(bean.getClass(),
+                    new CommandAnnotationParser(bean),
+                    method -> method.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Command.class));
         }
         return bean;
     }
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    private class CommandAnnotationParser implements ReflectionUtils.MethodCallback {
+        private final Object bean;
+
+        private CommandAnnotationParser(Object bean) {
+            this.bean = bean;
+        }
+
+        @Override
+        public void doWith(Method method) throws IllegalArgumentException {
+            LOGGER.debug("Adding @Command-annotated annotation {}", method.getName());
+            Command c = new Command.Builder(method.getName())
+                    .withAction(new MethodCallingAction(bean, method))
+                    .build();
+            commandList.add(c);
+        }
     }
 }

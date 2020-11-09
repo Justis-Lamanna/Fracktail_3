@@ -29,4 +29,13 @@ public interface BaseContext<T> {
     default AsynchronousMap<String, Object> getMap() {
         return new AsynchronousMap<>();
     }
+
+    /**
+     * Respond to this context, in some way the context sees fit
+     * @param message The message to send
+     * @return Asynchronous indication of completion
+     */
+    default Mono<Void> respond(String message) {
+        return Mono.empty();
+    }
 }

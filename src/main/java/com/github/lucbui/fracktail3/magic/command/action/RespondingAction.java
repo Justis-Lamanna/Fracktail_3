@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.RespondingContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -30,10 +29,7 @@ public class RespondingAction implements PlatformBasicAction {
 
     @Override
     public Mono<Void> doAction(PlatformBaseContext<?> context) {
-        if(context instanceof RespondingContext) {
-            return text.getFor(context)
-                    .flatMap(((RespondingContext) context)::respond);
-        }
-        return Mono.empty();
+        return text.getFor(context)
+                .flatMap(context::respond);
     }
 }

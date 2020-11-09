@@ -3,14 +3,13 @@ package com.github.lucbui.fracktail3.discord.context;
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.platform.context.RespondingContext;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
-public class DiscordCommandSearchContext extends DiscordBasePlatformContext<MessageCreateEvent> implements RespondingContext {
+public class DiscordCommandSearchContext extends DiscordBasePlatformContext<MessageCreateEvent> {
     private Mono<Locale> cached;
 
     public DiscordCommandSearchContext(Bot bot, DiscordPlatform platform, MessageCreateEvent payload) {

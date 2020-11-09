@@ -4,8 +4,8 @@ import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
-import com.github.lucbui.fracktail3.magic.command.action.RespondingAction;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.spring.annotation.Command;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,25 +16,21 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class Config {
-    @Value("${token}")
-    private String token;
-
     @Bean
-    public Platform discord() {
-        DiscordEventHook<RerHook> rer = new DiscordEventHook<>("rer", new RerHook());
+    public Platform discord(@Value("${token}") String token) {
         return new DiscordPlatform.Builder()
             .withConfiguration(new DiscordConfigurationBuilder(token)
             .withPrefix("!")
             .withOwner(248612704019808258L)
             .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
             .withHandlers(new DiscordEventHookStoreBuilder2()
-                    .withHook(rer)
+                    .withHook(new DiscordEventHook<>("rer", new RerHook()))
             ))
             .build();
     }
 
-    @Bean
-    public RespondingAction hello() {
-        return new RespondingAction("Hey there!!");
+    @Command
+    public String hello() {
+        return "H-hewwo???";
     }
 }
