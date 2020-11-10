@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.plugin;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Plugins {
     private final List<Plugin> plugins;
@@ -19,5 +20,11 @@ public class Plugins {
         return plugins.stream()
                 .filter(predicate)
                 .findFirst();
+    }
+
+    public List<Plugin> getPlugins(Predicate<Plugin> predicate) {
+        return plugins.stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 }

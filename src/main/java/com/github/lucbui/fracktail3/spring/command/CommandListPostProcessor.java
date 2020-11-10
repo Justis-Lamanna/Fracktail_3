@@ -108,8 +108,8 @@ public class CommandListPostProcessor implements BeanPostProcessor {
                 c.withNames(nameAnnotation.value());
             }
 
-            Optional<Plugin> plugin = plugins.getPlugin(p -> p.canProcessMethodCommand(c, bean, method));
-            plugin.ifPresent(value -> value.processMethodCommand(c, bean, method));
+            List<Plugin> plugin = plugins.getPlugins(p -> p.canProcessMethodCommand(c, bean, method));
+            plugin.forEach(value -> value.processMethodCommand(c, bean, method));
 
             addOrMerge(c.build());
         }
