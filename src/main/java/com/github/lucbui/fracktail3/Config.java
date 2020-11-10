@@ -6,10 +6,9 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.Parameter;
+import com.github.lucbui.fracktail3.spring.annotation.Variable;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +33,7 @@ public class Config {
     }
 
     @Command
-    public String hello(@Parameter(0) Optional<String> number) {
-        return "H-hewwo" + StringUtils.repeat('?', number.map(Integer::parseInt).orElse(2));
+    public String hello(@Variable("Nothing") Optional<String> var) {
+        return var.map(v -> "Value is " + v).orElse("Nothing was there.");
     }
 }

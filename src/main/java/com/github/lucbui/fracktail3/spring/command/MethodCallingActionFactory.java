@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
+import com.github.lucbui.fracktail3.spring.annotation.Variable;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -39,6 +41,8 @@ public class MethodCallingActionFactory {
         Class<?> type = parameter.getType();
         if (parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Parameter.class)) {
             return compileParameterAnnotated(obj, method, parameter);
+        } else if(parameter.isAnnotationPresent(Variable.class)) {
+            return compileParameterVariable(obj, method, parameter);
         } else if (ClassUtils.isAssignable(CommandUseContext.class, type)) {
             return new ParameterComponent(ctx -> ctx);
         } else {
@@ -91,6 +95,32 @@ public class MethodCallingActionFactory {
                 return Mono.just(true);
             }
             return Mono.just(value < ctx.getParameters().length);
+        });
+    }
+
+    protected ParameterComponent compileParameterVariable(Object obj, Method method, Parameter parameter) {
+        Variable vAnnot = parameter.getAnnotation(Variable.class);
+        String value = vAnnot.value();
+        Class<?> paramType = parameter.getType();
+
+        return new ParameterComponent(ctx -> {
+            AsynchronousMap<String, Object> map = ctx.getMap();
+            if(paramType.equals(Mono.class)) {
+                return map.getAsync(value);
+            }
+            Object v = map.get(value);
+            if (paramType.equals(Optional.class)) {
+                if(v == null) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(v);
+                }
+            }
+            if(conversionService.canConvert(v.getClass(), paramType)) {
+                return conversionService.convert(v, paramType);
+            } else {
+                throw new BotConfigurationException("Cannot convert object " + v.getClass() + " to type " + paramType.getCanonicalName());
+            }
         });
     }
 
