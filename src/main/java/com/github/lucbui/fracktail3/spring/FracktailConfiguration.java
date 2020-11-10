@@ -8,6 +8,7 @@ import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.spring.command.CommandListPostProcessor;
+import com.github.lucbui.fracktail3.spring.command.MethodCallingActionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +27,8 @@ public class FracktailConfiguration {
     }
 
     @Bean
-    public CommandListPostProcessor commandListPostProcessor(CommandList commandList) {
-        return new CommandListPostProcessor(commandList);
+    public CommandListPostProcessor commandListPostProcessor(CommandList commandList, MethodCallingActionFactory factory) {
+        return new CommandListPostProcessor(factory, commandList);
     }
 
     @Bean

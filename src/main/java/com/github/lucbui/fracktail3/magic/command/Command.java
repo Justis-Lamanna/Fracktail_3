@@ -6,14 +6,11 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Encapsulation of a bot's command
@@ -117,7 +114,7 @@ public class Command implements Id, Disableable {
      * @param ctx The context of the commands usage
      * @return Asynchronous boolean indicating if the guard passes
      */
-    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
+    public Mono<Boolean> matches(CommandUseContext<?> ctx) {
         return BooleanUtils.and(Mono.just(enabled), action.guard(ctx));
     }
 
@@ -177,6 +174,25 @@ public class Command implements Id, Disableable {
         public Builder withName(String name) {
             names.add(name);
             return this;
+        }
+
+        /**
+         * Add multiple names to the list
+         * @param names The names to add
+         * @return This builder
+         */
+        public Builder withNames(List<String> names) {
+            this.names.addAll(names);
+            return this;
+        }
+
+        /**
+         * Add multiple names to the list
+         * @param names The names to add
+         * @return This builder
+         */
+        public Builder withNames(String... names) {
+            return withNames(Arrays.asList(names));
         }
 
         /**

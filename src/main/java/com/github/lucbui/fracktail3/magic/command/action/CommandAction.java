@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -29,7 +28,7 @@ public interface CommandAction {
      * @param context The context to check against
      * @return The guard action
      */
-    default Mono<Boolean> guard(PlatformBaseContext<?> context) {
+    default Mono<Boolean> guard(CommandUseContext<?> context) {
         return Mono.just(true);
     }
 }

@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.command.action;
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +49,7 @@ public class ActionOption implements Id, Disableable {
      * @param ctx The context of the commands usage
      * @return Asynchronous boolean indicating if the guard passes
      */
-    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
+    public Mono<Boolean> matches(CommandUseContext<?> ctx) {
         return BooleanUtils.and(Mono.just(enabled), action.guard(ctx));
     }
 

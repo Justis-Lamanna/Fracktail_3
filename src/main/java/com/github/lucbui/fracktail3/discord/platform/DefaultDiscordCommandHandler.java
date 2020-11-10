@@ -78,17 +78,17 @@ public class DefaultDiscordCommandHandler implements DiscordCommandHandler {
                         String commandName = t.getT1();
                         return StringUtils.startsWith(ctx.getPayload().getMessage().getContent(), configuration.getPrefix() + commandName);
                     })
-                    .filterWhen(t -> {
-                        Command cmd = t.getT2();
-                        return cmd.matches(ctx);
-                    })
-                    .next()
                     .map(t -> {
                         String commandName = t.getT1();
                         Command cmd = t.getT2();
                         String rawParamString = StringUtils.removeStart(contents, configuration.getPrefix() + commandName);
                         return new DiscordCommandUseContext(ctx, cmd, rawParamString, parseParameters(rawParamString));
                     })
+                    .filterWhen(c -> {
+                        Command cmd = c.getCommand();
+                        return cmd.matches(c);
+                    })
+                    .next()
                     .flatMap(executionHook::beforeExecution)
                     .flatMap(dCtx -> {
                         Command cmd = dCtx.getCommand();
