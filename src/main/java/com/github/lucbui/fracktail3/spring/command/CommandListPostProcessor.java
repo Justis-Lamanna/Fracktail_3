@@ -73,9 +73,12 @@ public class CommandListPostProcessor implements BeanPostProcessor {
     private void addOrMerge(Command c) {
         Optional<Command> old = commandList.getCommandById(c.getId());
         if(old.isPresent()) {
-            throw new IllegalArgumentException("I'll do this later");
+            LOGGER.debug("Overwriting command. One day, the commands will be merged, instead");
+            plugins.getPlugins().forEach(p -> p.onCommandMerge(old.get(), c));
+        } else {
+            commandList.add(c);
+            plugins.getPlugins().forEach(p -> p.onCommandAdd(c));
         }
-        commandList.add(c);
     }
 
     private class CommandAnnotationParser implements ReflectionUtils.MethodCallback {
