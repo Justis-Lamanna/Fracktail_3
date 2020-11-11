@@ -16,10 +16,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
-import java.util.Optional;
 
 @Configuration
 public class FracktailConfiguration {
+    @Bean
+    @ConditionalOnMissingBean
+    public Plugins plugins(List<Plugin> plugins) {
+        return new Plugins(plugins);
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public CommandList commandList() {
@@ -28,8 +33,8 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Plugins plugins(List<Plugin> plugins) {
-        return new Plugins(plugins);
+    public ScheduledEvents scheduledEvents() {
+        return ScheduledEvents.empty();
     }
 
     @Bean
@@ -47,11 +52,15 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BotSpec botSpec(List<Platform> platforms, Optional<CommandList> commandList, Optional<ScheduledEvents> eventList) {
+    public BotSpec botSpec(List<Platform> platforms, Plugins plugins, CommandList commandList, ScheduledEvents eventList) {
+        plugins.getPlugins().forEach(p -> {
+            commandList.addAll(p.getAdditionalCommands());
+            eventList.addAll(p.getAdditionalScheduledEvents());
+        });
         return new BotSpec(
                 platforms,
-                commandList.orElse(CommandList.empty()),
-                eventList.orElse(ScheduledEvents.empty())
+                commandList,
+                eventList
         );
     }
 

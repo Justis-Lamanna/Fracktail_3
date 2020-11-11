@@ -1,6 +1,9 @@
 package com.github.lucbui.fracktail3.magic.util;
 
 import com.github.lucbui.fracktail3.magic.Id;
+import org.apache.commons.collections4.MultiSet;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.collections4.multiset.HashMultiSet;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,6 +67,29 @@ public class IdStore<ITEM extends Id>{
             throw new IllegalArgumentException("Item with ID " + item.getId() + " already exists in-store");
         }
         store.put(item.getId(), item);
+    }
+
+    /**
+     * Add items to the store.
+     * If any items have a non-unique ID, an error is thrown, and none of the batch are added.
+     * @param items The items to add
+     */
+    public void addAll(Collection<ITEM> items) {
+        Objects.requireNonNull(items);
+        items.forEach(Objects::requireNonNull);
+        //Check all items are unique w.r.t each other.
+        MultiSet<String> ids = items.stream().map(Id::getId).collect(Collectors.toCollection(HashMultiSet::new));
+        Set<String> nonUniqueIds = ids.stream().filter(s -> ids.getCount(s) > 1).collect(Collectors.toSet());
+        if(!nonUniqueIds.isEmpty()) {
+            throw new IllegalArgumentException("Duplicate IDs: " + String.join(",", nonUniqueIds));
+        }
+        //Check all items are unique w.r.t the store.
+        Set<String> common = SetUtils.intersection(ids.uniqueSet(), store.keySet()).toSet();
+        if(!common.isEmpty()) {
+            throw new IllegalArgumentException("ID matches one already in store: " + String.join(",", common));
+        }
+
+        items.forEach(i -> store.put(i.getId(), i));
     }
 
     /**

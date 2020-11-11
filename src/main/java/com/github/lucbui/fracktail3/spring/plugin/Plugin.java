@@ -4,11 +4,14 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public interface Plugin {
@@ -58,5 +61,13 @@ public interface Plugin {
 
     default void processMethodCommand(Command.Builder builder, Object obj, Method method) {
 
+    }
+
+    default List<Command> getAdditionalCommands() {
+        return Collections.emptyList();
+    }
+
+    default List<ScheduledEvent> getAdditionalScheduledEvents() {
+        return Collections.emptyList();
     }
 }
