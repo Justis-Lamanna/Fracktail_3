@@ -4,10 +4,9 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
-import com.github.lucbui.fracktail3.spring.plugin.Plugin;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -26,9 +25,6 @@ public class MethodCallingActionFactory {
     @Autowired
     ConversionService conversionService;
 
-    @Autowired
-    Plugins plugins;
-
     public CommandAction createAction(Object obj, Method method) {
         List<ParameterComponent> components = compileParameters(obj, method);
         BiFunction<CommandUseContext<?>, Object, Mono<Void>> returnFunc = compileReturn(obj, method);
@@ -43,10 +39,7 @@ public class MethodCallingActionFactory {
 
     protected ParameterComponent compileParameter(Object obj, Method method, Parameter parameter) {
         Class<?> type = parameter.getType();
-        Optional<Plugin> plugin = plugins.getPlugin(p -> p.canHandleParameterCompile(obj, method, parameter));
-        if(plugin.isPresent()) {
-            return plugin.get().handleParameterCompile(obj, method, parameter);
-        } else if (parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Parameter.class)) {
+        if (parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Parameter.class)) {
             return compileParameterAnnotated(obj, method, parameter);
         } else if(parameter.isAnnotationPresent(Variable.class)) {
             return compileParameterVariable(obj, method, parameter);
@@ -60,11 +53,8 @@ public class MethodCallingActionFactory {
     }
 
     protected BiFunction<CommandUseContext<?>, Object, Mono<Void>> compileReturn(Object obj, Method method) {
-        Optional<Plugin> plugin = plugins.getPlugin(p -> p.canHandleReturnCompile(obj, method));
         Class<?> returnType = method.getReturnType();
-        if(plugin.isPresent()) {
-            return plugin.get().handleReturnCompile(obj, method);
-        } if (returnType.equals(Void.class)) {
+        if (returnType.equals(Void.class)) {
             return (ctx, o) -> Mono.empty();
         } else if (returnType.equals(String.class)) {
             return (ctx, o) -> ctx.respond((String) o);
@@ -104,7 +94,11 @@ public class MethodCallingActionFactory {
                     paramType.equals(OptionalLong.class) || paramType.equals(OptionalDouble.class)) {
                 return Mono.just(true);
             }
-            return Mono.just(value < ctx.getParameters().length);
+            if (ctx instanceof CommandUseContext) {
+                CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
+                return Mono.just(value < cctx.getParameters().length);
+            }
+            return Mono.just(true);
         });
     }
 
@@ -157,7 +151,7 @@ public class MethodCallingActionFactory {
         }
 
         @Override
-        public Mono<Boolean> guard(CommandUseContext<?> context) {
+        public Mono<Boolean> guard(PlatformBaseContext<?> context) {
             return parameterComponents.stream()
                     .filter(pc -> pc.guard != null)
                     .map(pc -> pc.guard.apply(context))

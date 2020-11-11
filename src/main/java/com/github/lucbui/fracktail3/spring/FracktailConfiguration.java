@@ -7,8 +7,6 @@ import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
-import com.github.lucbui.fracktail3.spring.plugin.Plugin;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -19,12 +17,6 @@ import java.util.List;
 
 @Configuration
 public class FracktailConfiguration {
-    @Bean
-    @ConditionalOnMissingBean
-    public Plugins plugins(List<Plugin> plugins) {
-        return new Plugins(plugins);
-    }
-
     @Bean
     @ConditionalOnMissingBean
     public CommandList commandList() {
@@ -52,11 +44,7 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BotSpec botSpec(List<Platform> platforms, Plugins plugins, CommandList commandList, ScheduledEvents eventList) {
-        plugins.getPlugins().forEach(p -> {
-            commandList.addAll(p.getAdditionalCommands());
-            eventList.addAll(p.getAdditionalScheduledEvents());
-        });
+    public BotSpec botSpec(List<Platform> platforms, CommandList commandList, ScheduledEvents eventList) {
         return new BotSpec(
                 platforms,
                 commandList,
