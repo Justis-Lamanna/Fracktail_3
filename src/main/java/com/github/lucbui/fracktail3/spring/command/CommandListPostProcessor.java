@@ -6,6 +6,8 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.plugin.Plugin;
+import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -30,20 +32,31 @@ public class CommandListPostProcessor implements BeanPostProcessor {
     @Autowired
     private CommandList commandList;
 
+    @Autowired
+    private Plugins plugins;
+
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if(bean instanceof Plugin) {
+            LOGGER.debug("Installing Plugin {}", bean.getClass());
+            plugins.addPlugin((Plugin) bean);
+            List<Command> commands = ((Plugin)bean).addAdditionalCommands();
+            commands.forEach(c -> LOGGER.debug("Adding Command Bean from plugin {} of id {}", bean.getClass(), c.getId()));
+            commandList.addAll(commands);
+        }
+
         if(bean instanceof Command) {
-            LOGGER.debug("Adding Command Bean of name {}", beanName);
+            LOGGER.debug("Adding Command Bean of id {}", beanName);
             Command c = (Command)bean;
             addOrMerge(c);
         } else if(bean instanceof CommandAction) {
-            LOGGER.debug("Adding CommandAction Bean of name {}", beanName);
+            LOGGER.debug("Adding CommandAction Bean of id {}", beanName);
             Command c = new Command.Builder(beanName)
                         .withAction((CommandAction) bean)
                         .build();
             addOrMerge(c);
         } else if(bean instanceof PlatformBasicAction) {
-            LOGGER.debug("Adding PlatformBasicAction Bean of name {}", beanName);
+            LOGGER.debug("Adding PlatformBasicAction Bean of id {}", beanName);
             Command c = new Command.Builder(beanName)
                         .withAction((PlatformBasicAction) bean)
                         .build();

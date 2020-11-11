@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * Formatter which treats the input as a key to a ResourceBundle
  */
@@ -28,7 +30,7 @@ public class TranslatorFormatter implements ContextFormatter {
     }
 
     @Override
-    public Mono<String> format(String raw, BaseContext<?> ctx) {
+    public Mono<String> format(String raw, BaseContext<?> ctx, Map<String, Object> addlVariables) {
         if(ctx instanceof Localizable) {
             Localizable lCtx = (Localizable) ctx;
             return ctx.getLocale()

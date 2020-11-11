@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
+import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
 public class MethodCallingActionFactory {
     @Autowired
     ConversionService conversionService;
+
+    @Autowired
+    private Plugins plugins;
 
     public CommandAction createAction(Object obj, Method method) {
         List<ParameterComponent> components = compileParameters(obj, method);

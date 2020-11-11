@@ -3,6 +3,9 @@ package com.github.lucbui.fracktail3.magic.formatter;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * Class which encapsulates a formattable string
  */
@@ -67,7 +70,17 @@ public class FormattedString {
      * @return The formatted value
      */
     public Mono<String> getFor(PlatformBaseContext<?> ctx) {
-        return formatter.format(raw, ctx);
+        return formatter.format(raw, ctx, Collections.emptyMap());
+    }
+
+    /**
+     * Get the formatted string
+     * @param ctx The context of the string
+     * @param addlVariables Additional variables to use
+     * @return The formatted value
+     */
+    public Mono<String> getFor(PlatformBaseContext<?> ctx, Map<String, Object> addlVariables) {
+        return formatter.format(raw, ctx, addlVariables);
     }
 
     /**

@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
+import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,12 @@ public class FracktailConfiguration {
     @ConditionalOnMissingBean
     public ScheduledEvents scheduledEvents() {
         return ScheduledEvents.empty();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public Plugins plugins() {
+        return new Plugins();
     }
 
     @Bean

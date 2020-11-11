@@ -6,7 +6,8 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.Parameter;
+import com.github.lucbui.fracktail3.spring.plugin.Plugin;
+import com.github.lucbui.fracktail3.spring.plugin.command.CommandLookupPlugin;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,12 @@ public class Config {
     }
 
     @Command
-    public String hello(@Parameter(0) String var) {
-        return "Hewwo, " + var;
+    public String hello() {
+        return "Hewwo!!!";
+    }
+
+    @Bean
+    public Plugin clp() {
+        return new CommandLookupPlugin();
     }
 }

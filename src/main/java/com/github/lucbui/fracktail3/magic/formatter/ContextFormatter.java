@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.magic.formatter;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * Describes how a string should be formatted, when combined with a context
  */
@@ -13,14 +15,14 @@ public interface ContextFormatter {
      * @param ctx The context to use in the formatting
      * @return Asynchronously-determined formatted string
      */
-    Mono<String> format(String raw, BaseContext<?> ctx);
+    Mono<String> format(String raw, BaseContext<?> ctx, Map<String, Object> addlVars);
 
     /**
      * Formatter which simply returns the input
      * @return An identity formatter which does no formatting
      */
     static ContextFormatter identity() {
-        return (raw, ctx) -> Mono.just(raw);
+        return (raw, ctx, vars) -> Mono.just(raw);
     }
 
     /**
@@ -32,6 +34,6 @@ public interface ContextFormatter {
      */
     default ContextFormatter pipe(ContextFormatter next) {
         ContextFormatter us = this;
-        return (raw, ctx) -> us.format(raw, ctx).flatMap(s -> next.format(s, ctx));
+        return (raw, ctx, vars) -> us.format(raw, ctx, vars).flatMap(s -> next.format(s, ctx, vars));
     }
 }
