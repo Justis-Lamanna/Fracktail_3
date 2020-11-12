@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
@@ -20,6 +21,7 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class MethodCallingActionFactory {
@@ -32,7 +34,7 @@ public class MethodCallingActionFactory {
     public CommandAction createAction(Object obj, Method method) {
         List<ParameterComponent> components = compileParameters(obj, method);
         BiFunction<CommandUseContext<?>, Object, Mono<Void>> returnFunc = compileReturn(obj, method);
-        return new MethodCallingAction(components, obj, method, returnFunc);
+        return new MethodCallingAction(components, Collections.emptyList(), obj, method, returnFunc);
     }
 
     protected List<ParameterComponent> compileParameters(Object obj, Method method) {
@@ -77,7 +79,7 @@ public class MethodCallingActionFactory {
             throw new BotConfigurationException("Cannot convert String parameter to type " + paramType.getCanonicalName());
         }
 
-        return new ParameterComponent(ctx -> {
+        ParameterComponent component = new ParameterComponent(ctx -> {
             String[] params = ctx.getParameters();
             if (value < params.length) {
                 return conversionService.convert(params[value], paramType);
@@ -93,17 +95,25 @@ public class MethodCallingActionFactory {
                 }
                 return null;
             }
-        }, ctx -> {
-            if (paramType.equals(Optional.class) || paramType.equals(OptionalInt.class) ||
-                    paramType.equals(OptionalLong.class) || paramType.equals(OptionalDouble.class)) {
-                return Mono.just(true);
-            }
-            if (ctx instanceof CommandUseContext) {
-                CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
-                return Mono.just(value < cctx.getParameters().length);
-            }
-            return Mono.just(true);
         });
+
+        if (!isOptional(paramType) && !pAnnot.optional()) {
+            //Enforce parameter count (unless optional is expected)
+            component.addGuard(ctx -> {
+                if (ctx instanceof CommandUseContext) {
+                    CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
+                    return Mono.just(value < cctx.getParameters().length);
+                }
+                return Mono.just(true);
+            });
+        }
+
+        return component;
+    }
+
+    private boolean isOptional(Class<?> clazz) {
+        return clazz.equals(Optional.class) || clazz.equals(OptionalInt.class) ||
+                clazz.equals(OptionalLong.class) || clazz.equals(OptionalDouble.class);
     }
 
     protected ParameterComponent compileParameterVariable(Object obj, Method method, Parameter parameter) {
@@ -134,15 +144,17 @@ public class MethodCallingActionFactory {
 
     protected static class MethodCallingAction implements CommandAction {
         private final List<ParameterComponent> parameterComponents;
+        private final List<Guard> addlGuards;
         private final Object objToInvokeOn;
         private final Method methodToCall;
         private final BiFunction<CommandUseContext<?>, Object, Mono<Void>> postTransformer;
 
-        public MethodCallingAction(List<ParameterComponent> parameterComponents, Object objToInvokeOn, Method methodToCall, BiFunction<CommandUseContext<?>, Object, Mono<Void>> postTransformer) {
+        public MethodCallingAction(List<ParameterComponent> parameterComponents, List<Guard> addlGuards, Object objToInvokeOn, Method methodToCall, BiFunction<CommandUseContext<?>, Object, Mono<Void>> postTransformer) {
             this.parameterComponents = parameterComponents;
             this.objToInvokeOn = objToInvokeOn;
             this.methodToCall = methodToCall;
             this.postTransformer = postTransformer;
+            this.addlGuards = addlGuards;
         }
 
         @Override
@@ -156,9 +168,10 @@ public class MethodCallingActionFactory {
 
         @Override
         public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-            return parameterComponents.stream()
-                    .filter(pc -> pc.guard != null)
-                    .map(pc -> pc.guard.apply(context))
+            return Stream.concat(
+                        parameterComponents.stream().flatMap(pc -> pc.guards.stream()),
+                        addlGuards.stream())
+                    .map(guard -> guard.matches(context))
                     .reduce(Mono.just(true), BooleanUtils::and);
         }
     }
