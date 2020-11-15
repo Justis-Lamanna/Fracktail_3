@@ -6,6 +6,7 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.slf4j.Logger;
@@ -38,11 +39,13 @@ public class CommandListPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if(bean instanceof Plugin) {
-            LOGGER.debug("Installing Plugin {}", bean.getClass());
+            LOGGER.debug("Installing Plugin {}", ((Plugin) bean).getId());
             plugins.addPlugin((Plugin) bean);
-            List<Command> commands = ((Plugin)bean).addAdditionalCommands();
-            commands.forEach(c -> LOGGER.debug("Adding Command Bean from plugin {} of id {}", bean.getClass(), c.getId()));
-            commandList.addAll(commands);
+            if(bean instanceof CommandPlugin) {
+                List<Command> commands = ((CommandPlugin) bean).addAdditionalCommands();
+                commands.forEach(c -> LOGGER.debug("Adding Command Bean from plugin {} of id {}", bean.getClass(), c.getId()));
+                commands.forEach(this::addOrMerge);
+            }
         }
 
         if(bean instanceof Command) {
@@ -74,10 +77,10 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         Optional<Command> old = commandList.getCommandById(c.getId());
         if(old.isPresent()) {
             LOGGER.debug("Overwriting command. One day, the commands will be merged, instead");
-            plugins.getPlugins().forEach(p -> p.onCommandMerge(old.get(), c));
+            plugins.onCommandMerge(old.get(), c);
         } else {
             commandList.add(c);
-            plugins.getPlugins().forEach(p -> p.onCommandAdd(c));
+            plugins.onCommandAdd(c);
         }
     }
 

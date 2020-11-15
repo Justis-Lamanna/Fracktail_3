@@ -50,11 +50,13 @@ public class MethodCallingActionFactory {
         } else if(parameter.isAnnotationPresent(Variable.class)) {
             return compileParameterVariable(obj, method, parameter);
         } else if (ClassUtils.isAssignable(CommandUseContext.class, type)) {
-            return new ParameterComponent(ctx -> ctx);
+            return plugins.enhanceCompiledParameter(obj, method, parameter, new ParameterComponent(ctx -> ctx));
         } else {
-            throw new BotConfigurationException("Unable to parse parameter " + parameter.getName() +
-                    " of type " + type.getCanonicalName() +
-                    "in method " + method.getName());
+            ParameterComponent component = plugins.createCompiledParameter(obj, method, parameter)
+                    .orElseThrow(() -> new BotConfigurationException("Unable to parse parameter " + parameter.getName() +
+                             " of type " + type.getCanonicalName() +
+                             "in method " + method.getName()));
+            return plugins.enhanceCompiledParameter(obj, method, parameter, component);
         }
     }
 
@@ -108,7 +110,7 @@ public class MethodCallingActionFactory {
             });
         }
 
-        return component;
+        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
     }
 
     private boolean isOptional(Class<?> clazz) {
@@ -121,7 +123,7 @@ public class MethodCallingActionFactory {
         String value = vAnnot.value();
         Class<?> paramType = parameter.getType();
 
-        return new ParameterComponent(ctx -> {
+        ParameterComponent component = new ParameterComponent(ctx -> {
             AsynchronousMap<String, Object> map = ctx.getMap();
             if(paramType.equals(Mono.class)) {
                 return map.getAsync(value);
@@ -140,6 +142,8 @@ public class MethodCallingActionFactory {
                 throw new BotConfigurationException("Cannot convert object " + v.getClass() + " to type " + paramType.getCanonicalName());
             }
         });
+
+        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
     }
 
     protected static class MethodCallingAction implements CommandAction {
