@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
@@ -18,10 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class CommandListPostProcessor implements BeanPostProcessor {
@@ -105,19 +102,6 @@ public class CommandListPostProcessor implements BeanPostProcessor {
             }
 
             addOrMerge(c.build());
-        }
-
-        private Method getGuardMethod(Class<?> aClass, String value) {
-            List<Method> methods = Arrays.stream(aClass.getMethods())
-                    .filter(m -> m.getName().equals(value))
-                    .collect(Collectors.toList());
-            if(methods.isEmpty()) {
-                throw new BotConfigurationException("Attempted Guard Method - Method " + value + " does not exist in class " + aClass.getCanonicalName());
-            } else if(methods.size() == 1) {
-                return methods.get(0);
-            } else {
-                throw new BotConfigurationException("Attempted Guard Method - Multiple methods with name " + value + " exist in class " + aClass.getCanonicalName());
-            }
         }
     }
 }

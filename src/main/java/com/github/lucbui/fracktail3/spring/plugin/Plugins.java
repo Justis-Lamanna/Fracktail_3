@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.spring.plugin;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
 import org.apache.commons.lang3.ClassUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -47,29 +48,54 @@ public class Plugins {
         plugins.stream().flatMap(cast(CommandPlugin.class)).forEach(p -> p.onCommandMerge(old, nuu));
     }
 
-    public ParameterComponent enhanceCompiledParameter(Object obj, Method method, Parameter parameter, ParameterComponent component) {
-        ParameterComponent current = component;
-        for(Plugin plugin : plugins) {
-            if(plugin instanceof CompiledParameterPlugin) {
-                current = ((CompiledParameterPlugin) plugin).enhanceCompiledParameter(obj, method, parameter, current);
-            }
-        }
-        return current;
-    }
-
     public Optional<ParameterComponent> createCompiledParameter(Object obj, Method method, Parameter parameter) {
         return plugins.stream()
-                .flatMap(cast(CompiledParameterPlugin.class))
+                .flatMap(cast(CompiledMethodPlugin.class))
                 .flatMap(p -> {
-                    Result<ParameterComponent> component = p.createCompiledParameter(obj, method, parameter);
+                    Result<ParameterComponent> component = p.createParameterComponent(obj, method, parameter);
                     if(component.isResult()) {
                         return Stream.of(Tuples.of(p, component.getResult()));
                     } else {
                         return Stream.empty();
                     }
                 })
-                .max(Comparator.comparing(t -> t.getT1().getCPPPriority()))
+                .max(Comparator.comparing(t -> t.getT1().getPluginPriority()))
                 .map(Tuple2::getT2);
+    }
+
+    public ParameterComponent enhanceCompiledParameter(Object obj, Method method, Parameter parameter, ParameterComponent component) {
+        ParameterComponent current = component;
+        for(Plugin plugin : plugins) {
+            if(plugin instanceof CompiledMethodPlugin) {
+                current = ((CompiledMethodPlugin) plugin).decorateParameterComponent(obj, method, parameter, current);
+            }
+        }
+        return current;
+    }
+
+    public Optional<ReturnComponent> createCompiledReturn(Object obj, Method method) {
+        return plugins.stream()
+                .flatMap(cast(CompiledMethodPlugin.class))
+                .flatMap(p -> {
+                    Result<ReturnComponent> component = p.createReturnComponent(obj, method);
+                    if(component.isResult()) {
+                        return Stream.of(Tuples.of(p, component.getResult()));
+                    } else {
+                        return Stream.empty();
+                    }
+                })
+                .max(Comparator.comparing(t -> t.getT1().getPluginPriority()))
+                .map(Tuple2::getT2);
+    }
+
+    public ReturnComponent enhanceCompiledReturn(Object obj, Method method, ReturnComponent component) {
+        ReturnComponent current = component;
+        for(Plugin plugin : plugins) {
+            if(plugin instanceof CompiledMethodPlugin) {
+                current = ((CompiledMethodPlugin) plugin).decorateReturnComponent(obj, method, current);
+            }
+        }
+        return current;
     }
 
     private <P> Function<? super Plugin, Stream<P>> cast(Class<P> clazz) {

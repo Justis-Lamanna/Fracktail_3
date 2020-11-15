@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
@@ -14,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 import reactor.bool.BooleanUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,8 +32,8 @@ public class MethodCallingActionFactory {
 
     public CommandAction createAction(Object obj, Method method) {
         List<ParameterComponent> components = compileParameters(obj, method);
-        BiFunction<CommandUseContext<?>, Object, Mono<Void>> returnFunc = compileReturn(obj, method);
-        return new MethodCallingAction(components, Collections.emptyList(), obj, method, returnFunc);
+        ReturnComponent returnComponent = compileReturn(obj, method);
+        return new MethodCallingAction(components, Collections.emptyList(), obj, method, returnComponent);
     }
 
     protected List<ParameterComponent> compileParameters(Object obj, Method method) {
@@ -60,16 +59,20 @@ public class MethodCallingActionFactory {
         }
     }
 
-    protected BiFunction<CommandUseContext<?>, Object, Mono<Void>> compileReturn(Object obj, Method method) {
+    protected ReturnComponent compileReturn(Object obj, Method method) {
         Class<?> returnType = method.getReturnType();
         if (returnType.equals(Void.class)) {
-            return (ctx, o) -> Mono.empty();
-        } else if (returnType.equals(String.class)) {
-            return (ctx, o) -> ctx.respond((String) o);
-        } else if (returnType.equals(FormattedString.class)) {
-            return (ctx, o) -> ((FormattedString) o).getFor(ctx).flatMap(ctx::respond);
+            return new ReturnComponent((ctx, o) -> Mono.empty());
+        } else if (returnType.equals(Mono.class)) {
+            return new ReturnComponent((ctx, o) -> ((Mono<?>)o).then());
+        } else if (returnType.equals(Flux.class)) {
+            return new ReturnComponent((ctx, o) -> ((Flux<?>)o).then());
+        } else {
+            ReturnComponent component = plugins.createCompiledReturn(obj, method)
+                    .orElseThrow(() -> new BotConfigurationException("Unable to parse return type " + returnType.getCanonicalName() +
+                            "in method " + method.getName()));
+            return plugins.enhanceCompiledReturn(obj, method, component);
         }
-        return (ctx, o) -> o instanceof Mono ? ((Mono<?>) o).then() : Mono.empty();
     }
 
     protected ParameterComponent compileParameterAnnotated(Object obj, Method method, Parameter parameter) {
@@ -151,9 +154,9 @@ public class MethodCallingActionFactory {
         private final List<Guard> addlGuards;
         private final Object objToInvokeOn;
         private final Method methodToCall;
-        private final BiFunction<CommandUseContext<?>, Object, Mono<Void>> postTransformer;
+        private final ReturnComponent postTransformer;
 
-        public MethodCallingAction(List<ParameterComponent> parameterComponents, List<Guard> addlGuards, Object objToInvokeOn, Method methodToCall, BiFunction<CommandUseContext<?>, Object, Mono<Void>> postTransformer) {
+        public MethodCallingAction(List<ParameterComponent> parameterComponents, List<Guard> addlGuards, Object objToInvokeOn, Method methodToCall, ReturnComponent postTransformer) {
             this.parameterComponents = parameterComponents;
             this.objToInvokeOn = objToInvokeOn;
             this.methodToCall = methodToCall;
@@ -167,7 +170,8 @@ public class MethodCallingActionFactory {
                     .map(pc -> pc.func.apply(context))
                     .toArray();
             return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
-                    .flatMap(o -> postTransformer.apply(context, o));
+                    .doOnNext(o -> postTransformer.consumers.forEach(c -> c.accept(o)))
+                    .flatMap(o -> postTransformer.basic.apply(context, o));
         }
 
         @Override
