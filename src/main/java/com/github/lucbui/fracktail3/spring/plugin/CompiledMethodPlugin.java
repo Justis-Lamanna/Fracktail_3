@@ -1,12 +1,13 @@
 package com.github.lucbui.fracktail3.spring.plugin;
 
+import com.github.lucbui.fracktail3.spring.command.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public interface CompiledMethodPlugin extends Plugin {
+public interface CompiledMethodPlugin extends PreloadPlugin {
     default Result<ParameterComponent> createParameterComponent(Object obj, Method method, Parameter parameter) {
         return Result.ignore();
     }
@@ -24,6 +25,10 @@ public interface CompiledMethodPlugin extends Plugin {
     }
 
     default ReturnComponent decorateReturnComponent(Object obj, Method method, ReturnComponent base) {
+        return base;
+    }
+
+    default MethodComponent decorateMethodComponent(Object obj, Method method, MethodComponent base) {
         return base;
     }
 }

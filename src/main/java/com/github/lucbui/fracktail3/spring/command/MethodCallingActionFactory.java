@@ -2,12 +2,12 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
+import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -31,9 +31,14 @@ public class MethodCallingActionFactory {
     private Plugins plugins;
 
     public CommandAction createAction(Object obj, Method method) {
+        MethodComponent methodComponent = compileMethod(obj, method);
         List<ParameterComponent> components = compileParameters(obj, method);
         ReturnComponent returnComponent = compileReturn(obj, method);
-        return new MethodCallingAction(components, Collections.emptyList(), obj, method, returnComponent);
+        return new MethodCallingAction(methodComponent, components, obj, method, returnComponent);
+    }
+
+    private MethodComponent compileMethod(Object obj, Method method) {
+        return plugins.enhanceCompiledMethod(obj, method, new MethodComponent());
     }
 
     protected List<ParameterComponent> compileParameters(Object obj, Method method) {
@@ -89,16 +94,7 @@ public class MethodCallingActionFactory {
             if (value < params.length) {
                 return conversionService.convert(params[value], paramType);
             } else {
-                if (paramType.equals(Optional.class)) {
-                    return Optional.empty();
-                } else if (paramType.equals(Integer.TYPE)) {
-                    return 0;
-                } else if (paramType.equals(Long.TYPE)) {
-                    return 0L;
-                } else if (paramType.equals(Double.TYPE)) {
-                    return 0.0;
-                }
-                return null;
+                return Defaults.getDefault(paramType);
             }
         });
 
@@ -150,18 +146,18 @@ public class MethodCallingActionFactory {
     }
 
     protected static class MethodCallingAction implements CommandAction {
+        private final MethodComponent methodComponent;
         private final List<ParameterComponent> parameterComponents;
-        private final List<Guard> addlGuards;
         private final Object objToInvokeOn;
         private final Method methodToCall;
-        private final ReturnComponent postTransformer;
+        private final ReturnComponent returnComponent;
 
-        public MethodCallingAction(List<ParameterComponent> parameterComponents, List<Guard> addlGuards, Object objToInvokeOn, Method methodToCall, ReturnComponent postTransformer) {
+        public MethodCallingAction(MethodComponent methodComponent, List<ParameterComponent> parameterComponents, Object objToInvokeOn, Method methodToCall, ReturnComponent returnComponent) {
             this.parameterComponents = parameterComponents;
             this.objToInvokeOn = objToInvokeOn;
             this.methodToCall = methodToCall;
-            this.postTransformer = postTransformer;
-            this.addlGuards = addlGuards;
+            this.returnComponent = returnComponent;
+            this.methodComponent = methodComponent;
         }
 
         @Override
@@ -170,15 +166,16 @@ public class MethodCallingActionFactory {
                     .map(pc -> pc.func.apply(context))
                     .toArray();
             return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
-                    .doOnNext(o -> postTransformer.consumers.forEach(c -> c.accept(o)))
-                    .flatMap(o -> postTransformer.basic.apply(context, o));
+                    .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
+                    .flatMap(o -> returnComponent.basic.apply(context, o));
         }
 
         @Override
         public Mono<Boolean> guard(PlatformBaseContext<?> context) {
             return Stream.concat(
-                        parameterComponents.stream().flatMap(pc -> pc.guards.stream()),
-                        addlGuards.stream())
+                        methodComponent.guards.stream(),
+                        parameterComponents.stream().flatMap(pc -> pc.guards.stream())
+                    )
                     .map(guard -> guard.matches(context))
                     .reduce(Mono.just(true), BooleanUtils::and);
         }

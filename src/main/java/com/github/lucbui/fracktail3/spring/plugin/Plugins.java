@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.plugin;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.spring.command.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
 import org.apache.commons.lang3.ClassUtils;
@@ -93,6 +94,16 @@ public class Plugins {
         for(Plugin plugin : plugins) {
             if(plugin instanceof CompiledMethodPlugin) {
                 current = ((CompiledMethodPlugin) plugin).decorateReturnComponent(obj, method, current);
+            }
+        }
+        return current;
+    }
+
+    public MethodComponent enhanceCompiledMethod(Object obj, Method method, MethodComponent component) {
+        MethodComponent current = component;
+        for(Plugin plugin : plugins) {
+            if(plugin instanceof CompiledMethodPlugin) {
+                current = ((CompiledMethodPlugin) plugin).decorateMethodComponent(obj, method, current);
             }
         }
         return current;
