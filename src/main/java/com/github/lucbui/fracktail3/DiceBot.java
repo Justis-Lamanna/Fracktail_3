@@ -42,7 +42,7 @@ public class DiceBot {
             Pattern.compile("(" +
                     LESS_THAN_OR_EQUALS.pattern() + "|" +
                     GREATER_THAN_OR_EQUALS.pattern() + "|" +
-                    "<|>|==|" +
+                    "<+|>+|==|" +
                     NOT_EQUALS.pattern() + "!=)");
 
     private final Pattern VALID_EXPRESSION_REGEX =
