@@ -93,6 +93,9 @@ public class DiceBot {
         if(!VALID_EXPRESSION_REGEX.matcher(expression).matches()) {
             throw new IllegalArgumentException("Bad Expression");
         }
+        if(expression.contains("**")) {
+            throw new IllegalArgumentException("Bad Expression");
+        }
     }
 
     protected String denormalizeExpression(String expression) {
