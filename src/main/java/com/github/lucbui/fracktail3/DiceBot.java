@@ -26,31 +26,28 @@ import java.util.stream.Stream;
 public class DiceBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiceBot.class);
 
+    private static final String[] FORBIDDEN_CONSTRUCTS = {"**", "++", "--", "<<", "<<<", ">>"};
+
     //Pattern which provides the following:
     //Group 1 - Number of Dice
     //Group 2 - Dice to roll
     //Group 3 - l, if lowest, or empty, if highest
     //Group 4 - Keep amount
-    private final Pattern DICE_ROLL_PATTERN = Pattern.compile("([0-9]+)?d([0-9]+)(?>k(l)?([0-9]+))?");
-    private final Pattern NUMBERS_PATTERN = Pattern.compile("[0-9]+");
-    private final Pattern OPERATIONS_PATTERN = Pattern.compile("([+\\-*/()])");
+    private final Pattern DICE_ROLL_PATTERN = Pattern.compile("(\\d+)?d(\\d+)(?>k(l)?(\\d+))?");
+    private final Pattern NUMBERS_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+    private final Pattern OPERATIONS_PATTERN = Pattern.compile("(\\+|-|\\*|×|/|÷|<|>|≤|⩽|<=|≥|⩾|>=|==|≠|<>|=/=)");
+
+    private final Pattern MULTIPLICATION = Pattern.compile("(\\*|×)");
+    private final Pattern DIVISION = Pattern.compile("(/|÷)");
     private final Pattern LESS_THAN_OR_EQUALS = Pattern.compile("(≤|⩽|<=)");
     private final Pattern GREATER_THAN_OR_EQUALS = Pattern.compile("(≥|⩾|>=)");
-    private final Pattern NOT_EQUALS = Pattern.compile("(≠|<>|=/=)");
-
-    private final Pattern COMPARISON_PATTERN =
-            Pattern.compile("(" +
-                    LESS_THAN_OR_EQUALS.pattern() + "|" +
-                    GREATER_THAN_OR_EQUALS.pattern() + "|" +
-                    "<+|>+|==|" +
-                    NOT_EQUALS.pattern() + "!=)");
+    private final Pattern NOT_EQUALS = Pattern.compile("(≠|<>|=/=|!=)");
 
     private final Pattern VALID_EXPRESSION_REGEX =
             Pattern.compile("(?>" +
                     DICE_ROLL_PATTERN.pattern() + "|" +
                     NUMBERS_PATTERN.pattern() + "|" +
-                    OPERATIONS_PATTERN.pattern() + "|" +
-                    COMPARISON_PATTERN.pattern() + ")+");
+                    OPERATIONS_PATTERN.pattern() + "|\\(|\\))+");
 
 
     public RollResult roll(String e) {
@@ -86,14 +83,14 @@ public class DiceBot {
         expression = LESS_THAN_OR_EQUALS.matcher(expression).replaceAll("<=");
         expression = GREATER_THAN_OR_EQUALS.matcher(expression).replaceAll(">=");
         expression = NOT_EQUALS.matcher(expression).replaceAll("!=");
+        expression = MULTIPLICATION.matcher(expression).replaceAll("*");
+        expression = DIVISION.matcher(expression).replaceAll("/");
         return expression;
     }
 
     protected void validateExpression(String expression) {
-        if(!VALID_EXPRESSION_REGEX.matcher(expression).matches()) {
-            throw new IllegalArgumentException("Bad Expression");
-        }
-        if(expression.contains("**")) {
+        if(!VALID_EXPRESSION_REGEX.matcher(expression).matches() |
+                StringUtils.containsAny(expression, FORBIDDEN_CONSTRUCTS)) {
             throw new IllegalArgumentException("Bad Expression");
         }
     }
@@ -101,10 +98,11 @@ public class DiceBot {
     protected String denormalizeExpression(String expression) {
         //Nice formatting. Spaces around every operator, fancy ASCII
         expression = OPERATIONS_PATTERN.matcher(expression).replaceAll(" $1 ");
-        expression = COMPARISON_PATTERN.matcher(expression).replaceAll(" $1 ");
         expression = LESS_THAN_OR_EQUALS.matcher(expression).replaceAll("≤");
         expression = GREATER_THAN_OR_EQUALS.matcher(expression).replaceAll("≥");
         expression = NOT_EQUALS.matcher(expression).replaceAll("≠");
+        expression = expression.replaceAll("\\(", "( ");
+        expression = expression.replaceAll("\\)", " )");
         return expression;
     }
 
