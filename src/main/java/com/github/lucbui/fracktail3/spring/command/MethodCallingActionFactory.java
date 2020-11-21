@@ -2,23 +2,30 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
+import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
+import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +41,8 @@ public class MethodCallingActionFactory {
         MethodComponent methodComponent = compileMethod(obj, method);
         List<ParameterComponent> components = compileParameters(obj, method);
         ReturnComponent returnComponent = compileReturn(obj, method);
-        return new MethodCallingAction(methodComponent, components, obj, method, returnComponent);
+        ExceptionComponent exceptionComponent = compileException(obj, method);
+        return new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
     }
 
     private MethodComponent compileMethod(Object obj, Method method) {
@@ -66,17 +74,38 @@ public class MethodCallingActionFactory {
 
     protected ReturnComponent compileReturn(Object obj, Method method) {
         Class<?> returnType = method.getReturnType();
+        ReturnComponent ret;
         if (returnType.equals(Void.class)) {
-            return new ReturnComponent((ctx, o) -> Mono.empty());
+            ret = new ReturnComponent((ctx, o) -> Mono.empty());
         } else if (returnType.equals(Mono.class)) {
-            return new ReturnComponent((ctx, o) -> ((Mono<?>)o).then());
+            ret = new ReturnComponent((ctx, o) -> ((Mono<?>)o).then());
         } else if (returnType.equals(Flux.class)) {
-            return new ReturnComponent((ctx, o) -> ((Flux<?>)o).then());
+            ret = new ReturnComponent((ctx, o) -> ((Flux<?>)o).then());
         } else {
-            ReturnComponent component = plugins.createCompiledReturn(obj, method)
+            ret = plugins.createCompiledReturn(obj, method)
                     .orElseThrow(() -> new BotConfigurationException("Unable to parse return type " + returnType.getCanonicalName() +
                             "in method " + method.getName()));
-            return plugins.enhanceCompiledReturn(obj, method, component);
+        }
+        return plugins.enhanceCompiledReturn(obj, method, ret);
+    }
+
+    private ExceptionComponent compileException(Object obj, Method method) {
+        ExceptionComponent component = new ExceptionComponent();
+        compileOnExceptionRespond(component, obj.getClass());
+        compileOnExceptionRespond(component, method);
+        return plugins.enhanceCompiledException(obj, method, component);
+    }
+
+    private void compileOnExceptionRespond(ExceptionComponent component, AnnotatedElement element) {
+        Set<OnExceptionRespond> annotations = AnnotatedElementUtils.getMergedRepeatableAnnotations(element, OnExceptionRespond.class, OnExceptionRespond.Wrapper.class);
+
+        for(OnExceptionRespond annotation : annotations) {
+            FormattedString fString = AnnotationUtils.fromFString(annotation.value());
+            BiFunction<CommandUseContext<?>, Throwable, Mono<Void>> handler =
+                    (ctx, ex) -> ctx.respond(fString, Collections.singletonMap("message", ex.getMessage()));
+            for(Class<? extends Throwable> clazz : annotation.exception()) {
+                component.addHandler(clazz, handler);
+            }
         }
     }
 
@@ -151,13 +180,20 @@ public class MethodCallingActionFactory {
         private final Object objToInvokeOn;
         private final Method methodToCall;
         private final ReturnComponent returnComponent;
+        private final ExceptionComponent exceptionComponent;
 
-        public MethodCallingAction(MethodComponent methodComponent, List<ParameterComponent> parameterComponents, Object objToInvokeOn, Method methodToCall, ReturnComponent returnComponent) {
+        public MethodCallingAction(
+                MethodComponent methodComponent,
+                List<ParameterComponent> parameterComponents,
+                Object objToInvokeOn, Method methodToCall,
+                ReturnComponent returnComponent,
+                ExceptionComponent exceptionComponent) {
             this.parameterComponents = parameterComponents;
             this.objToInvokeOn = objToInvokeOn;
             this.methodToCall = methodToCall;
             this.returnComponent = returnComponent;
             this.methodComponent = methodComponent;
+            this.exceptionComponent = exceptionComponent;
         }
 
         @Override
@@ -167,7 +203,20 @@ public class MethodCallingActionFactory {
                     .toArray();
             return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
                     .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
-                    .flatMap(o -> returnComponent.basic.apply(context, o));
+                    .flatMap(o -> returnComponent.basic.apply(context, o))
+                    .onErrorResume(InvocationTargetException.class, ex -> {
+                        Optional<BiFunction<CommandUseContext<?>, Throwable, Mono<Void>>> handler =
+                                exceptionComponent.getBestHandlerFor(ex.getClass());
+                        if(handler.isPresent()) {
+                            return handler.get().apply(context, ex);
+                        } else {
+                            return Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass()))
+                                    .flatMap(func -> func.apply(context, ex));
+                        }
+                    })
+                    .onErrorResume(ex ->
+                            Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
+                                    .flatMap(func -> func.apply(context, ex)));
         }
 
         @Override

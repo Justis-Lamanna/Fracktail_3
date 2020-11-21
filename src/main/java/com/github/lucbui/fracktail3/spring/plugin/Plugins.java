@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.plugin;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.command.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
@@ -104,6 +105,16 @@ public class Plugins {
         for(Plugin plugin : plugins) {
             if(plugin instanceof CompiledMethodPlugin) {
                 current = ((CompiledMethodPlugin) plugin).decorateMethodComponent(obj, method, current);
+            }
+        }
+        return current;
+    }
+
+    public ExceptionComponent enhanceCompiledException(Object obj, Method method, ExceptionComponent component) {
+        ExceptionComponent current = component;
+        for(Plugin plugin : plugins) {
+            if(plugin instanceof CompiledMethodPlugin) {
+                current = ((CompiledMethodPlugin) plugin).decorateExceptionComponent(obj, method, current);
             }
         }
         return current;

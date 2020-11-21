@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
+import com.github.lucbui.fracktail3.spring.annotation.FString;
+import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import groovy.util.Eval;
@@ -107,14 +109,10 @@ public class DiceBot {
     }
 
     @Command
+    @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
     public Mono<Void> roll(CommandUseContext<?> ctx) {
-        try {
-            RollResult result = roll(ctx.getRawParameters());
-            return ctx.respond(result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr()));
-        } catch (IllegalArgumentException ex) {
-            LOGGER.info("Exception in roll command", ex);
-            return ctx.respond("Something went wrong evaluating that. Check your syntax!");
-        }
+        RollResult result = roll(ctx.getRawParameters());
+        return ctx.respond(result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr()));
     }
 
     private OptionalInt parseOpt(String s) {

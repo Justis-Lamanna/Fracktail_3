@@ -94,7 +94,7 @@ public class AsynchronousMap<K, V> implements Map<K, V> {
         if(map instanceof AsynchronousMap) {
             internal.putAll(((AsynchronousMap<K, V>) map).internal);
         } else {
-            map.forEach((k, v) -> this.internal.put(k, Mono.just(v)));
+            map.forEach((k, v) -> this.internal.put(k, Mono.justOrEmpty(v)));
         }
     }
 
