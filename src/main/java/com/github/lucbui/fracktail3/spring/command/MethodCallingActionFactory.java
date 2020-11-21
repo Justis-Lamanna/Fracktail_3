@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
@@ -16,18 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
-import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class MethodCallingActionFactory {
@@ -101,7 +96,7 @@ public class MethodCallingActionFactory {
 
         for(OnExceptionRespond annotation : annotations) {
             FormattedString fString = AnnotationUtils.fromFString(annotation.value());
-            BiFunction<CommandUseContext<?>, Throwable, Mono<Void>> handler =
+            ExceptionComponent.ExceptionHandler handler =
                     (ctx, ex) -> ctx.respond(fString, Collections.singletonMap("message", ex.getMessage()));
             for(Class<? extends Throwable> clazz : annotation.exception()) {
                 component.addHandler(clazz, handler);
@@ -172,62 +167,6 @@ public class MethodCallingActionFactory {
         });
 
         return plugins.enhanceCompiledParameter(obj, method, parameter, component);
-    }
-
-    protected static class MethodCallingAction implements CommandAction {
-        private final MethodComponent methodComponent;
-        private final List<ParameterComponent> parameterComponents;
-        private final Object objToInvokeOn;
-        private final Method methodToCall;
-        private final ReturnComponent returnComponent;
-        private final ExceptionComponent exceptionComponent;
-
-        public MethodCallingAction(
-                MethodComponent methodComponent,
-                List<ParameterComponent> parameterComponents,
-                Object objToInvokeOn, Method methodToCall,
-                ReturnComponent returnComponent,
-                ExceptionComponent exceptionComponent) {
-            this.parameterComponents = parameterComponents;
-            this.objToInvokeOn = objToInvokeOn;
-            this.methodToCall = methodToCall;
-            this.returnComponent = returnComponent;
-            this.methodComponent = methodComponent;
-            this.exceptionComponent = exceptionComponent;
-        }
-
-        @Override
-        public Mono<Void> doAction(CommandUseContext<?> context) {
-            Object[] params = parameterComponents.stream()
-                    .map(pc -> pc.func.apply(context))
-                    .toArray();
-            return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
-                    .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
-                    .flatMap(o -> returnComponent.basic.apply(context, o))
-                    .onErrorResume(InvocationTargetException.class, ex -> {
-                        Optional<BiFunction<CommandUseContext<?>, Throwable, Mono<Void>>> handler =
-                                exceptionComponent.getBestHandlerFor(ex.getClass());
-                        if(handler.isPresent()) {
-                            return handler.get().apply(context, ex);
-                        } else {
-                            return Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass()))
-                                    .flatMap(func -> func.apply(context, ex));
-                        }
-                    })
-                    .onErrorResume(ex ->
-                            Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                                    .flatMap(func -> func.apply(context, ex)));
-        }
-
-        @Override
-        public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-            return Stream.concat(
-                        methodComponent.guards.stream(),
-                        parameterComponents.stream().flatMap(pc -> pc.guards.stream())
-                    )
-                    .map(guard -> guard.matches(context))
-                    .reduce(Mono.just(true), BooleanUtils::and);
-        }
     }
 
 }

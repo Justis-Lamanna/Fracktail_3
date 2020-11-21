@@ -9,15 +9,17 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class ReturnComponent {
-    final BiFunction<CommandUseContext<?>, Object, Mono<Void>> basic;
+    final ReturnConverterFunction func;
     final List<Consumer<Object>> consumers;
 
-    public ReturnComponent(BiFunction<CommandUseContext<?>, Object, Mono<Void>> basic) {
-        this.basic = basic;
+    public ReturnComponent(ReturnConverterFunction func) {
+        this.func = func;
         this.consumers = new ArrayList<>();
     }
 
     public void addConsumer(Consumer<Object> consumer) {
         this.consumers.add(consumer);
     }
+
+    public interface ReturnConverterFunction extends BiFunction<CommandUseContext<?>, Object, Mono<Void>> {}
 }

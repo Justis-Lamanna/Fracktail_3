@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public class ParameterComponent {
-    Function<CommandUseContext<?>, Object> func;
+    ParameterConverterFunction func;
     List<Guard> guards;
 
-    public ParameterComponent(Function<CommandUseContext<?>, Object> func) {
+    public ParameterComponent(ParameterConverterFunction func) {
         this.func = func;
         this.guards = new ArrayList<>();
     }
@@ -19,4 +19,6 @@ public class ParameterComponent {
     public void addGuard(Guard guard) {
         this.guards.add(guard);
     }
+
+    public interface ParameterConverterFunction extends Function<CommandUseContext<?>, Object> {}
 }

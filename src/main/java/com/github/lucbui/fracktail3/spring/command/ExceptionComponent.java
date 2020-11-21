@@ -9,17 +9,17 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class ExceptionComponent {
-    final Map<Class<? extends Throwable>, BiFunction<CommandUseContext<?>, Throwable, Mono<Void>>> candidates;
+    final Map<Class<? extends Throwable>, ExceptionHandler> candidates;
 
     public ExceptionComponent() {
         this.candidates = new HashMap<>();
     }
 
-    public void addHandler(Class<? extends Throwable> clazz,  BiFunction<CommandUseContext<?>, Throwable, Mono<Void>> handler) {
+    public void addHandler(Class<? extends Throwable> clazz, ExceptionHandler handler) {
         this.candidates.put(clazz, handler);
     }
 
-    public Optional<BiFunction<CommandUseContext<?>, Throwable, Mono<Void>>> getBestHandlerFor(Class<? extends Throwable> clazz) {
+    public Optional<ExceptionHandler> getBestHandlerFor(Class<? extends Throwable> clazz) {
         if(candidates.isEmpty()) return Optional.empty(); //Don't even bother.
         Class<?> current = clazz;
         //Iterate through the class tree until we find a suitable match.
@@ -31,4 +31,6 @@ public class ExceptionComponent {
         }
         return Optional.empty();
     }
+
+    public interface ExceptionHandler extends BiFunction<CommandUseContext<?>, Throwable, Mono<Void>> {}
 }
