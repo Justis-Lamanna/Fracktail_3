@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface Command {
-    String value() default "";
+public @interface Usage {
+    String value();
+    Formatter[] formatters() default {};
 }

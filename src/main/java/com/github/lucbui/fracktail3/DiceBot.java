@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
+import com.github.lucbui.fracktail3.spring.annotation.Usage;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import groovy.util.Eval;
@@ -109,9 +110,13 @@ public class DiceBot {
     }
 
     @Command
+    @Usage("Roll a dice to get results. The format is `d[number of faces]`.\n" +
+            "You can roll multiple dice by specifying a number before the 'd', such as `4d20`.\n" +
+            "You can append `k<number>` or `kl<number>` to keep the highest or lowest <number> of dice, and ignore the rest.\n" +
+            "`+`, `-`, `*`, and `/` are also supported, as are comparison operators `<`, `>`, `==`, `<=`, `>=`, and `!=` and parenthesis `()`.")
     @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
     public Mono<Void> roll(CommandUseContext<?> ctx) {
-        RollResult result = roll(ctx.getRawParameters());
+        RollResult result = roll(ctx.getParameters().getRaw());
         return ctx.respond(result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr()));
     }
 

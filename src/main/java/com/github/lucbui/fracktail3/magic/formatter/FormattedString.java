@@ -49,6 +49,15 @@ public class FormattedString {
     }
 
     /**
+     * A format string which does absolutely nothing.
+     * When this is provided as a response, it is equivalent to no response.
+     * @return A FormattedString which does nothing at all.
+     */
+    public static FormattedString nothing() {
+        return from("", (raw, ctx, addlVars) -> Mono.empty());
+    }
+
+    /**
      * Get the raw text string
      * @return The raw string
      */

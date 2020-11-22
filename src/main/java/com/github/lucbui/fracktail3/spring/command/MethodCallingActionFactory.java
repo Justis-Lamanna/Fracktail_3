@@ -114,12 +114,9 @@ public class MethodCallingActionFactory {
         }
 
         ParameterComponent component = new ParameterComponent(ctx -> {
-            String[] params = ctx.getParameters();
-            if (value < params.length) {
-                return conversionService.convert(params[value], paramType);
-            } else {
-                return Defaults.getDefault(paramType);
-            }
+            return ctx.getParameters().getParameter(value)
+                    .map(s -> (Object)conversionService.convert(s, paramType))
+                    .orElseGet(() -> Defaults.getDefault(paramType));
         });
 
         if (!isOptional(paramType) && !pAnnot.optional()) {
@@ -127,7 +124,7 @@ public class MethodCallingActionFactory {
             component.addGuard(ctx -> {
                 if (ctx instanceof CommandUseContext) {
                     CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
-                    return Mono.just(value < cctx.getParameters().length);
+                    return Mono.just(value < cctx.getParameters().getNumberOfParameters());
                 }
                 return Mono.just(true);
             });

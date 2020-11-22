@@ -1,9 +1,10 @@
 package com.github.lucbui.fracktail3.spring.plugin.command;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandLookupPlugin implements CommandPlugin {
@@ -14,10 +15,17 @@ public class CommandLookupPlugin implements CommandPlugin {
 
     @Override
     public List<Command> addAdditionalCommands() {
-        Command c = new Command.Builder("command-lookup-plugin.cmds")
+        Command cmds = new Command.Builder("command-lookup-plugin.cmds")
                 .withName("cmds")
                 .withAction(new CommandListAction())
+                .withHelp(FormattedString.from("Use !cmds to get a list of commands you can use."))
                 .build();
-        return Collections.singletonList(c);
+
+        Command help = new Command.Builder("command-lookup-plugin.help")
+                .withNames("help", "usage")
+                .withAction(new CommandHelpAction())
+                .withHelp(FormattedString.from("Use !help <command> to get usage on a particular command."))
+                .build();
+        return Arrays.asList(cmds, help);
     }
 }

@@ -261,9 +261,6 @@ public class Command implements Id, Disableable {
             if(names.isEmpty()) {
                 names = Collections.singleton(id);
             }
-            if(help == null) {
-                this.help = FormattedString.from(id + ".help");
-            }
             return new Command(id, enabled, names, help, action);
         }
     }

@@ -5,9 +5,12 @@ import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.annotation.Usage;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
+import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -90,8 +93,9 @@ public class CommandListPostProcessor implements BeanPostProcessor {
 
         @Override
         public void doWith(Method method) throws IllegalArgumentException {
-            LOGGER.debug("Adding @Command-annotated method {}", method.getName());
-            Command.Builder c = new Command.Builder(method.getName());
+            String id = getId(method);
+            LOGGER.debug("Adding @Command-annotated method {}", id);
+            Command.Builder c = new Command.Builder(id);
 
             c.withAction(factory.createAction(bean, method));
 
@@ -101,7 +105,23 @@ public class CommandListPostProcessor implements BeanPostProcessor {
                 c.withNames(nameAnnotation.value());
             }
 
+            if(method.isAnnotationPresent(Usage.class)) {
+                Usage usageAnnotation = method.getAnnotation(Usage.class);
+                LOGGER.debug("Method {} with help text as {}", method.getName(), usageAnnotation.value());
+                c.withHelp(AnnotationUtils.fromUsage(usageAnnotation));
+            }
+
             addOrMerge(c.build());
+        }
+
+        private String getId(Method method) {
+            com.github.lucbui.fracktail3.spring.annotation.Command cAnnot =
+                    method.getAnnotation(com.github.lucbui.fracktail3.spring.annotation.Command.class);
+            if(StringUtils.isBlank(cAnnot.value())) {
+                return method.getName();
+            } else {
+                return cAnnot.value();
+            }
         }
     }
 }
