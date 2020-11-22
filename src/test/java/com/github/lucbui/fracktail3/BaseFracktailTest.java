@@ -72,8 +72,9 @@ public abstract class BaseFracktailTest {
 
     private void mock() {
         when(command.getAction()).thenReturn(commandAction);
-        when(commandAction.guard(any())).thenReturn(Mono.just(true));
-        command.setEnabled(true);
+        when(command.matches(any())).thenReturn(Mono.just(true));
+        when(command.getNames()).thenReturn(Collections.singleton("test"));
+        when(command.getHelp()).thenReturn(FormattedString.literal("test hello"));
 
         when(context.getBot()).thenReturn(bot);
         when(context.getPlatform()).thenReturn(platform);

@@ -12,8 +12,13 @@ import reactor.core.publisher.Mono;
  * this action is guarded.
  */
 public class CompositeAction implements CommandAction {
-    private Guard guard;
-    private CommandAction action;
+    private final Guard guard;
+    private final CommandAction action;
+
+    public CompositeAction(Guard guard, CommandAction action) {
+        this.guard = guard;
+        this.action = action;
+    }
 
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
