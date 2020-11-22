@@ -14,7 +14,13 @@ import java.util.Map;
 public class ICU4JDecoratorFormatter implements ContextFormatter {
     @Override
     public Mono<String> format(String raw, BaseContext<?> ctx, Map<String, Object> addlVariables) {
-        Map<String, Object> map = new AsynchronousMap<>(ctx.getMap());
+        Map<String, Object> contextMap = ctx.getMap();
+        Map<String, Object> map;
+        if(contextMap == null ) {
+            map = new AsynchronousMap<>();
+        } else {
+            map = new AsynchronousMap<>(ctx.getMap());
+        }
         map.putAll(addlVariables);
         return ctx.getLocale()
                 .map(locale -> new MessageFormat(raw, locale))
