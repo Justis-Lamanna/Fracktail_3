@@ -21,11 +21,11 @@ public interface PlatformBaseContext<T> extends BaseContext<T> {
 
     default Mono<Void> directMessage(FormattedString fString) {
         return fString.getFor(this)
-                .flatMap(this::directMessage);
+                .flatMap(this::privateMessage);
     }
 
     default Mono<Void> directMessage(FormattedString fString, Map<String, Object> addlVariables) {
         return fString.getFor(this, addlVariables)
-                .flatMap(this::directMessage);
+                .flatMap(this::privateMessage);
     }
 }

@@ -7,6 +7,7 @@ import java.lang.annotation.*;
 @Repeatable(OnExceptionRespond.Wrapper.class)
 public @interface OnExceptionRespond {
     FString value();
+    RespondType respondType() default RespondType.INLINE;
     Class<? extends Throwable>[] exception() default Exception.class;
 
     @Retention(RetentionPolicy.RUNTIME)

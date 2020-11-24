@@ -2,13 +2,15 @@ package com.github.lucbui.fracktail3.spring.plugin.command;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.WrapperContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
-public class CommandLookupContext<T> implements PlatformBaseContext<T> {
+public class CommandLookupContext<T> implements PlatformBaseContext<T>, WrapperContext {
     private final PlatformBaseContext<T> wrapped;
 
     public CommandLookupContext(PlatformBaseContext<T> wrapped) {
@@ -43,5 +45,18 @@ public class CommandLookupContext<T> implements PlatformBaseContext<T> {
     @Override
     public Mono<Void> respond(String message) {
         return wrapped.respond(message);
+    }
+
+    @Override
+    public Mono<Void> privateMessage(String message) {
+        return wrapped.privateMessage(message);
+    }
+
+    @Override
+    public BaseContext<?> getWrappedContext() {
+        if(wrapped instanceof WrapperContext) {
+            return ((WrapperContext) wrapped).getWrappedContext();
+        }
+        return wrapped;
     }
 }

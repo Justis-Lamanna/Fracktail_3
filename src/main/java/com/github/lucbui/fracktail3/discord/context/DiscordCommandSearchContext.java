@@ -32,7 +32,7 @@ public class DiscordCommandSearchContext extends DiscordBasePlatformContext<Mess
     }
 
     @Override
-    public Mono<Void> directMessage(String message) {
+    public Mono<Void> privateMessage(String message) {
         return getPayload().getMessage().getAuthor()
                 .map(user -> getPlatform().dm(DiscordUserset.forUser(user.getId()), message))
                 .orElse(Mono.empty());

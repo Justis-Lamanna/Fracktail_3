@@ -44,7 +44,7 @@ public interface BaseContext<T> {
      * @param message The message to send
      * @return Asynchronous indication of completion
      */
-    default Mono<Void> directMessage(String message) {
+    default Mono<Void> privateMessage(String message) {
         return Mono.empty();
     }
 }
