@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
+
 @Component
 public class DiscordBotRunner implements CommandLineRunner {
     @Autowired
@@ -13,5 +15,10 @@ public class DiscordBotRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         bot.start().block();
+    }
+
+    @PreDestroy
+    public void destroy() throws Exception {
+        bot.stop().block();
     }
 }
