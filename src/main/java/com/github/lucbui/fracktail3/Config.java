@@ -5,6 +5,9 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHook;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.spring.annotation.Command;
+import com.github.lucbui.fracktail3.spring.annotation.Respond;
+import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.command.CommandLookupPlugin;
 import discord4j.core.object.presence.Activity;
@@ -33,5 +36,11 @@ public class Config {
     @Bean
     public Plugin clp() {
         return new CommandLookupPlugin();
+    }
+
+    @Command
+    @Respond(RespondType.DIRECT_MESSAGE)
+    public String hello() {
+        return "Hello, World!";
     }
 }

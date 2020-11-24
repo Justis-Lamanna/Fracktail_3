@@ -38,4 +38,13 @@ public interface BaseContext<T> {
     default Mono<Void> respond(String message) {
         return Mono.empty();
     }
+
+    /**
+     * Respond to this context, over some form of private communication
+     * @param message The message to send
+     * @return Asynchronous indication of completion
+     */
+    default Mono<Void> directMessage(String message) {
+        return Mono.empty();
+    }
 }

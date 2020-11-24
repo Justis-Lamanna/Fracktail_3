@@ -18,4 +18,14 @@ public interface PlatformBaseContext<T> extends BaseContext<T> {
         return fString.getFor(this, addlVariables)
                 .flatMap(this::respond);
     }
+
+    default Mono<Void> directMessage(FormattedString fString) {
+        return fString.getFor(this)
+                .flatMap(this::directMessage);
+    }
+
+    default Mono<Void> directMessage(FormattedString fString, Map<String, Object> addlVariables) {
+        return fString.getFor(this, addlVariables)
+                .flatMap(this::directMessage);
+    }
 }

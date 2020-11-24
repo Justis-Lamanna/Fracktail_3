@@ -6,6 +6,8 @@ import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
+import com.github.lucbui.fracktail3.spring.annotation.Respond;
+import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
@@ -73,9 +75,17 @@ public class MethodCallingActionFactory {
         if (returnType.equals(Void.class)) {
             ret = new ReturnComponent((ctx, o) -> Mono.empty());
         } else if (returnType.equals(Mono.class)) {
-            ret = new ReturnComponent((ctx, o) -> ((Mono<?>)o).then());
+            ret = new ReturnComponent((ctx, o) -> ((Mono<?>) o).then());
         } else if (returnType.equals(Flux.class)) {
-            ret = new ReturnComponent((ctx, o) -> ((Flux<?>)o).then());
+            ret = new ReturnComponent((ctx, o) -> ((Flux<?>) o).then());
+        } else if(returnType.equals(String.class)) {
+            RespondType type = method.isAnnotationPresent(Respond.class) ?
+                    method.getAnnotation(Respond.class).value() : RespondType.INLINE;
+            ret = new ReturnComponent(type.forString());
+        } else if(returnType.equals(FormattedString.class)) {
+            RespondType type = method.isAnnotationPresent(Respond.class) ?
+                    method.getAnnotation(Respond.class).value() : RespondType.INLINE;
+            ret = new ReturnComponent(type.forFString());
         } else {
             ret = plugins.createCompiledReturn(obj, method)
                     .orElseThrow(() -> new BotConfigurationException("Unable to parse return type " + returnType.getCanonicalName() +
