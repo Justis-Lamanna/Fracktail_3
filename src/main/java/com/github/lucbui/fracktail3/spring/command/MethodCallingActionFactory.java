@@ -5,10 +5,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
-import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
-import com.github.lucbui.fracktail3.spring.annotation.Respond;
-import com.github.lucbui.fracktail3.spring.annotation.RespondType;
-import com.github.lucbui.fracktail3.spring.annotation.Variable;
+import com.github.lucbui.fracktail3.spring.annotation.*;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
@@ -42,12 +39,19 @@ public class MethodCallingActionFactory {
         List<ParameterComponent> components = compileParameters(obj, method);
         ReturnComponent returnComponent = compileReturn(obj, method);
         ExceptionComponent exceptionComponent = compileException(obj, method);
+        LOGGER.debug("Finished compiling method {}", method.getName());
         return new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
     }
 
     private MethodComponent compileMethod(Object obj, Method method) {
         LOGGER.debug("Compiling method {}", method.getName());
-        return plugins.enhanceCompiledMethod(obj, method, new MethodComponent());
+        MethodComponent component = new MethodComponent();
+        if(method.isAnnotationPresent(ForPlatform.class)) {
+            Class<? extends Platform> platform = method.getAnnotation(ForPlatform.class).value();
+            LOGGER.debug("Limiting command to usage with {} platform", platform.getCanonicalName());
+            component.addGuard(ctx -> Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), platform)));
+        }
+        return plugins.enhanceCompiledMethod(obj, method, component);
     }
 
     protected List<ParameterComponent> compileParameters(Object obj, Method method) {
@@ -59,23 +63,27 @@ public class MethodCallingActionFactory {
 
     protected ParameterComponent compileParameter(Object obj, Method method, Parameter parameter) {
         Class<?> type = parameter.getType();
+        ParameterComponent component;
         if (parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Parameter.class)) {
             LOGGER.debug("Compiling parameter {} annotated with @Parameter", parameter.getName());
-            return compileParameterAnnotated(obj, method, parameter);
+            component = compileParameterAnnotated(obj, method, parameter);
         } else if(parameter.isAnnotationPresent(Variable.class)) {
             LOGGER.debug("Compiling parameter {} annotated with @Variable", parameter.getName());
-            return compileParameterVariable(obj, method, parameter);
+            component = compileParameterVariable(obj, method, parameter);
         } else if (ClassUtils.isAssignable(CommandUseContext.class, type)) {
             LOGGER.warn("Compiling parameter {} of type CommandUseContext. THIS IS DEPRECATED!", parameter.getName());
-            return plugins.enhanceCompiledParameter(obj, method, parameter, new ParameterComponent(ctx -> ctx));
+            component = new ParameterComponent(ctx -> ctx);
+        } else if (parameter.isAnnotationPresent(Platform.class)) {
+            LOGGER.warn("Compiling parameter {} annotated with @Platform", parameter.getName());
+            component = compileParameterPlatform(obj, method, parameter);
         } else {
             LOGGER.warn("Parameter {} matches no acceptable types. Looking in plugins...", parameter.getName());
-            ParameterComponent component = plugins.createCompiledParameter(obj, method, parameter)
+            component = plugins.createCompiledParameter(obj, method, parameter)
                     .orElseThrow(() -> new BotConfigurationException("Unable to parse parameter " + parameter.getName() +
                              " of type " + type.getCanonicalName() +
                              "in method " + method.getName()));
-            return plugins.enhanceCompiledParameter(obj, method, parameter, component);
         }
+        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
     }
 
     protected ReturnComponent compileReturn(Object obj, Method method) {
@@ -149,7 +157,7 @@ public class MethodCallingActionFactory {
                     .orElseGet(() -> Defaults.getDefault(paramType));
         });
 
-        if (!isOptional(paramType) && !pAnnot.optional()) {
+        if (isNotOptional(paramType) && !pAnnot.optional()) {
             //Enforce parameter count (unless optional is expected)
             component.addGuard(ctx -> {
                 if (ctx instanceof CommandUseContext) {
@@ -159,13 +167,12 @@ public class MethodCallingActionFactory {
                 return Mono.just(true);
             });
         }
-
-        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
+        return component;
     }
 
-    private boolean isOptional(Class<?> clazz) {
-        return clazz.equals(Optional.class) || clazz.equals(OptionalInt.class) ||
-                clazz.equals(OptionalLong.class) || clazz.equals(OptionalDouble.class);
+    private boolean isNotOptional(Class<?> clazz) {
+        return !clazz.equals(Optional.class) && !clazz.equals(OptionalInt.class) &&
+                !clazz.equals(OptionalLong.class) && !clazz.equals(OptionalDouble.class);
     }
 
     protected ParameterComponent compileParameterVariable(Object obj, Method method, Parameter parameter) {
@@ -193,7 +200,27 @@ public class MethodCallingActionFactory {
             }
         });
 
-        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
+        if(isNotOptional(paramType) && !vAnnot.optional()) {
+            component.addGuard(ctx -> Mono.just(ctx.getMap().containsKey(value)));
+        }
+
+        return component;
     }
 
+    private ParameterComponent compileParameterPlatform(Object obj, Method method, Parameter parameter) {
+        Platform p = parameter.getAnnotation(Platform.class);
+        Class<?> paramType = parameter.getType();
+
+        ParameterComponent component = new ParameterComponent(ctx -> {
+            if(paramType.equals(Optional.class)) {
+                return Optional.of(ctx.getPlatform());
+            }
+            return ctx.getPlatform();
+        });
+
+        if(isNotOptional(paramType) && !p.optional()) {
+            component.addGuard(ctx -> Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), paramType)));
+        }
+        return component;
+    }
 }
