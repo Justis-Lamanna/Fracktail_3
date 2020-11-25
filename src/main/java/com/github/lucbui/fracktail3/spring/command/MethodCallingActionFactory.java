@@ -1,8 +1,10 @@
 package com.github.lucbui.fracktail3.spring.command;
 
+import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.*;
@@ -70,12 +72,12 @@ public class MethodCallingActionFactory {
         } else if(parameter.isAnnotationPresent(Variable.class)) {
             LOGGER.debug("Compiling parameter {} annotated with @Variable", parameter.getName());
             component = compileParameterVariable(obj, method, parameter);
-        } else if (ClassUtils.isAssignable(CommandUseContext.class, type)) {
-            LOGGER.warn("Compiling parameter {} of type CommandUseContext. THIS IS DEPRECATED!", parameter.getName());
-            component = new ParameterComponent(ctx -> ctx);
         } else if (parameter.isAnnotationPresent(Platform.class)) {
             LOGGER.warn("Compiling parameter {} annotated with @Platform", parameter.getName());
             component = compileParameterPlatform(obj, method, parameter);
+        } else if(ClassUtils.isAssignable(Bot.class, type)) {
+            LOGGER.warn("Injecting parameter {} annotated with Bot instance", parameter.getName());
+            component = new ParameterComponent(BaseContext::getBot);
         } else {
             LOGGER.warn("Parameter {} matches no acceptable types. Looking in plugins...", parameter.getName());
             component = plugins.createCompiledParameter(obj, method, parameter)
@@ -153,7 +155,7 @@ public class MethodCallingActionFactory {
 
         ParameterComponent component = new ParameterComponent(ctx -> {
             return ctx.getParameters().getParameter(value)
-                    .map(s -> (Object)conversionService.convert(s, paramType))
+                    .map(s -> convertObjectForParam(s, parameter, pAnnot.optional()))
                     .orElseGet(() -> Defaults.getDefault(paramType));
         });
 
@@ -170,11 +172,6 @@ public class MethodCallingActionFactory {
         return component;
     }
 
-    private boolean isNotOptional(Class<?> clazz) {
-        return !clazz.equals(Optional.class) && !clazz.equals(OptionalInt.class) &&
-                !clazz.equals(OptionalLong.class) && !clazz.equals(OptionalDouble.class);
-    }
-
     protected ParameterComponent compileParameterVariable(Object obj, Method method, Parameter parameter) {
         Variable vAnnot = parameter.getAnnotation(Variable.class);
         String value = vAnnot.value();
@@ -185,19 +182,7 @@ public class MethodCallingActionFactory {
             if(paramType.equals(Mono.class)) {
                 return map.getAsync(value);
             }
-            Object v = map.get(value);
-            if (paramType.equals(Optional.class)) {
-                if(v == null) {
-                    return Optional.empty();
-                } else {
-                    return Optional.of(v);
-                }
-            }
-            if(conversionService.canConvert(v.getClass(), paramType)) {
-                return conversionService.convert(v, paramType);
-            } else {
-                throw new BotConfigurationException("Cannot convert object " + v.getClass() + " to type " + paramType.getCanonicalName());
-            }
+            return convertObjectForParam(map.get(value), parameter, vAnnot.optional());
         });
 
         if(isNotOptional(paramType) && !vAnnot.optional()) {
@@ -211,16 +196,34 @@ public class MethodCallingActionFactory {
         Platform p = parameter.getAnnotation(Platform.class);
         Class<?> paramType = parameter.getType();
 
-        ParameterComponent component = new ParameterComponent(ctx -> {
-            if(paramType.equals(Optional.class)) {
-                return Optional.of(ctx.getPlatform());
-            }
-            return ctx.getPlatform();
-        });
+        ParameterComponent component = new ParameterComponent(ctx -> convertObjectForParam(ctx.getPlatform(), parameter, p.optional()));
 
         if(isNotOptional(paramType) && !p.optional()) {
             component.addGuard(ctx -> Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), paramType)));
         }
         return component;
+    }
+
+    private Object convertObjectForParam(Object obj, Parameter param, boolean isOptional) {
+        Class<?> paramType = param.getType();
+        if(obj == null) {
+            return Defaults.getDefault(paramType);
+        } else if(paramType.equals(Optional.class)) {
+            return Optional.of(obj); //All we can do is assume the types are right.
+        } else if(ClassUtils.isAssignable(obj.getClass(), paramType)) {
+            return obj;
+        } else if(conversionService.canConvert(obj.getClass(), paramType)) {
+            return conversionService.convert(obj, paramType);
+        } else {
+            if(isOptional) {
+                return Defaults.getDefault(paramType);
+            }
+            throw new BotConfigurationException("Cannot cast object " + obj.getClass().getCanonicalName() + " to parameter type " + paramType.getCanonicalName());
+        }
+    }
+
+    private boolean isNotOptional(Class<?> clazz) {
+        return !clazz.equals(Optional.class) && !clazz.equals(OptionalInt.class) &&
+                !clazz.equals(OptionalLong.class) && !clazz.equals(OptionalDouble.class);
     }
 }
