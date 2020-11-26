@@ -22,6 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -69,6 +70,9 @@ public class MethodCallingActionFactory {
         if (parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Parameter.class)) {
             LOGGER.debug("Compiling parameter {} annotated with @Parameter", parameter.getName());
             component = compileParameterAnnotated(obj, method, parameter);
+        } else if(parameter.isAnnotationPresent(ParameterRange.class)) {
+            LOGGER.debug("Compiling parameter {} annotated with @ParameterRange", parameter.getName());
+            component = compileParameterRangeAnnotated(obj, method, parameter);
         } else if(parameter.isAnnotationPresent(Variable.class)) {
             LOGGER.debug("Compiling parameter {} annotated with @Variable", parameter.getName());
             component = compileParameterVariable(obj, method, parameter);
@@ -153,11 +157,10 @@ public class MethodCallingActionFactory {
             throw new BotConfigurationException("Cannot convert String parameter to type " + paramType.getCanonicalName());
         }
 
-        ParameterComponent component = new ParameterComponent(ctx -> {
-            return ctx.getParameters().getParameter(value)
-                    .map(s -> convertObjectForParam(s, parameter, pAnnot.optional()))
-                    .orElseGet(() -> Defaults.getDefault(paramType));
-        });
+        ParameterComponent component = new ParameterComponent(ctx ->
+                ctx.getParameters().getParameter(value)
+                .map(s -> convertObjectForParam(s, parameter, pAnnot.optional()))
+                .orElseGet(() -> Defaults.getDefault(paramType)));
 
         if (isNotOptional(paramType) && !pAnnot.optional()) {
             //Enforce parameter count (unless optional is expected)
@@ -170,6 +173,54 @@ public class MethodCallingActionFactory {
             });
         }
         return component;
+    }
+
+    protected ParameterComponent compileParameterRangeAnnotated(Object obj, Method method, Parameter parameter) {
+        ParameterRange range = parameter.getAnnotation(ParameterRange.class);
+        int start = range.lower();
+        int end = range.value();
+        Class<?> paramType = parameter.getType();
+
+        ParameterComponent component;
+        if(paramType.isArray()) {
+            Class<?> innerType = paramType.getComponentType();
+            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
+                .map(opt -> {
+                    if(opt.isPresent()) {
+                        return convertObjectForClass(opt.get(), parameter, innerType, range.optional());
+                    } else if(range.optional()) {
+                        return Defaults.getDefault(innerType);
+                    } else {
+                        throw new BotConfigurationException("Cannot cast object " +
+                                obj.getClass().getCanonicalName() + " to parameter type " + innerType.getCanonicalName());
+                    }
+                })
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    Object arr = Array.newInstance(innerType, list.size());
+                    for(int idx = 0; idx < list.size(); idx++) {
+                        Array.set(arr, idx, list.get(idx));
+                    }
+                    return arr;
+                })));
+        } else if(ClassUtils.isAssignable(List.class, paramType)) {
+            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
+                .map(opt -> {
+                    if(opt.isPresent()) {
+                        return convertObjectForClass(opt.get(), parameter, String.class, range.optional());
+                    } else if(range.optional()) {
+                        return Defaults.getDefault(String.class);
+                    } else {
+                        throw new BotConfigurationException("Cannot cast object " +
+                                obj.getClass().getCanonicalName() + " to parameter type String (assuming List<String>)");
+                    }
+                })
+                .collect(Collectors.toList()));
+        } else if(ClassUtils.isAssignable(String.class, paramType)) {
+            //TODO: Substring?
+            return new ParameterComponent(context -> context.getParameters().getRaw());
+        } else {
+            throw new BotConfigurationException("Cannot convert parameters to type " + paramType.getCanonicalName());
+        }
     }
 
     protected ParameterComponent compileParameterVariable(Object obj, Method method, Parameter parameter) {
@@ -205,9 +256,15 @@ public class MethodCallingActionFactory {
     }
 
     private Object convertObjectForParam(Object obj, Parameter param, boolean isOptional) {
-        Class<?> paramType = param.getType();
+        return convertObjectForClass(obj, param, param.getType(), isOptional);
+    }
+
+    private Object convertObjectForClass(Object obj, Parameter param, Class<?> paramType, boolean isOptional) {
         if(obj == null) {
-            return Defaults.getDefault(paramType);
+            if(isOptional) {
+                return Defaults.getDefault(paramType);
+            }
+            throw new BotConfigurationException("Encountered null for non-optional parameter " + param.getName());
         } else if(paramType.equals(Optional.class)) {
             return Optional.of(obj); //All we can do is assume the types are right.
         } else if(ClassUtils.isAssignable(obj.getClass(), paramType)) {

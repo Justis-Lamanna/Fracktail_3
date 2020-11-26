@@ -40,7 +40,7 @@ class DiceBotTest {
     @Test
     void oneDiceRoll() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20");
         assertEquals(10, result.getResult());
         assertEquals("10", result.getResultStr());
         assertEquals("( 10 )", result.getPrettyExpression());
@@ -49,7 +49,7 @@ class DiceBotTest {
     @Test
     void multiDiceRoll() {
         when(dice.roll()).thenReturn(10).thenReturn(5);
-        DiceBot.RollResult result = diceBot.roll("2d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20");
         assertEquals(15, result.getResult());
         assertEquals("15", result.getResultStr());
         assertEquals("( 10 + 5 )", result.getPrettyExpression());
@@ -58,7 +58,7 @@ class DiceBotTest {
     @Test
     void multiDiceRollKeepHighest() {
         when(dice.roll()).thenReturn(10).thenReturn(5);
-        DiceBot.RollResult result = diceBot.roll("2d20k1");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20k1");
         assertEquals(10, result.getResult());
         assertEquals("10", result.getResultStr());
         assertEquals("( 10 + ~~5~~ )", result.getPrettyExpression());
@@ -67,7 +67,7 @@ class DiceBotTest {
     @Test
     void multiDiceRollKeepLowest() {
         when(dice.roll()).thenReturn(10).thenReturn(5);
-        DiceBot.RollResult result = diceBot.roll("2d20kl1");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20kl1");
         assertEquals(5, result.getResult());
         assertEquals("5", result.getResultStr());
         assertEquals("( ~~10~~ + 5 )", result.getPrettyExpression());
@@ -76,7 +76,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollPlusConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 + 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 + 2");
         assertEquals(12, result.getResult());
         assertEquals("12", result.getResultStr());
         assertEquals("( 10 ) + 2", result.getPrettyExpression());
@@ -85,7 +85,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollMinusConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 - 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 - 2");
         assertEquals(8, result.getResult());
         assertEquals("8", result.getResultStr());
         assertEquals("( 10 ) - 2", result.getPrettyExpression());
@@ -94,7 +94,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollTimesConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 * 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 * 2");
         assertEquals(20, result.getResult());
         assertEquals("20", result.getResultStr());
         assertEquals("( 10 ) * 2", result.getPrettyExpression());
@@ -103,7 +103,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollDividedByConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 / 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 / 2");
         assertEquals(new BigDecimal("5"), result.getResult());
         assertEquals("5.00", result.getResultStr());
         assertEquals("( 10 ) / 2", result.getPrettyExpression());
@@ -112,7 +112,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollLessThanConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 < 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 < 2");
         assertEquals(false, result.getResult());
         assertEquals("False", result.getResultStr());
         assertEquals("( 10 ) < 2", result.getPrettyExpression());
@@ -121,7 +121,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollGreaterThanConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 > 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 > 2");
         assertEquals(true, result.getResult());
         assertEquals("True", result.getResultStr());
         assertEquals("( 10 ) > 2", result.getPrettyExpression());
@@ -130,7 +130,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollLessThanOrEqualToConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 <= 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 <= 2");
         assertEquals(false, result.getResult());
         assertEquals("False", result.getResultStr());
         assertEquals("( 10 ) ≤ 2", result.getPrettyExpression());
@@ -139,7 +139,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollGreaterThanOrEqualToConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 >= 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 >= 2");
         assertEquals(true, result.getResult());
         assertEquals("True", result.getResultStr());
         assertEquals("( 10 ) ≥ 2", result.getPrettyExpression());
@@ -148,7 +148,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollEqualsConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 == 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 == 2");
         assertEquals(false, result.getResult());
         assertEquals("False", result.getResultStr());
         assertEquals("( 10 ) == 2", result.getPrettyExpression());
@@ -157,7 +157,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollDoesNotEqualConstant() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("d20 != 2");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 != 2");
         assertEquals(true, result.getResult());
         assertEquals("True", result.getResultStr());
         assertEquals("( 10 ) ≠ 2", result.getPrettyExpression());
@@ -166,7 +166,7 @@ class DiceBotTest {
     @Test
     void oneDiceRollPlusOneDiceRoll() {
         when(dice.roll()).thenReturn(10).thenReturn(5);
-        DiceBot.RollResult result = diceBot.roll("d20 + d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("d20 + d20");
         assertEquals(15, result.getResult());
         assertEquals("15", result.getResultStr());
         assertEquals("( 10 ) + ( 5 )", result.getPrettyExpression());
@@ -175,7 +175,7 @@ class DiceBotTest {
     @Test
     void twoDiceRollPlusOneDiceRoll() {
         when(dice.roll()).thenReturn(10).thenReturn(5).thenReturn(2);
-        DiceBot.RollResult result = diceBot.roll("2d20 + d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20 + d20");
         assertEquals(17, result.getResult());
         assertEquals("17", result.getResultStr());
         assertEquals("( 10 + 5 ) + ( 2 )", result.getPrettyExpression());
@@ -184,7 +184,7 @@ class DiceBotTest {
     @Test
     void twoDiceRollKeepHighestPlusOneDiceRoll() {
         when(dice.roll()).thenReturn(10).thenReturn(5).thenReturn(2);
-        DiceBot.RollResult result = diceBot.roll("2d20k1 + d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20k1 + d20");
         assertEquals(12, result.getResult());
         assertEquals("12", result.getResultStr());
         assertEquals("( 10 + ~~5~~ ) + ( 2 )", result.getPrettyExpression());
@@ -193,7 +193,7 @@ class DiceBotTest {
     @Test
     void twoDiceRollKeepLowestPlusOneDiceRoll() {
         when(dice.roll()).thenReturn(10).thenReturn(5).thenReturn(2);
-        DiceBot.RollResult result = diceBot.roll("2d20kl1 + d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("2d20kl1 + d20");
         assertEquals(7, result.getResult());
         assertEquals("7", result.getResultStr());
         assertEquals("( ~~10~~ + 5 ) + ( 2 )", result.getPrettyExpression());
@@ -202,7 +202,7 @@ class DiceBotTest {
     @Test
     void negativeDiceRoll() {
         when(dice.roll()).thenReturn(10);
-        DiceBot.RollResult result = diceBot.roll("-d20");
+        DiceBot.RollResult result = diceBot.rollForExpression("-d20");
         assertEquals(-10, result.getResult());
         assertEquals("-10", result.getResultStr());
         assertEquals("- ( 10 )", result.getPrettyExpression());
@@ -211,42 +211,42 @@ class DiceBotTest {
     @Test
     void invalidExpression() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("hello, world");
+            diceBot.rollForExpression("hello, world");
         });
     }
 
     @Test
     void expressionUsingPowers() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("d20 ** 2");
+            diceBot.rollForExpression("d20 ** 2");
         });
     }
 
     @Test
     void expressionUsingNegativeAmountOfFaces() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("d-10");
+            diceBot.rollForExpression("d-10");
         });
     }
 
     @Test
     void expressionUsingZeroFaces() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("d0");
+            diceBot.rollForExpression("d0");
         });
     }
 
     @Test
     void expressionUsingZeroRolls() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("0d20");
+            diceBot.rollForExpression("0d20");
         });
     }
 
     @Test
     void expressionUsingZeroKeep() {
         assertThrows(IllegalArgumentException.class, () -> {
-            diceBot.roll("d20k0");
+            diceBot.rollForExpression("d20k0");
         });
     }
 }

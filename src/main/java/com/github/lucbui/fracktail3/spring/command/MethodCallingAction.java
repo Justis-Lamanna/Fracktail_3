@@ -47,7 +47,8 @@ class MethodCallingAction implements CommandAction {
                             .flatMap(handler -> handler.apply(context, ex)))
                 .onErrorResume(ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                            .flatMap(func -> func.apply(context, ex)));
+                            .flatMap(func -> func.apply(context, ex)))
+                .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 
     @Override

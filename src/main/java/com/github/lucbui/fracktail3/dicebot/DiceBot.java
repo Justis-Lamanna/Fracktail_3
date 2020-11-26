@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.dicebot;
 
+import com.github.lucbui.fracktail3.discord.util.FormatUtils;
+import com.github.lucbui.fracktail3.spring.annotation.*;
 import groovy.util.Eval;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +48,7 @@ public class DiceBot {
                     OPERATIONS_PATTERN.pattern() + "|\\(|\\))+");
 
 
-    public RollResult roll(String e) {
+    public RollResult rollForExpression(String e) {
         String expression = normalizeExpression(e);
         validateExpression(expression);
 
@@ -105,16 +107,16 @@ public class DiceBot {
         return expression.trim();
     }
 
-//    @Command
-//    @Usage("Roll a dice to get results. The format is `d[number of faces]`.\n" +
-//            "You can roll multiple dice by specifying a number before the 'd', such as `4d20`.\n" +
-//            "You can append `k<number>` or `kl<number>` to keep the highest or lowest <number> of dice, and ignore the rest.\n" +
-//            "`+`, `-`, `*`, and `/` are also supported, as are comparison operators `<`, `>`, `==`, `<=`, `>=`, and `!=` and parenthesis `()`.")
-//    @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
-//    public Mono<Void> roll(CommandUseContext<?> ctx) {
-//        RollResult result = roll(ctx.getParameters().getRaw());
-//        return ctx.respond(result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr()));
-//    }
+    @Command
+    @Usage("Roll a dice to get results. The format is `d[number of faces]`.\n" +
+            "You can roll multiple dice by specifying a number before the 'd', such as `4d20`.\n" +
+            "You can append `k<number>` or `kl<number>` to keep the highest or lowest <number> of dice, and ignore the rest.\n" +
+            "`+`, `-`, `*`, and `/` are also supported, as are comparison operators `<`, `>`, `==`, `<=`, `>=`, and `!=` and parenthesis `()`.")
+    @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
+    public String roll(@ParameterRange String expression) {
+        RollResult result = rollForExpression(expression);
+        return result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr());
+    }
 
     private OptionalInt parseOpt(String s) {
         if(s == null) {

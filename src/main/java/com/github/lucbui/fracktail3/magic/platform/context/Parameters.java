@@ -1,6 +1,10 @@
 package com.github.lucbui.fracktail3.magic.platform.context;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Parameters {
     private final String raw;
@@ -24,6 +28,18 @@ public class Parameters {
             return Optional.empty();
         } else {
             return Optional.of(parsed[idx]);
+        }
+    }
+
+    public List<Optional<String>> getParameters(int start, int end) {
+        if(end < 0) {
+            return Arrays.stream(parsed, start, parsed.length + end + 1)
+                    .map(Optional::of)
+                    .collect(Collectors.toList());
+        } else {
+            return IntStream.rangeClosed(start, end)
+                .mapToObj(i -> i < parsed.length ? Optional.of(parsed[i]) : Optional.<String>empty())
+                .collect(Collectors.toList());
         }
     }
 

@@ -6,7 +6,7 @@ import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.Parameter;
+import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.command.CommandLookupPlugin;
 import discord4j.core.object.presence.Activity;
@@ -38,8 +38,11 @@ public class Config {
     }
 
     @Command
-    public String hello(@com.github.lucbui.fracktail3.spring.annotation.Platform DiscordPlatform platform, @Parameter(value = 0, optional = true) String value) {
-        System.out.println(value);
-        return "Hello, World!";
+    public String hello(@ParameterRange String[] value) {
+        if(value.length == 0) {
+            return "Hello, World!";
+        } else {
+            return "Hello, " + String.join(", ", value);
+        }
     }
 }
