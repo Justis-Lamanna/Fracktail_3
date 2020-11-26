@@ -35,6 +35,10 @@ class MethodCallingAction implements CommandAction {
 
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
+        return doActionUnguarded(context);
+    }
+
+    public Mono<Void> doActionUnguarded(CommandUseContext<?> context) {
         Object[] params = parameterComponents.stream()
                 .map(pc -> pc.func.apply(context))
                 .toArray();
@@ -43,11 +47,11 @@ class MethodCallingAction implements CommandAction {
                 .flatMap(o -> returnComponent.func.apply(context, o))
                 .onErrorResume(InvocationTargetException.class, ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                            .switchIfEmpty(Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass())))
-                            .flatMap(handler -> handler.apply(context, ex)))
+                                .switchIfEmpty(Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass())))
+                                .flatMap(handler -> handler.apply(context, ex)))
                 .onErrorResume(ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                            .flatMap(func -> func.apply(context, ex)))
+                                .flatMap(func -> func.apply(context, ex)))
                 .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 

@@ -17,7 +17,6 @@ public class Defaults {
         suppliers.put(OptionalInt.class, OptionalInt::empty);
         suppliers.put(OptionalLong.class, OptionalLong::empty);
         suppliers.put(OptionalDouble.class, OptionalDouble::empty);
-        suppliers.put(String.class, () -> "");
     }
 
     public static <T> T getDefault(Class<T> clazz) {

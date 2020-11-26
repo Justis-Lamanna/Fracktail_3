@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.List;
+
 @Configuration
 @EnableScheduling
 public class Config {
@@ -38,11 +40,7 @@ public class Config {
     }
 
     @Command
-    public String hello(@ParameterRange String[] value) {
-        if(value.length == 0) {
-            return "Hello, World!";
-        } else {
-            return "Hello, " + String.join(", ", value);
-        }
+    public String hello(@ParameterRange(value = 15, optional = true) List<String> value) {
+        return "Hello, World!";
     }
 }
