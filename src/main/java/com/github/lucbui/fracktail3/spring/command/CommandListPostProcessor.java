@@ -28,7 +28,7 @@ public class CommandListPostProcessor implements BeanPostProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListPostProcessor.class);
 
     @Autowired
-    private MethodCallingActionFactory factory;
+    private ReflectiveCommandActionFactory factory;
 
     @Autowired
     private CommandList commandList;

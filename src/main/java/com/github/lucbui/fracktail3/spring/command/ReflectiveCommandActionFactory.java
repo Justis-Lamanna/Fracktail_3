@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 @Component
-public class MethodCallingActionFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodCallingActionFactory.class);
+public class ReflectiveCommandActionFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveCommandActionFactory.class);
 
     @Autowired
     private MethodComponentFactory methodComponentFactory;
@@ -33,4 +33,12 @@ public class MethodCallingActionFactory {
         LOGGER.debug("Finished compiling method {}", method.getName());
         return new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
     }
+
+//    public CommandAction createAction(Object obj, Field field) {
+//        MethodComponent methodComponent = methodComponentFactory.compileMethod(obj, field);
+//        ReturnComponent returnComponent = returnComponentFactory.compileReturn(obj, field);
+//        ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, field);
+//        LOGGER.debug("Finished compiling field {}", field.getName());
+//        return new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
+//    }
 }

@@ -1,17 +1,16 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
+import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
-import com.github.lucbui.fracktail3.spring.annotation.Platform;
+import com.github.lucbui.fracktail3.spring.command.guard.PlatformValidatorGuard;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
-import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -35,12 +34,12 @@ public class MethodComponentFactory extends BaseFactory {
         if(method.isAnnotationPresent(ForPlatform.class)) {
             Class<? extends Platform> platform = method.getAnnotation(ForPlatform.class).value();
             LOGGER.debug("Limiting command to usage with {} platform", platform.getCanonicalName());
-            component.addGuard(ctx -> Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), platform)));
+            component.addGuard(new PlatformValidatorGuard(platform));
         }
         return plugins.enhanceCompiledMethod(obj, method, component);
     }
 
-    public Optional<Guard> compileParameterSizeGuard(Object obj, Method method) {
+    protected Optional<Guard> compileParameterSizeGuard(Object obj, Method method) {
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
 

@@ -7,6 +7,7 @@ import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
 import com.github.lucbui.fracktail3.spring.annotation.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.Variable;
+import com.github.lucbui.fracktail3.spring.command.guard.MapContainsKeyGuard;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
@@ -122,7 +123,7 @@ public class ParameterComponentFactory extends BaseFactory {
         });
 
         if(isNotOptional(parameter, vAnnot.optional())) {
-            component.addGuard(ctx -> Mono.just(ctx.getMap().containsKey(value)));
+            component.addGuard(new MapContainsKeyGuard(value));
         }
 
         return component;

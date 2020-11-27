@@ -6,67 +6,27 @@ import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.stream.Stream;
 
-public class MethodCallingAction implements CommandAction {
+public class FieldCallingAction implements CommandAction {
     private final MethodComponent methodComponent;
-    private final List<ParameterComponent> parameterComponents;
     private final Object objToInvokeOn;
-    private final Method methodToCall;
+    private final Field fieldToRetrieve;
     private final ReturnComponent returnComponent;
     private final ExceptionComponent exceptionComponent;
 
-    public MethodCallingAction(
-            MethodComponent methodComponent,
-            List<ParameterComponent> parameterComponents,
-            Object objToInvokeOn, Method methodToCall,
-            ReturnComponent returnComponent,
-            ExceptionComponent exceptionComponent) {
-        this.parameterComponents = parameterComponents;
-        this.objToInvokeOn = objToInvokeOn;
-        this.methodToCall = methodToCall;
-        this.returnComponent = returnComponent;
+    public FieldCallingAction(MethodComponent methodComponent, Object objToInvokeOn, Field fieldToRetrieve, ReturnComponent returnComponent, ExceptionComponent exceptionComponent) {
         this.methodComponent = methodComponent;
+        this.objToInvokeOn = objToInvokeOn;
+        this.fieldToRetrieve = fieldToRetrieve;
+        this.returnComponent = returnComponent;
         this.exceptionComponent = exceptionComponent;
-    }
-
-    public MethodComponent getMethodComponent() {
-        return methodComponent;
-    }
-
-    public List<ParameterComponent> getParameterComponents() {
-        return parameterComponents;
-    }
-
-    public Object getObjToInvokeOn() {
-        return objToInvokeOn;
-    }
-
-    public Method getMethodToCall() {
-        return methodToCall;
-    }
-
-    public ReturnComponent getReturnComponent() {
-        return returnComponent;
-    }
-
-    public ExceptionComponent getExceptionComponent() {
-        return exceptionComponent;
     }
 
     @Override
     public Mono<Void> doAction(CommandUseContext<?> context) {
-        return doActionUnguarded(context);
-    }
-
-    public Mono<Void> doActionUnguarded(CommandUseContext<?> context) {
-        Object[] params = parameterComponents.stream()
-                .map(pc -> pc.func.apply(context))
-                .toArray();
-        return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
+        return Mono.fromCallable(() -> fieldToRetrieve.get(objToInvokeOn))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
                 .flatMap(o -> returnComponent.func.apply(context, o))
                 .onErrorResume(InvocationTargetException.class, ex ->
@@ -81,10 +41,7 @@ public class MethodCallingAction implements CommandAction {
 
     @Override
     public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-        return Stream.concat(
-                    methodComponent.guards.stream(),
-                    parameterComponents.stream().flatMap(pc -> pc.guards.stream())
-                )
+        return methodComponent.guards.stream()
                 .map(guard -> guard.matches(context))
                 .reduce(Mono.just(true), BooleanUtils::and);
     }

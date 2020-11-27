@@ -23,4 +23,12 @@ public class ParameterSizeGuard implements Guard {
         }
         return Mono.just(true);
     }
+
+    public int getMinimum() {
+        return minimum;
+    }
+
+    public int getMaximum() {
+        return maximum;
+    }
 }
