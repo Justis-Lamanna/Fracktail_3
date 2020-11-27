@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface ParameterRange {
     int lower() default 0;
     int value() default -1;
+    boolean optional() default false;
 }

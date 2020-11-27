@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command;
 
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
@@ -21,13 +20,13 @@ public class BaseFactory {
         this.plugins = plugins;
     }
 
-    protected Object convertObjectForParam(Object obj, Parameter param, boolean isOptional) {
-        return convertObjectForParamUsingClass(obj, param, param.getType(), isOptional);
+    protected Object convertObjectForParam(Object obj, Parameter param) {
+        return convertObjectForParamUsingClass(obj, param.getType());
     }
 
-    protected <T> T convertObjectForParamUsingClass(Object obj, Parameter param, Class<T> paramType, boolean isOptional) {
+    protected <T> T convertObjectForParamUsingClass(Object obj, Class<T> paramType) {
         if(obj == null) {
-            return getDefaultIfOptional(paramType, isOptional, "Encountered null for non-optional parameter " + param.getName());
+            return Defaults.getDefault(paramType);
         } else if(ClassUtils.isAssignable(obj.getClass(), paramType)) {
             return (T) obj;
         } else if(paramType.equals(Optional.class)) {
@@ -35,20 +34,17 @@ public class BaseFactory {
         } else if(conversionService.canConvert(obj.getClass(), paramType)) {
             return conversionService.convert(obj, paramType);
         } else {
-            return getDefaultIfOptional(paramType, isOptional, "Cannot cast object " + obj.getClass().getCanonicalName() +
-                    " to parameter type " + paramType.getCanonicalName());
+            return Defaults.getDefault(paramType);
         }
+    }
+
+    protected boolean isNotOptional(Parameter parameter, boolean optionalFromAnnotation) {
+        Class<?> clazz = parameter.getType();
+        return !optionalFromAnnotation && isNotOptional(clazz);
     }
 
     protected boolean isNotOptional(Class<?> clazz) {
         return !clazz.equals(Optional.class) && !clazz.equals(OptionalInt.class) &&
                 !clazz.equals(OptionalLong.class) && !clazz.equals(OptionalDouble.class);
-    }
-
-    protected <T> T getDefaultIfOptional(Class<T> clazz, boolean optional, String message) {
-        if(!optional && isNotOptional(clazz)) {
-            throw new BotConfigurationException(message);
-        }
-        return Defaults.getDefault(clazz);
     }
 }

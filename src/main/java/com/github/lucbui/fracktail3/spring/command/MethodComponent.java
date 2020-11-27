@@ -7,18 +7,12 @@ import java.util.List;
 
 public class MethodComponent {
     List<Guard> guards;
-    List<CommandGuard> commandGuards;
 
     public MethodComponent() {
         this.guards = new ArrayList<>();
-        this.commandGuards = new ArrayList<>();
     }
 
     public void addGuard(Guard guard) {
         this.guards.add(guard);
-    }
-
-    public void addCommandGuard(CommandGuard guard) {
-        this.commandGuards.add(guard);
     }
 }

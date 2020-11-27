@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.spring.command;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
 import com.github.lucbui.fracktail3.spring.annotation.Platform;
@@ -79,22 +78,10 @@ public class ParameterComponentFactory extends BaseFactory {
             throw new BotConfigurationException("Cannot convert String parameter to type " + paramType.getCanonicalName());
         }
 
-        ParameterComponent component = new ParameterComponent(ctx ->
+        return new ParameterComponent(ctx ->
                 ctx.getParameters().getParameter(value)
-                        .map(s -> convertObjectForParam(s, parameter, pAnnot.optional()))
+                        .map(s -> convertObjectForParam(s, parameter))
                         .orElseGet(() -> Defaults.getDefault(paramType)));
-
-        if (isNotOptional(paramType) && !pAnnot.optional()) {
-            //Enforce parameter count (unless optional is expected)
-            component.addGuard(ctx -> {
-                if (ctx instanceof CommandUseContext) {
-                    CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
-                    return Mono.just(value < cctx.getParameters().getNumberOfParameters());
-                }
-                return Mono.just(true);
-            });
-        }
-        return component;
     }
 
     protected ParameterComponent compileParameterRangeAnnotated(Object obj, Method method, Parameter parameter) {
@@ -103,26 +90,22 @@ public class ParameterComponentFactory extends BaseFactory {
         int end = range.value();
         Class<?> paramType = parameter.getType();
 
-        ParameterComponent component;
         if(paramType.isArray()) {
             Class<?> innerType = paramType.getComponentType();
-            component = new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
-                    .map(opt -> opt.map(s -> (Object)convertObjectForParamUsingClass(s, parameter, innerType, true))
+            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
+                    .map(opt -> opt.map(s -> (Object)convertObjectForParamUsingClass(s, innerType))
                             .orElseGet(() -> Defaults.getDefault(innerType)))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), list -> createFrom(innerType, list))));
 
         } else if(ClassUtils.isAssignable(List.class, paramType)) {
-            component = new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
+            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
                     .map(opt -> opt.orElseGet(() -> Defaults.getDefault(String.class)))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
         } else if(ClassUtils.isAssignable(String.class, paramType) && start == 0 && end == -1) {
-            //TODO: Substring?
-            component = new ParameterComponent(context -> context.getParameters().getRaw());
+            return new ParameterComponent(context -> context.getParameters().getRaw());
         } else {
             throw new BotConfigurationException("Cannot convert parameters to type " + paramType.getCanonicalName());
         }
-
-        return component;
     }
 
     protected ParameterComponent compileVariableAnnotated(Object obj, Method method, Parameter parameter) {
@@ -135,26 +118,18 @@ public class ParameterComponentFactory extends BaseFactory {
             if(paramType.equals(Mono.class)) {
                 return map.getAsync(value);
             }
-            return convertObjectForParam(map.get(value), parameter, vAnnot.optional());
+            return convertObjectForParam(map.get(value), parameter);
         });
 
-        if(isNotOptional(paramType) && !vAnnot.optional()) {
+        if(isNotOptional(parameter, vAnnot.optional())) {
             component.addGuard(ctx -> Mono.just(ctx.getMap().containsKey(value)));
         }
 
         return component;
     }
 
-    private ParameterComponent compilePlatformAnnotated(Object obj, Method method, Parameter parameter) {
-        Platform p = parameter.getAnnotation(Platform.class);
-        Class<?> paramType = parameter.getType();
-
-        ParameterComponent component = new ParameterComponent(ctx -> convertObjectForParam(ctx.getPlatform(), parameter, p.optional()));
-
-        if(isNotOptional(paramType) && !p.optional()) {
-            component.addGuard(ctx -> Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), paramType)));
-        }
-        return component;
+    protected ParameterComponent compilePlatformAnnotated(Object obj, Method method, Parameter parameter) {
+        return new ParameterComponent(ctx -> convertObjectForParam(ctx.getPlatform(), parameter));
     }
 
     protected Object createFrom(Class<?> innerClass, List<?> objs) {
