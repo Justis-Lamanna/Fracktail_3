@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -34,11 +35,11 @@ public class ReflectiveCommandActionFactory {
         return new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
     }
 
-//    public CommandAction createAction(Object obj, Field field) {
-//        MethodComponent methodComponent = methodComponentFactory.compileMethod(obj, field);
-//        ReturnComponent returnComponent = returnComponentFactory.compileReturn(obj, field);
-//        ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, field);
-//        LOGGER.debug("Finished compiling field {}", field.getName());
-//        return new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
-//    }
+    public CommandAction createAction(Object obj, Field field) {
+        MethodComponent methodComponent = methodComponentFactory.compileField(obj, field);
+        ReturnComponent returnComponent = returnComponentFactory.compileReturn(obj, field);
+        ExceptionComponent exceptionComponent = new ExceptionComponent(); //exceptionComponentFactory.compileException(obj, field);
+        LOGGER.debug("Finished compiling field {}", field.getName());
+        return new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
+    }
 }

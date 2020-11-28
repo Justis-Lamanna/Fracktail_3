@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
+import com.github.lucbui.fracktail3.spring.command.guard.ParameterSizeGuard;
 import com.github.lucbui.fracktail3.spring.command.guard.PlatformValidatorGuard;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
@@ -32,11 +34,20 @@ public class MethodComponentFactory extends BaseFactory {
         compileParameterSizeGuard(obj, method).ifPresent(component::addGuard);
 
         if(method.isAnnotationPresent(ForPlatform.class)) {
-            Class<? extends Platform> platform = method.getAnnotation(ForPlatform.class).value();
-            LOGGER.debug("Limiting command to usage with {} platform", platform.getCanonicalName());
-            component.addGuard(new PlatformValidatorGuard(platform));
+            component.addGuard(compileForPlatform(obj, method.getAnnotation(ForPlatform.class)));
         }
         return plugins.enhanceCompiledMethod(obj, method, component);
+    }
+
+    public MethodComponent compileField(Object obj, Field field) {
+        LOGGER.debug("Compiling method {}", field.getName());
+        MethodComponent component = new MethodComponent();
+        component.addGuard(new ParameterSizeGuard(0, 0));
+
+        if(field.isAnnotationPresent(ForPlatform.class)) {
+            component.addGuard(compileForPlatform(obj, field.getAnnotation(ForPlatform.class)));
+        }
+        return component; //plugins.enhanceCompiledMethod(obj, method, component);
     }
 
     protected Optional<Guard> compileParameterSizeGuard(Object obj, Method method) {
@@ -78,5 +89,11 @@ public class MethodComponentFactory extends BaseFactory {
         LOGGER.debug("Calculated parameter count: min={}, max={}", min, max);
         return Optional.empty();
         //return Optional.of(new ParameterSizeGuard(min, max));
+    }
+
+    protected Guard compileForPlatform(Object obj, ForPlatform forPlatform) {
+        Class<? extends Platform> platform = forPlatform.value();
+        LOGGER.debug("Limiting command to usage with {} platform", platform.getCanonicalName());
+        return new PlatformValidatorGuard(platform);
     }
 }

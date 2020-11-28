@@ -9,6 +9,7 @@ import org.apache.commons.lang3.ClassUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -90,11 +91,36 @@ public class Plugins {
                 .map(Tuple2::getT2);
     }
 
+    public Optional<ReturnComponent> createCompiledFieldReturn(Object obj, Field field) {
+        return plugins.stream()
+                .flatMap(cast(CompiledMethodPlugin.class))
+                .flatMap(p -> {
+                    Result<ReturnComponent> component = p.createFieldReturnComponent(obj, field);
+                    if(component.isResult()) {
+                        return Stream.of(Tuples.of(p, component.getResult()));
+                    } else {
+                        return Stream.empty();
+                    }
+                })
+                .max(Comparator.comparing(t -> t.getT1().getPluginPriority()))
+                .map(Tuple2::getT2);
+    }
+
     public ReturnComponent enhanceCompiledReturn(Object obj, Method method, ReturnComponent component) {
         ReturnComponent current = component;
         for(Plugin plugin : plugins) {
             if(plugin instanceof CompiledMethodPlugin) {
                 current = ((CompiledMethodPlugin) plugin).decorateReturnComponent(obj, method, current);
+            }
+        }
+        return current;
+    }
+
+    public ReturnComponent enhanceCompiledFieldReturn(Object obj, Field field, ReturnComponent component) {
+        ReturnComponent current = component;
+        for(Plugin plugin : plugins) {
+            if(plugin instanceof CompiledMethodPlugin) {
+                current = ((CompiledMethodPlugin) plugin).decorateFieldReturnComponent(obj, field, current);
             }
         }
         return current;

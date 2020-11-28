@@ -19,6 +19,9 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -66,9 +69,14 @@ public class CommandListPostProcessor implements BeanPostProcessor {
             addOrMerge(c);
         } else {
             LOGGER.trace("Investigating Bean {} for command candidates", beanName);
+            CommandAnnotationParser parser = new CommandAnnotationParser(bean);
             ReflectionUtils.doWithMethods(bean.getClass(),
-                    new CommandAnnotationParser(bean),
+                    parser,
                     method -> method.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Command.class));
+
+            ReflectionUtils.doWithFields(bean.getClass(),
+                    parser,
+                    field -> field.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Command.class));
         }
         return bean;
     }
@@ -84,7 +92,7 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         }
     }
 
-    private class CommandAnnotationParser implements ReflectionUtils.MethodCallback {
+    private class CommandAnnotationParser implements ReflectionUtils.MethodCallback, ReflectionUtils.FieldCallback {
         private final Object bean;
 
         private CommandAnnotationParser(Object bean) {
@@ -114,11 +122,34 @@ public class CommandListPostProcessor implements BeanPostProcessor {
             addOrMerge(c.build());
         }
 
-        private String getId(Method method) {
+        @Override
+        public void doWith(Field field) throws IllegalArgumentException {
+            String id = getId(field);
+            LOGGER.debug("Adding @Command-annotated field {}", id);
+            Command.Builder c = new Command.Builder(id);
+
+            c.withAction(factory.createAction(bean, field));
+
+            if(field.isAnnotationPresent(Name.class)) {
+                Name nameAnnotation = field.getAnnotation(Name.class);
+                LOGGER.debug("Field {} named via annotation as {}", field.getName(), nameAnnotation.value());
+                c.withNames(nameAnnotation.value());
+            }
+
+            if(field.isAnnotationPresent(Usage.class)) {
+                Usage usageAnnotation = field.getAnnotation(Usage.class);
+                LOGGER.debug("Field {} with help text as {}", field.getName(), usageAnnotation.value());
+                c.withHelp(AnnotationUtils.fromUsage(usageAnnotation));
+            }
+
+            addOrMerge(c.build());
+        }
+
+        private <T extends AnnotatedElement & Member> String getId(T member) {
             com.github.lucbui.fracktail3.spring.annotation.Command cAnnot =
-                    method.getAnnotation(com.github.lucbui.fracktail3.spring.annotation.Command.class);
+                    member.getAnnotation(com.github.lucbui.fracktail3.spring.annotation.Command.class);
             if(StringUtils.isBlank(cAnnot.value())) {
-                return method.getName();
+                return member.getName();
             } else {
                 return cAnnot.value();
             }

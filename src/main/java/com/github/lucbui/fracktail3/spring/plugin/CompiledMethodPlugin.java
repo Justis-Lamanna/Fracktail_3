@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.spring.command.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -29,9 +30,23 @@ public interface CompiledMethodPlugin extends PreloadPlugin {
         return base;
     }
 
+    default Result<ReturnComponent> createFieldReturnComponent(Object obj, Field field) {
+        return Result.ignore();
+    }
+
+    default ReturnComponent decorateFieldReturnComponent(Object obj, Field field, ReturnComponent base) {
+        return base;
+    }
+
     default MethodComponent decorateMethodComponent(Object obj, Method method, MethodComponent base) {
         return base;
     }
 
+    default MethodComponent decorateFieldComponent(Object obj, Field field, MethodComponent base) {
+        return base;
+    }
+
     default ExceptionComponent decorateExceptionComponent(Object obj, Method method, ExceptionComponent base) { return base; }
+
+    default ExceptionComponent decorateFieldExceptionComponent(Object obj, Field field, ExceptionComponent base) { return base; }
 }

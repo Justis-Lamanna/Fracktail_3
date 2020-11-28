@@ -13,7 +13,11 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 @Component
 public class ReturnComponentFactory extends BaseFactory {
@@ -27,35 +31,48 @@ public class ReturnComponentFactory extends BaseFactory {
     public ReturnComponent compileReturn(Object obj, Method method) {
         LOGGER.debug("Compiling return of method {}", method.getName());
         Class<?> returnType = method.getReturnType();
-        ReturnComponent ret;
-        if (returnType.equals(Void.class)) {
-            LOGGER.debug("Compiling return of method {} as void", method.getName());
-            ret = new ReturnComponent((ctx, o) -> Mono.empty());
-        } else if (returnType.equals(Mono.class)) {
-            LOGGER.debug("Compiling return of method {} as Mono<?>", method.getName());
-            ret = new ReturnComponent((ctx, o) -> ((Mono<?>) o).then());
-        } else if (returnType.equals(Flux.class)) {
-            LOGGER.debug("Compiling return of method {} as Flux<?>", method.getName());
-            ret = new ReturnComponent((ctx, o) -> ((Flux<?>) o).then());
-        } else if(returnType.equals(String.class)) {
-            RespondType type = getRespondType(method);
-            LOGGER.debug("Compiling return of method {} as String (responding as {})", method.getName(), type);
-            ret = new ReturnComponent(type.forString());
-        } else if(returnType.equals(FormattedString.class)) {
-            RespondType type = getRespondType(method);
-            LOGGER.debug("Compiling return of method {} as FormattedString (responding as {})", method.getName(), type);
-            ret = new ReturnComponent(type.forFString());
-        } else {
-            LOGGER.debug("Method {} matches no acceptable types. Looking in plugins...", method.getName());
-            ret = plugins.createCompiledReturn(obj, method)
+        ReturnComponent ret = createReturnComponent(method, returnType)
+                .orElseGet(() -> plugins.createCompiledReturn(obj, method)
                     .orElseThrow(() -> new BotConfigurationException("Unable to parse return type " + returnType.getCanonicalName() +
-                            "in method " + method.getName()));
-        }
+                            "in method " + method.getName())));
         return plugins.enhanceCompiledReturn(obj, method, ret);
     }
 
-    private RespondType getRespondType(Method method) {
-        return method.isAnnotationPresent(Respond.class) ?
-                method.getAnnotation(Respond.class).value() : RespondType.INLINE;
+    public ReturnComponent compileReturn(Object obj, Field field) {
+        LOGGER.debug("Compiling return of field {}", field.getName());
+        Class<?> returnType = field.getType();
+        ReturnComponent ret = createReturnComponent(field, returnType)
+                .orElseGet(() -> plugins.createCompiledFieldReturn(obj, field)
+                        .orElseThrow(() -> new BotConfigurationException("Unable to parse return type " + returnType.getCanonicalName() +
+                                "in field " + field.getName())));
+        return plugins.enhanceCompiledFieldReturn(obj, field, ret);
+    }
+
+    private <T extends AnnotatedElement & Member> Optional<ReturnComponent>
+        createReturnComponent(T member, Class<?> returnType) {
+        if (returnType.equals(Void.class)) {
+            LOGGER.debug("Compiling return of {} {} as void", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent((ctx, o) -> Mono.empty()));
+        } else if (returnType.equals(Mono.class)) {
+            LOGGER.debug("Compiling return of {} {} as Mono<?>", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent((ctx, o) -> ((Mono<?>) o).then()));
+        } else if (returnType.equals(Flux.class)) {
+            LOGGER.debug("Compiling return of {} {} as Flux<?>", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent((ctx, o) -> ((Flux<?>) o).then()));
+        } else if(returnType.equals(String.class)) {
+            RespondType type = getRespondType(member);
+            LOGGER.debug("Compiling return of {} {} as String (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
+            return Optional.of(new ReturnComponent(type.forString()));
+        } else if(returnType.equals(FormattedString.class)) {
+            RespondType type = getRespondType(member);
+            LOGGER.debug("Compiling return of {} {} as FormattedString (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
+            return Optional.of(new ReturnComponent(type.forFString()));
+        }
+        return Optional.empty();
+    }
+
+    private RespondType getRespondType(AnnotatedElement element) {
+        return element.isAnnotationPresent(Respond.class) ?
+                element.getAnnotation(Respond.class).value() : RespondType.INLINE;
     }
 }
