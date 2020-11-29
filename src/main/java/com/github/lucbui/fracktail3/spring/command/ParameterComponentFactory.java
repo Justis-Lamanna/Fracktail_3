@@ -88,7 +88,7 @@ public class ParameterComponentFactory extends BaseFactory {
     protected ParameterComponent compileParameterRangeAnnotated(Object obj, Method method, Parameter parameter) {
         ParameterRange range = parameter.getAnnotation(ParameterRange.class);
         int start = range.lower();
-        int end = range.value();
+        int end = range.upper();
         Class<?> paramType = parameter.getType();
 
         if(paramType.isArray()) {

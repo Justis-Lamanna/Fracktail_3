@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ParameterRange {
-    int lower() default 0;
-    int value() default -1;
+    int lower() default -1;
+    int upper() default -1;
     boolean optional() default false;
 }

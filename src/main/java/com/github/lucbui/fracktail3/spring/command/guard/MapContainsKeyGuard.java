@@ -13,6 +13,7 @@ public class MapContainsKeyGuard implements Guard {
 
     @Override
     public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
+        if(ctx.getMap() == null) return Mono.just(false);
         return Mono.just(ctx.getMap().containsKey(key));
     }
 
