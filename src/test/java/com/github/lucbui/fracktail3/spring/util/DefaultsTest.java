@@ -73,9 +73,4 @@ class DefaultsTest {
     void defaultBoxedDoubleReturnZero() {
         assertEquals(0, Defaults.getDefault(Double.class));
     }
-
-    @Test
-    void defaultStringReturnsEmpty() {
-        assertEquals("", Defaults.getDefault(String.class));
-    }
 }
