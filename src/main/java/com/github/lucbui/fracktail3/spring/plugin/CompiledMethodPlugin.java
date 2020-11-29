@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public interface CompiledMethodPlugin extends PreloadPlugin {
+public interface CompiledMethodPlugin extends Plugin {
     default Result<ParameterComponent> createParameterComponent(Object obj, Method method, Parameter parameter) {
         return Result.ignore();
     }
