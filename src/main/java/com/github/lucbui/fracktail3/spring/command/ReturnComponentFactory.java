@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.annotation.Respond;
 import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
+import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -67,6 +69,11 @@ public class ReturnComponentFactory extends BaseFactory {
             RespondType type = getRespondType(member);
             LOGGER.debug("Compiling return of {} {} as FormattedString (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
             return Optional.of(new ReturnComponent(type.forFString()));
+        } else if(ClassUtils.isAssignable(returnType, BotResponse.class)) {
+            RespondType type = getRespondType(member);
+            LOGGER.debug("Compiling return of {} {} as BotResponse (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
+            return Optional.of(new ReturnComponent((context, o) ->
+                    type.outputFString().apply(context, ((BotResponse)o).respondWith(), Collections.emptyMap())));
         }
         return Optional.empty();
     }
