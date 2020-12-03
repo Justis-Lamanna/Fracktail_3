@@ -23,7 +23,7 @@ public class ExceptionComponent {
         if(candidates.isEmpty()) return Optional.empty(); //Don't even bother.
         Class<?> current = clazz;
         //Iterate through the class tree until we find a suitable match.
-        while(current != Exception.class) {
+        while(current != null && current != Object.class) {
             if (candidates.containsKey(current)) {
                 return Optional.of(candidates.get(current));
             }

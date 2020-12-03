@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.annotation.Respond;
 import com.github.lucbui.fracktail3.spring.annotation.RespondType;
+import com.github.lucbui.fracktail3.spring.command.handler.ReturnHandlers;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -52,28 +52,27 @@ public class ReturnComponentFactory extends BaseFactory {
 
     private <T extends AnnotatedElement & Member> Optional<ReturnComponent>
         createReturnComponent(T member, Class<?> returnType) {
-        if (returnType.equals(Void.class)) {
+        if (returnType.equals(Void.class) || returnType.equals(Void.TYPE)) {
             LOGGER.debug("Compiling return of {} {} as void", member.getClass().getSimpleName(), member.getName());
-            return Optional.of(new ReturnComponent((ctx, o) -> Mono.empty()));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.Voids()));
         } else if (returnType.equals(Mono.class)) {
             LOGGER.debug("Compiling return of {} {} as Mono<?>", member.getClass().getSimpleName(), member.getName());
-            return Optional.of(new ReturnComponent((ctx, o) -> ((Mono<?>) o).then()));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.Monos()));
         } else if (returnType.equals(Flux.class)) {
             LOGGER.debug("Compiling return of {} {} as Flux<?>", member.getClass().getSimpleName(), member.getName());
-            return Optional.of(new ReturnComponent((ctx, o) -> ((Flux<?>) o).then()));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.Fluxs()));
         } else if(returnType.equals(String.class)) {
             RespondType type = getRespondType(member);
             LOGGER.debug("Compiling return of {} {} as String (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent(type.forString()));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.Strings(type)));
         } else if(returnType.equals(FormattedString.class)) {
             RespondType type = getRespondType(member);
             LOGGER.debug("Compiling return of {} {} as FormattedString (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent(type.forFString()));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.FStrings(type)));
         } else if(ClassUtils.isAssignable(returnType, BotResponse.class)) {
             RespondType type = getRespondType(member);
             LOGGER.debug("Compiling return of {} {} as BotResponse (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent((context, o) ->
-                    type.outputFString().apply(context, ((BotResponse)o).respondWith(), Collections.emptyMap())));
+            return Optional.of(new ReturnComponent(new ReturnHandlers.BotResponses(type)));
         }
         return Optional.empty();
     }

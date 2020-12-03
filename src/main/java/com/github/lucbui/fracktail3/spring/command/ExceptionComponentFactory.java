@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
-import com.github.lucbui.fracktail3.spring.annotation.RespondType;
+import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Set;
 
 @Component
@@ -39,10 +38,7 @@ public class ExceptionComponentFactory extends BaseFactory {
 
         for(OnExceptionRespond annotation : annotations) {
             FormattedString fString = AnnotationUtils.fromFString(annotation.value());
-            RespondType type = annotation.respondType();
-            ExceptionComponent.ExceptionHandler handler =
-                    (ctx, ex) -> type.outputFString()
-                            .apply(ctx, fString, Collections.singletonMap("message", ex.getMessage()));
+            ExceptionComponent.ExceptionHandler handler = new ExceptionRespondHandler(annotation.respondType(), fString);
             for(Class<? extends Throwable> clazz : annotation.exception()) {
                 LOGGER.debug("On exception {} will respond with {}", clazz.getCanonicalName(), annotation.value().value());
                 component.addHandler(clazz, handler);

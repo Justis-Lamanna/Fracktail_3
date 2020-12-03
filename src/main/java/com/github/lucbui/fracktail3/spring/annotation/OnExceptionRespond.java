@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 public @interface OnExceptionRespond {
     FString value();
     RespondType respondType() default RespondType.INLINE;
-    Class<? extends Throwable>[] exception() default Exception.class;
+    Class<? extends Throwable>[] exception() default Throwable.class;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD, ElementType.TYPE})
