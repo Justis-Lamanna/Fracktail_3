@@ -2,9 +2,11 @@ package com.github.lucbui.fracktail3.magic.platform.context;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
+import com.github.lucbui.fracktail3.spring.command.BotResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Base level context with some payload
@@ -35,16 +37,56 @@ public interface BaseContext<T> {
      * @param message The message to send
      * @return Asynchronous indication of completion
      */
-    default Mono<Void> respond(String message) {
-        return Mono.empty();
+    Mono<Void> respond(String message);
+
+    /**
+     * Respond to this context, in some way the context sees fit
+     * @param response The message to send
+     * @return Asynchronous indication of completion
+     */
+    default Mono<Void> respond(BotResponse response) {
+        return response.respondWith().getFor(this)
+                .flatMap(this::respond);
     }
 
     /**
-     * Respond to this context, over some form of private communication
-     * @param message The message to send
+     * Respond to this context, in some way the context sees fit
+     * @param response The message to send
+     * @param addlVariables Additional key/value pairs to use
      * @return Asynchronous indication of completion
      */
-    default Mono<Void> privateMessage(String message) {
-        return Mono.empty();
+    default Mono<Void> respond(BotResponse response, Map<String, Object> addlVariables) {
+        return response.respondWith().getFor(this, addlVariables)
+                .flatMap(this::respond);
     }
+//
+//    /**
+//     * Respond to this context, over some form of private communication
+//     * @param message The message to send
+//     * @return Asynchronous indication of completion
+//     */
+//    default Mono<Void> privateMessage(String message) {
+//        return Mono.empty();
+//    }
+//
+//    /**
+//     * Respond to this context, over some form of private communication
+//     * @param response The message to send
+//     * @return Asynchronous indication of completion
+//     */
+//    default Mono<Void> privateMessage(BotResponse response) {
+//        return response.respondWith().getFor(this)
+//                .flatMap(this::privateMessage);
+//    }
+//
+//    /**
+//     * Respond to this context, over some form of private communication
+//     * @param response The message to send
+//     * @param addlVariables Additional key/value pairs to use
+//     * @return Asynchronous indication of completion
+//     */
+//    default Mono<Void> privateMessage(BotResponse response, Map<String, Object> addlVariables) {
+//        return response.respondWith().getFor(this, addlVariables)
+//                .flatMap(this::privateMessage);
+//    }
 }

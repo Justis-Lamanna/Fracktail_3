@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.Collections;
@@ -32,6 +33,11 @@ class TranslatorFormatterTest {
         @Override
         public Object getPayload() {
             return null;
+        }
+
+        @Override
+        public Mono<Void> respond(String message) {
+            return Mono.empty();
         }
     };
 
@@ -110,6 +116,11 @@ class TranslatorFormatterTest {
         @Override
         public Object getPayload() {
             return null;
+        }
+
+        @Override
+        public Mono<Void> respond(String message) {
+            return Mono.empty();
         }
 
         @Override

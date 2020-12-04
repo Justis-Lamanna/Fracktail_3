@@ -4,11 +4,16 @@ import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T>, Localizable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DiscordBasePlatformContext.class);
+
     private final Bot bot;
     private final DiscordPlatform platform;
     private final T payload;
@@ -38,6 +43,11 @@ public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T>, Lo
     @Override
     public T getPayload() {
         return payload;
+    }
+
+    @Override
+    public Mono<Void> respond(String message) {
+        return Mono.fromRunnable(() -> LOGGER.info("Responded to DiscordBasePlatformContext >>> {}", message));
     }
 
     @Override

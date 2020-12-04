@@ -2,8 +2,6 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.spring.annotation.Respond;
-import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.command.handler.ReturnHandlers;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.apache.commons.lang3.ClassUtils;
@@ -62,23 +60,15 @@ public class ReturnComponentFactory extends BaseFactory {
             LOGGER.debug("Compiling return of {} {} as Flux<?>", member.getClass().getSimpleName(), member.getName());
             return Optional.of(new ReturnComponent(new ReturnHandlers.Fluxs()));
         } else if(returnType.equals(String.class)) {
-            RespondType type = getRespondType(member);
-            LOGGER.debug("Compiling return of {} {} as String (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent(new ReturnHandlers.Strings(type)));
+            LOGGER.debug("Compiling return of {} {} as String (responding)", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent(new ReturnHandlers.Strings()));
         } else if(returnType.equals(FormattedString.class)) {
-            RespondType type = getRespondType(member);
-            LOGGER.debug("Compiling return of {} {} as FormattedString (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent(new ReturnHandlers.FStrings(type)));
+            LOGGER.debug("Compiling return of {} {} as FormattedString (responding)", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent(new ReturnHandlers.FStrings()));
         } else if(ClassUtils.isAssignable(returnType, BotResponse.class)) {
-            RespondType type = getRespondType(member);
-            LOGGER.debug("Compiling return of {} {} as BotResponse (responding as {})", member.getClass().getSimpleName(), member.getName(), type);
-            return Optional.of(new ReturnComponent(new ReturnHandlers.BotResponses(type)));
+            LOGGER.debug("Compiling return of {} {} as BotResponse (responding)", member.getClass().getSimpleName(), member.getName());
+            return Optional.of(new ReturnComponent(new ReturnHandlers.BotResponses()));
         }
         return Optional.empty();
-    }
-
-    private RespondType getRespondType(AnnotatedElement element) {
-        return element.isAnnotationPresent(Respond.class) ?
-                element.getAnnotation(Respond.class).value() : RespondType.INLINE;
     }
 }

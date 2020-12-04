@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.discord.context;
 
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
-import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -29,13 +28,6 @@ public class DiscordCommandSearchContext extends DiscordBasePlatformContext<Mess
     public Mono<Void> respond(String message) {
         return getPlatform()
                 .message(DiscordChannelset.forChannel(getPayload().getMessage().getChannelId()), message);
-    }
-
-    @Override
-    public Mono<Void> privateMessage(String message) {
-        return getPayload().getMessage().getAuthor()
-                .map(user -> getPlatform().dm(DiscordUserset.forUser(user.getId()), message))
-                .orElse(Mono.empty());
     }
 
     @Override

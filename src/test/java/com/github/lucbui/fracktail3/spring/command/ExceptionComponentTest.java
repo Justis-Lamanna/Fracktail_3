@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ExceptionComponentTest {
     private ExceptionRespondHandler makeHandler() {
-        return new ExceptionRespondHandler(RespondType.INLINE, FormattedString.literal("hello, world"));
+        return new ExceptionRespondHandler(FormattedString.literal("hello, world"));
     }
 
     private ExceptionRespondHandler getBestHandler(ExceptionComponent component, Class<? extends Throwable> clazz) {

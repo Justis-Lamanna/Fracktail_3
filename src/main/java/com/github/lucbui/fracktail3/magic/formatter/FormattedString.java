@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.spring.command.BotResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Class which encapsulates a formattable string
  */
-public class FormattedString {
+public class FormattedString implements BotResponse {
     private static ContextFormatter _default = new ICU4JDecoratorFormatter();
 
     private final String raw;
@@ -78,7 +79,7 @@ public class FormattedString {
      * @param ctx The context of the string
      * @return The formatted value
      */
-    public Mono<String> getFor(PlatformBaseContext<?> ctx) {
+    public Mono<String> getFor(BaseContext<?> ctx) {
         return formatter.format(raw, ctx, Collections.emptyMap());
     }
 
@@ -88,7 +89,7 @@ public class FormattedString {
      * @param addlVariables Additional variables to use
      * @return The formatted value
      */
-    public Mono<String> getFor(PlatformBaseContext<?> ctx, Map<String, Object> addlVariables) {
+    public Mono<String> getFor(BaseContext<?> ctx, Map<String, Object> addlVariables) {
         return formatter.format(raw, ctx, addlVariables);
     }
 
@@ -106,5 +107,10 @@ public class FormattedString {
      */
     public static ContextFormatter getDefaultFormatter() {
         return _default;
+    }
+
+    @Override
+    public FormattedString respondWith() {
+        return this;
     }
 }

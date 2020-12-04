@@ -102,7 +102,7 @@ public class ParameterComponentFactory extends BaseFactory {
             return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
                     .map(opt -> opt.orElseGet(() -> Defaults.getDefault(String.class)))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
-        } else if(ClassUtils.isAssignable(String.class, paramType) && start == 0 && end == -1) {
+        } else if(ClassUtils.isAssignable(String.class, paramType) && start == -1 && end == -1) {
             return new ParameterComponent(context -> context.getParameters().getRaw());
         } else {
             throw new BotConfigurationException("Cannot convert parameters to type " + paramType.getCanonicalName());

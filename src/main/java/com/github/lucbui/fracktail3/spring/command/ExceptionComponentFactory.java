@@ -38,7 +38,7 @@ public class ExceptionComponentFactory extends BaseFactory {
 
         for(OnExceptionRespond annotation : annotations) {
             FormattedString fString = AnnotationUtils.fromFString(annotation.value());
-            ExceptionComponent.ExceptionHandler handler = new ExceptionRespondHandler(annotation.respondType(), fString);
+            ExceptionComponent.ExceptionHandler handler = new ExceptionRespondHandler(fString);
             for(Class<? extends Throwable> clazz : annotation.exception()) {
                 LOGGER.debug("On exception {} will respond with {}", clazz.getCanonicalName(), annotation.value().value());
                 component.addHandler(clazz, handler);

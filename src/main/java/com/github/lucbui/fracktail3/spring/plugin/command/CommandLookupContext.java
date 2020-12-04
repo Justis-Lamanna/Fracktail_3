@@ -48,11 +48,6 @@ public class CommandLookupContext<T> implements PlatformBaseContext<T>, WrapperC
     }
 
     @Override
-    public Mono<Void> privateMessage(String message) {
-        return wrapped.privateMessage(message);
-    }
-
-    @Override
     public BaseContext<?> getWrappedContext() {
         if(wrapped instanceof WrapperContext) {
             return ((WrapperContext) wrapped).getWrappedContext();

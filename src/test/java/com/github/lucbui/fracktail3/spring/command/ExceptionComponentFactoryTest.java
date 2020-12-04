@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
-import com.github.lucbui.fracktail3.spring.annotation.RespondType;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.junit.jupiter.api.AfterEach;
@@ -59,7 +58,6 @@ class ExceptionComponentFactoryTest {
         Method method = getMethod(getClass(), "exceptionRespondCatchAll");
         ExceptionComponent component = factory.compileException(this, method);
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
-        assertEquals(RespondType.INLINE, handler.getType());
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
@@ -68,7 +66,6 @@ class ExceptionComponentFactoryTest {
         Method method = getMethod(CatchAll.class, "exceptionRespondCatchAll");
         ExceptionComponent component = factory.compileException(new CatchAll(), method);
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
-        assertEquals(RespondType.INLINE, handler.getType());
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
@@ -77,7 +74,6 @@ class ExceptionComponentFactoryTest {
         Method method = getMethod(CatchAll.class, "exceptionRespondOverwrite");
         ExceptionComponent component = factory.compileException(new CatchAll(), method);
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
-        assertEquals(RespondType.INLINE, handler.getType());
         assertEquals("Goodbye, world", handler.getfString().getRaw());
     }
 
@@ -88,9 +84,7 @@ class ExceptionComponentFactoryTest {
         ExceptionRespondHandler defaultHandler = getHandler(component, Throwable.class);
         ExceptionRespondHandler specificHandler = getHandler(component, NoSuchElementException.class);
 
-        assertEquals(RespondType.INLINE, defaultHandler.getType());
         assertEquals("Hello, world", defaultHandler.getfString().getRaw());
-        assertEquals(RespondType.INLINE, specificHandler.getType());
         assertEquals("Goodbye, world", specificHandler.getfString().getRaw());
     }
 
@@ -99,7 +93,6 @@ class ExceptionComponentFactoryTest {
         Method method = getMethod(getClass(), "exceptionRespondSpecificException");
         ExceptionComponent component = factory.compileException(this, method);
         ExceptionRespondHandler handler = getHandler(component, NoSuchElementException.class);
-        assertEquals(RespondType.INLINE, handler.getType());
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
@@ -108,7 +101,6 @@ class ExceptionComponentFactoryTest {
         Method method = getMethod(CatchSpecific.class, "exceptionRespondSpecificException");
         ExceptionComponent component = factory.compileException(new CatchSpecific(), method);
         ExceptionRespondHandler handler = getHandler(component, NoSuchElementException.class);
-        assertEquals(RespondType.INLINE, handler.getType());
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
