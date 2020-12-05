@@ -1,15 +1,18 @@
 package com.github.lucbui.fracktail3.spring.command;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
+import com.github.lucbui.fracktail3.spring.plugin.v2.MethodComponentStrategy;
+import com.github.lucbui.fracktail3.spring.plugin.v2.MethodStrategy;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.core.convert.ConversionService;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Parameter;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BaseFactory {
     protected final ConversionService conversionService;
@@ -46,5 +49,22 @@ public class BaseFactory {
     protected boolean isNotOptional(Class<?> clazz) {
         return !clazz.equals(Optional.class) && !clazz.equals(OptionalInt.class) &&
                 !clazz.equals(OptionalLong.class) && !clazz.equals(OptionalDouble.class);
+    }
+
+    protected List<MethodComponentStrategy> getMethodStrategies(AnnotatedElement element) {
+        return Arrays.stream(element.getAnnotations())
+                .map(Annotation::annotationType)
+                .filter(annotType -> annotType.isAnnotationPresent(MethodStrategy.class))
+                .map(annotType -> annotType.getAnnotation(MethodStrategy.class))
+                .flatMap(annotation -> Arrays.stream(annotation.value()))
+                .map(stratClazz -> {
+                    //TODO: Consult ApplicationContext for instances? Cache?
+                    try {
+                        return stratClazz.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new BotConfigurationException("Error initializing MethodStrategy for element " + element, e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }

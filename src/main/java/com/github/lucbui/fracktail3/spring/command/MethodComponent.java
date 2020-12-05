@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.command;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MethodComponent {
@@ -14,5 +15,9 @@ public class MethodComponent {
 
     public void addGuard(Guard guard) {
         this.guards.add(guard);
+    }
+
+    public List<Guard> getGuards() {
+        return Collections.unmodifiableList(guards);
     }
 }
