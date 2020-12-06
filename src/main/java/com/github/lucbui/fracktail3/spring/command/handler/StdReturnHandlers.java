@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-public class ReturnHandlers {
+public class StdReturnHandlers {
     public static class Voids implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {

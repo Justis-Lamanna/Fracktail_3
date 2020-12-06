@@ -5,6 +5,11 @@ import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.plugin.v2.*;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 
 import java.lang.annotation.Annotation;
@@ -14,13 +19,20 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class BaseFactory {
+public class BaseFactory implements ApplicationContextAware {
     protected final ConversionService conversionService;
     protected final Plugins plugins;
+
+    private ApplicationContext context;
 
     public BaseFactory(ConversionService conversionService, Plugins plugins) {
         this.conversionService = conversionService;
         this.plugins = plugins;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
     }
 
     protected Object convertObjectForParam(Object obj, Parameter param) {
@@ -81,9 +93,17 @@ public class BaseFactory {
 
     private <T> T resolve(Class<T> clazz) {
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new BotConfigurationException("Error initializing MethodStrategy", e);
+            return context.getBean(clazz);
+        } catch (NoUniqueBeanDefinitionException ex) {
+            throw new BotConfigurationException("Multiple beans of type " + clazz.getCanonicalName(), ex);
+        } catch (NoSuchBeanDefinitionException ex) {
+            try {
+                return clazz.newInstance(); //TODO: Cache this
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new BotConfigurationException("Error initializing MethodStrategy", e);
+            }
+        } catch (BeansException ex) {
+            throw new BotConfigurationException("Error creating bean " + clazz.getCanonicalName(), ex);
         }
     }
 }

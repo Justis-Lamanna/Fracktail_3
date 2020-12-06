@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ReturnHandlersTest extends BaseFracktailTest {
+class StdReturnHandlersTest extends BaseFracktailTest {
 
     @BeforeEach
     public void setup() {
@@ -23,7 +23,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void voidsShouldReturnEmptyMono() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Voids();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Voids();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -32,7 +32,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void monosShouldReturnMonoWhichCompletesWhenMonoCompletes() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Monos();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Monos();
         PublisherProbe<Void> probe = PublisherProbe.empty();
 
         StepVerifier.create(rcf.apply(context, probe.mono()))
@@ -46,7 +46,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void monosShouldReturnEmptyWhenNull() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Monos();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Monos();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -55,7 +55,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void fluxsShouldReturnMonoWhichCompletesWhenFluxCompletes() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Fluxs();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Fluxs();
         PublisherProbe<Void> probe = PublisherProbe.empty();
 
         StepVerifier.create(rcf.apply(context, probe.flux()))
@@ -69,7 +69,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void fluxsShouldReturnEmptyWhenNull() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Fluxs();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Fluxs();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -78,7 +78,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void stringsShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.Strings();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.Strings();
 
         StepVerifier.create(rcf.apply(context, "hello, world"))
                 .expectSubscription()
@@ -89,7 +89,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void fstringsShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.FStrings();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.FStrings();
 
         StepVerifier.create(rcf.apply(context, FormattedString.from("hello, world")))
                 .expectSubscription()
@@ -100,7 +100,7 @@ class ReturnHandlersTest extends BaseFracktailTest {
 
     @Test
     void botResponseShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new ReturnHandlers.BotResponses();
+        ReturnComponent.ReturnConverterFunction rcf = new StdReturnHandlers.BotResponses();
 
         BotResponse mock = Mockito.mock(BotResponse.class);
         when(mock.respondWith()).thenReturn(FormattedString.literal("hello, world"));
