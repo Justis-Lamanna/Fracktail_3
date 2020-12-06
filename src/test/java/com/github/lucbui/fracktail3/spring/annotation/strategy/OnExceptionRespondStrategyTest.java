@@ -1,18 +1,11 @@
-package com.github.lucbui.fracktail3.spring.command;
+package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
+import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.springframework.core.convert.ConversionService;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,34 +14,15 @@ import java.util.NoSuchElementException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ExceptionComponentFactoryTest {
-    @Mock
-    private ConversionService conversionService;
-
-    @Spy
-    private Plugins plugins = new Plugins();
-
-    @InjectMocks
-    private ExceptionComponentFactory factory;
-
-    private AutoCloseable mocks;
-
-    @BeforeEach
-    void setUp() {
-        mocks = MockitoAnnotations.openMocks(this);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        mocks.close();
-    }
+class OnExceptionRespondStrategyTest {
+    private final OnExceptionRespondStrategy strategy = new OnExceptionRespondStrategy();
 
     private ExceptionRespondHandler getHandler(ExceptionComponent component, Class<? extends Throwable> clazz) {
         ExceptionRespondHandler handler = component.getBestHandlerFor(clazz)
                 .filter(eh -> eh instanceof ExceptionRespondHandler)
                 .map(eh -> (ExceptionRespondHandler)eh)
                 .orElseGet(Assertions::fail);
-        assertNotNull(component.candidates.get(clazz), "candidates should have handler for class " + clazz);
+        assertNotNull(component.getCandidates().get(clazz), "candidates should have handler for class " + clazz);
 
         return handler;
     }
@@ -56,31 +30,31 @@ class ExceptionComponentFactoryTest {
     @Test
     void shouldCreateExceptionComponentWhichHandlesAllExceptions() {
         Method method = getMethod(getClass(), "exceptionRespondCatchAll");
-        ExceptionComponent component = factory.compileException(this, method);
+        ExceptionComponent component = strategy.decorate(this, method, new ExceptionComponent());
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
     @Test
     void shouldCreateExceptionComponentWhichHandlesAllExceptions_ClassLevel() {
-        Method method = getMethod(CatchAll.class, "exceptionRespondCatchAll");
-        ExceptionComponent component = factory.compileException(new CatchAll(), method);
+        Method method = getMethod(OnExceptionRespondStrategyTest.CatchAll.class, "exceptionRespondCatchAll");
+        ExceptionComponent component = strategy.decorate(new OnExceptionRespondStrategyTest.CatchAll(), method, new ExceptionComponent());
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
     @Test
     void shouldCreateExceptionComponentWhichHandlesAllExceptions_Overwrite() {
-        Method method = getMethod(CatchAll.class, "exceptionRespondOverwrite");
-        ExceptionComponent component = factory.compileException(new CatchAll(), method);
+        Method method = getMethod(OnExceptionRespondStrategyTest.CatchAll.class, "exceptionRespondOverwrite");
+        ExceptionComponent component = strategy.decorate(new OnExceptionRespondStrategyTest.CatchAll(), method, new ExceptionComponent());
         ExceptionRespondHandler handler = getHandler(component, Throwable.class);
         assertEquals("Goodbye, world", handler.getfString().getRaw());
     }
 
     @Test
     void shouldCreateExceptionComponentWhichHandlesAllExceptions_Add() {
-        Method method = getMethod(CatchAll.class, "exceptionRespondAdd");
-        ExceptionComponent component = factory.compileException(new CatchAll(), method);
+        Method method = getMethod(OnExceptionRespondStrategyTest.CatchAll.class, "exceptionRespondAdd");
+        ExceptionComponent component = strategy.decorate(new OnExceptionRespondStrategyTest.CatchAll(), method, new ExceptionComponent());
         ExceptionRespondHandler defaultHandler = getHandler(component, Throwable.class);
         ExceptionRespondHandler specificHandler = getHandler(component, NoSuchElementException.class);
 
@@ -91,15 +65,15 @@ class ExceptionComponentFactoryTest {
     @Test
     void shouldCreateExceptionComponentWhichHandlesSpecificExceptions() {
         Method method = getMethod(getClass(), "exceptionRespondSpecificException");
-        ExceptionComponent component = factory.compileException(this, method);
+        ExceptionComponent component = strategy.decorate(this, method, new ExceptionComponent());
         ExceptionRespondHandler handler = getHandler(component, NoSuchElementException.class);
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
 
     @Test
     void shouldCreateExceptionComponentWhichHandlesSpecificExceptions_ClassLevel() {
-        Method method = getMethod(CatchSpecific.class, "exceptionRespondSpecificException");
-        ExceptionComponent component = factory.compileException(new CatchSpecific(), method);
+        Method method = getMethod(OnExceptionRespondStrategyTest.CatchSpecific.class, "exceptionRespondSpecificException");
+        ExceptionComponent component = strategy.decorate(new OnExceptionRespondStrategyTest.CatchSpecific(), method, new ExceptionComponent());
         ExceptionRespondHandler handler = getHandler(component, NoSuchElementException.class);
         assertEquals("Hello, world", handler.getfString().getRaw());
     }
@@ -107,8 +81,8 @@ class ExceptionComponentFactoryTest {
     @Test
     void shouldCreateExceptionComponentWithTwoHandlers() {
         Method method = getMethod(getClass(), "exceptionRespondSpecificExceptionTwoAnnotations");
-        ExceptionComponent component = factory.compileException(this, method);
-        assertEquals(2, component.candidates.size());
+        ExceptionComponent component = strategy.decorate(this, method, new ExceptionComponent());
+        assertEquals(2, component.getCandidates().size());
     }
 
     //------------------------------Test Methods------------------------------------------------------------------------

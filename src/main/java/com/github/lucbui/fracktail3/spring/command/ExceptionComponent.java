@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.command;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,10 @@ public class ExceptionComponent {
 
     public void addHandler(Class<? extends Throwable> clazz, ExceptionHandler handler) {
         this.candidates.put(clazz, handler);
+    }
+
+    public Map<Class<? extends Throwable>, ExceptionHandler> getCandidates() {
+        return Collections.unmodifiableMap(candidates);
     }
 
     public Optional<ExceptionHandler> getBestHandlerFor(Class<? extends Throwable> clazz) {
