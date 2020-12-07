@@ -15,7 +15,7 @@ class PlatformValidatorGuardTest extends BaseFracktailTest {
 
     @BeforeEach
     void setup() {
-        super.setUp();
+        super.parentSetup();
     }
 
     @Test

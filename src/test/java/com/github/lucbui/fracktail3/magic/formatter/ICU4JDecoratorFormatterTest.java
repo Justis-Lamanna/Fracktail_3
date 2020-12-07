@@ -19,8 +19,8 @@ class ICU4JDecoratorFormatterTest extends BaseFracktailTest {
     private ICU4JDecoratorFormatter formatter;
 
     @BeforeEach
-    protected void setUp() {
-        super.setUp();
+    protected void parentSetup() {
+        super.parentSetup();
         formatter = new ICU4JDecoratorFormatter();
     }
 

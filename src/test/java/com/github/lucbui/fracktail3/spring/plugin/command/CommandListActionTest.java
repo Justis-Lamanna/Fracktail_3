@@ -27,8 +27,8 @@ class CommandListActionTest extends BaseFracktailTest {
             .build();
 
     @BeforeEach
-    protected void setUp() {
-        super.setUp();
+    protected void parentSetup() {
+        super.parentSetup();
         commandListAction = new CommandListAction();
     }
 

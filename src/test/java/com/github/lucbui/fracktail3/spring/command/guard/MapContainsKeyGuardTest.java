@@ -12,8 +12,8 @@ import static org.mockito.Mockito.when;
 
 class MapContainsKeyGuardTest extends BaseFracktailTest {
     @BeforeEach
-    public void setUp() {
-        super.setUp();
+    public void parentSetup() {
+        super.parentSetup();
     }
 
     @Test

@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 class ExceptionRespondHandlerTest extends BaseFracktailTest {
     @BeforeEach
     void setup() {
-        super.setUp();
+        super.parentSetup();
     }
 
     @Test

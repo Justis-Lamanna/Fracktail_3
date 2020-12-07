@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 
 class ParameterSizeGuardTest extends BaseFracktailTest {
     @BeforeEach
-    public void setUp() {
-        super.setUp();
+    public void parentSetup() {
+        super.parentSetup();
     }
 
     @Test

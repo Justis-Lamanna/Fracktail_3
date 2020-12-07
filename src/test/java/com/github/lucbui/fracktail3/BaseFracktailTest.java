@@ -60,7 +60,7 @@ public abstract class BaseFracktailTest {
 
     private AutoCloseable mocks;
 
-    protected void setUp() {
+    protected void parentSetup() {
         mocks = MockitoAnnotations.openMocks(this);
         mock();
     }

@@ -18,7 +18,7 @@ class StdReturnHandlersTest extends BaseFracktailTest {
 
     @BeforeEach
     public void setup() {
-        super.setUp();
+        super.parentSetup();
     }
 
     @Test

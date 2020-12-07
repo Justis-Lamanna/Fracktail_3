@@ -17,8 +17,8 @@ class CommandHelpActionTest extends BaseFracktailTest {
     private CommandHelpAction commandHelpAction;
 
     @BeforeEach
-    protected void setUp() {
-        super.setUp();
+    protected void parentSetup() {
+        super.parentSetup();
         commandHelpAction = new CommandHelpAction();
     }
 
