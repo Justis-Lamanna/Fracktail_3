@@ -73,29 +73,6 @@ public class ParameterComponentFactory extends BaseFactory {
 //        return plugins.enhanceCompiledParameter(obj, method, parameter, component);
     }
 
-//    protected ParameterComponent compileParameterRangeAnnotated(Object obj, Method method, Parameter parameter) {
-//        ParameterRange range = parameter.getAnnotation(ParameterRange.class);
-//        int start = range.lower();
-//        int end = range.upper();
-//        Class<?> paramType = parameter.getType();
-//
-//        if(paramType.isArray()) {
-//            Class<?> innerType = paramType.getComponentType();
-//            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
-//                    .map(opt -> opt.map(s -> (Object)convertObjectForParamUsingClass(s, innerType))
-//                            .orElseGet(() -> Defaults.getDefault(innerType)))
-//                    .collect(Collectors.collectingAndThen(Collectors.toList(), list -> createFrom(innerType, list))));
-//
-//        } else if(ClassUtils.isAssignable(List.class, paramType)) {
-//            return new ParameterComponent(context -> context.getParameters().getParameters(start, end).stream()
-//                    .map(opt -> opt.orElseGet(() -> Defaults.getDefault(String.class)))
-//                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
-//        } else if(ClassUtils.isAssignable(String.class, paramType) && start == -1 && end == -1) {
-//            return new ParameterComponent(context -> context.getParameters().getRaw());
-//        } else {
-//            throw new BotConfigurationException("Cannot convert parameters to type " + paramType.getCanonicalName());
-//        }
-//    }
 //
 //    protected ParameterComponent compileVariableAnnotated(Object obj, Method method, Parameter parameter) {
 //        Variable vAnnot = parameter.getAnnotation(Variable.class);
@@ -121,11 +98,4 @@ public class ParameterComponentFactory extends BaseFactory {
 //        return new ParameterComponent(ctx -> convertObjectForParam(ctx.getPlatform(), parameter));
 //    }
 //
-//    protected Object createFrom(Class<?> innerClass, List<?> objs) {
-//        Object arr = Array.newInstance(innerClass, objs.size());
-//        for(int idx = 0; idx < objs.size(); idx++) {
-//            Array.set(arr, idx, objs.get(idx));
-//        }
-//        return arr;
-//    }
 }

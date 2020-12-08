@@ -4,12 +4,12 @@ import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 
-public class ParameterAnnotationHandler implements ParameterComponent.ParameterConverterFunction {
+public class ParameterToObjectHandler implements ParameterComponent.ParameterConverterFunction {
     private final Class<?> paramType;
     private final int param;
     private final ParameterConverters converters;
 
-    public ParameterAnnotationHandler(Class<?> paramType, int param, ParameterConverters converters) {
+    public ParameterToObjectHandler(Class<?> paramType, int param, ParameterConverters converters) {
         this.paramType = paramType;
         this.param = param;
         this.converters = converters;

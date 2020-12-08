@@ -3,8 +3,8 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 import com.github.lucbui.fracktail3.TestUtils;
 import com.github.lucbui.fracktail3.spring.annotation.Parameter;
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterAnnotationHandler;
 import com.github.lucbui.fracktail3.spring.command.handler.ParameterConverters;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,12 +19,12 @@ import java.lang.reflect.Method;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class ParameterAnnotationStrategyTest {
+class ParameterStrategyTest {
     @Mock
     private ParameterConverters converters;
 
     @InjectMocks
-    private ParameterAnnotationStrategy strategy;
+    private ParameterStrategy strategy;
 
     private AutoCloseable mocks;
 
@@ -44,7 +44,7 @@ class ParameterAnnotationStrategyTest {
         ParameterComponent component = strategy.create(this, pair.getT1(), pair.getT2())
                 .orElseGet(Assertions::fail);
 
-        assertEquals(ParameterAnnotationHandler.class, component.getFunc().getClass());
+        assertEquals(ParameterToObjectHandler.class, component.getFunc().getClass());
     }
 
     @Test

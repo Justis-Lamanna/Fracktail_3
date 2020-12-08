@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterAnnotationHandler;
 import com.github.lucbui.fracktail3.spring.command.handler.ParameterConverters;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectHandler;
 import com.github.lucbui.fracktail3.spring.plugin.v2.ParameterComponentStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.lang.reflect.Parameter;
 import java.util.Optional;
 
 @Component
-public class ParameterAnnotationStrategy implements ParameterComponentStrategy {
+public class ParameterStrategy implements ParameterComponentStrategy {
     @Autowired
     private ParameterConverters converters;
 
@@ -24,7 +24,7 @@ public class ParameterAnnotationStrategy implements ParameterComponentStrategy {
             int value = pAnnot.value();
             Class<?> paramType = parameter.getType();
 
-            return Optional.of(new ParameterComponent(new ParameterAnnotationHandler(paramType, value, converters)));
+            return Optional.of(new ParameterComponent(new ParameterToObjectHandler(paramType, value, converters)));
         }
         return Optional.empty();
     }
