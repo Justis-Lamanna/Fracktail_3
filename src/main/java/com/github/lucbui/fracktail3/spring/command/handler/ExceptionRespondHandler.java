@@ -7,13 +7,26 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+/**
+ * An ExceptionHandler which responds with a certain FormattedString
+ */
 public class ExceptionRespondHandler implements ExceptionComponent.ExceptionHandler {
     private final FormattedString fString;
 
+    /**
+     * Initialize
+     * Injected variables:
+     * - message: The message enclosed in the Throwable
+     * @param fString The string to respond with
+     */
     public ExceptionRespondHandler(FormattedString fString) {
         this.fString = fString;
     }
 
+    /**
+     * Get the FormattedString being used
+     * @return The FormattedString used
+     */
     public FormattedString getfString() {
         return fString;
     }

@@ -5,10 +5,18 @@ import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
+/**
+ * A guard which enforces a minimum and maximum size of parameters.
+ */
 public class ParameterSizeGuard implements Guard {
     private final int minimum;
     private final int maximum;
 
+    /**
+     * Initialize
+     * @param minimum The minimum number of parameters (inclusive)
+     * @param maximum The maximum number of prameters (inclusive)
+     */
     public ParameterSizeGuard(int minimum, int maximum) {
         this.minimum = minimum;
         this.maximum = maximum;
@@ -24,10 +32,18 @@ public class ParameterSizeGuard implements Guard {
         return Mono.just(true);
     }
 
+    /**
+     * Get the minimum number of parameters
+     * @return The minimum number of parameters
+     */
     public int getMinimum() {
         return minimum;
     }
 
+    /**
+     * Get the maximum number of parameters
+     * @return The maximum number of parameters
+     */
     public int getMaximum() {
         return maximum;
     }

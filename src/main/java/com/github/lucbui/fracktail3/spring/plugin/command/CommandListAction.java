@@ -11,17 +11,39 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * An action which provides a list of all usable commands
+ * The command retrieves every command the user has access to, and all names and aliases the command has. These are
+ * returned in alphabetical order.
+ *
+ * If the user has access to no commands (which shouldn't normally occur, since this command is being used and should
+ * thus be returned), a specified string is returned
+ */
 public class CommandListAction implements CommandAction {
     private final String delimiter;
     private final FormattedString str;
     private final FormattedString noCommandsStr;
 
+    /**
+     * Initialize this action
+     * Injected variable:
+     * - commands: The constructed list of commands
+     * @param delimiter A string to place in between each command in the listing
+     * @param commandString The string to return containing one or more commands
+     * @param noCommandsStr The string to return when no commands are found
+     */
     public CommandListAction(String delimiter, FormattedString commandString, FormattedString noCommandsStr) {
         this.delimiter = delimiter;
         this.str = commandString;
         this.noCommandsStr = noCommandsStr;
     }
 
+    /**
+     * Initialize this action with defaults
+     * Default delimiter is ", ".
+     * Default text is "Commands are: {commands}".
+     * Default no command text is "No commands are available"
+     */
     public CommandListAction() {
         this(
                 ", ",

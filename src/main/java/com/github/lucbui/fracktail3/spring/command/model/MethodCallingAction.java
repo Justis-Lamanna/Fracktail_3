@@ -11,6 +11,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Encapsulates a method call on an object, with relevant components.
+ */
 public class MethodCallingAction implements CommandAction {
     private final MethodComponent methodComponent;
     private final List<ParameterComponent> parameterComponents;
@@ -19,6 +22,16 @@ public class MethodCallingAction implements CommandAction {
     private final ReturnComponent returnComponent;
     private final ExceptionComponent exceptionComponent;
 
+    /**
+     * Initialize this action
+     * @param methodComponent A component containing the high-level guards
+     * @param parameterComponents A list of ParameterComponent, one for each parameter in the method. Determines
+     *                            how to inject a value into each parameter
+     * @param objToInvokeOn The object to call the method on
+     * @param methodToCall The method to call
+     * @param returnComponent A component which determines what to do with the retrieved object
+     * @param exceptionComponent A component which determines what to do when an exception is thrown during retrieval
+     */
     public MethodCallingAction(
             MethodComponent methodComponent,
             List<ParameterComponent> parameterComponents,

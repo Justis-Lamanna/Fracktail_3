@@ -10,9 +10,20 @@ import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
+/**
+ * A wrapping context which indicates we are using the context for lookup, rather than usage.
+ * All standard methods defer to the wrapped context.
+ * getWrappedContext() will return the wrapped context. If the wrapped context implements WrapperContext,
+ * wrapped.getWrappedContext() will be invoked, thereby continuing the chain until reaching the final context.
+ * @param <T> The type of payload
+ */
 public class CommandLookupContext<T> implements PlatformBaseContext<T>, WrapperContext {
     private final PlatformBaseContext<T> wrapped;
 
+    /**
+     * Wrap a context with this lookup context
+     * @param wrapped The wrapped context
+     */
     public CommandLookupContext(PlatformBaseContext<T> wrapped) {
         this.wrapped = wrapped;
     }

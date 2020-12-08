@@ -11,6 +11,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * A factory which combines multiple factories to create a complete action for an object and method/field
+ */
 @Component
 public class ReflectiveCommandActionFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveCommandActionFactory.class);
@@ -27,6 +30,12 @@ public class ReflectiveCommandActionFactory {
     @Autowired
     private ExceptionComponentFactory exceptionComponentFactory;
 
+    /**
+     * Create an action from an object + method
+     * @param obj The bean object
+     * @param method The method to compile
+     * @return A created CommandAction, constructed via object and method annotations
+     */
     public CommandAction createAction(Object obj, Method method) {
         MethodComponent methodComponent = methodComponentFactory.compileMethod(obj, method);
         List<ParameterComponent> components = parameterComponentFactory.compileParameters(obj, method);
@@ -36,6 +45,12 @@ public class ReflectiveCommandActionFactory {
         return new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
     }
 
+    /**
+     * Create an action from an object + field
+     * @param obj The bean object
+     * @param field The field to compile
+     * @return A created CommandAction, constructed via object and field annotations
+     */
     public CommandAction createAction(Object obj, Field field) {
         MethodComponent methodComponent = methodComponentFactory.compileField(obj, field);
         ReturnComponent returnComponent = returnComponentFactory.compileReturn(obj, field);

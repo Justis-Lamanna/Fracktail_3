@@ -10,13 +10,32 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * An action which provides basic help when invoked
+ * The command looks for the search string (parameter at index 0) among the set of commands the user is allowed
+ * to use. If a matching command is found, its usage is returned. If none are found, a specified noCommandFound string
+ * is returned.
+ *
+ * If no search string is provided, the attached command's help is returned instead, effectively showing how to use
+ * this command.
+ */
 public class CommandHelpAction implements CommandAction {
     private final FormattedString noCommandFound;
 
-    public CommandHelpAction(FormattedString selfHelp, FormattedString noCommandFound) {
+    /**
+     * Initialize this action with a FormattedString to respond with when no command was found.
+     * Injected variable:
+     * - search: The searched command
+     * @param noCommandFound The string to respond with when the command is unknown
+     */
+    public CommandHelpAction(FormattedString noCommandFound) {
         this.noCommandFound = noCommandFound;
     }
 
+    /**
+     * Initialize this action
+     * When no command is found, "I'm sorry, I don't know the command '{searched}'" is returned.
+     */
     public CommandHelpAction() {
         this.noCommandFound = FormattedString.from("I'm sorry, I don't know the command ''{search}''.");
     }

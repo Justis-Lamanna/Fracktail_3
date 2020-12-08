@@ -9,12 +9,22 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A ParameterConverterFunction which converts a range of parameters into an array of some type
+ */
 public class ParameterRangeToArrayConverterFunction implements ParameterComponent.ParameterConverterFunction {
     private final int start;
     private final int end;
     private final Class<?> memberType;
     private final ParameterConverters converters;
 
+    /**
+     * Initialize
+     * @param start The lower end of the parameter range (inclusive)
+     * @param end The upper end of the parameter range (inclusive)
+     * @param memberType The type of each parameter
+     * @param converters The converters to use
+     */
     public ParameterRangeToArrayConverterFunction(int start, int end, Class<?> memberType, ParameterConverters converters) {
         this.start = start;
         this.end = end;

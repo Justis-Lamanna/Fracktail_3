@@ -14,10 +14,17 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Scheduler that leverages a Spring TaskScheduler
+ */
 public class SpringScheduler implements Scheduler {
 
     private final TaskScheduler taskScheduler;
 
+    /**
+     * Initialize this scheduler using a TaskScheduler
+     * @param taskScheduler The TaskScheduler to use
+     */
     public SpringScheduler(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }

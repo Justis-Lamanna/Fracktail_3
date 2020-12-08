@@ -1,14 +1,12 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.plugin.v2.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.convert.ConversionService;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -18,15 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BaseFactory implements ApplicationContextAware {
-    protected final ConversionService conversionService;
-    protected final Plugins plugins;
-
     private ApplicationContext context;
-
-    public BaseFactory(ConversionService conversionService, Plugins plugins) {
-        this.conversionService = conversionService;
-        this.plugins = plugins;
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

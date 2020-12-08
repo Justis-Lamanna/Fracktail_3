@@ -7,6 +7,9 @@ import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A plugin which injects the cmds and help commands.
+ */
 public class CommandLookupPlugin implements CommandPlugin {
     @Override
     public String getId() {

@@ -9,7 +9,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
+/**
+ * A collection of standard return conversion function
+ */
 public class StdReturnConverterFunctions {
+    /**
+     * ReturnConverterFunction which handles a void or Void return.
+     * This simply does nothing with the return, since there is no return
+     */
     public static class Voids implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
@@ -17,6 +24,11 @@ public class StdReturnConverterFunctions {
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles a Mono return.
+     * The returned Mono completes when the input mono completes.
+     * If null, this returns an empty Mono
+     */
     public static class Monos implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
@@ -24,6 +36,11 @@ public class StdReturnConverterFunctions {
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles a Flux return.
+     * The returned Mono completes when the input flux completes.
+     * If null, this returns an empty Mono
+     */
     public static class Fluxs implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
@@ -31,6 +48,11 @@ public class StdReturnConverterFunctions {
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles a String return.
+     * The returned string is sent to the command user as a response.
+     * If null, this returns an empty Mono and does nothing.
+     */
     public static class Strings implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
@@ -38,6 +60,11 @@ public class StdReturnConverterFunctions {
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles a FormattedString return.
+     * The returned FormattedString is resolved and sent to the command user as a response.
+     * If null, this returns an empty Mono and does nothing.
+     */
     public static class FStrings implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
@@ -45,6 +72,11 @@ public class StdReturnConverterFunctions {
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles a BotResponse return.
+     * The returned BotResponse is resolved and sent to the command user as a response.
+     * If null, this returns an empty Mono and does nothing.
+     */
     public static class BotResponses implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {
