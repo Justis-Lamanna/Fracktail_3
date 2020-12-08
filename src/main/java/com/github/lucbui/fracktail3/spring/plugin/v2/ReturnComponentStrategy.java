@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.spring.plugin.v2;
 
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

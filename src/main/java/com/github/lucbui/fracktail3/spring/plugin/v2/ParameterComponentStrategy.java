@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.spring.plugin.v2;
 
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

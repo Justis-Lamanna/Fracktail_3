@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
-import com.github.lucbui.fracktail3.spring.command.BotResponse;
+import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;

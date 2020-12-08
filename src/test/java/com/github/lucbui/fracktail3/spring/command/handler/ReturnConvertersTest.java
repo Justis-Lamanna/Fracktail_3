@@ -1,8 +1,9 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.spring.command.BotResponse;
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ReturnConverters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -19,7 +20,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(Void.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.Voids.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.Voids.class, rcf.getClass());
     }
 
     @Test
@@ -27,7 +28,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(Void.TYPE)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.Voids.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.Voids.class, rcf.getClass());
     }
 
     @Test
@@ -35,7 +36,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(Mono.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.Monos.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.Monos.class, rcf.getClass());
     }
 
     @Test
@@ -43,7 +44,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(Flux.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.Fluxs.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.Fluxs.class, rcf.getClass());
     }
 
     @Test
@@ -51,7 +52,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(String.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.Strings.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.Strings.class, rcf.getClass());
     }
 
     @Test
@@ -59,7 +60,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(FormattedString.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.FStrings.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.FStrings.class, rcf.getClass());
     }
 
     @Test
@@ -67,7 +68,7 @@ class ReturnConvertersTest {
         ReturnComponent.ReturnConverterFunction rcf = returnConverters.getHandlerForType(BotResponse.class)
                 .orElseGet(Assertions::fail);
 
-        assertEquals(StdReturnHandlers.BotResponses.class, rcf.getClass());
+        assertEquals(StdReturnConverterFunctions.BotResponses.class, rcf.getClass());
     }
 
     @Test

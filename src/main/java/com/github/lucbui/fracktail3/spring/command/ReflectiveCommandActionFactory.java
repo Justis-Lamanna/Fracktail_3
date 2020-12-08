@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.spring.command.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

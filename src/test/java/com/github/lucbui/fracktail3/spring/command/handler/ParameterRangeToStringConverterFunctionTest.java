@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-class ParameterRangeToStringHandlerTest extends BaseFracktailTest {
-    private final ParameterRangeToStringHandler handler = new ParameterRangeToStringHandler();
+class ParameterRangeToStringConverterFunctionTest extends BaseFracktailTest {
+    private final ParameterRangeToStringConverterFunction handler = new ParameterRangeToStringConverterFunction();
 
     @BeforeEach
     void setUp() {

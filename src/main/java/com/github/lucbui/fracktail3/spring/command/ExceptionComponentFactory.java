@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command;
 
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.plugin.v2.ExceptionComponentStrategy;
 import org.slf4j.Logger;

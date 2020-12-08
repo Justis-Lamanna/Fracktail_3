@@ -4,8 +4,8 @@ import com.github.lucbui.fracktail3.TestPlatform;
 import com.github.lucbui.fracktail3.TestUtils;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
-import com.github.lucbui.fracktail3.spring.command.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.guard.PlatformValidatorGuard;
+import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

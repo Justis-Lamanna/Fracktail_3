@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.spring.command.handler;
+package com.github.lucbui.fracktail3.spring.command.service;
 
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;

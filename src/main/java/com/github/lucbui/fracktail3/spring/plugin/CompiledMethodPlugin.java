@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.spring.plugin;
 
-import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
-import com.github.lucbui.fracktail3.spring.command.MethodComponent;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
+import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

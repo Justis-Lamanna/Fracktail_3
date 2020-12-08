@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.TestUtils;
-import com.github.lucbui.fracktail3.spring.command.handler.ReturnConverters;
+import com.github.lucbui.fracktail3.spring.command.service.ReturnConverters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

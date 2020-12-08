@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;

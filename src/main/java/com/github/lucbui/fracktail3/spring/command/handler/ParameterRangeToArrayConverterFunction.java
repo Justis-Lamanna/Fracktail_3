@@ -1,20 +1,21 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ParameterRangeToArrayHandler implements ParameterComponent.ParameterConverterFunction {
+public class ParameterRangeToArrayConverterFunction implements ParameterComponent.ParameterConverterFunction {
     private final int start;
     private final int end;
     private final Class<?> memberType;
     private final ParameterConverters converters;
 
-    public ParameterRangeToArrayHandler(int start, int end, Class<?> memberType, ParameterConverters converters) {
+    public ParameterRangeToArrayConverterFunction(int start, int end, Class<?> memberType, ParameterConverters converters) {
         this.start = start;
         this.end = end;
         this.memberType = memberType;

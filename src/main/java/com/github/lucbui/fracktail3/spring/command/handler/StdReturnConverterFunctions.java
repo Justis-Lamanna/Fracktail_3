@@ -2,14 +2,14 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.BotResponse;
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 
-public class StdReturnHandlers {
+public class StdReturnConverterFunctions {
     public static class Voids implements ReturnComponent.ReturnConverterFunction {
         @Override
         public Mono<Void> apply(CommandUseContext<?> context, Object o) {

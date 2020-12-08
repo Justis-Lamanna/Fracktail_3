@@ -3,10 +3,10 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 import com.github.lucbui.fracktail3.TestUtils;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterConverters;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToArrayHandler;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToStringHandler;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToArrayConverterFunction;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToStringConverterFunction;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class ParameterRangeStrategyTest {
         ParameterComponent component = strategy.create(this, pair.getT1(), pair.getT2())
                 .orElseGet(Assertions::fail);
 
-        assertEquals(ParameterRangeToArrayHandler.class, component.getFunc().getClass());
+        assertEquals(ParameterRangeToArrayConverterFunction.class, component.getFunc().getClass());
     }
 
     @Test
@@ -56,7 +56,7 @@ class ParameterRangeStrategyTest {
         ParameterComponent component = strategy.create(this, pair.getT1(), pair.getT2())
                 .orElseGet(Assertions::fail);
 
-        assertEquals(ParameterRangeToArrayHandler.class, component.getFunc().getClass());
+        assertEquals(ParameterRangeToArrayConverterFunction.class, component.getFunc().getClass());
     }
 
     @Test
@@ -65,7 +65,7 @@ class ParameterRangeStrategyTest {
         ParameterComponent component = strategy.create(this, pair.getT1(), pair.getT2())
                 .orElseGet(Assertions::fail);
 
-        assertEquals(ParameterRangeToStringHandler.class, component.getFunc().getClass());
+        assertEquals(ParameterRangeToStringConverterFunction.class, component.getFunc().getClass());
     }
 
     @Test

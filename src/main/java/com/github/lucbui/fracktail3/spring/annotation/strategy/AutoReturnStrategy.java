@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ReturnConverters;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ReturnConverters;
 import com.github.lucbui.fracktail3.spring.plugin.v2.ReturnComponentStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

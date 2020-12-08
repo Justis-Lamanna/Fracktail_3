@@ -2,8 +2,8 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
-import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

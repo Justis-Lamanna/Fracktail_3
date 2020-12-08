@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.platform.context;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
-import com.github.lucbui.fracktail3.spring.command.BotResponse;
+import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;

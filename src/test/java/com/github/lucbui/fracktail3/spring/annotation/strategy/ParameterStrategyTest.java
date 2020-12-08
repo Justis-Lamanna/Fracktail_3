@@ -2,9 +2,9 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.TestUtils;
 import com.github.lucbui.fracktail3.spring.annotation.Parameter;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterConverters;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectHandler;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectConverterFunction;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class ParameterStrategyTest {
         ParameterComponent component = strategy.create(this, pair.getT1(), pair.getT2())
                 .orElseGet(Assertions::fail);
 
-        assertEquals(ParameterToObjectHandler.class, component.getFunc().getClass());
+        assertEquals(ParameterToObjectConverterFunction.class, component.getFunc().getClass());
     }
 
     @Test

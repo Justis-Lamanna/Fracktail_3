@@ -2,10 +2,10 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.annotation.ParameterRange;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterConverters;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToArrayHandler;
-import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToStringHandler;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToArrayConverterFunction;
+import com.github.lucbui.fracktail3.spring.command.handler.ParameterRangeToStringConverterFunction;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import com.github.lucbui.fracktail3.spring.plugin.v2.ParameterComponentStrategy;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +41,10 @@ public class ParameterRangeStrategy implements ParameterComponentStrategy {
 
         if(paramType.isArray()) {
             Class<?> innerType = paramType.getComponentType();
-            return new ParameterComponent(new ParameterRangeToArrayHandler(start, end, innerType, converters));
+            return new ParameterComponent(new ParameterRangeToArrayConverterFunction(start, end, innerType, converters));
         } else if(ClassUtils.isAssignable(String.class, paramType)) {
             if(start == 0 && end == -1) {
-                return new ParameterComponent(new ParameterRangeToStringHandler());
+                return new ParameterComponent(new ParameterRangeToStringConverterFunction());
             } else {
                 throw new BotConfigurationException("Cannot convert parameters to type String unless start and end are unspecified");
             }

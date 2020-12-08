@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.spring.plugin;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
-import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
-import com.github.lucbui.fracktail3.spring.command.ParameterComponent;
-import com.github.lucbui.fracktail3.spring.command.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import org.apache.commons.lang3.ClassUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;

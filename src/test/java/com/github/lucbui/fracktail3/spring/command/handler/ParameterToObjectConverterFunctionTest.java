@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.BaseFracktailTest;
+import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,7 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-class ParameterToObjectHandlerTest extends BaseFracktailTest {
+class ParameterToObjectConverterFunctionTest extends BaseFracktailTest {
     @Mock
     private ParameterConverters converters;
 
@@ -26,7 +27,7 @@ class ParameterToObjectHandlerTest extends BaseFracktailTest {
     void returnParameterWhenPresentWithNoConversion() {
         when(parameters.getParameter(anyInt())).thenReturn(Optional.of("hello"));
         when(converters.convertToType(any(), any())).thenReturn("hello");
-        ParameterToObjectHandler handler = new ParameterToObjectHandler(String.class, 0, converters);
+        ParameterToObjectConverterFunction handler = new ParameterToObjectConverterFunction(String.class, 0, converters);
 
         assertEquals("hello", handler.apply(context));
     }
@@ -35,7 +36,7 @@ class ParameterToObjectHandlerTest extends BaseFracktailTest {
     void convertParameterWhenPresent() {
         when(parameters.getParameter(anyInt())).thenReturn(Optional.of("one"));
         when(converters.convertToType(any(), any())).thenReturn(1);
-        ParameterToObjectHandler handler = new ParameterToObjectHandler(String.class, 0, converters);
+        ParameterToObjectConverterFunction handler = new ParameterToObjectConverterFunction(String.class, 0, converters);
 
         assertEquals(1, handler.apply(context));
     }
@@ -43,7 +44,7 @@ class ParameterToObjectHandlerTest extends BaseFracktailTest {
     @Test
     void returnDefaultWhenAbsent() {
         when(parameters.getParameter(anyInt())).thenReturn(Optional.empty());
-        ParameterToObjectHandler handler = new ParameterToObjectHandler(String.class, 0, converters);
+        ParameterToObjectConverterFunction handler = new ParameterToObjectConverterFunction(String.class, 0, converters);
 
         assertNull(handler.apply(context));
     }

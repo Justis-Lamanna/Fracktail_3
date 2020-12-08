@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.spring.command;
+package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 

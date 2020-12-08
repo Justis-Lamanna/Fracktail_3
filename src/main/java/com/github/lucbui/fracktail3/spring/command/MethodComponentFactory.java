@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command;
 
+import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.plugin.v2.MethodComponentStrategy;
 import org.slf4j.Logger;

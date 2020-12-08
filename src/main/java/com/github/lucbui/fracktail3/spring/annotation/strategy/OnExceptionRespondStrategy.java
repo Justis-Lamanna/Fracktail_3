@@ -2,8 +2,8 @@ package com.github.lucbui.fracktail3.spring.annotation.strategy;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.annotation.OnExceptionRespond;
-import com.github.lucbui.fracktail3.spring.command.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.plugin.v2.ExceptionComponentStrategy;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import org.slf4j.Logger;
