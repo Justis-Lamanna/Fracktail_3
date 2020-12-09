@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dicebot;
+package com.github.lucbui.fracktail3.dnd.dicebot;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

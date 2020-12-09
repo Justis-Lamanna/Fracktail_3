@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dicebot;
+package com.github.lucbui.fracktail3.dnd.dicebot;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.google.common.collect.HashMultiset;
