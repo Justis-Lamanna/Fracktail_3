@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd;
+package com.github.lucbui.fracktail3.modules.dnd;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

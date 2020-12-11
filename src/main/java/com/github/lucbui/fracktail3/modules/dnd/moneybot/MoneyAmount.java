@@ -1,6 +1,6 @@
-package com.github.lucbui.fracktail3.dnd.moneybot;
+package com.github.lucbui.fracktail3.modules.dnd.moneybot;
 
-import com.github.lucbui.fracktail3.dnd.Money;
+import com.github.lucbui.fracktail3.modules.dnd.Money;
 
 import java.math.BigDecimal;
 import java.util.Objects;

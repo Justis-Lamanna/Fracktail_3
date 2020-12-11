@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd.dicebot;
+package com.github.lucbui.fracktail3.modules.dnd.dicebot;
 
 import org.apache.commons.math3.random.RandomGenerator;
 

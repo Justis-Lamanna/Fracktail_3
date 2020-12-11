@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd;
+package com.github.lucbui.fracktail3.modules.dnd;
 
 /**
  * Represents a character's ability score

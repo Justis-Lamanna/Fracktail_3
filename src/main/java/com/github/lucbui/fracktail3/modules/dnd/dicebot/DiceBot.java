@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd.dicebot;
+package com.github.lucbui.fracktail3.modules.dnd.dicebot;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.spring.annotation.*;

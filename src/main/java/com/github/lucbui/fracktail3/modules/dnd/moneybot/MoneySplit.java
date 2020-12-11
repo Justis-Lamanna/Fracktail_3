@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd.moneybot;
+package com.github.lucbui.fracktail3.modules.dnd.moneybot;
 
 public class MoneySplit {
     private final MoneyAmount forEach;

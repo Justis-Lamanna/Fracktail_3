@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.dnd.harrowbot;
+package com.github.lucbui.fracktail3.modules.dnd.harrowbot;
 
 /**
  * Some type of Harrow deck of cards

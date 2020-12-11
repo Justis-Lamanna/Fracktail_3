@@ -1,7 +1,7 @@
-package com.github.lucbui.fracktail3.dnd.harrowbot;
+package com.github.lucbui.fracktail3.modules.dnd.harrowbot;
 
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
-import com.github.lucbui.fracktail3.dnd.AbilityScore;
+import com.github.lucbui.fracktail3.modules.dnd.AbilityScore;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.Payload;

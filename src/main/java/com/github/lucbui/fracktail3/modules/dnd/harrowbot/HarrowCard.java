@@ -1,7 +1,7 @@
-package com.github.lucbui.fracktail3.dnd.harrowbot;
+package com.github.lucbui.fracktail3.modules.dnd.harrowbot;
 
-import com.github.lucbui.fracktail3.dnd.AbilityScore;
-import com.github.lucbui.fracktail3.dnd.Alignment;
+import com.github.lucbui.fracktail3.modules.dnd.AbilityScore;
+import com.github.lucbui.fracktail3.modules.dnd.Alignment;
 
 /**
  * Describes one of 54 harrow cards, for fortune telling
