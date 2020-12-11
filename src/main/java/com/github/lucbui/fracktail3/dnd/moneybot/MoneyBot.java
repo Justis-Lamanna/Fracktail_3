@@ -42,7 +42,7 @@ public class MoneyBot {
             if(permissibleUnits.contains(unit)) {
                 BigDecimal[] divisionAndRemainder = left.divideAndRemainder(unit.convertTo(Money.COPPER));
                 if (!divisionAndRemainder[0].stripTrailingZeros().equals(BigDecimal.ZERO)) {
-                    sb.append(divisionAndRemainder[0].toPlainString()).append(unit.getUnit()).append("P");
+                    sb.append(divisionAndRemainder[0].stripTrailingZeros().toPlainString()).append(unit.getUnit()).append("P");
                 }
                 left = divisionAndRemainder[1];
             }
