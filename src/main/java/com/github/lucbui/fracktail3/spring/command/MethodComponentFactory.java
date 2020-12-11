@@ -1,9 +1,10 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
-import com.github.lucbui.fracktail3.spring.plugin.v2.MethodComponentStrategy;
+import com.github.lucbui.fracktail3.spring.command.service.StrategyExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -13,7 +14,10 @@ import java.lang.reflect.Method;
  * A factory which compiles an object + method, or object + field, into an MethodComponentFactory
  */
 @Component
-public class MethodComponentFactory extends BaseFactory {
+public class MethodComponentFactory {
+    @Autowired
+    private StrategyExtractor extractor;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodComponentFactory.class);
 
     /**
@@ -24,11 +28,8 @@ public class MethodComponentFactory extends BaseFactory {
      */
     public MethodComponent compileMethod(Object obj, Method method) {
         LOGGER.debug("Compiling method {}", method.getName());
-        MethodComponent component = new MethodComponent();
-        for(MethodComponentStrategy strategy : getMethodStrategies(method)) {
-            component = strategy.decorate(obj, method, component);
-        }
-        return component;
+        return BaseFactory.decorate(extractor.getMethodStrategies(method),
+                (strategy, component) -> strategy.decorate(obj, method, component), new MethodComponent());
     }
 
     /**
@@ -39,10 +40,7 @@ public class MethodComponentFactory extends BaseFactory {
      */
     public MethodComponent compileField(Object obj, Field field) {
         LOGGER.debug("Compiling method {}", field.getName());
-        MethodComponent component = new MethodComponent();
-        for(MethodComponentStrategy strategy : getMethodStrategies(field)) {
-            component = strategy.decorate(obj, field, component);
-        }
-        return component;
+        return BaseFactory.decorate(extractor.getMethodStrategies(field),
+                (strategy, component) -> strategy.decorate(obj, field, component), new MethodComponent());
     }
 }

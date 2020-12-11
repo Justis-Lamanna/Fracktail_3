@@ -54,7 +54,7 @@ public class ReflectiveCommandActionFactory {
     public CommandAction createAction(Object obj, Field field) {
         MethodComponent methodComponent = methodComponentFactory.compileField(obj, field);
         ReturnComponent returnComponent = returnComponentFactory.compileReturn(obj, field);
-        ExceptionComponent exceptionComponent = new ExceptionComponent(); //exceptionComponentFactory.compileException(obj, field);
+        ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, field);
         LOGGER.debug("Finished compiling field {}", field.getName());
         return new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
     }
