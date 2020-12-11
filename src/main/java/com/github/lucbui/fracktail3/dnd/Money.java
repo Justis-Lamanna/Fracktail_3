@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.dnd;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Represents money in DnD
@@ -62,5 +64,16 @@ public enum Money {
             return this.numCopper;
         }
         return this.numCopper.divide(to.numCopper, 3, RoundingMode.DOWN);
+    }
+
+    /**
+     * Get a money from the unit name (C, S, G, E, or P)
+     * @param unit The unit
+     * @return The Money, or Optional if no match
+     */
+    public static Optional<Money> valueFromUnit(String unit) {
+        return Arrays.stream(Money.values())
+                .filter(m -> m.unit.equals(unit))
+                .findFirst();
     }
 }

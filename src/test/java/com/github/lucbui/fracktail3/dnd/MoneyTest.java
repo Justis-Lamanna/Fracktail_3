@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MoneyTest {
     @Test
     void testIdentityConversion() {
-        assertEquals(new BigDecimal("1.000"), Money.COPPER.convertTo(Money.COPPER));
+        assertEquals(BigDecimal.ONE, Money.COPPER.convertTo(Money.COPPER));
     }
 
     @Test

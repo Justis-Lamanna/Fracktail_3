@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.dnd.AbilityScore;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.Payload;
+import com.github.lucbui.fracktail3.spring.annotation.Usage;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.rest.util.Color;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,9 @@ public class HarrowBot {
     }
 
     @Command
+    @Usage("Perform a harrowing. Nine cards will be drawn: the first three represent your past, the second three your present," +
+            "and the last three your future. Each card has an associated ability score and alignment, which is used by the" +
+            "harrower to distribute awards or penalties.")
     @ForPlatform(DiscordPlatform.class)
     public Mono<Void> harrow(@Payload MessageCreateEvent event) {
         Harrowing<HarrowCard> harrowing = perform();
