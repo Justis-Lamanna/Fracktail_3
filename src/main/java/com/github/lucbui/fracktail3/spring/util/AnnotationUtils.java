@@ -3,13 +3,19 @@ package com.github.lucbui.fracktail3.spring.util;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
+import com.github.lucbui.fracktail3.spring.annotation.Cron;
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.Formatter;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.StringJoiner;
+import java.util.TimeZone;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -67,6 +73,25 @@ public class AnnotationUtils {
             return constructor.newInstance((Object[]) formatter.params());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ex) {
             throw new BotConfigurationException("Cannot invoke constructor in class " + clazz.getCanonicalName() + " with " + constructorSignature.length + " string args", ex);
+        }
+    }
+
+    public static ScheduleEventTrigger fromCron(Cron cron) {
+        // Validate
+        StringJoiner sj = new StringJoiner(" ");
+        String cronStr = sj
+                .add(cron.second())
+                .add(cron.minute())
+                .add(cron.hour())
+                .add(cron.dayOfMonth())
+                .add(cron.month())
+                .add(cron.dayOfWeek())
+                .toString();
+        if(StringUtils.isBlank(cron.timezone())) {
+            return new CronTrigger(cronStr);
+        } else {
+            TimeZone timeZone = TimeZone.getTimeZone(cron.timezone());
+            return new CronTrigger(cronStr, timeZone);
         }
     }
 }
