@@ -4,10 +4,11 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
-import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
+import com.github.lucbui.fracktail3.spring.annotation.Cron;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
 import com.github.lucbui.fracktail3.spring.annotation.Schedule;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
@@ -232,7 +233,10 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         }
 
         private ScheduleEventTrigger getTrigger(AnnotatedElement member) {
-            return new CronTrigger("0 * * ? * SUN-THU");
+            if(member.isAnnotationPresent(Cron.class)) {
+                return AnnotationUtils.fromCron(member.getAnnotation(Cron.class));
+            }
+            throw new BotConfigurationException("@Scheduled must be annotated with @Cron");
         }
     }
 }
