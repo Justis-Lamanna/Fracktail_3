@@ -1,11 +1,13 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.spring.command.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -57,5 +59,27 @@ public class ReflectiveCommandActionFactory {
         ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, field);
         LOGGER.debug("Finished compiling field {}", field.getName());
         return new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
+    }
+
+    /**
+     * Create a scheduled action from an object + method
+     * @param obj The bean object
+     * @param method The method to compile
+     * @return A created ScheduledAction, constructed via object and method annotations
+     */
+    public ScheduledAction createScheduledAction(Object obj, Method method) {
+        LOGGER.debug("Finished compiling method {} for scheduled action", method.getName());
+        throw new NotImplementedException();
+    }
+
+    /**
+     * Create a scheduled action from an object + field
+     * @param obj The bean object
+     * @param field The field to compile
+     * @return A created ScheduledAction, constructed via object and field annotations
+     */
+    public ScheduledAction createScheduledAction(Object obj, Field field) {
+        LOGGER.debug("Finished compiling field {} for scheduled action", field.getName());
+        throw new NotImplementedException();
     }
 }

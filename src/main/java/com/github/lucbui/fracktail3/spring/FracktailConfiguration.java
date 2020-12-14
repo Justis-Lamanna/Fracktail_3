@@ -5,7 +5,6 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
@@ -13,7 +12,6 @@ import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,15 +66,8 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(TaskScheduler.class)
     public Scheduler springScheduler(TaskScheduler taskScheduler) {
         return new SpringScheduler(taskScheduler);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Scheduler defaultScheduler() {
-        return new DefaultScheduler();
     }
 
     @Bean

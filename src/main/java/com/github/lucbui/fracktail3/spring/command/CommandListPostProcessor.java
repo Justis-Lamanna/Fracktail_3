@@ -4,7 +4,12 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.annotation.Schedule;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
@@ -52,6 +57,9 @@ public class CommandListPostProcessor implements BeanPostProcessor {
     private CommandList commandList;
 
     @Autowired
+    private ScheduledEvents scheduledEvents;
+
+    @Autowired
     private Plugins plugins;
 
     @Override
@@ -85,13 +93,18 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         } else {
             LOGGER.trace("Investigating Bean {} for command candidates", beanName);
             CommandAnnotationParser parser = new CommandAnnotationParser(bean);
-            ReflectionUtils.doWithMethods(bean.getClass(),
-                    parser,
+            ReflectionUtils.doWithMethods(bean.getClass(), parser,
                     method -> method.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Command.class));
 
-            ReflectionUtils.doWithFields(bean.getClass(),
-                    parser,
+            ReflectionUtils.doWithFields(bean.getClass(), parser,
                     field -> field.isAnnotationPresent(com.github.lucbui.fracktail3.spring.annotation.Command.class));
+
+            ScheduledAnnotationParser scheduledParser = new ScheduledAnnotationParser(bean);
+            ReflectionUtils.doWithMethods(bean.getClass(), scheduledParser,
+                    method -> method.isAnnotationPresent(Schedule.class));
+
+            ReflectionUtils.doWithFields(bean.getClass(), scheduledParser,
+                    field -> field.isAnnotationPresent(Schedule.class));
         }
         return bean;
     }
@@ -104,6 +117,25 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         } else {
             commandList.add(c);
             plugins.onCommandAdd(c);
+        }
+    }
+
+    private void addOrMerge(ScheduledEvent event) {
+        Optional<ScheduledEvent> old = scheduledEvents.getById(event.getId());
+        if(old.isPresent()) {
+            LOGGER.debug("Overwriting command, so ignoring");
+            // plugins.onScheduledEventMerge(old.get(), event);
+        } else {
+            scheduledEvents.add(event);
+            // plugins.onCommandAdd(event);
+        }
+    }
+
+    private static String returnStringOrMemberName(String id, Member member) {
+        if(StringUtils.isBlank(id)) {
+            return member.getName();
+        } else {
+            return id;
         }
     }
 
@@ -161,13 +193,46 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         }
 
         private <T extends AnnotatedElement & Member> String getId(T member) {
-            com.github.lucbui.fracktail3.spring.annotation.Command cAnnot =
-                    member.getAnnotation(com.github.lucbui.fracktail3.spring.annotation.Command.class);
-            if(StringUtils.isBlank(cAnnot.value())) {
-                return member.getName();
-            } else {
-                return cAnnot.value();
-            }
+            return CommandListPostProcessor.returnStringOrMemberName(
+                    member.getAnnotation(com.github.lucbui.fracktail3.spring.annotation.Command.class).value(), member);
+        }
+    }
+
+    private class ScheduledAnnotationParser implements ReflectionUtils.MethodCallback, ReflectionUtils.FieldCallback {
+        private final Object bean;
+
+        private ScheduledAnnotationParser(Object bean) {
+            this.bean = bean;
+        }
+
+        @Override
+        public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+            String id = getId(method);
+            LOGGER.debug("Adding @Scheduled-annotated method {}", id);
+
+            ScheduledEvent event = getEvent(id, bean, method);
+            addOrMerge(event);
+        }
+
+        @Override
+        public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+            String id = getId(field);
+            LOGGER.debug("Adding @Scheduled-annotated field {}", id);
+
+            ScheduledEvent event = getEvent(id, bean, field);
+            addOrMerge(event);
+        }
+
+        private <T extends AnnotatedElement & Member> String getId(T member) {
+            return returnStringOrMemberName(member.getAnnotation(Schedule.class).value(), member);
+        }
+
+        private ScheduledEvent getEvent(String id, Object bean, AnnotatedElement member) {
+            return new ScheduledEvent(id, getTrigger(member), c -> c.respond("Hello, world!"));
+        }
+
+        private ScheduleEventTrigger getTrigger(AnnotatedElement member) {
+            return new CronTrigger("0 * * ? * SUN-THU");
         }
     }
 }

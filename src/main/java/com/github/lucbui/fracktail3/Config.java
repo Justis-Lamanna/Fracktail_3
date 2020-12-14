@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.command.CommandLookupPlugin;
 import discord4j.core.object.presence.Activity;
@@ -17,9 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class Config {
-    @Command
-    public static final String hello = "hello, world!";
-
     @Bean
     public Platform discord(@Value("${token}") String token) {
         return new DiscordPlatform.Builder()
