@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
 import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * A ParameterConverterFunction which converts a range of parameters into an array of some type
  */
-public class ParameterRangeToArrayConverterFunction implements ParameterComponent.ParameterConverterFunction {
+public class ParameterRangeToArrayConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext<?>> {
     private final int start;
     private final int end;
     private final Class<?> memberType;

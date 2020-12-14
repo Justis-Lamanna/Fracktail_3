@@ -1,9 +1,10 @@
 package com.github.lucbui.fracktail3.spring.command.service;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
-import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnBaseComponent;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Component
 public class ReturnConverters {
-    public Optional<ReturnComponent.ReturnConverterFunction> getHandlerForType(Class<?> clazz) {
+    public Optional<ReturnBaseComponent.ReturnConverterFunction<? super CommandUseContext<?>>> getHandlerForType(Class<?> clazz) {
         if (clazz.equals(Void.class) || clazz.equals(Void.TYPE)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if (clazz.equals(Mono.class)) {

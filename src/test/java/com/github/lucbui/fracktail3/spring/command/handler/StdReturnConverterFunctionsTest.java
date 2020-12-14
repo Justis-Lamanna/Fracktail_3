@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 import com.github.lucbui.fracktail3.BaseFracktailTest;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
-import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,7 +22,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void voidsShouldReturnEmptyMono() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Voids();
+        StdReturnConverterFunctions.Voids rcf = new StdReturnConverterFunctions.Voids();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -32,7 +31,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void monosShouldReturnMonoWhichCompletesWhenMonoCompletes() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Monos();
+        StdReturnConverterFunctions.Monos rcf = new StdReturnConverterFunctions.Monos();
         PublisherProbe<Void> probe = PublisherProbe.empty();
 
         StepVerifier.create(rcf.apply(context, probe.mono()))
@@ -46,7 +45,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void monosShouldReturnEmptyWhenNull() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Monos();
+        StdReturnConverterFunctions.Monos rcf = new StdReturnConverterFunctions.Monos();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -55,7 +54,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void fluxsShouldReturnMonoWhichCompletesWhenFluxCompletes() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Fluxs();
+        StdReturnConverterFunctions.Fluxs rcf = new StdReturnConverterFunctions.Fluxs();
         PublisherProbe<Void> probe = PublisherProbe.empty();
 
         StepVerifier.create(rcf.apply(context, probe.flux()))
@@ -69,7 +68,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void fluxsShouldReturnEmptyWhenNull() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Fluxs();
+        StdReturnConverterFunctions.Fluxs rcf = new StdReturnConverterFunctions.Fluxs();
 
         StepVerifier.create(rcf.apply(context, null))
                 .expectSubscription()
@@ -78,7 +77,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void stringsShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.Strings();
+        StdReturnConverterFunctions.Strings rcf = new StdReturnConverterFunctions.Strings();
 
         StepVerifier.create(rcf.apply(context, "hello, world"))
                 .expectSubscription()
@@ -89,7 +88,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void fstringsShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.FStrings();
+        StdReturnConverterFunctions.FStrings rcf = new StdReturnConverterFunctions.FStrings();
 
         StepVerifier.create(rcf.apply(context, FormattedString.from("hello, world")))
                 .expectSubscription()
@@ -100,7 +99,7 @@ class StdReturnConverterFunctionsTest extends BaseFracktailTest {
 
     @Test
     void botResponseShouldRespond() {
-        ReturnComponent.ReturnConverterFunction rcf = new StdReturnConverterFunctions.BotResponses();
+        StdReturnConverterFunctions.BotResponses rcf = new StdReturnConverterFunctions.BotResponses();
 
         BotResponse mock = Mockito.mock(BotResponse.class);
         when(mock.respondWith()).thenReturn(FormattedString.literal("hello, world"));

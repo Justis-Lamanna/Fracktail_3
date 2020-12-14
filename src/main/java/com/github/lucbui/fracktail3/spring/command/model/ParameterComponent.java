@@ -6,21 +6,15 @@ import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * A piece of a MethodCallingAction which resolves the context into a parameter to be injected into the method
  */
-public class ParameterComponent {
-    ParameterConverterFunction func;
+public class ParameterComponent extends ParameterBaseComponent<CommandUseContext<?>> {
     List<Guard> guards;
 
-    /**
-     * Initialize this component with a function
-     * @param func The function to use
-     */
-    public ParameterComponent(ParameterConverterFunction func) {
-        this.func = func;
+    public ParameterComponent(ParameterConverterFunction<CommandUseContext<?>> func) {
+        super(func);
         this.guards = new ArrayList<>();
     }
 
@@ -33,23 +27,10 @@ public class ParameterComponent {
     }
 
     /**
-     * Get the ParameterConverterFunction being used
-     * @return The function used
-     */
-    public ParameterConverterFunction getFunc() {
-        return func;
-    }
-
-    /**
      * Get the parameter-specific guards being used
      * @return The guards used
      */
     public List<Guard> getGuards() {
         return Collections.unmodifiableList(guards);
     }
-
-    /**
-     * A function which converts the CommandUseContext into some injectable parameter
-     */
-    public interface ParameterConverterFunction extends Function<CommandUseContext<?>, Object> {}
 }

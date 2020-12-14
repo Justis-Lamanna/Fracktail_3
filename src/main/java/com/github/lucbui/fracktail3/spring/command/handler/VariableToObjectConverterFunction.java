@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
-import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
 import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
 import com.github.lucbui.fracktail3.spring.util.Defaults;
 import org.apache.commons.lang3.ClassUtils;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 /**
  * A ParameterConverterFunction which converts a map value into some object
  */
-public class VariableToObjectConverterFunction implements ParameterComponent.ParameterConverterFunction {
+public class VariableToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext<?>> {
     private final Class<?> paramType;
     private final String key;
     private final ParameterConverters converters;

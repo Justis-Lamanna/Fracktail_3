@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionBaseComponent;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -10,7 +10,7 @@ import java.util.Collections;
 /**
  * An ExceptionHandler which responds with a certain FormattedString
  */
-public class ExceptionRespondHandler implements ExceptionComponent.ExceptionHandler {
+public class ExceptionRespondHandler implements ExceptionBaseComponent.ExceptionHandler<CommandUseContext<?>> {
     private final FormattedString fString;
 
     /**
