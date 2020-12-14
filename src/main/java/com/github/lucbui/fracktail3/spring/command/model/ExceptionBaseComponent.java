@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+/**
+ * A base component which handles exceptions thrown in the course of execution
+ */
 public abstract class ExceptionBaseComponent<T extends BaseContext<?>> {
     final Map<Class<? extends Throwable>, ExceptionHandler<? super T>> candidates;
 

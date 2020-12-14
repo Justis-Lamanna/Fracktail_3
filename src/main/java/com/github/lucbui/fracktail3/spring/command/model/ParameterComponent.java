@@ -13,6 +13,10 @@ import java.util.List;
 public class ParameterComponent extends ParameterBaseComponent<CommandUseContext<?>> {
     List<Guard> guards;
 
+    /**
+     * Initialize this component with a function
+     * @param func The function to use
+     */
     public ParameterComponent(ParameterConverterFunction<CommandUseContext<?>> func) {
         super(func);
         this.guards = new ArrayList<>();
