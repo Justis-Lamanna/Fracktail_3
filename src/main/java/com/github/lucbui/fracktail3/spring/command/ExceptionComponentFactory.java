@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionScheduledComponent;
 import com.github.lucbui.fracktail3.spring.command.service.StrategyExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,5 +43,29 @@ public class ExceptionComponentFactory {
         LOGGER.debug("Compiling exception handlers of method {}", field.getName());
         return BaseFactory.decorate(extractor.getExceptionStrategies(field),
                 (strategy, component) -> strategy.decorate(obj, field, component), new ExceptionComponent());
+    }
+
+    /**
+     * Compile this object and method into an ExceptionComponent
+     * @param obj The bean object
+     * @param method The method to compile
+     * @return The created component
+     */
+    public ExceptionScheduledComponent compileScheduleException(Object obj, Method method) {
+        LOGGER.debug("Compiling exception handlers of method {}", method.getName());
+        return BaseFactory.decorate(extractor.getExceptionScheduleStrategies(method),
+                (strategy, component) -> strategy.decorate(obj, method, component), new ExceptionScheduledComponent());
+    }
+
+    /**
+     * Compile this object and field into an ExceptionComponent
+     * @param obj The bean object
+     * @param field The field to compile
+     * @return The created component
+     */
+    public ExceptionScheduledComponent compileScheduleException(Object obj, Field field) {
+        LOGGER.debug("Compiling exception handlers of method {}", field.getName());
+        return BaseFactory.decorate(extractor.getExceptionScheduleStrategies(field),
+                (strategy, component) -> strategy.decorate(obj, field, component), new ExceptionScheduledComponent());
     }
 }

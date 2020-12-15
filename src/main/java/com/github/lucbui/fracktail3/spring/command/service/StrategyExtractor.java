@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.service;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.plugin.v2.*;
+import com.github.lucbui.fracktail3.spring.plugin.v2.schedule.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
@@ -33,12 +34,24 @@ public class StrategyExtractor implements ApplicationContextAware {
         return getStrategies(element, ExceptionStrategy.class, ExceptionStrategy::value);
     }
 
+    public List<ExceptionScheduledComponentStrategy> getExceptionScheduleStrategies(AnnotatedElement element) {
+        return getStrategies(element, ExceptionScheduleStrategy.class, ExceptionScheduleStrategy::value);
+    }
+
     public List<ParameterComponentStrategy> getParameterStrategies(AnnotatedElement element) {
         return getStrategies(element, ParameterStrategy.class, ParameterStrategy::value);
     }
 
+    public List<ParameterScheduledComponentStrategy> getParameterScheduleStrategies(AnnotatedElement element) {
+        return getStrategies(element, ParameterScheduleStrategy.class, ParameterScheduleStrategy::value);
+    }
+
     public List<ReturnComponentStrategy> getReturnStrategies(AnnotatedElement element) {
         return getStrategies(element, ReturnStrategy.class, ReturnStrategy::value);
+    }
+
+    public List<ReturnScheduledComponentStrategy> getReturnScheduleStrategies(AnnotatedElement element) {
+        return getStrategies(element, ReturnScheduleStrategy.class, ReturnScheduleStrategy::value);
     }
 
     public <STRAT, ANNOT extends Annotation> List<STRAT> getStrategies(AnnotatedElement element,

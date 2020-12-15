@@ -210,7 +210,7 @@ public class CommandListPostProcessor implements BeanPostProcessor {
             String id = getId(method);
             LOGGER.debug("Adding @Scheduled-annotated method {}", id);
 
-            ScheduledEvent event = getEvent(id, bean, method);
+            ScheduledEvent event = new ScheduledEvent(id, getTrigger(method), factory.createScheduledAction(bean, method));
             addOrMerge(event);
         }
 
@@ -219,16 +219,12 @@ public class CommandListPostProcessor implements BeanPostProcessor {
             String id = getId(field);
             LOGGER.debug("Adding @Scheduled-annotated field {}", id);
 
-            ScheduledEvent event = getEvent(id, bean, field);
+            ScheduledEvent event = new ScheduledEvent(id, getTrigger(field), factory.createScheduledAction(bean, field));
             addOrMerge(event);
         }
 
         private <T extends AnnotatedElement & Member> String getId(T member) {
             return returnStringOrMemberName(member.getAnnotation(Schedule.class).value(), member);
-        }
-
-        private ScheduledEvent getEvent(String id, Object bean, AnnotatedElement member) {
-            return new ScheduledEvent(id, getTrigger(member), c -> c.respond("Hello, world!"));
         }
 
         private ScheduleEventTrigger getTrigger(AnnotatedElement member) {

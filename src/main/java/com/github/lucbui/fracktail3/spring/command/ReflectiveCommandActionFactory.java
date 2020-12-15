@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -68,8 +67,11 @@ public class ReflectiveCommandActionFactory {
      * @return A created ScheduledAction, constructed via object and method annotations
      */
     public ScheduledAction createScheduledAction(Object obj, Method method) {
+        List<ParameterScheduledComponent> components = parameterComponentFactory.compileScheduleParameters(obj, method);
+        ReturnScheduledComponent returnComponent = returnComponentFactory.compileScheduledReturn(obj, method);
+        ExceptionScheduledComponent exceptionComponent = exceptionComponentFactory.compileScheduleException(obj, method);
         LOGGER.debug("Finished compiling method {} for scheduled action", method.getName());
-        throw new NotImplementedException();
+        return new MethodCallingScheduledAction(components, obj, method, returnComponent, exceptionComponent);
     }
 
     /**
@@ -79,7 +81,9 @@ public class ReflectiveCommandActionFactory {
      * @return A created ScheduledAction, constructed via object and field annotations
      */
     public ScheduledAction createScheduledAction(Object obj, Field field) {
+        ReturnScheduledComponent returnComponent = returnComponentFactory.compileScheduledReturn(obj, field);
+        ExceptionScheduledComponent exceptionComponent = exceptionComponentFactory.compileScheduleException(obj, field);
         LOGGER.debug("Finished compiling field {} for scheduled action", field.getName());
-        throw new NotImplementedException();
+        return new FieldCallingScheduledAction(obj, field, returnComponent, exceptionComponent);
     }
 }
