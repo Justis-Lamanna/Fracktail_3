@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.spring.annotation.scheduled;
+package com.github.lucbui.fracktail3.spring.annotation.schedule;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,11 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify the annotated action should run repeated, waiting the provided duration between runs
+ * Specify the annotated action should run after waiting the provided duration after startup
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
-public @interface RunEvery {
+public @interface RunAfter {
     /**
      * The duration to wait, in ISO format
      * @return The duration to wait

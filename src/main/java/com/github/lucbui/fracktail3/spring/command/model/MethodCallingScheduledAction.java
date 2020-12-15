@@ -72,7 +72,7 @@ public class MethodCallingScheduledAction implements ScheduledAction {
                 .onErrorResume(InvocationTargetException.class, ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
                                 .switchIfEmpty(Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass())))
-                                .flatMap(handler -> handler.apply(context, ex)))
+                                .flatMap(handler -> handler.apply(context, ex.getTargetException())))
                 .onErrorResume(ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
                                 .flatMap(func -> func.apply(context, ex)))

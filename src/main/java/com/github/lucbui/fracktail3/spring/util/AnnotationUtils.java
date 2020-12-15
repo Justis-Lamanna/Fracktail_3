@@ -7,10 +7,10 @@ import com.github.lucbui.fracktail3.magic.schedule.trigger.*;
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.Formatter;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
-import com.github.lucbui.fracktail3.spring.annotation.scheduled.Cron;
-import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunAfter;
-import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunAt;
-import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunEvery;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.Cron;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.RunAfter;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.RunAt;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.RunEvery;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;

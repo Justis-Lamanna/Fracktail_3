@@ -10,7 +10,7 @@ import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
-import com.github.lucbui.fracktail3.spring.annotation.scheduled.*;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.*;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
