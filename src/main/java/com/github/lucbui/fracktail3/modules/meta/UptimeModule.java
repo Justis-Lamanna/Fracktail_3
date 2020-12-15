@@ -1,10 +1,14 @@
 package com.github.lucbui.fracktail3.modules.meta;
 
+import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.schedule.RunEvery;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.Cron;
+import com.github.lucbui.fracktail3.spring.annotation.schedule.InjectPlatform;
 import com.github.lucbui.fracktail3.spring.annotation.schedule.Schedule;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
@@ -12,14 +16,14 @@ import java.time.Instant;
 
 @Component
 public class UptimeModule {
+    private static final DiscordChannelset BOT_TIME = DiscordChannelset.forChannel(744390997429059595L);
+
     private Instant startTime;
 
     @Schedule
-    //@Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
-    @RunEvery("PT5S")
-    public void test() {
-        System.out.println("Hi!");
-        //throw new CancelTaskException();
+    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
+    public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
+        return platform.message(BOT_TIME, "<@!248612704019808258>, go the heck to sleep!!");
     }
 
     @PostConstruct
