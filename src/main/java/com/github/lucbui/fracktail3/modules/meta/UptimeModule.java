@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.modules;
+package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.scheduled.Cron;
