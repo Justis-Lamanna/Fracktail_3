@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.spring.plugin.command;
+package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
