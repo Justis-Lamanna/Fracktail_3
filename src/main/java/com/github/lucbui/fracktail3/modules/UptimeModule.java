@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.modules;
 
 import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.Cron;
-import com.github.lucbui.fracktail3.spring.annotation.Schedule;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.Cron;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.Schedule;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +15,8 @@ public class UptimeModule {
     private Instant startTime;
 
     @Schedule
-    @Cron(minute = "*", hour = "*")
-    public static final String test = "";
+    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
+    public static final String test = "@Lucbui, go the heck to sleep!";
 
     @PostConstruct
     private void setStartTime() {

@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.spring.annotation;
+package com.github.lucbui.fracktail3.spring.annotation.scheduled;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

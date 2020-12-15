@@ -3,16 +3,22 @@ package com.github.lucbui.fracktail3.spring.util;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
-import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
-import com.github.lucbui.fracktail3.spring.annotation.Cron;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.*;
 import com.github.lucbui.fracktail3.spring.annotation.FString;
 import com.github.lucbui.fracktail3.spring.annotation.Formatter;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.Cron;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunAfter;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunAt;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.RunEvery;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.TimeZone;
@@ -76,8 +82,12 @@ public class AnnotationUtils {
         }
     }
 
+    /**
+     * Convert a @Cron annotation into a ScheduleEventTrigger
+     * @param cron The annotation
+     * @return The created trigger
+     */
     public static ScheduleEventTrigger fromCron(Cron cron) {
-        // Validate
         StringJoiner sj = new StringJoiner(" ");
         String cronStr = sj
                 .add(cron.second())
@@ -93,5 +103,35 @@ public class AnnotationUtils {
             TimeZone timeZone = TimeZone.getTimeZone(cron.timezone());
             return new CronTrigger(cronStr, timeZone);
         }
+    }
+
+    /**
+     * Convert a @RunAt annotation into a ScheduledEventTrigger
+     * @param run The annotation
+     * @return The created trigger
+     */
+    public static ScheduleEventTrigger fromRunAt(RunAt run) {
+        Instant instant = ZonedDateTime.parse(run.value(), DateTimeFormatter.ISO_DATE_TIME).toInstant();
+        return new ExecuteOnInstantTrigger(instant);
+    }
+
+    /**
+     * Convert a @RunAfter annotation into a ScheduledEventTrigger
+     * @param run The annotation
+     * @return The created trigger
+     */
+    public static ScheduleEventTrigger fromRunAfter(RunAfter run) {
+        Duration duration = Duration.parse(run.value());
+        return new ExecuteAfterDurationTrigger(duration);
+    }
+
+    /**
+     * Convert a @RunEvery annotation into a ScheduledEventTrigger
+     * @param run The annotation
+     * @return The created trigger
+     */
+    public static ScheduleEventTrigger fromRunEvery(RunEvery run) {
+        Duration duration = Duration.parse(run.value());
+        return new ExecuteRepeatedlyTrigger(duration);
     }
 }

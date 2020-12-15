@@ -8,10 +8,9 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
-import com.github.lucbui.fracktail3.spring.annotation.Cron;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
-import com.github.lucbui.fracktail3.spring.annotation.Schedule;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
+import com.github.lucbui.fracktail3.spring.annotation.scheduled.*;
 import com.github.lucbui.fracktail3.spring.plugin.CommandPlugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import com.github.lucbui.fracktail3.spring.plugin.Plugins;
@@ -235,8 +234,14 @@ public class CommandListPostProcessor implements BeanPostProcessor {
         private ScheduleEventTrigger getTrigger(AnnotatedElement member) {
             if(member.isAnnotationPresent(Cron.class)) {
                 return AnnotationUtils.fromCron(member.getAnnotation(Cron.class));
+            } else if(member.isAnnotationPresent(RunAt.class)) {
+                return AnnotationUtils.fromRunAt(member.getAnnotation(RunAt.class));
+            } else if(member.isAnnotationPresent(RunAfter.class)) {
+                return AnnotationUtils.fromRunAfter(member.getAnnotation(RunAfter.class));
+            } else if(member.isAnnotationPresent(RunEvery.class)) {
+                return AnnotationUtils.fromRunEvery(member.getAnnotation(RunEvery.class));
             }
-            throw new BotConfigurationException("@Scheduled must be annotated with @Cron");
+            throw new BotConfigurationException("@Scheduled must be annotated with @Cron, @RunAt, @RunAfter, or @RunEvery");
         }
     }
 }
