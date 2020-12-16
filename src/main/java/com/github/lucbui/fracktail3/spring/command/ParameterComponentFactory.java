@@ -76,8 +76,8 @@ public class ParameterComponentFactory {
     public ParameterScheduledComponent compileScheduleParameter(Object obj, Method method, Parameter parameter) {
         LOGGER.debug("Compiling parameter {} of method {}", parameter.getName(), method.getName());
         return BaseFactory.createAndDecorate(extractor.getParameterScheduleStrategies(parameter),
-                strategy -> strategy.create(obj, method, parameter),
-                (strategy, component) -> strategy.decorate(obj, method, parameter, component))
+                strategy -> strategy.createSchedule(obj, method, parameter),
+                (strategy, component) -> strategy.decorateSchedule(obj, method, parameter, component))
                 .orElseThrow(() -> new BotConfigurationException("Unequipped to compile parameter " + parameter.getName() + " for method " + method.getName()));
     }
 }

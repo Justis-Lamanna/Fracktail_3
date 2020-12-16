@@ -17,7 +17,7 @@ public interface ParameterScheduledComponentStrategy {
      * @param parameter The parameter being injected for this action
      * @return An Optional containing the created component, or empty if this strategy cannot handle.
      */
-    Optional<ParameterScheduledComponent> create(Object obj, Method method, Parameter parameter);
+    Optional<ParameterScheduledComponent> createSchedule(Object obj, Method method, Parameter parameter);
 
     /**
      * Decorate an ParameterScheduledComponent
@@ -27,5 +27,5 @@ public interface ParameterScheduledComponentStrategy {
      * @param base The base ParameterScheduledComponent to decorate
      * @return The decorated ParameterScheduledComponent
      */
-    ParameterScheduledComponent decorate(Object obj, Method method, Parameter parameter, ParameterScheduledComponent base);
+    ParameterScheduledComponent decorateSchedule(Object obj, Method method, Parameter parameter, ParameterScheduledComponent base);
 }

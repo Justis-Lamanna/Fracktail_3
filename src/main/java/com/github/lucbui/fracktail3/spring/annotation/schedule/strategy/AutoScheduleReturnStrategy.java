@@ -20,24 +20,24 @@ public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrat
     private ReturnConverters converters;
 
     @Override
-    public Optional<ReturnScheduledComponent> create(Object obj, Method method) {
+    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method) {
         return converters.getScheduleHandlerForType(method.getReturnType())
                 .map(ReturnScheduledComponent::new);
     }
 
     @Override
-    public ReturnScheduledComponent decorate(Object obj, Method method, ReturnScheduledComponent base) {
+    public ReturnScheduledComponent decorateSchedule(Object obj, Method method, ReturnScheduledComponent base) {
         return base;
     }
 
     @Override
-    public Optional<ReturnScheduledComponent> create(Object obj, Field field) {
+    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field) {
         return converters.getScheduleHandlerForType(field.getType())
                 .map(ReturnScheduledComponent::new);
     }
 
     @Override
-    public ReturnScheduledComponent decorate(Object obj, Field field, ReturnScheduledComponent base) {
+    public ReturnScheduledComponent decorateSchedule(Object obj, Field field, ReturnScheduledComponent base) {
         return base;
     }
 }

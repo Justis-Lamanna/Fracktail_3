@@ -16,7 +16,7 @@ public interface ExceptionScheduledComponentStrategy {
      * @param base The base ExceptionScheduledComponent to decorate
      * @return The decorated ExceptionScheduledComponent
      */
-    ExceptionScheduledComponent decorate(Object obj, Method method, ExceptionScheduledComponent base);
+    ExceptionScheduledComponent decorateSchedule(Object obj, Method method, ExceptionScheduledComponent base);
 
     /**
      * Decorate an ExceptionScheduledComponent
@@ -25,5 +25,5 @@ public interface ExceptionScheduledComponentStrategy {
      * @param base The base ExceptionScheduledComponent to decorate
      * @return The decorated ExceptionScheduledComponent
      */
-    ExceptionScheduledComponent decorate(Object obj, Field field, ExceptionScheduledComponent base);
+    ExceptionScheduledComponent decorateSchedule(Object obj, Field field, ExceptionScheduledComponent base);
 }

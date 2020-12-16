@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
 import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 /**
  * A ParameterConverterFunction which converts a map value into some object
  */
-public class VariableToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext<?>> {
+public class VariableToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<BaseContext<?>> {
     private final Class<?> paramType;
     private final String key;
     private final ParameterConverters converters;
@@ -29,7 +29,7 @@ public class VariableToObjectConverterFunction implements ParameterBaseComponent
     }
 
     @Override
-    public Object apply(CommandUseContext<?> context) {
+    public Object apply(BaseContext<?> context) {
         AsynchronousMap<String, Object> map = context.getMap();
         if(map.containsKey(key)) {
             if(ClassUtils.isAssignable(Mono.class, paramType)) {

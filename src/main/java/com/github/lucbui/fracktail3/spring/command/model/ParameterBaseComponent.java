@@ -14,7 +14,7 @@ public abstract class ParameterBaseComponent<T extends BaseContext<?>> {
      * Initialize this component with a function
      * @param func The function to use
      */
-    public ParameterBaseComponent(ParameterConverterFunction<T> func) {
+    public ParameterBaseComponent(ParameterConverterFunction<? super T> func) {
         this.func = func;
     }
 

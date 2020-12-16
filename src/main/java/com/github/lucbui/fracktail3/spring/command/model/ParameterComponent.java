@@ -17,7 +17,7 @@ public class ParameterComponent extends ParameterBaseComponent<CommandUseContext
      * Initialize this component with a function
      * @param func The function to use
      */
-    public ParameterComponent(ParameterConverterFunction<CommandUseContext<?>> func) {
+    public ParameterComponent(ParameterConverterFunction<? super CommandUseContext<?>> func) {
         super(func);
         this.guards = new ArrayList<>();
     }

@@ -54,7 +54,7 @@ public class ExceptionComponentFactory {
     public ExceptionScheduledComponent compileScheduleException(Object obj, Method method) {
         LOGGER.debug("Compiling exception handlers of method {}", method.getName());
         return BaseFactory.decorate(extractor.getExceptionScheduleStrategies(method),
-                (strategy, component) -> strategy.decorate(obj, method, component), new ExceptionScheduledComponent());
+                (strategy, component) -> strategy.decorateSchedule(obj, method, component), new ExceptionScheduledComponent());
     }
 
     /**
@@ -66,6 +66,6 @@ public class ExceptionComponentFactory {
     public ExceptionScheduledComponent compileScheduleException(Object obj, Field field) {
         LOGGER.debug("Compiling exception handlers of method {}", field.getName());
         return BaseFactory.decorate(extractor.getExceptionScheduleStrategies(field),
-                (strategy, component) -> strategy.decorate(obj, field, component), new ExceptionScheduledComponent());
+                (strategy, component) -> strategy.decorateSchedule(obj, field, component), new ExceptionScheduledComponent());
     }
 }

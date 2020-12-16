@@ -16,7 +16,7 @@ public interface ReturnScheduledComponentStrategy {
      * @param method The method being compiled
      * @return An Optional containing the created component, or empty if this strategy cannot handle.
      */
-    Optional<ReturnScheduledComponent> create(Object obj, Method method);
+    Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method);
 
     /**
      * Decorate an ReturnScheduledComponent
@@ -25,7 +25,7 @@ public interface ReturnScheduledComponentStrategy {
      * @param base The base ReturnScheduledComponent to decorate
      * @return The decorated ReturnScheduledComponent
      */
-    ReturnScheduledComponent decorate(Object obj, Method method, ReturnScheduledComponent base);
+    ReturnScheduledComponent decorateSchedule(Object obj, Method method, ReturnScheduledComponent base);
 
     /**
      * Create a ReturnScheduledComponent
@@ -33,7 +33,7 @@ public interface ReturnScheduledComponentStrategy {
      * @param field The field being compiled
      * @return An Optional containing the created component, or empty if this strategy cannot handle.
      */
-    Optional<ReturnScheduledComponent> create(Object obj, Field field);
+    Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field);
 
     /**
      * Decorate an ReturnScheduledComponent
@@ -42,5 +42,5 @@ public interface ReturnScheduledComponentStrategy {
      * @param base The base ReturnScheduledComponent to decorate
      * @return The decorated ReturnScheduledComponent
      */
-    ReturnScheduledComponent decorate(Object obj, Field field, ReturnScheduledComponent base);
+    ReturnScheduledComponent decorateSchedule(Object obj, Field field, ReturnScheduledComponent base);
 }

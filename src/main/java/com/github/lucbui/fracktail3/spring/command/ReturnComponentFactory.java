@@ -62,8 +62,8 @@ public class ReturnComponentFactory {
         LOGGER.debug("Compiling return of method {}", method.getName());
         return BaseFactory.createAndDecorate(
                 extractor.getReturnScheduleStrategies(method),
-                strategy -> strategy.create(obj, method),
-                (strategy, component) -> strategy.decorate(obj, method, component)
+                strategy -> strategy.createSchedule(obj, method),
+                (strategy, component) -> strategy.decorateSchedule(obj, method, component)
         ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for method " + method.getName()));
     }
 
@@ -77,8 +77,8 @@ public class ReturnComponentFactory {
         LOGGER.debug("Compiling return of field {}", field.getName());
         return BaseFactory.createAndDecorate(
                 extractor.getReturnScheduleStrategies(field),
-                strategy -> strategy.create(obj, field),
-                (strategy, component) -> strategy.decorate(obj, field, component)
+                strategy -> strategy.createSchedule(obj, field),
+                (strategy, component) -> strategy.decorateSchedule(obj, field, component)
         ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for field " + field.getName()));
     }
 }

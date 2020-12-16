@@ -13,13 +13,13 @@ import java.lang.reflect.Method;
  */
 public class AutoOnExceptionCancelStrategy implements ExceptionScheduledComponentStrategy {
     @Override
-    public ExceptionScheduledComponent decorate(Object obj, Method method, ExceptionScheduledComponent base) {
+    public ExceptionScheduledComponent decorateSchedule(Object obj, Method method, ExceptionScheduledComponent base) {
         base.addHandler(CancelTaskException.class, new ExceptionCancelHandler());
         return base;
     }
 
     @Override
-    public ExceptionScheduledComponent decorate(Object obj, Field field, ExceptionScheduledComponent base) {
+    public ExceptionScheduledComponent decorateSchedule(Object obj, Field field, ExceptionScheduledComponent base) {
         base.addHandler(CancelTaskException.class, new ExceptionCancelHandler());
         return base;
     }
