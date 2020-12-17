@@ -1,14 +1,10 @@
-package com.github.lucbui.fracktail3.spring.util;
+package com.github.lucbui.fracktail3.spring.command.annotation;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.annotation.AnnotationUtils;
-import com.github.lucbui.fracktail3.spring.command.annotation.FString;
-import com.github.lucbui.fracktail3.spring.command.annotation.Formatter;
-import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
