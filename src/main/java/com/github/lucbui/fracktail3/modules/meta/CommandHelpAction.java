@@ -4,6 +4,9 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.annotation.Usage;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +22,9 @@ import java.util.List;
  * If no search string is provided, the attached command's help is returned instead, effectively showing how to use
  * this command.
  */
+@Component("help")
+@Name({"usage", "help"})
+@Usage("Use !help <command> to get usage on a particular command.")
 public class CommandHelpAction implements CommandAction {
     private final FormattedString noCommandFound;
 

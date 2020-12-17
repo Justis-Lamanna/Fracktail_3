@@ -2,11 +2,9 @@ package com.github.lucbui.fracktail3.spring.command;
 
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
-import com.github.lucbui.fracktail3.magic.command.action.PlatformBasicAction;
 import com.github.lucbui.fracktail3.spring.annotation.Command;
 import com.github.lucbui.fracktail3.spring.annotation.Name;
 import com.github.lucbui.fracktail3.spring.annotation.Usage;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +27,6 @@ public class CommandConfigurer extends FieldAndMethodBasedConfigurer {
     @Autowired
     private CommandList commandList;
 
-    @Autowired
-    private Plugins plugins;
-
     protected CommandConfigurer() {
         super(Command.class);
     }
@@ -44,16 +39,10 @@ public class CommandConfigurer extends FieldAndMethodBasedConfigurer {
             addOrMerge(c);
         } else if(bean instanceof CommandAction) {
             LOGGER.debug("Adding CommandAction Bean of id {}", beanName);
-            com.github.lucbui.fracktail3.magic.command.Command c = new com.github.lucbui.fracktail3.magic.command.Command.Builder(beanName)
-                    .withAction((CommandAction) bean)
-                    .build();
-            addOrMerge(c);
-        } else if(bean instanceof PlatformBasicAction) {
-            LOGGER.debug("Adding PlatformBasicAction Bean of id {}", beanName);
-            com.github.lucbui.fracktail3.magic.command.Command c = new com.github.lucbui.fracktail3.magic.command.Command.Builder(beanName)
-                    .withAction((PlatformBasicAction) bean)
-                    .build();
-            addOrMerge(c);
+            com.github.lucbui.fracktail3.magic.command.Command.Builder c = new com.github.lucbui.fracktail3.magic.command.Command.Builder(beanName)
+                    .withAction((CommandAction) bean);
+            handleAnnotations(bean.getClass(), c);
+            addOrMerge(c.build());
         }
 
         LOGGER.trace("Investigating Bean {} for command candidates", beanName);
@@ -99,11 +88,10 @@ public class CommandConfigurer extends FieldAndMethodBasedConfigurer {
     private void addOrMerge(com.github.lucbui.fracktail3.magic.command.Command c) {
         Optional<com.github.lucbui.fracktail3.magic.command.Command> old = commandList.getCommandById(c.getId());
         if(old.isPresent()) {
-            LOGGER.debug("Overwriting command. One day, the commands will be merged, instead");
-            plugins.onCommandMerge(old.get(), c);
+            LOGGER.debug("+-Overwriting command. One day, the commands will be merged, instead");
+            commandList.replace(c);
         } else {
             commandList.add(c);
-            plugins.onCommandAdd(c);
         }
     }
 }

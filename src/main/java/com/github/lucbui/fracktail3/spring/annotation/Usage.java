@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Specifies usage clues on how to use this command
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
 public @interface Usage {
     /**
      * The raw string value

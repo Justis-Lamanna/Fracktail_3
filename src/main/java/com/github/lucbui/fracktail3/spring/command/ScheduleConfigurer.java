@@ -5,7 +5,6 @@ import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
 import com.github.lucbui.fracktail3.spring.annotation.schedule.*;
-import com.github.lucbui.fracktail3.spring.plugin.Plugins;
 import com.github.lucbui.fracktail3.spring.util.AnnotationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +25,6 @@ public class ScheduleConfigurer extends FieldAndMethodBasedConfigurer {
 
     @Autowired
     private ScheduledEvents scheduledEvents;
-
-    @Autowired
-    private Plugins plugins;
 
     protected ScheduleConfigurer() {
         super(Schedule.class);
@@ -68,11 +64,10 @@ public class ScheduleConfigurer extends FieldAndMethodBasedConfigurer {
     private void addOrMerge(ScheduledEvent event) {
         Optional<ScheduledEvent> old = scheduledEvents.getById(event.getId());
         if(old.isPresent()) {
-            LOGGER.debug("Overwriting command, so ignoring");
-            // plugins.onScheduledEventMerge(old.get(), event);
+            LOGGER.debug("+-Overwriting scheduled event.");
+            scheduledEvents.replace(event);
         } else {
             scheduledEvents.add(event);
-            // plugins.onCommandAdd(event);
         }
     }
 }

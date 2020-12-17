@@ -4,7 +4,10 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.spring.annotation.Name;
+import com.github.lucbui.fracktail3.spring.annotation.Usage;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +22,9 @@ import java.util.List;
  * If the user has access to no commands (which shouldn't normally occur, since this command is being used and should
  * thus be returned), a specified string is returned
  */
+@Component("cmds")
+@Name("cmds")
+@Usage("Use !cmds to get a list of commands you can use.")
 public class CommandListAction implements CommandAction {
     private final String delimiter;
     private final FormattedString str;

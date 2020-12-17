@@ -4,8 +4,6 @@ import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
 import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.modules.meta.CommandLookupPlugin;
-import com.github.lucbui.fracktail3.spring.plugin.Plugin;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +25,5 @@ public class Config {
                     //.withHook(new DiscordEventHook<>("rer", new RerHook()))
             ))
             .build();
-    }
-
-    @Bean
-    public Plugin clp() {
-        return new CommandLookupPlugin();
     }
 }
