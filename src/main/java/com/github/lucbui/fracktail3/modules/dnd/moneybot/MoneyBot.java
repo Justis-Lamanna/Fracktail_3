@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.modules.dnd.moneybot;
 
 import com.github.lucbui.fracktail3.modules.dnd.Money;
-import com.github.lucbui.fracktail3.spring.annotation.*;
+import com.github.lucbui.fracktail3.spring.command.annotation.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

@@ -2,8 +2,8 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
-import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
-import com.github.lucbui.fracktail3.spring.util.Defaults;
+import com.github.lucbui.fracktail3.spring.service.Defaults;
+import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 
 import java.lang.reflect.Array;
 import java.util.List;

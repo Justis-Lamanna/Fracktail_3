@@ -2,10 +2,10 @@ package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
-import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.schedule.Cron;
-import com.github.lucbui.fracktail3.spring.annotation.schedule.InjectPlatform;
-import com.github.lucbui.fracktail3.spring.annotation.schedule.Schedule;
+import com.github.lucbui.fracktail3.spring.command.annotation.Command;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.Cron;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.Schedule;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

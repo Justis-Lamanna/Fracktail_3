@@ -2,10 +2,10 @@ package com.github.lucbui.fracktail3.modules.dnd.harrowbot;
 
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.modules.dnd.AbilityScore;
-import com.github.lucbui.fracktail3.spring.annotation.Command;
-import com.github.lucbui.fracktail3.spring.annotation.ForPlatform;
-import com.github.lucbui.fracktail3.spring.annotation.Payload;
-import com.github.lucbui.fracktail3.spring.annotation.Usage;
+import com.github.lucbui.fracktail3.spring.command.annotation.Command;
+import com.github.lucbui.fracktail3.spring.command.annotation.ForPlatform;
+import com.github.lucbui.fracktail3.spring.command.annotation.Payload;
+import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.rest.util.Color;
 import org.springframework.stereotype.Component;

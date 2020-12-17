@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.modules.dnd.dicebot;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.github.lucbui.fracktail3.spring.annotation.*;
+import com.github.lucbui.fracktail3.spring.command.annotation.*;
 import groovy.util.Eval;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

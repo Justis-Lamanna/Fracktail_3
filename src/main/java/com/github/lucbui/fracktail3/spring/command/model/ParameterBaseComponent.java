@@ -8,7 +8,7 @@ import java.util.function.Function;
  * A base component which resolves the context into a parameter to be injected into the method
  */
 public abstract class ParameterBaseComponent<T extends BaseContext<?>> {
-    final ParameterConverterFunction<? super T> func;
+    protected final ParameterConverterFunction<? super T> func;
 
     /**
      * Initialize this component with a function

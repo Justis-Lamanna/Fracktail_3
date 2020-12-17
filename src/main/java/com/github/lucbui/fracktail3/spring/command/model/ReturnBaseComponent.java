@@ -13,8 +13,8 @@ import java.util.function.Consumer;
  * A base component which determines how the method's response should be handled
  */
 public abstract class ReturnBaseComponent<T extends BaseContext<?>> {
-    final ReturnConverterFunction<? super T> func;
-    final List<Consumer<Object>> consumers;
+    protected final ReturnConverterFunction<? super T> func;
+    protected final List<Consumer<Object>> consumers;
 
     /**
      * Initialize this component with a handler

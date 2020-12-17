@@ -3,8 +3,8 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.util.AsynchronousMap;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
-import com.github.lucbui.fracktail3.spring.command.service.ParameterConverters;
-import com.github.lucbui.fracktail3.spring.util.Defaults;
+import com.github.lucbui.fracktail3.spring.service.Defaults;
+import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 import org.apache.commons.lang3.ClassUtils;
 import reactor.core.publisher.Mono;
 

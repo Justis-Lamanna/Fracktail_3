@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.util;
 
+import com.github.lucbui.fracktail3.spring.service.Defaults;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
