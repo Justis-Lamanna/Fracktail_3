@@ -24,6 +24,22 @@ public class CronTrigger implements ScheduleEventTrigger {
     }
 
     /**
+     * The Cron expression to trigger the event on
+     * @return The cron expression
+     */
+    public String getCron() {
+        return cron;
+    }
+
+    /**
+     * The time zone to use when determining trigger time
+     * @return The timezone specified
+     */
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    /**
      * Initialize this trigger with expression and system default timezone
      * @param cron The Cron expression
      */

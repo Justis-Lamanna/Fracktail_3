@@ -12,10 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.StringJoiner;
 import java.util.TimeZone;
@@ -108,7 +107,16 @@ public class AnnotationUtils {
      * @return The created trigger
      */
     public static ScheduleEventTrigger fromRunAt(RunAt run) {
-        Instant instant = ZonedDateTime.parse(run.value(), DateTimeFormatter.ISO_DATE_TIME).toInstant();
+        Instant instant;
+        try {
+            instant = ZonedDateTime.parse(run.value(), DateTimeFormatter.ISO_DATE_TIME).toInstant();
+        } catch(DateTimeParseException ex) {
+            try {
+                instant = LocalDateTime.parse(run.value(), DateTimeFormatter.ISO_DATE_TIME).atZone(ZoneId.systemDefault()).toInstant();
+            } catch (DateTimeParseException ex2) {
+                throw new BotConfigurationException("Invalid time " + run.value(), ex2);
+            }
+        }
         return new ExecuteOnInstantTrigger(instant);
     }
 
@@ -118,8 +126,12 @@ public class AnnotationUtils {
      * @return The created trigger
      */
     public static ScheduleEventTrigger fromRunAfter(RunAfter run) {
-        Duration duration = Duration.parse(run.value());
-        return new ExecuteAfterDurationTrigger(duration);
+        try {
+            Duration duration = Duration.parse(run.value());
+            return new ExecuteAfterDurationTrigger(duration);
+        } catch (DateTimeParseException ex) {
+            throw new BotConfigurationException("Invalid duration " + run.value(), ex);
+        }
     }
 
     /**
@@ -128,7 +140,11 @@ public class AnnotationUtils {
      * @return The created trigger
      */
     public static ScheduleEventTrigger fromRunEvery(RunEvery run) {
-        Duration duration = Duration.parse(run.value());
-        return new ExecuteRepeatedlyTrigger(duration);
+        try {
+            Duration duration = Duration.parse(run.value());
+            return new ExecuteRepeatedlyTrigger(duration);
+        } catch (DateTimeParseException ex) {
+            throw new BotConfigurationException("Invalid duration " + run.value(), ex);
+        }
     }
 }

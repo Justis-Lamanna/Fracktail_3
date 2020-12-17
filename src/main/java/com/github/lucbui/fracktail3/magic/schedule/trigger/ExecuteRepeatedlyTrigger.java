@@ -24,4 +24,12 @@ public class ExecuteRepeatedlyTrigger implements ScheduleEventTrigger {
     public Publisher<Instant> schedule(Scheduler scheduler) {
         return scheduler.every(duration);
     }
+
+    /**
+     * Get the amount of time to wait before executing
+     * @return The amount of time to wait before executing
+     */
+    public Duration getDuration() {
+        return duration;
+    }
 }

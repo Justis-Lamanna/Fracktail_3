@@ -43,7 +43,7 @@ public class ScheduleConfigurer extends FieldAndMethodBasedConfigurer {
     @Override
     protected void handleField(Object obj, Field field) {
         String id = returnStringOrMemberName(field.getAnnotation(Schedule.class).value(), field);
-        LOGGER.debug("Adding @Scheduled-annotated method {}", id);
+        LOGGER.debug("Adding @Scheduled-annotated field {}", id);
 
         ScheduledEvent event = new ScheduledEvent(id, getTrigger(field), factory.createScheduledAction(obj, field));
         addOrMerge(event);

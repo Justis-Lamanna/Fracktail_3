@@ -1,6 +1,5 @@
-package com.github.lucbui.fracktail3.spring.command.handler;
+package com.github.lucbui.fracktail3.spring.service;
 
-import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -32,4 +32,12 @@ public class ExecuteOnInstantTrigger implements ScheduleEventTrigger {
     public Publisher<Instant> schedule(Scheduler scheduler) {
         return scheduler.at(instant);
     }
+
+    /**
+     * The instant to run the scheduled task at
+     * @return the instant to run the scheduled task at
+     */
+    public Instant getInstant() {
+        return instant;
+    }
 }

@@ -24,4 +24,12 @@ public class ExecuteAfterDurationTrigger implements ScheduleEventTrigger {
     public Publisher<Instant> schedule(Scheduler scheduler) {
         return scheduler.wait(duration);
     }
+
+    /**
+     * Get the amount of time to wait before executing
+     * @return The amount of time to wait before executing
+     */
+    public Duration getDuration() {
+        return duration;
+    }
 }

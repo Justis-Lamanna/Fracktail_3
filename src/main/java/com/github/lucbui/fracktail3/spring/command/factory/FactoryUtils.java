@@ -15,11 +15,7 @@ public class FactoryUtils {
         for(STRAT s : strategies) {
             Optional<COMP> componentOpt = createFunc.apply(s);
             if(componentOpt.isPresent()) {
-                COMP component = componentOpt.get();
-                for(STRAT strategy : strategies) {
-                    component = decorateFunc.apply(strategy, component);
-                }
-                return Optional.of(component);
+                return Optional.of(decorate(strategies, decorateFunc, componentOpt.get()));
             }
         }
         return Optional.empty();

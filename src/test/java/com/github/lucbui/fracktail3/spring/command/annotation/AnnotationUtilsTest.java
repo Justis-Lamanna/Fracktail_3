@@ -5,6 +5,14 @@ import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.ExecuteAfterDurationTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.ExecuteOnInstantTrigger;
+import com.github.lucbui.fracktail3.magic.schedule.trigger.ExecuteRepeatedlyTrigger;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.Cron;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.RunAfter;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.RunAt;
+import com.github.lucbui.fracktail3.spring.schedule.annotation.RunEvery;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,71 +21,19 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
-import java.lang.annotation.Annotation;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
+import static com.github.lucbui.fracktail3.spring.command.annotation.AnnotationUtilsTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class AnnotationUtilsTest {
-    private static Formatter createFormatter(Class<? extends ContextFormatter> clazz, String... params) {
-        return new Formatter(){
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return Formatter.class;
-            }
-
-            @Override
-            public Class<? extends ContextFormatter> value() {
-                return clazz;
-            }
-
-            @Override
-            public String[] params() {
-                return params;
-            }
-        };
-    }
-
-    private static FString createFString(String base, Formatter... formatters) {
-        return new FString(){
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return FString.class;
-            }
-
-            @Override
-            public String value() {
-                return base;
-            }
-
-            @Override
-            public Formatter[] formatters() {
-                return formatters;
-            }
-        };
-    }
-
-    private static Usage createUsage(String base, Formatter... formatters) {
-        return new Usage(){
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return Usage.class;
-            }
-
-            @Override
-            public String value() {
-                return base;
-            }
-
-            @Override
-            public Formatter[] formatters() {
-                return formatters;
-            }
-        };
-    }
-
     @Mock
     private CommandUseContext<?> ctx;
 
@@ -175,6 +131,82 @@ class AnnotationUtilsTest {
         Assertions.assertThrows(BotConfigurationException.class, () -> {
             Usage usage = createUsage("usage", createFormatter(TestContextFormatter.class, "one", "two", "three"));
             AnnotationUtils.fromUsage(usage);
+        });
+    }
+
+    @Test
+    void testCron() {
+        Cron cron = createCron("0", "0", "0", "*", "*", "?", "");
+        CronTrigger trigger = (CronTrigger) AnnotationUtils.fromCron(cron);
+
+        assertEquals("0 0 0 * * ?", trigger.getCron());
+        assertEquals(TimeZone.getDefault(), trigger.getTimeZone());
+    }
+
+    @Test
+    void testRunAfter() {
+        RunAfter runAfter = createRunAfter("PT5S");
+        ExecuteAfterDurationTrigger trigger = (ExecuteAfterDurationTrigger) AnnotationUtils.fromRunAfter(runAfter);
+
+        assertEquals(Duration.ofSeconds(5), trigger.getDuration());
+    }
+
+    @Test
+    void testRunAfterWithInvalidExpression() {
+        RunAfter runAfter = createRunAfter("boop");
+        assertThrows(BotConfigurationException.class, () -> {
+            ExecuteAfterDurationTrigger trigger = (ExecuteAfterDurationTrigger) AnnotationUtils.fromRunAfter(runAfter);
+        });
+    }
+
+    @Test
+    void testRunEvery() {
+        RunEvery runEvery = createRunEvery("PT5S");
+        ExecuteRepeatedlyTrigger trigger = (ExecuteRepeatedlyTrigger) AnnotationUtils.fromRunEvery(runEvery);
+
+        assertEquals(Duration.ofSeconds(5), trigger.getDuration());
+    }
+
+    @Test
+    void testRunEveryWithInvalidExpression() {
+        RunEvery runEvery = createRunEvery("boop");
+        assertThrows(BotConfigurationException.class, () -> {
+            ExecuteRepeatedlyTrigger trigger = (ExecuteRepeatedlyTrigger) AnnotationUtils.fromRunEvery(runEvery);
+        });
+    }
+
+    @Test
+    void testRunAtNoTimezone() {
+        ZonedDateTime zdt = ZonedDateTime.of(2020, 12, 16, 10, 30, 0, 0, ZoneId.systemDefault());
+        RunAt runAt = createRunAt("2020-12-16T10:30:00");
+        ExecuteOnInstantTrigger trigger = (ExecuteOnInstantTrigger) AnnotationUtils.fromRunAt(runAt);
+
+        assertEquals(zdt.toInstant(), trigger.getInstant());
+    }
+
+    @Test
+    void testRunAtWithTimezone() {
+        ZonedDateTime zdt = ZonedDateTime.of(2020, 12, 16, 10, 30, 0, 0, ZoneId.of("+01:00"));
+        RunAt runAt = createRunAt("2020-12-16T10:30:00+01:00");
+        ExecuteOnInstantTrigger trigger = (ExecuteOnInstantTrigger) AnnotationUtils.fromRunAt(runAt);
+
+        assertEquals(zdt.toInstant(), trigger.getInstant());
+    }
+
+    @Test
+    void testRunAtWithEnhancedTimezone() {
+        ZonedDateTime zdt = ZonedDateTime.of(2020, 12, 16, 10, 30, 0, 0, ZoneId.of("+01:00"));
+        RunAt runAt = createRunAt("2020-12-16T10:30:00+01:00[Europe/Paris]");
+        ExecuteOnInstantTrigger trigger = (ExecuteOnInstantTrigger) AnnotationUtils.fromRunAt(runAt);
+
+        assertEquals(zdt.toInstant(), trigger.getInstant());
+    }
+
+    @Test
+    void testRunAtWithBadTime() {
+        RunAt runAt = createRunAt("boop");
+        assertThrows(BotConfigurationException.class, () -> {
+            ExecuteOnInstantTrigger trigger = (ExecuteOnInstantTrigger) AnnotationUtils.fromRunAt(runAt);
         });
     }
 
