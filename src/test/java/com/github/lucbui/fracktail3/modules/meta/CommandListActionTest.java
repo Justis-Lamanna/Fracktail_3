@@ -4,18 +4,20 @@ import com.github.lucbui.fracktail3.BaseFracktailTest;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.CompositeAction;
+import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 class CommandListActionTest extends BaseFracktailTest {
@@ -26,10 +28,24 @@ class CommandListActionTest extends BaseFracktailTest {
             .withAction(new CompositeAction(ctx -> Mono.just(false), CommandAction.NOOP))
             .build();
 
+    @Mock
+    private Command lookupCommand;
+
     @BeforeEach
     protected void parentSetup() {
         super.parentSetup();
         commandListAction = new CommandListAction();
+
+        when(commandList.getCommands()).thenReturn(Collections.singletonList(lookupCommand));
+        when(commandList.getNumberOfCommands()).thenReturn(1);
+        when(commandList.getCommandById(anyString())).thenReturn(Optional.of(lookupCommand));
+        when(commandList.getCommandsById()).thenReturn(Collections.singletonMap("test", lookupCommand));
+
+        when(lookupCommand.getId()).thenReturn("test");
+        when(lookupCommand.getNames()).thenReturn(Collections.singleton("test"));
+        when(lookupCommand.matches(any())).thenReturn(Mono.just(true));
+        when(lookupCommand.getHelp()).thenReturn(FormattedString.literal("test hello"));
+        when(lookupCommand.doAction(any())).thenReturn(Mono.empty());
     }
 
     @Test
@@ -45,7 +61,7 @@ class CommandListActionTest extends BaseFracktailTest {
 
     @Test
     public void returnsListWithAllNamesWhenRun() {
-        when(command.getNames()).thenReturn(SetUtils.hashSet("test", "example"));
+        when(lookupCommand.getNames()).thenReturn(SetUtils.hashSet("test", "example"));
 
         PublisherProbe<Void> probe = PublisherProbe.empty();
         when(context.respond(eq("Commands are: example, test"))).thenReturn(probe.mono());
@@ -71,7 +87,7 @@ class CommandListActionTest extends BaseFracktailTest {
 
     @Test
     public void returnsEmptyListWhenAllCommandsBlocked() {
-        when(command.matches(any())).thenReturn(Mono.just(false));
+        when(lookupCommand.matches(any())).thenReturn(Mono.just(false));
 
         PublisherProbe<Void> probe = PublisherProbe.empty();
         when(context.respond(eq("No commands are available."))).thenReturn(probe.mono());
@@ -84,7 +100,7 @@ class CommandListActionTest extends BaseFracktailTest {
 
     @Test
     public void returnsListWithOneNameWhenOneBlocked() {
-        when(commandList.getCommands()).thenReturn(Arrays.asList(command, lockedCommand));
+        when(commandList.getCommands()).thenReturn(Arrays.asList(lookupCommand, lockedCommand));
 
         PublisherProbe<Void> probe = PublisherProbe.empty();
         when(context.respond(eq("Commands are: test"))).thenReturn(probe.mono());

@@ -9,12 +9,12 @@ import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -47,13 +47,14 @@ public abstract class BaseFracktailTest {
     protected ScheduledEvents scheduledEvents;
 
     @Mock
-    protected Command command;
-
-    @Mock
     protected CommandAction commandAction;
 
-    @Mock
-    protected ScheduledEvent scheduledEvent;
+    @Spy
+    protected Command command = new Command.Builder("test")
+            .withNames("test")
+            .withHelp("test hello")
+            .withAction(commandAction)
+            .build();
 
     @Mock
     protected Parameters parameters;
@@ -71,11 +72,6 @@ public abstract class BaseFracktailTest {
     }
 
     private void mock() {
-        when(command.getAction()).thenReturn(commandAction);
-        when(command.matches(any())).thenReturn(Mono.just(true));
-        when(command.getNames()).thenReturn(Collections.singleton("test"));
-        when(command.getHelp()).thenReturn(FormattedString.literal("test hello"));
-
         when(context.getBot()).thenReturn(bot);
         when(context.getPlatform()).thenReturn(platform);
         when(context.getParameters()).thenReturn(parameters);
@@ -101,8 +97,8 @@ public abstract class BaseFracktailTest {
         when(commandList.getCommandById(anyString())).thenReturn(Optional.of(command));
         when(commandList.getCommandsById()).thenReturn(Collections.singletonMap("test", command));
 
-        when(scheduledEvents.getAll()).thenReturn(Collections.singletonList(scheduledEvent));
-        when(scheduledEvents.getById(anyString())).thenReturn(Optional.of(scheduledEvent));
-        when(scheduledEvents.size()).thenReturn(1);
+        when(scheduledEvents.getAll()).thenReturn(Collections.emptyList());
+        when(scheduledEvents.getById(anyString())).thenReturn(Optional.empty());
+        when(scheduledEvents.size()).thenReturn(0);
     }
 }

@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class TestUtils {
+    public static String any = "";
+    public static void any() {}
+
+
     public static Method getMethod(Class<?> clazz, String methodName) {
         return Arrays.stream(clazz.getMethods())
                 .filter(m -> m.getName().equals(methodName))
@@ -20,11 +24,19 @@ public class TestUtils {
                 .orElseThrow(NoSuchElementException::new);
     }
 
+    public static Method getAnyMethod() {
+        return getMethod(TestUtils.class, "any");
+    }
+
     public static Field getField(Class<?> clazz, String fieldName) {
         return Arrays.stream(clazz.getFields())
                 .filter(m -> m.getName().equals(fieldName))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public static Field getAnyField() {
+        return getField(TestUtils.class, "any");
     }
 
     public static Parameter getParameter(Class<?> clazz, String name, String paramName) {
