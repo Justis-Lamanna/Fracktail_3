@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.discord.util;
 
+import discord4j.common.util.Snowflake;
+
 /**
  * Utility class for formatting text
  */
@@ -13,6 +15,15 @@ public class FormatUtils {
     private static final String MARKDOWN_QUOTE_BLOCK = "> ";
     private static final String MARKDOWN_MULTILINE_QUOTE_BLOCK = ">>> ";
     private static final String MARKDOWN_SPOILER = "||";
+
+    private static final String AT_USER = "<@";
+    private static final String AT_ROLE = "<@&";
+    private static final String END_AT = ">";
+
+    private static final String EMOTE_PREFIX = "<:";
+    private static final String ANIMATED_EMOTE_PREFIX = "<a:";
+    private static final String EMOTE_SEPARATOR = ":";
+    private static final String EMOTE_END = ">";
 
     private FormatUtils() {
     }
@@ -142,5 +153,44 @@ public class FormatUtils {
      */
     public static String spoiler(String text) {
         return MARKDOWN_SPOILER + text + MARKDOWN_SPOILER;
+    }
+
+    /**
+     * Ping a user
+     * @param user The ID of the user
+     * @return A string representing a ping
+     */
+    public static String mentionUser(Snowflake user) {
+        return AT_USER + user.asString() + END_AT;
+    }
+
+    /**
+     * Ping a role
+     * Note that this doesn't verify if the role can actually be pinged
+     * @param role The ID of the role
+     * @return A string representing a ping
+     */
+    public static String mentionRole(Snowflake role) {
+        return AT_ROLE + role.asString() + END_AT;
+    }
+
+    /**
+     * Display an non-animated emote
+     * @param name The emoji name
+     * @param id The emoji ID
+     * @return A string representing an emote
+     */
+    public static String emoji(String name, Snowflake id) {
+        return EMOTE_PREFIX + name + EMOTE_SEPARATOR + id.asString() + EMOTE_END;
+    }
+
+    /**
+     * Display an animated emote
+     * @param name The emoji name
+     * @param id The emoji ID
+     * @return A string representing an emote
+     */
+    public static String animatedEmoji(String name, Snowflake id) {
+        return ANIMATED_EMOTE_PREFIX + name + EMOTE_SEPARATOR + id.asString() + EMOTE_END;
     }
 }
