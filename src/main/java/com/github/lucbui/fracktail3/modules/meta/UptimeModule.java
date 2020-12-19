@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.spring.command.annotation.Command;
+import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.Cron;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.Schedule;
@@ -23,12 +24,6 @@ public class UptimeModule {
 
     private Instant startTime;
 
-    @Schedule
-    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
-    public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
-        return platform.message(BOT_TIME, FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!");
-    }
-
     @PostConstruct
     private void setStartTime() {
         startTime = Instant.now();
@@ -39,4 +34,14 @@ public class UptimeModule {
         long elapsed = Duration.between(startTime, Instant.now()).toMillis();
         return "I have been alive for " + DurationFormatUtils.formatDurationWords(elapsed, true, false) + ".";
     }
+
+    @Schedule
+    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
+    public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
+        return platform.message(BOT_TIME, FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!");
+    }
+
+    @Command
+    @Usage("Evaluate an arbitrary math expression")
+    public String math = "The answer is 3.";
 }
