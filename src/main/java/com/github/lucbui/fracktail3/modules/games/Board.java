@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.modules.games;
 
+import com.github.lucbui.fracktail3.modules.games.exceptions.InvalidPositionException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.MultiValuedMap;
