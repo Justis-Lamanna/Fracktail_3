@@ -20,7 +20,7 @@ public class Config {
             .withConfiguration(new DiscordConfigurationBuilder(token)
             .withPrefix("!")
             .withOwner(248612704019808258L)
-            .withPresence(Presence.doNotDisturb(Activity.playing("Beta v3~!")))
+            .withPresence(Presence.doNotDisturb(Activity.streaming("Watch Milo!", "https://twitch.tv/milo_marten")))
             .withHandlers(new DiscordEventHookStoreBuilder2()
                     //.withHook(new DiscordEventHook<>("rer", new RerHook()))
             ))
