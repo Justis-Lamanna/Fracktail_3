@@ -1,5 +1,13 @@
 package com.github.lucbui.fracktail3.modules.games;
 
-public interface Action<T, B extends Board<T>> {
-    void performAction(Game<T, B> previousState);
+/**
+ * An action that can be performed for this game
+ * @param <GF> The game field
+ */
+public interface Action<GF> {
+    /**
+     * Perform the action on a game
+     * @param gameState The current state of the game
+     */
+    void performAction(Game<GF> gameState);
 }

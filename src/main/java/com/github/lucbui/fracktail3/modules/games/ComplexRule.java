@@ -5,16 +5,21 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A complex rule, which contains a base rule, and exceptions to the rule
+ * If the base rule fails, and one of the exceptions pass, then this rule passes. Otherwise, it fails
+ * @param <GF> The game field
+ */
 @Data
-public class ComplexRule<T, B extends Board<T>> implements Rule<T, B> {
-    public final Rule<T, B> baseRule;
-    public final List<Rule<T, B>> exceptions = new ArrayList<>();
+public class ComplexRule<GF> implements Rule<GF> {
+    private final Rule<GF> baseRule;
+    private final List<Rule<GF>> exceptions = new ArrayList<>();
 
     /**
      * Add an exception to this rule
      * @param exception The exception to add
      */
-    public void addException(Rule<T, B> exception) {
+    public void addException(Rule<GF> exception) {
         this.exceptions.add(exception);
     }
 
@@ -23,12 +28,12 @@ public class ComplexRule<T, B extends Board<T>> implements Rule<T, B> {
      * @param exception The exception to remove
      * @return True, if the exception was removed
      */
-    public boolean removeException(Rule<T, B> exception) {
+    public boolean removeException(Rule<GF> exception) {
         return this.exceptions.remove(exception);
     }
 
     @Override
-    public ActionLegality isLegalMove(Action<T, B> action, B board) {
+    public ActionLegality isLegalMove(Action<GF> action, GF board) {
         ActionLegality baseMoveLegality = baseRule.isLegalMove(action, board);
         if(baseMoveLegality.isLegal()) {
             return baseMoveLegality;
