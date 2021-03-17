@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.modules.games;
 
 import com.github.lucbui.fracktail3.modules.games.exceptions.InvalidPositionException;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -14,6 +15,7 @@ import java.util.function.Predicate;
  * In addition to the board, pieces that have been removed from play (such as by capture) are maintained.
  * @param <T> The type of pieces on the board
  */
+@EqualsAndHashCode
 public abstract class Board<T> {
     protected MultiValuedMap<Position, T> board;
     protected List<T> removals;

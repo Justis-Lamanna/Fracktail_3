@@ -15,6 +15,10 @@ public class ActionLegality {
         return new ActionLegality(reason);
     }
 
+    public static ActionLegality test(boolean legality, String reason) {
+        return legality ? legal() : illegal(reason);
+    }
+
     public boolean isLegal() {
         return failureReason == null;
     }
