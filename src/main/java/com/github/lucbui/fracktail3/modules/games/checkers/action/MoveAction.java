@@ -23,7 +23,7 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction {
                 .ifPresent(start -> {
                     field.movePiece(piece, start, position);
                     //Jump the middle piece
-                    Position check = start.interpolate(position, 0.5);
+                    Position check = start.middle(position);
                     field.removePieces(check);
                 });
     }

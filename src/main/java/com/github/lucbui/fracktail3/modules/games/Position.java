@@ -14,16 +14,32 @@ public class Position {
         return Math.abs(other.row - row) == Math.abs(other.col - col);
     }
 
-    public boolean isOrthogonal(Position other) {
+    public boolean isOrthogonalTo(Position other) {
         return row == other.row || col == other.col;
     }
 
-    public boolean isAdjacent(Position other) {
-        return isDistance(other, 1);
+    public boolean isAdjacentTo(Position other) {
+        return isDistanceFrom(other, 1);
     }
 
-    public boolean isDistance(Position other, int distance) {
+    public boolean isDistanceFrom(Position other, int distance) {
         return Math.abs(other.row - row) == distance || Math.abs(other.col - col) == distance;
+    }
+
+    public boolean isLeftOf(Position other) {
+        return this.col < other.col;
+    }
+
+    public boolean isRightOf(Position other) {
+        return this.col > other.col;
+    }
+
+    public boolean isAbove(Position other) {
+        return this.row < other.row;
+    }
+
+    public boolean isBelow(Position other) {
+        return this.row > other.row;
     }
 
     public Position interpolate(Position other, int independentCol) {
@@ -31,8 +47,8 @@ public class Position {
         return new Position(dependentRow, independentCol);
     }
 
-    public Position interpolate(Position other, double weight) {
-        int calculatedIndCol = (int) (((weight * other.col) + ((1.0 - weight) * col)) / 1.0);
+    public Position middle(Position other) {
+        int calculatedIndCol = (other.col + col) / 2;
         return interpolate(other, calculatedIndCol);
     }
 }

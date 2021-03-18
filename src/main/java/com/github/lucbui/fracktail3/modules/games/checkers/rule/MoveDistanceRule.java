@@ -20,10 +20,10 @@ public class MoveDistanceRule implements Rule<Checkerboard> {
                 if(!s.isDiagonal(ma.getPosition())) {
                     return ActionLegality.illegal("Can only move diagonally");
                 }
-                if(s.isDistance(ma.getPosition(), 1)) {
+                if(s.isDistanceFrom(ma.getPosition(), 1)) {
                     return ActionLegality.legal();
-                } else if(s.isDistance(ma.getPosition(), 2)) {
-                    Position between = s.interpolate(ma.getPosition(), 0.5);
+                } else if(s.isDistanceFrom(ma.getPosition(), 2)) {
+                    Position between = s.middle(ma.getPosition());
                     return ActionLegality.test(!board.getPieces(between).isEmpty(), "Can only jump over pieces");
                 } else {
                     return ActionLegality.illegal("Can only move one or two spaces");

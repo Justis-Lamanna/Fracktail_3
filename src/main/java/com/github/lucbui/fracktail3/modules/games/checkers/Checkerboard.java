@@ -37,4 +37,8 @@ public class Checkerboard extends Board<Piece> implements HasTurns {
     public void advanceTurn() {
         currentPlayer = (currentPlayer + 1) % 2;
     }
+
+    public Color getCurrentPlayerColor() {
+        return getCurrentPlayer() == 0 ? Color.RED : Color.BLACK;
+    }
 }
