@@ -1,7 +1,10 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
+import com.github.lucbui.fracktail3.modules.games.ActionLimitRule;
 import com.github.lucbui.fracktail3.modules.games.BasicGame;
 import com.github.lucbui.fracktail3.modules.games.Rule;
+import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
+import com.github.lucbui.fracktail3.modules.games.checkers.action.PassAction;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.CorrectPieceRule;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.MoveDirectionRule;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.MoveDistanceRule;
@@ -12,6 +15,7 @@ import java.util.List;
 
 public class Checkers extends BasicGame<Checkerboard> {
     private static final List<Rule<Checkerboard>> RULES = Arrays.asList(
+            new ActionLimitRule<>(MoveAction.class, PassAction.class),
             new TurnOrderRule(),
             new CorrectPieceRule(),
             new MoveDistanceRule(),
