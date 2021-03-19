@@ -25,6 +25,11 @@ public class Checkerboard extends Board<Piece> implements HasTurns {
         this.height = dimension;
     }
 
+    public int getTopRow() { return 0; }
+    public int getBottomRow() { return this.height - 1; }
+    public int getLeftColumn() { return 0; }
+    public int getRightColumn() { return this.width - 1; }
+
     @Override
     public boolean isValidPosition(Piece piece, Position position) {
         return position.getRow() >= 0 &&

@@ -6,6 +6,7 @@ import com.github.lucbui.fracktail3.modules.games.Position;
 import com.github.lucbui.fracktail3.modules.games.Rule;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
+import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
 import com.github.lucbui.fracktail3.modules.games.checkers.Type;
 import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 
@@ -14,11 +15,12 @@ public class MoveDirectionRule implements Rule<Checkerboard> {
     public ActionLegality isLegalMove(Action<Checkerboard> action, Checkerboard board) {
         if(action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
-            if(ma.getPiece().getType() == Type.MAN) {
+            Piece piece = ma.getPiece();
+            if(piece.getType() == Type.MAN) {
                 Position end = ma.getPosition();
-                return board.getPositionOfPiece(ma.getPiece())
+                return board.getPositionOfPiece(piece)
                         .map(start -> {
-                            if(ma.getPiece().getColor() == Color.RED) {
+                            if(piece.getColor() == Color.RED) {
                                 return ActionLegality.test(end.isBelow(start), "Can only move red men down");
                             } else {
                                 return ActionLegality.test(end.isAbove(start), "Can only move black men up");

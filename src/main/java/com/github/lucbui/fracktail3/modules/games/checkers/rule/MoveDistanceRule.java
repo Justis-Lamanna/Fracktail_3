@@ -19,8 +19,7 @@ public class MoveDistanceRule implements Rule<Checkerboard> {
                 Position s = start.get();
                 if(!s.isDiagonal(ma.getPosition())) {
                     return ActionLegality.illegal("Can only move diagonally");
-                }
-                if(s.isDistanceFrom(ma.getPosition(), 1)) {
+                } else if(s.isDistanceFrom(ma.getPosition(), 1)) {
                     return ActionLegality.legal();
                 } else if(s.isDistanceFrom(ma.getPosition(), 2)) {
                     Position between = s.middle(ma.getPosition());
@@ -28,6 +27,8 @@ public class MoveDistanceRule implements Rule<Checkerboard> {
                 } else {
                     return ActionLegality.illegal("Can only move one or two spaces");
                 }
+            } else {
+                return ActionLegality.illegal("Piece does not exist");
             }
         }
         return ActionLegality.legal();

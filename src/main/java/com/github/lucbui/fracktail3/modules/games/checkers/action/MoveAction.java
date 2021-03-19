@@ -42,10 +42,10 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction {
     protected boolean isPromote(Checkerboard field) {
         if(piece.getColor() == Color.RED) {
             //Promotion at the bottom of the board
-            return position.getRow() == field.getHeight() - 1;
+            return position.getRow() == field.getBottomRow();
         } else {
             //Promotion at the top of the board
-            return position.getRow() == 0;
+            return position.getRow() == field.getTopRow();
         }
     }
 }
