@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.modules.games;
 
 public class ActionLegality {
+    private static final ActionLegality LEGAL = new ActionLegality(null);
+
     private final String failureReason;
 
     private ActionLegality(String failureReason) {
@@ -8,7 +10,7 @@ public class ActionLegality {
     }
 
     public static ActionLegality legal() {
-        return new ActionLegality(null);
+        return LEGAL;
     }
 
     public static ActionLegality illegal(String reason) {
