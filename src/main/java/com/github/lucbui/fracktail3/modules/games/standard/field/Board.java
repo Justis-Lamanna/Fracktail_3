@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.modules.games.exceptions.InvalidPositionExce
 import lombok.EqualsAndHashCode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapIterator;
+import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
@@ -174,6 +175,22 @@ public abstract class Board<T> {
      */
     public List<T> getGraveyard() {
         return Collections.unmodifiableList(removals);
+    }
+
+    /**
+     * Get all pieces on the board
+     * @return The pieces on the board
+     */
+    public Collection<T> getPieces() {
+        return Collections.unmodifiableCollection(board.values());
+    }
+
+    /**
+     * Get all occupied positions
+     * @return The occupied positions
+     */
+    public MultiSet<Position> getOccupiedPositions() {
+        return board.keys();
     }
 
     public abstract boolean isValidPosition(T piece, Position position);

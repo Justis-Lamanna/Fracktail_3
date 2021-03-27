@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A specific type of board, made of a grid of squares
@@ -58,5 +60,14 @@ public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Int
     @Override
     public Collection<Integer> getAllPlayers() {
         return Arrays.asList(0, 1);
+    }
+
+    /**
+     * Get the current standings, if there is one
+     * @return A map of how many pieces each color has in play
+     */
+    public Map<Color, Long> getStandings() {
+        return getPieces().stream()
+                .collect(Collectors.groupingBy(Piece::getColor, Collectors.counting()));
     }
 }
