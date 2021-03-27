@@ -1,5 +1,8 @@
-package com.github.lucbui.fracktail3.modules.games;
+package com.github.lucbui.fracktail3.modules.games.standard.rule;
 
+import com.github.lucbui.fracktail3.modules.games.Action;
+import com.github.lucbui.fracktail3.modules.games.ActionLegality;
+import com.github.lucbui.fracktail3.modules.games.Rule;
 import lombok.Data;
 
 import java.util.ArrayList;

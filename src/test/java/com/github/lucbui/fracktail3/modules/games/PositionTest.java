@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.modules.games;
 
+import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

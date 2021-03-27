@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
-import com.github.lucbui.fracktail3.modules.games.Board;
-import com.github.lucbui.fracktail3.modules.games.Position;
+import com.github.lucbui.fracktail3.modules.games.standard.field.Board;
+import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import com.github.lucbui.fracktail3.modules.games.standard.field.TurnBasedGameField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

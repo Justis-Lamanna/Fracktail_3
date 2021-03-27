@@ -1,11 +1,12 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
 import com.github.lucbui.fracktail3.modules.games.BasicGame;
-import com.github.lucbui.fracktail3.modules.games.Position;
 import com.github.lucbui.fracktail3.modules.games.Rule;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.CorrectPieceRule;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.MoveDirectionRule;
 import com.github.lucbui.fracktail3.modules.games.checkers.rule.MoveDistanceRule;
+import com.github.lucbui.fracktail3.modules.games.checkers.rule.MoveToEmptySpaceRule;
+import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import com.github.lucbui.fracktail3.modules.games.standard.rule.TurnOrderRule;
 
 import java.util.Arrays;
@@ -17,7 +18,8 @@ public class Checkers extends BasicGame<Checkerboard> {
             new TurnOrderRule<>(),
             new CorrectPieceRule(),
             new MoveDistanceRule(),
-            new MoveDirectionRule()
+            new MoveDirectionRule(),
+            new MoveToEmptySpaceRule()
     );
 
     public Checkers() {

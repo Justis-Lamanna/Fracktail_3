@@ -2,11 +2,11 @@ package com.github.lucbui.fracktail3.modules.games.checkers.action;
 
 import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.Game;
-import com.github.lucbui.fracktail3.modules.games.Position;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
 import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
+import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import lombok.Data;
 
 /**

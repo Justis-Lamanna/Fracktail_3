@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.modules.games;
+package com.github.lucbui.fracktail3.modules.games.standard.field;
 
 import com.github.lucbui.fracktail3.modules.games.exceptions.InvalidPositionException;
 import lombok.EqualsAndHashCode;

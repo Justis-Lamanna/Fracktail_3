@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.modules.games;
 
+import com.github.lucbui.fracktail3.modules.games.standard.rule.ComplexRule;
+
 /**
  * Encapsulates a legal board move
  * @param <GF> The Game Field being applied
