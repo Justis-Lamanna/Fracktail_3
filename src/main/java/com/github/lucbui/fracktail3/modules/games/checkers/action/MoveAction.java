@@ -6,13 +6,14 @@ import com.github.lucbui.fracktail3.modules.games.Position;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
 import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
+import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import lombok.Data;
 
 /**
  * An action which moves a checkers piece to one or more positions
  */
 @Data
-public class MoveAction implements Action<Checkerboard>, InTurnAction {
+public class MoveAction implements Action<Checkerboard>, InTurnAction<Integer, Checkerboard> {
     private final int playerNum;
     private final Piece piece;
     private final Position position;
@@ -47,5 +48,10 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction {
             //Promotion at the top of the board
             return position.getRow() == field.getTopRow();
         }
+    }
+
+    @Override
+    public Integer getPlayer() {
+        return playerNum;
     }
 }

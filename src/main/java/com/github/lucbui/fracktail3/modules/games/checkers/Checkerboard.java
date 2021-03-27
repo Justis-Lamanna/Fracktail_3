@@ -1,17 +1,20 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
 import com.github.lucbui.fracktail3.modules.games.Board;
-import com.github.lucbui.fracktail3.modules.games.HasTurns;
 import com.github.lucbui.fracktail3.modules.games.Position;
+import com.github.lucbui.fracktail3.modules.games.standard.field.TurnBasedGameField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * A specific type of board, made of a grid of squares
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Checkerboard extends Board<Piece> implements HasTurns {
+public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Integer> {
     private final int width;
     private final int height;
     private int currentPlayer = 0;
@@ -43,7 +46,17 @@ public class Checkerboard extends Board<Piece> implements HasTurns {
         currentPlayer = (currentPlayer + 1) % 2;
     }
 
+    @Override
+    public void advanceTurnTo(Integer playerIdx) {
+        currentPlayer = playerIdx;
+    }
+
     public Color getCurrentPlayerColor() {
         return getCurrentPlayer() == 0 ? Color.RED : Color.BLACK;
+    }
+
+    @Override
+    public Collection<Integer> getAllPlayers() {
+        return Arrays.asList(0, 1);
     }
 }
