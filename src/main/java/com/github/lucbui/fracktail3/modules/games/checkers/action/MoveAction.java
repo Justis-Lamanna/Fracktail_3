@@ -9,6 +9,8 @@ import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * An action which moves a checkers piece to one or more positions
  */
@@ -26,8 +28,8 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction<Color, Che
                     field.movePiece(piece, start, position);
                     //Jump the middle piece
                     if(isJump(start)) {
-                        Position check = start.middle(position);
-                        field.removePieces(check);
+                        List<Position> check = start.between(position);
+                        check.forEach(field::removePieces);
                     }
                     //Promote
                     if(isPromote(field)) {
@@ -41,12 +43,6 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction<Color, Che
     }
 
     protected boolean isPromote(Checkerboard field) {
-        if(piece.getColor() == Color.RED) {
-            //Promotion at the bottom of the board
-            return position.getRow() == field.getBottomRow();
-        } else {
-            //Promotion at the top of the board
-            return position.getRow() == field.getTopRow();
-        }
+        return piece.getColor().getPromoteRow().apply(field) == position.getRow();
     }
 }

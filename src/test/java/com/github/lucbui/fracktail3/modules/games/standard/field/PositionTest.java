@@ -2,6 +2,9 @@ package com.github.lucbui.fracktail3.modules.games.standard.field;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PositionTest {
@@ -141,5 +144,13 @@ class PositionTest {
         Position middle = one.middle(two);
         assertEquals(5, middle.getRow());
         assertEquals(5, middle.getCol());
+    }
+
+    @Test
+    public void interpolate_between() {
+        Position one = new Position(4, 4);
+        Position two = new Position(6, 6);
+        List<Position> range = one.between(two);
+        assertEquals(Arrays.asList(one, new Position(5, 5), two), range);
     }
 }

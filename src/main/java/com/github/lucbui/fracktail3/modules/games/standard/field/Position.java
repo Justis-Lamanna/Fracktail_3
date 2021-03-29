@@ -2,6 +2,10 @@ package com.github.lucbui.fracktail3.modules.games.standard.field;
 
 import lombok.Data;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 /**
  * The position on a board
  */
@@ -50,5 +54,12 @@ public class Position {
     public Position middle(Position other) {
         int calculatedIndCol = (other.col + col) / 2;
         return interpolate(other, calculatedIndCol);
+    }
+
+    public List<Position> between(Position other) {
+        return IntStream.range(col, other.col)
+                .skip(1)
+                .mapToObj(indCol -> interpolate(other, indCol))
+                .collect(Collectors.toList());
     }
 }
