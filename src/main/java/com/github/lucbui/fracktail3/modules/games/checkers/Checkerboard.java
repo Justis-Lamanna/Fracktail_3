@@ -5,8 +5,8 @@ import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import com.github.lucbui.fracktail3.modules.games.standard.field.TurnBasedGameField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.EnumUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Integer> {
+public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Color> {
     private final int width;
     private final int height;
     private int currentPlayer = 0;
@@ -49,17 +49,17 @@ public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Int
     }
 
     @Override
-    public void advanceTurnTo(Integer playerIdx) {
-        currentPlayer = playerIdx;
+    public void advanceTurnTo(Color color) {
+        currentPlayer = color.getTurnOrder();
     }
 
-    public Color getCurrentPlayerColor() {
-        return getCurrentPlayer() == 0 ? Color.RED : Color.BLACK;
+    public Color getCurrentPlayer() {
+        return Color.getByTurnOrder(currentPlayer);
     }
 
     @Override
-    public Collection<Integer> getAllPlayers() {
-        return Arrays.asList(0, 1);
+    public Collection<Color> getAllPlayers() {
+        return EnumUtils.getEnumList(Color.class);
     }
 
     /**

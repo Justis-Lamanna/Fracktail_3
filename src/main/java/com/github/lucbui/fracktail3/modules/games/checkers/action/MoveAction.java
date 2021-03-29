@@ -13,8 +13,8 @@ import lombok.Data;
  * An action which moves a checkers piece to one or more positions
  */
 @Data
-public class MoveAction implements Action<Checkerboard>, InTurnAction<Integer, Checkerboard> {
-    private final int playerNum;
+public class MoveAction implements Action<Checkerboard>, InTurnAction<Color, Checkerboard> {
+    private final Color player;
     private final Piece piece;
     private final Position position;
 
@@ -48,10 +48,5 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction<Integer, C
             //Promotion at the top of the board
             return position.getRow() == field.getTopRow();
         }
-    }
-
-    @Override
-    public Integer getPlayer() {
-        return playerNum;
     }
 }

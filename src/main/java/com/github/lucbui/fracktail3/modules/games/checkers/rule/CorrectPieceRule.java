@@ -11,7 +11,7 @@ public class CorrectPieceRule implements Rule<Checkerboard> {
     public ActionLegality isLegalMove(Action<Checkerboard> action, Checkerboard board) {
         if(action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
-            ActionLegality.test(ma.getPiece().getColor() == board.getCurrentPlayerColor(), "Can only move pieces of your color");
+            ActionLegality.test(ma.getPiece().getColor() == board.getCurrentPlayer(), "Can only move pieces of your color");
         }
         return ActionLegality.legal();
     }
