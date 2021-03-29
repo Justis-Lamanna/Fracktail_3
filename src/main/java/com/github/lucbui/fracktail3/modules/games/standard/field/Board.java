@@ -156,9 +156,9 @@ public abstract class Board<T> {
      * @param piecePredicate The predicate to determine piece eligibility
      * @return The positions of all pieces that matches the predicate
      */
-    public List<Position> getPositionsOfPieces(Predicate<T> piecePredicate) {
+    public Set<Position> getPositionsOfPieces(Predicate<T> piecePredicate) {
         MapIterator<Position, T> iter = board.mapIterator();
-        List<Position> foundPositions = new ArrayList<>();
+        Set<Position> foundPositions = new HashSet<>();
         while(iter.hasNext()) {
             Position pos = iter.next();
             T pieceAtPos = iter.getValue();

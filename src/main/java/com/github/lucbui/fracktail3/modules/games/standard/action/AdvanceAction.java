@@ -6,10 +6,11 @@ import lombok.Data;
 
 @Data
 public class AdvanceAction<PLAYER, GF extends TurnBasedGameField<PLAYER>> implements InTurnAction<PLAYER, GF> {
-    private PLAYER player;
+    private final PLAYER player;
 
     @Override
     public void performAction(Game<GF> gameState) {
         gameState.getGameField().advanceTurn();
     }
 }
+
