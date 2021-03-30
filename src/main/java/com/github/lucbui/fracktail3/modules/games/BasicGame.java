@@ -20,7 +20,7 @@ public class BasicGame<GF> implements Game<GF> {
     public void performAction(Action<GF> action) {
         ActionLegality legality = canPerformAction(action);
         if(legality.isLegal()) {
-            action.performAction(this);
+            action.performAction(gameField);
         } else {
             throw new IllegalActionException(legality);
         }

@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.modules.games.checkers.action;
 
 import com.github.lucbui.fracktail3.modules.games.Action;
-import com.github.lucbui.fracktail3.modules.games.Game;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
 import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
@@ -21,8 +20,7 @@ public class MoveAction implements Action<Checkerboard>, InTurnAction<Color, Che
     private final Position position;
 
     @Override
-    public void performAction(Game<Checkerboard> gameState) {
-        Checkerboard field = gameState.getGameField();
+    public void performAction(Checkerboard field) {
         field.getPositionOfPiece(piece)
                 .ifPresent(start -> {
                     field.movePiece(piece, start, position);

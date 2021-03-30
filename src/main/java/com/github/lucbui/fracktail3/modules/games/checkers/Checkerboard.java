@@ -8,15 +8,18 @@ import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.EnumUtils;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A specific type of board, made of a grid of squares
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Color> {
+public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Color>, Iterable<Piece> {
     private final int width;
     private final int height;
     private int currentPlayer = 0;
@@ -69,5 +72,48 @@ public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Col
     public Map<Color, Long> getStandings() {
         return getPieces().stream()
                 .collect(Collectors.groupingBy(Piece::getColor, Collectors.counting()));
+    }
+
+    public String print(String empty, Function<Piece, String> nonEmpty) {
+        return IntStream.rangeClosed(0, this.height)
+                .mapToObj(row -> IntStream.rangeClosed(0, this.width)
+                        .mapToObj(col -> {
+                            Collection<Piece> pieces = getPieces(new Position(row, col));
+                            if(pieces.isEmpty()) {
+                                return empty;
+                            } else {
+                                return nonEmpty.apply(pieces.iterator().next());
+                            }
+                        })
+                        .collect(Collectors.joining()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    public String print() {
+        return print("-", p -> p.getType() == Type.KING ? p.getColor().name().toUpperCase() : p.getColor().name().toLowerCase());
+    }
+
+    @Override
+    public Iterator<Piece> iterator() {
+        return new Iterator<Piece>() {
+            int row;
+            int col;
+
+            @Override
+            public boolean hasNext() {
+                return row != getBottomRow() && col != getRightColumn();
+            }
+
+            @Override
+            public Piece next() {
+                col++;
+                if(col == width) {
+                    col = 0;
+                    row++;
+                }
+                Collection<Piece> pieces = getPieces(new Position(row, col));
+                return pieces.size() == 0 ? null : pieces.iterator().next();
+            }
+        };
     }
 }

@@ -48,6 +48,20 @@ public abstract class Board<T> {
     }
 
     /**
+     * Get one pieces at a position
+     * @param position The position to get
+     * @return The piece at that position
+     */
+    public Optional<T> getPiece(Position position) {
+        Collection<T> pieces = getPieces(position);
+        if(pieces.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(CollectionUtils.extractSingleton(pieces));
+        }
+    }
+
+    /**
      * Add a piece to the board
      * @param piece The piece to add
      * @param position The position on the board to add it

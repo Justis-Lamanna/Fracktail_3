@@ -9,5 +9,5 @@ public interface Action<GF> {
      * Perform the action on a game
      * @param gameState The current state of the game
      */
-    void performAction(Game<GF> gameState);
+    void performAction(GF gameState);
 }
