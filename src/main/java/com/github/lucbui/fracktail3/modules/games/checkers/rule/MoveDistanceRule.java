@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
 import com.github.lucbui.fracktail3.modules.games.Rule;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
+import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
 import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 
@@ -23,7 +24,13 @@ public class MoveDistanceRule implements Rule<Checkerboard> {
                     return ActionLegality.legal();
                 } else if(s.isDistanceFrom(ma.getPosition(), 2)) {
                     Position between = s.middle(ma.getPosition());
-                    return ActionLegality.test(!board.getPieces(between).isEmpty(), "Can only jump over pieces");
+                    Optional<Piece> betweenPiece = board.getPiece(between);
+                    if(betweenPiece.isPresent()) {
+                        return ActionLegality.test(betweenPiece.get().getColor() != ma.getPlayer(),
+                                "Can only jump over opponent pieces");
+                    } else {
+                        return ActionLegality.illegal("Can only jump over pieces");
+                    }
                 } else {
                     return ActionLegality.illegal("Can only move one or two spaces");
                 }
