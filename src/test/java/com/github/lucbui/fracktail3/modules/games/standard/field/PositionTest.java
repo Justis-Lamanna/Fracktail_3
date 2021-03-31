@@ -151,6 +151,6 @@ class PositionTest {
         Position one = new Position(4, 4);
         Position two = new Position(6, 6);
         List<Position> range = one.between(two);
-        assertEquals(Arrays.asList(one, new Position(5, 5), two), range);
+        assertEquals(Arrays.asList(new Position(5, 5)), range);
     }
 }
