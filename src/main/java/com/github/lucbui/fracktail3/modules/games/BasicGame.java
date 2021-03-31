@@ -1,15 +1,22 @@
 package com.github.lucbui.fracktail3.modules.games;
 
 import com.github.lucbui.fracktail3.modules.games.exceptions.IllegalActionException;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 
 @Data
 public class BasicGame<GF> implements Game<GF> {
     private final List<Rule<GF>> rulesList;
     private final GF gameField;
+
+    @Getter(AccessLevel.PROTECTED)
+    private final Queue<Action<GF>> actions = new LinkedList<>();
 
     /**
      * Perform a potentially-illegal action
@@ -20,6 +27,7 @@ public class BasicGame<GF> implements Game<GF> {
     public void performAction(Action<GF> action) {
         ActionLegality legality = canPerformAction(action);
         if(legality.isLegal()) {
+            getActions().add(action);
             action.performAction(gameField);
         } else {
             throw new IllegalActionException(legality);

@@ -26,13 +26,4 @@ public interface Game<GF> {
      * @return The game field
      */
     GF getGameField();
-
-    /**
-     * Output a message of some sort
-     * By default, prints to console.
-     * @param message The message to print
-     */
-    default void outputMessage(String message) {
-        System.out.println(message);
-    }
 }
