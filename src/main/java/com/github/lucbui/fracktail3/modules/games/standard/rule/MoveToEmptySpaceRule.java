@@ -10,7 +10,7 @@ public class MoveToEmptySpaceRule<T extends Board<?>> implements Rule<T> {
     @Override
     public ActionLegality isLegalMove(Action<T> action, T board) {
         if(action instanceof IMoveAction) {
-            IMoveAction<?> ma = (IMoveAction<?>) action;
+            IMoveAction<?, ?> ma = (IMoveAction<?, ?>) action;
             return ActionLegality.test(board.getPieces(ma.getPosition()).isEmpty(), "Can only move to an empty spot");
         }
         return ActionLegality.legal();
