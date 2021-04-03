@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class MoveActionTest {
+class IMoveActionTest {
     @Test
     public void testStandardMoveAction() {
         Checkerboard board = new Checkerboard(8);

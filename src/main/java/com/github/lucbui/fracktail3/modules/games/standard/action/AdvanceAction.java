@@ -4,7 +4,7 @@ import com.github.lucbui.fracktail3.modules.games.standard.field.TurnBasedGameFi
 import lombok.Data;
 
 @Data
-public class AdvanceAction<PLAYER, GF extends TurnBasedGameField<PLAYER>> implements InTurnAction<PLAYER, GF> {
+public class AdvanceAction<PLAYER, GF extends TurnBasedGameField<PLAYER>> implements InTurnAction<GF, PLAYER> {
     private final PLAYER player;
 
     @Override

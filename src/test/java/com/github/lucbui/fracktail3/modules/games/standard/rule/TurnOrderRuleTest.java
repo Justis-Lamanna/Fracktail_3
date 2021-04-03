@@ -18,7 +18,7 @@ class TurnOrderRuleTest {
     private static final TurnOrderRule<TurnBasedGameField<Integer>> RULE = new TurnOrderRule<>();
 
     @Mock
-    private InTurnAction<Integer, TurnBasedGameField<Integer>> action;
+    private InTurnAction<TurnBasedGameField<Integer>, Integer> action;
 
     @Mock
     private TurnBasedGameField<Integer> gameField;

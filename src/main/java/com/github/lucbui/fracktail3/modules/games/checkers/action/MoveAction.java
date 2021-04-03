@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.modules.games.checkers.action;
 
-import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
 import com.github.lucbui.fracktail3.modules.games.checkers.Piece;
+import com.github.lucbui.fracktail3.modules.games.standard.action.IMoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import lombok.Data;
@@ -14,7 +14,9 @@ import java.util.List;
  * An action which moves a checkers piece to one or more positions
  */
 @Data
-public class MoveAction implements Action<Checkerboard>, InTurnAction<Color, Checkerboard> {
+public class MoveAction implements
+        InTurnAction<Checkerboard, Color>,
+        IMoveAction<Checkerboard, Piece> {
     private final Color player;
     private final Piece piece;
     private final Position position;

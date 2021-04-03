@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.modules.games.checkers.rule;
+package com.github.lucbui.fracktail3.modules.games.standard.rule;
 
 import com.github.lucbui.fracktail3.modules.games.checkers.Checkerboard;
 import com.github.lucbui.fracktail3.modules.games.checkers.Color;
