@@ -3,8 +3,6 @@ package com.github.lucbui.fracktail3.discord.platform;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
-import com.github.lucbui.fracktail3.discord.hook.DefaultDiscordOnEventHandler;
-import com.github.lucbui.fracktail3.discord.hook.DiscordOnEventHandler;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -13,7 +11,6 @@ import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
@@ -59,7 +56,6 @@ public class DiscordPlatform implements Platform {
         BotSpec botSpec = bot.getSpec();
 
         DiscordCommandHandler discordCommandHandler = new DefaultDiscordCommandHandler(botSpec.getCommandList());
-        DiscordOnEventHandler discordEventHandler = new DefaultDiscordOnEventHandler();
 
         DiscordClient discordClient =
                 DiscordClientBuilder.create(configuration.getToken()).build();
@@ -75,10 +71,6 @@ public class DiscordPlatform implements Platform {
 
         gateway.on(MessageCreateEvent.class)
                 .flatMap(msg -> discordCommandHandler.execute(bot, this, msg))
-                .subscribe();
-
-        gateway.on(Event.class)
-                .flatMap(evt -> discordEventHandler.execute(bot, this, evt))
                 .subscribe();
 
         return gateway.onDisconnect().thenReturn(true);

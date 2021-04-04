@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStoreBuilder2;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import discord4j.core.object.presence.Activity;
@@ -18,12 +17,9 @@ public class Config {
     public Platform discord(@Value("${token}") String token) {
         return new DiscordPlatform.Builder()
             .withConfiguration(new DiscordConfigurationBuilder(token)
-            .withPrefix("!")
-            .withOwner(248612704019808258L)
-            .withPresence(Presence.doNotDisturb(Activity.streaming("Watch Milo!", "https://twitch.tv/milo_marten")))
-            .withHandlers(new DiscordEventHookStoreBuilder2()
-                    //.withHook(new DiscordEventHook<>("rer", new RerHook()))
-            ))
+                .withPrefix("!")
+                .withOwner(248612704019808258L)
+                .withPresence(Presence.doNotDisturb(Activity.watching("you be such a cutie"))))
             .build();
     }
 }

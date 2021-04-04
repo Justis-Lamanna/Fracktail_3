@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore2;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import discord4j.common.util.Snowflake;
@@ -22,7 +21,6 @@ public class DiscordConfiguration implements Config, Localizable {
     private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
-    private final DiscordEventHookStore2 handlers;
 
     /**
      * Initialize a bot Configuration
@@ -34,13 +32,12 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(
             String token, String prefix, @Nullable Snowflake owner, String i18nPath,
-            StatusUpdate presence, DiscordEventHookStore2 handlers) {
+            StatusUpdate presence) {
         this.token = token;
         this.prefix = prefix;
         this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
-        this.handlers = handlers;
     }
 
     /**
@@ -50,7 +47,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence, new DiscordEventHookStore2());
+        this(token, prefix, null, null, presence);
     }
 
     /**
@@ -121,13 +118,5 @@ public class DiscordConfiguration implements Config, Localizable {
     @Override
     public boolean isLocalizationEnabled() {
         return i18nPath != null;
-    }
-
-    /**
-     * Get the handlers for this configuration
-     * @return The handlers used
-     */
-    public DiscordEventHookStore2 getHandlers() {
-        return handlers;
     }
 }

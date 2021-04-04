@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.discord.hook.DiscordEventHookStore2;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
@@ -16,7 +15,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
-    private DiscordEventHookStore2 handlers = new DiscordEventHookStore2();
 
     /**
      * Initialize builder with a token
@@ -72,26 +70,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
     }
 
     /**
-     * Add an event hook, to be used by the PlatformRunner
-     * @param handler The handler to use
-     * @return This builder.
-     */
-    public DiscordConfigurationBuilder withHandlers(DiscordEventHookStore2 handler) {
-        this.handlers = handler;
-        return this;
-    }
-
-    /**
-     * Add an event hook, to be used by the PlatformRunner
-     * @param handler The handler to use
-     * @return This builder.
-     */
-    public DiscordConfigurationBuilder withHandlers(IBuilder<DiscordEventHookStore2> handler) {
-        this.handlers = handler.build();
-        return this;
-    }
-
-    /**
      * Specify the path of a Resource Bundle.
      * If this path is absent, localization is disabled. If present, ResourceBundles can be retrieved from
      * the provided path on a locale-by-locale basis. These bundles can then be used in translation of a FormattedString
@@ -110,7 +88,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
                 ObjectUtils.defaultIfNull(prefix, ""),
                 owner,
                 i18nPath,
-                ObjectUtils.defaultIfNull(presence, Presence.online()),
-                handlers);
+                ObjectUtils.defaultIfNull(presence, Presence.online()));
     }
 }
