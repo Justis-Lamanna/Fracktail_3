@@ -11,6 +11,7 @@ import com.github.lucbui.fracktail3.modules.games.standard.rule.TurnOrderRule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 public class Checkers extends BasicGame<Checkerboard> {
@@ -38,5 +39,11 @@ public class Checkers extends BasicGame<Checkerboard> {
         for(int idx = offset; idx < board.getWidth(); idx += 2) {
             board.addPiece(new Piece(color), new Position(row, idx));
         }
+    }
+
+    @Override
+    public boolean isComplete() {
+        Map<Color, Long> standings = getGameField().getStandings();
+        return standings.get(Color.RED) == 0 || standings.get(Color.BLACK) == 0;
     }
 }

@@ -26,4 +26,10 @@ public interface Game<GF> {
      * @return The game field
      */
     GF getGameField();
+
+    /**
+     * Check if this game is complete
+     * @return True if the game is complete
+     */
+    boolean isComplete();
 }

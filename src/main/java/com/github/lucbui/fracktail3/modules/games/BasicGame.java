@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Queue;
 
 @Data
-public class BasicGame<GF> implements Game<GF> {
+public abstract class BasicGame<GF> implements Game<GF> {
     private final List<Rule<GF>> rulesList;
     private final GF gameField;
 
