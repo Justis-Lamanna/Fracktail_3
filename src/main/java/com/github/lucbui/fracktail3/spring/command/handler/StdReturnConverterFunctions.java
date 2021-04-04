@@ -56,7 +56,9 @@ public class StdReturnConverterFunctions {
     public static class Strings implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
         @Override
         public Mono<Void> apply(BaseContext<?> context, Object o) {
-            return o == null ? Mono.empty() : context.respond((String)o);
+            return o == null ?
+                    Mono.empty() :
+                    context.respond((String)o).then();
         }
     }
 
@@ -68,7 +70,12 @@ public class StdReturnConverterFunctions {
     public static class FStrings implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
         @Override
         public Mono<Void> apply(BaseContext<?> context, Object o) {
-            return o == null ? Mono.empty() : context.respond((FormattedString) o, Collections.emptyMap());
+            return o == null ?
+                    Mono.empty() :
+                    ((FormattedString)o).getFor(context, Collections.emptyMap())
+                        .zipWith(context.getTriggerPlace())
+                        .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
+                        .then();
         }
     }
 
@@ -80,7 +87,12 @@ public class StdReturnConverterFunctions {
     public static class BotResponses implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
         @Override
         public Mono<Void> apply(BaseContext<?> context, Object o) {
-            return o == null ? Mono.empty() : context.respond(((BotResponse)o).respondWith(), Collections.emptyMap());
+            return o == null ?
+                    Mono.empty() :
+                    ((BotResponse)o).respondWith().getFor(context, Collections.emptyMap())
+                            .zipWith(context.getTriggerPlace())
+                            .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
+                            .then();
         }
     }
 }

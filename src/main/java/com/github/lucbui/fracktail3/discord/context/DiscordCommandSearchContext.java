@@ -2,11 +2,9 @@ package com.github.lucbui.fracktail3.discord.context;
 
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
-import discord4j.common.util.Snowflake;
+import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.User;
-import discord4j.rest.util.AllowedMentions;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
@@ -61,55 +59,8 @@ public class DiscordCommandSearchContext extends DiscordBasePlatformContext<Mess
     }
 
     @Override
-    public Mono<Void> respond(String message) {
-        switch (responseType) {
-            case INLINE: return respondInline(message);
-            case DM: return respondDm(message);
-            default: return respondClassic(message);
-        }
-    }
-
-
-    /**
-     * Respond in the classic way (as just a plain message)
-     * @param message The message to respond with
-     * @return Asynchronous indication of completion
-     */
-    public Mono<Void> respondClassic(String message) {
-        return getPayload().getMessage().getChannel()
-                .flatMap(mc -> mc.createMessage(message))
-                .then();
-    }
-
-    /**
-     * Respond over DM
-     * @param message The message to respond with
-     * @return Asynchronous indication of completion
-     */
-    public Mono<Void> respondDm(String message) {
-        return Mono.justOrEmpty(getPayload().getMessage().getAuthor())
-                .flatMap(User::getPrivateChannel)
-                .flatMap(pc -> pc.createMessage(message))
-                .then();
-    }
-
-    /**
-     * Respond using Discord's inline-reply feature
-     * @param message The message to respond with
-     * @return Asynchronous indication of completion
-     */
-    public Mono<Void> respondInline(String message) {
-        Snowflake reference = getPayload().getMessage().getId();
-        return getPayload().getMessage().getChannel()
-                .flatMap(mc -> mc.createMessage(spec -> {
-                    spec.setMessageReference(reference);
-                    spec.setAllowedMentions(
-                            AllowedMentions.builder()
-                                    .repliedUser(false)
-                                    .build());
-                    spec.setContent(message);
-                }))
-                .then();
+    public Mono<Place> getTriggerPlace() {
+        return getPayload().getMessage().getChannel().map(DiscordPlace::new);
     }
 
     @Override

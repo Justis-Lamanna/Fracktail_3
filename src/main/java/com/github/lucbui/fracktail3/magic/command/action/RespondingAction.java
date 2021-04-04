@@ -30,6 +30,6 @@ public class RespondingAction implements PlatformBasicAction {
     @Override
     public Mono<Void> doAction(PlatformBaseContext<?> context) {
         return text.getFor(context)
-                .flatMap(context::respond);
+                .flatMap(context::respond).then();
     }
 }

@@ -1,10 +1,12 @@
 package com.github.lucbui.fracktail3.discord.hook.context.message;
 
 import com.github.lucbui.fracktail3.discord.context.DiscordBasePlatformContext;
-import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
+import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
+import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
@@ -19,8 +21,7 @@ public class MessageUpdateContext extends DiscordBasePlatformContext<MessageUpda
     }
 
     @Override
-    public Mono<Void> respond(String message) {
-        return getPlatform()
-                .message(DiscordChannelset.forChannel(getPayload().getChannelId()), message);
+    public Mono<Place> getTriggerPlace() {
+        return getPayload().getMessage().flatMap(Message::getChannel).map(DiscordPlace::new);
     }
 }

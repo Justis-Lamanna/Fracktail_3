@@ -5,7 +5,6 @@ import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
@@ -21,7 +20,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public abstract class BaseFracktailTest {
@@ -79,8 +78,6 @@ public abstract class BaseFracktailTest {
         when(context.getLocale()).thenReturn(Mono.just(Locale.ENGLISH));
 
         when(context.respond(anyString())).thenReturn(Mono.empty());
-        when(context.respond(any(FormattedString.class))).thenCallRealMethod();
-        when(context.respond(any(FormattedString.class), anyMap())).thenCallRealMethod();
 
         when(bot.getSpec()).thenReturn(botSpec);
         when(bot.getPlatforms()).thenReturn(Collections.singletonList(platform));

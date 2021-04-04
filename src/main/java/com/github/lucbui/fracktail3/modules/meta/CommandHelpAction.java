@@ -59,8 +59,12 @@ public class CommandHelpAction implements CommandAction {
                         .next()
                         .flatMap(c -> Mono.justOrEmpty(c.getHelp()))
                         .defaultIfEmpty(this.noCommandFound)
-                        .flatMap(fs -> context.respond(fs, Collections.singletonMap("search", searchString)))
+                        .flatMap(fs -> fs.getFor(context, Collections.singletonMap("search", searchString)))
+                        .flatMap(str -> context.respond(str))
+                        .then()
                 )
-                .orElse(context.respond(context.getCommand().getHelp()));
+                .orElseGet(() -> context.getCommand().getHelp().getFor(context)
+                        .flatMap(str -> context.respond(str))
+                        .then());
     }
 }

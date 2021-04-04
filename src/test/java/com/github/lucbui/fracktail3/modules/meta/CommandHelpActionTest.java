@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.modules.meta;
 import com.github.lucbui.fracktail3.BaseFracktailTest;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.platform.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -43,7 +44,7 @@ class CommandHelpActionTest extends BaseFracktailTest {
     void shouldReturnHelpIfValidCommandProvided() {
         when(parameters.getParameter(eq(0))).thenReturn(Optional.of("test"));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("test hello"))).thenReturn(probe.mono());
 
         StepVerifier.create(commandHelpAction.doAction(context)).verifyComplete();
@@ -56,7 +57,7 @@ class CommandHelpActionTest extends BaseFracktailTest {
     void shouldReturnErrorIfInvalidCommandProvided() {
         when(parameters.getParameter(eq(0))).thenReturn(Optional.of("unknown"));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("I'm sorry, I don't know the command 'unknown'."))).thenReturn(probe.mono());
 
         StepVerifier.create(commandHelpAction.doAction(context)).verifyComplete();
@@ -70,7 +71,7 @@ class CommandHelpActionTest extends BaseFracktailTest {
         when(parameters.getParameter(eq(0))).thenReturn(Optional.of("test"));
         when(lookupCommand.matches(any())).thenReturn(Mono.just(false));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("I'm sorry, I don't know the command 'test'."))).thenReturn(probe.mono());
 
         StepVerifier.create(commandHelpAction.doAction(context)).verifyComplete();
@@ -84,7 +85,7 @@ class CommandHelpActionTest extends BaseFracktailTest {
         when(parameters.getParameter(eq(0))).thenReturn(Optional.of("test"));
         when(lookupCommand.getHelp()).thenReturn(null);
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("I'm sorry, I don't know the command 'test'."))).thenReturn(probe.mono());
 
         StepVerifier.create(commandHelpAction.doAction(context)).verifyComplete();
@@ -97,7 +98,7 @@ class CommandHelpActionTest extends BaseFracktailTest {
     void shouldReturnSelfHelpIfNoCommandProvided() {
         when(parameters.getParameter(eq(0))).thenReturn(Optional.empty());
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("test hello"))).thenReturn(probe.mono());
 
         StepVerifier.create(commandHelpAction.doAction(context)).verifyComplete();

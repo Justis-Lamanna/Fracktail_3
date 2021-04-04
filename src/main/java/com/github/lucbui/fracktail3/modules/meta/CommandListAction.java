@@ -73,6 +73,7 @@ public class CommandListAction implements CommandAction {
                 .map(ls -> String.join(this.delimiter, ls))
                 .flatMap(cmds -> str.getFor(context, Collections.singletonMap("commands", cmds)))
                 .switchIfEmpty(noCommandsStr.getFor(context))
-                .flatMap(context::respond);
+                .flatMap(context::respond)
+                .then();
     }
 }

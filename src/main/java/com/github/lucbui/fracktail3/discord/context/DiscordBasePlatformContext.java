@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.discord.context;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Localizable;
+import com.github.lucbui.fracktail3.magic.platform.NonePlace;
+import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +48,8 @@ public class DiscordBasePlatformContext<T> implements PlatformBaseContext<T>, Lo
     }
 
     @Override
-    public Mono<Void> respond(String message) {
-        return Mono.fromRunnable(() -> LOGGER.info("Responded to DiscordBasePlatformContext >>> {}", message));
+    public Mono<Place> getTriggerPlace() {
+        return Mono.just(NonePlace.INSTANCE);
     }
 
     @Override

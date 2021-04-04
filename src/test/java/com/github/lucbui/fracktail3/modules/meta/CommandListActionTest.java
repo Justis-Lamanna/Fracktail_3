@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.command.action.CompositeAction;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
+import com.github.lucbui.fracktail3.magic.platform.Message;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class CommandListActionTest extends BaseFracktailTest {
 
     @Test
     public void returnsListWhenRun() {
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("Commands are: test"))).thenReturn(probe.mono());
 
         StepVerifier.create(commandListAction.doAction(context)).verifyComplete();
@@ -63,7 +64,7 @@ class CommandListActionTest extends BaseFracktailTest {
     public void returnsListWithAllNamesWhenRun() {
         when(lookupCommand.getNames()).thenReturn(SetUtils.hashSet("test", "example"));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("Commands are: example, test"))).thenReturn(probe.mono());
 
         StepVerifier.create(commandListAction.doAction(context)).verifyComplete();
@@ -76,7 +77,7 @@ class CommandListActionTest extends BaseFracktailTest {
     public void returnsEmptyListWhenNoCommandsWhenRun() {
         when(commandList.getCommands()).thenReturn(Collections.emptyList());
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("No commands are available."))).thenReturn(probe.mono());
 
         StepVerifier.create(commandListAction.doAction(context)).verifyComplete();
@@ -89,7 +90,7 @@ class CommandListActionTest extends BaseFracktailTest {
     public void returnsEmptyListWhenAllCommandsBlocked() {
         when(lookupCommand.matches(any())).thenReturn(Mono.just(false));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("No commands are available."))).thenReturn(probe.mono());
 
         StepVerifier.create(commandListAction.doAction(context)).verifyComplete();
@@ -102,7 +103,7 @@ class CommandListActionTest extends BaseFracktailTest {
     public void returnsListWithOneNameWhenOneBlocked() {
         when(commandList.getCommands()).thenReturn(Arrays.asList(lookupCommand, lockedCommand));
 
-        PublisherProbe<Void> probe = PublisherProbe.empty();
+        PublisherProbe<Message> probe = PublisherProbe.empty();
         when(context.respond(eq("Commands are: test"))).thenReturn(probe.mono());
 
         StepVerifier.create(commandListAction.doAction(context)).verifyComplete();

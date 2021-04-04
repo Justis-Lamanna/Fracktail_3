@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
@@ -44,6 +45,11 @@ public class CommandLookupContext<T> implements PlatformBaseContext<T>, WrapperC
     }
 
     @Override
+    public Mono<Place> getTriggerPlace() {
+        return wrapped.getTriggerPlace();
+    }
+
+    @Override
     public Mono<Locale> getLocale() {
         return wrapped.getLocale();
     }
@@ -51,11 +57,6 @@ public class CommandLookupContext<T> implements PlatformBaseContext<T>, WrapperC
     @Override
     public AsynchronousMap<String, Object> getMap() {
         return wrapped.getMap();
-    }
-
-    @Override
-    public Mono<Void> respond(String message) {
-        return wrapped.respond(message);
     }
 
     @Override
