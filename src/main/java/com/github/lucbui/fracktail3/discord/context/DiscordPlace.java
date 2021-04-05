@@ -13,10 +13,18 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Formattable;
+import java.util.FormattableFlags;
+import java.util.Formatter;
 import java.util.stream.Collectors;
 
+/**
+ * A wrapper around a Discord Place (formally, a channel)
+ * Note: You can use this as the input to a format string. %s will display the channel's name,
+ * and %#s will print a mention output ("#channel"). All other flags, width, and precision are ignored.
+ */
 @Data
-public class DiscordPlace implements Place {
+public class DiscordPlace implements Place, Formattable {
     private final String name;
     private final MessageChannel place;
 
@@ -48,5 +56,12 @@ public class DiscordPlace implements Place {
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("Unknown file", ex);
         }
+    }
+
+    @Override
+    public void formatTo(Formatter formatter, int flags, int width, int precision) {
+        boolean alternate = (flags & FormattableFlags.ALTERNATE) == FormattableFlags.ALTERNATE;
+        String output = alternate ? place.getMention() : getName();
+        formatter.format(output);
     }
 }

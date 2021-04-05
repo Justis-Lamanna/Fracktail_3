@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.config.Config;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+
 /**
  * An object which encapsulates a particular platform.
  * This acts as a further layer of abstracting than a PlatformHandler.
@@ -45,4 +47,16 @@ public interface Platform extends Id {
      * @return The place
      */
     Mono<Place> getPlace(String id);
+
+    /**
+     * Send a message using the specified platform
+     * @param placeId The Place ID
+     * @param content The content of the message
+     * @param attachments Zero or more attachments
+     * @return A created message
+     */
+    default Mono<Message> sendMessage(String placeId, String content, File... attachments) {
+        return getPlace(placeId)
+                .flatMap(place -> place.sendMessage(content, attachments));
+    }
 }

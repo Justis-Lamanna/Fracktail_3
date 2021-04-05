@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.*;
 import reactor.core.publisher.Mono;
 
 public class TestPlatform implements Platform {
@@ -19,6 +19,16 @@ public class TestPlatform implements Platform {
     @Override
     public Mono<Boolean> stop(Bot bot) {
         return null;
+    }
+
+    @Override
+    public Mono<Person> getPerson(String id) {
+        return Mono.just(NonePerson.INSTANCE);
+    }
+
+    @Override
+    public Mono<Place> getPlace(String id) {
+        return Mono.just(NonePlace.INSTANCE);
     }
 
     @Override

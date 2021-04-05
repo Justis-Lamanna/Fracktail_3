@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.context.DiscordMemberPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
 import com.github.lucbui.fracktail3.magic.Bot;
@@ -87,29 +88,42 @@ public class DiscordPlatform implements Platform {
 
     @Override
     public Mono<Person> getPerson(String id) {
-        if(gateway == null) {
-            return Mono.error(
-                    new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
-        }
-        Snowflake person = Snowflake.of(id);
-        return gateway.getUserById(person)
-                .map(DiscordPerson::new)
-                .cast(Person.class)
-                .defaultIfEmpty(NonePerson.INSTANCE);
+        return Mono.defer(() -> {
+            if(gateway == null) {
+                return Mono.error(
+                        new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
+            } else if(id.contains(":")) {
+                String[] guildAndId = id.split(":");
+                return gateway.getMemberById(Snowflake.of(guildAndId[0]), Snowflake.of(guildAndId[1]))
+                        .map(DiscordMemberPerson::new)
+                        .cast(Person.class)
+                        .defaultIfEmpty(NonePerson.INSTANCE)
+                        .onErrorReturn(NonePerson.INSTANCE);
+            } else {
+                return gateway.getUserById(Snowflake.of(id))
+                        .map(DiscordPerson::new)
+                        .cast(Person.class)
+                        .defaultIfEmpty(NonePerson.INSTANCE)
+                        .onErrorReturn(NonePerson.INSTANCE);
+            }
+        });
     }
 
     @Override
     public Mono<Place> getPlace(String id) {
-        if(gateway == null) {
-            return Mono.error(
-                    new BotConfigurationException("Attempted to retrieve place on Discord, but it was never running"));
-        }
-        Snowflake place = Snowflake.of(id);
-        return gateway.getChannelById(place)
-                .cast(TextChannel.class)
-                .map(DiscordPlace::new)
-                .cast(Place.class)
-                .defaultIfEmpty(NonePlace.INSTANCE);
+        return Mono.defer(() -> {
+            if(gateway == null) {
+                return Mono.error(
+                        new BotConfigurationException("Attempted to retrieve place on Discord, but platform was not running"));
+            }
+            Snowflake place = Snowflake.of(id);
+            return gateway.getChannelById(place)
+                    .cast(TextChannel.class)
+                    .map(DiscordPlace::new)
+                    .cast(Place.class)
+                    .defaultIfEmpty(NonePlace.INSTANCE)
+                    .onErrorReturn(NonePlace.INSTANCE);
+        });
     }
 
     public static class Builder implements IBuilder<DiscordPlatform> {

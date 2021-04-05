@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.spring.schedule.handler;
 import com.github.lucbui.fracktail3.BaseFracktailTest;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -78,6 +78,16 @@ class InjectPlatformHandlerTest extends BaseFracktailTest {
         @Override
         public String getId() {
             return "test";
+        }
+
+        @Override
+        public Mono<Person> getPerson(String id) {
+            return Mono.just(NonePerson.INSTANCE);
+        }
+
+        @Override
+        public Mono<Place> getPlace(String id) {
+            return Mono.just(NonePlace.INSTANCE);
         }
     }
 }
