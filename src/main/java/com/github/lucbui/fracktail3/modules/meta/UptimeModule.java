@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.modules.meta;
 
-import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.spring.command.annotation.Command;
@@ -19,7 +18,7 @@ import java.time.Instant;
 
 @Component
 public class UptimeModule {
-    private static final DiscordChannelset BOT_TIME = DiscordChannelset.forChannel(744390997429059595L);
+    private static final Snowflake BOT_TIME = Snowflake.of(744390997429059595L);
     private static final Snowflake ME = Snowflake.of(248612704019808258L);
 
     private Instant startTime;
@@ -38,7 +37,9 @@ public class UptimeModule {
     @Schedule
     @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
     public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
-        return platform.message(BOT_TIME, FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!");
+        return platform.getPlace(BOT_TIME.asString())
+                .map(place -> place.sendMessage(FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!"))
+                .then();
     }
 
     @Command

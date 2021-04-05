@@ -1,23 +1,21 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.guard.DiscordChannelset;
-import com.github.lucbui.fracktail3.discord.guard.DiscordUserset;
+import com.github.lucbui.fracktail3.discord.context.DiscordPerson;
+import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -87,60 +85,31 @@ public class DiscordPlatform implements Platform {
                 .thenReturn(true);
     }
 
-    /**
-     * Send a message to all members of a DiscordChannelset.
-     * Note, if you send DiscordChannelset.ALL_CHANNELS, you *will* send a message in every single channel the bot knows.
-     * @param channelset The channelset to send to
-     * @param message The message to say
-     * @return Asynchronous indication of completion
-     */
-    public Mono<Void> message(DiscordChannelset channelset, String message) {
-        if(channelset.matchesEveryChannel()) {
-            //Ho boy...
-            return gateway.getGuilds()
-                    .flatMap(Guild::getChannels)
-                    .cast(MessageChannel.class)
-                    .flatMap(channel -> channel.createMessage(message))
-                    .next()
-                    .then();
+    @Override
+    public Mono<Person> getPerson(String id) {
+        if(gateway == null) {
+            return Mono.error(
+                    new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
         }
-        if(channelset.matchesNoChannel()) {
-            // Short-circuit. Don't even bother iterating.
-            return Mono.empty();
-        }
-        return Flux.fromIterable(channelset.getChannelSnowflakes())
-                .flatMap(channel -> gateway.getChannelById(channel))
-                .cast(MessageChannel.class)
-                .flatMap(channel -> channel.createMessage(message))
-                .next()
-                .then();
+        Snowflake person = Snowflake.of(id);
+        return gateway.getUserById(person)
+                .map(DiscordPerson::new)
+                .cast(Person.class)
+                .defaultIfEmpty(NonePerson.INSTANCE);
     }
 
-    /**
-     * Send a dm to all members of a DiscordUserset.
-     * Note, if you send DiscordUserset.ALL_USERS, you *will* send a message in every single user the bot knows.
-     * @param userset The users to message
-     * @param message The message to say
-     * @return Asynchronous indication of completion
-     */
-    public Mono<Void> dm(DiscordUserset userset, String message) {
-        if(userset.matchesEveryUser()) {
-            return gateway.getUsers()
-                    .flatMap(User::getPrivateChannel)
-                    .flatMap(dm -> dm.createMessage(message))
-                    .next()
-                    .then();
+    @Override
+    public Mono<Place> getPlace(String id) {
+        if(gateway == null) {
+            return Mono.error(
+                    new BotConfigurationException("Attempted to retrieve place on Discord, but it was never running"));
         }
-        if(userset.matchesNoUser()) {
-            // Short-circuit. Don't even bother iterating.
-            return Mono.empty();
-        }
-        return Flux.fromIterable(userset.getUserSnowflakes())
-                .flatMap(user -> gateway.getUserById(user))
-                .flatMap(User::getPrivateChannel)
-                .flatMap(dm -> dm.createMessage(message))
-                .next()
-                .then();
+        Snowflake place = Snowflake.of(id);
+        return gateway.getChannelById(place)
+                .cast(TextChannel.class)
+                .map(DiscordPlace::new)
+                .cast(Place.class)
+                .defaultIfEmpty(NonePlace.INSTANCE);
     }
 
     public static class Builder implements IBuilder<DiscordPlatform> {

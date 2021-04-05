@@ -31,4 +31,18 @@ public interface Platform extends Id {
      * @return An asynchronous boolean, whether the bot was stopped or not. (note, boolean is ignored)
      */
     Mono<Boolean> stop(Bot bot);
+
+    /**
+     * Retrieve a person on this platform by their ID
+     * @param id The person's ID
+     * @return The person
+     */
+    Mono<Person> getPerson(String id);
+
+    /**
+     * Retrieve a place on this platform by its ID
+     * @param id The place's ID
+     * @return The place
+     */
+    Mono<Place> getPlace(String id);
 }
