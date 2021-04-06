@@ -92,13 +92,17 @@ public class DiscordPlatform implements Platform {
             if(gateway == null) {
                 return Mono.error(
                         new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
-            } else if(id.contains(":")) {
-                String[] guildAndId = id.split(":");
-                return gateway.getMemberById(Snowflake.of(guildAndId[0]), Snowflake.of(guildAndId[1]))
-                        .map(DiscordMemberPerson::new)
-                        .cast(Person.class)
-                        .defaultIfEmpty(NonePerson.INSTANCE)
-                        .onErrorReturn(NonePerson.INSTANCE);
+            } else if(id.contains("/")) {
+                String[] typeAndOthers = id.split("/");
+                if(typeAndOthers[0].equals("member")) {
+                    return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
+                            .map(DiscordMemberPerson::new)
+                            .cast(Person.class)
+                            .defaultIfEmpty(NonePerson.INSTANCE)
+                            .onErrorReturn(NonePerson.INSTANCE);
+                } else {
+                    throw new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]);
+                }
             } else {
                 return gateway.getUserById(Snowflake.of(id))
                         .map(DiscordPerson::new)
