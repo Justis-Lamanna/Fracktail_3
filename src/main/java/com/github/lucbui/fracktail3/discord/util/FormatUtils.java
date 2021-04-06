@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.discord.util;
 
 import discord4j.common.util.Snowflake;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class for formatting text
@@ -16,7 +17,7 @@ public class FormatUtils {
     private static final String MARKDOWN_MULTILINE_QUOTE_BLOCK = ">>> ";
     private static final String MARKDOWN_SPOILER = "||";
 
-    private static final String AT_USER = "<@";
+    private static final String AT_USER = "<@!";
     private static final String AT_ROLE = "<@&";
     private static final String END_AT = ">";
 
@@ -162,6 +163,16 @@ public class FormatUtils {
      */
     public static String mentionUser(Snowflake user) {
         return AT_USER + user.asString() + END_AT;
+    }
+
+    /**
+     * From a user Ping, extract a user
+     * @param mention The string mention
+     * @return The parsed Snowflake
+     */
+    public static Snowflake fromUserMention(String mention) {
+        String trimmed = StringUtils.removeEnd(StringUtils.removeStart(mention, AT_USER), END_AT);
+        return Snowflake.of(trimmed);
     }
 
     /**

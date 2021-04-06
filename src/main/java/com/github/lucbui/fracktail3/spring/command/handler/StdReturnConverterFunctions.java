@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
@@ -32,7 +33,23 @@ public class StdReturnConverterFunctions {
     public static class Monos implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
         @Override
         public Mono<Void> apply(BaseContext<?> context, Object o) {
-            return o == null ? Mono.empty() : ((Mono<?>)o).then();
+            return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> {
+                if(s == null) {
+                    return new Monos().apply(context, null);
+                } else if (s instanceof Mono) {
+                    return new Monos().apply(context, s);
+                } else if (s instanceof Flux) {
+                    return new Fluxs().apply(context, s);
+                } else if (s instanceof String) {
+                    return new Strings().apply(context, s);
+                } else if (s instanceof FormattedString) {
+                    return new FStrings().apply(context, s);
+                } else if (s instanceof BotResponse) {
+                    return new BotResponses().apply(context, s);
+                } else {
+                    return Mono.error(new BotConfigurationException("Mono returned unknown type " + s.getClass().getCanonicalName()));
+                }
+            });
         }
     }
 

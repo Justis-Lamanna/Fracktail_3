@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.platform.context;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,9 @@ public class Parameters {
     }
 
     public List<Optional<String>> getParameters(int start, int end) {
-        if(end < 0) {
+        if(parsed.length == 0) {
+            return Collections.emptyList();
+        } else if(end < 0) {
             return Arrays.stream(parsed, start, parsed.length + end + 1)
                     .map(Optional::of)
                     .collect(Collectors.toList());

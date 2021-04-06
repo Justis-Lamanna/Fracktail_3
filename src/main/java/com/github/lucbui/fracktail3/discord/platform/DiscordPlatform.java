@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
+import com.github.lucbui.fracktail3.discord.context.DiscordBotPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordMemberPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
@@ -96,7 +97,7 @@ public class DiscordPlatform implements Platform {
                 String[] typeAndOthers = id.split("/");
                 if(typeAndOthers[0].equals("member")) {
                     return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
-                            .map(DiscordMemberPerson::new)
+                            .map(m -> m.isBot() ? new DiscordBotPerson(m) : new DiscordMemberPerson(m))
                             .cast(Person.class)
                             .defaultIfEmpty(NonePerson.INSTANCE)
                             .onErrorReturn(NonePerson.INSTANCE);
@@ -105,7 +106,7 @@ public class DiscordPlatform implements Platform {
                 }
             } else {
                 return gateway.getUserById(Snowflake.of(id))
-                        .map(DiscordPerson::new)
+                        .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u))
                         .cast(Person.class)
                         .defaultIfEmpty(NonePerson.INSTANCE)
                         .onErrorReturn(NonePerson.INSTANCE);
