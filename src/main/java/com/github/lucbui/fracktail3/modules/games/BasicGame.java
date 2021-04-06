@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.modules.games.exceptions.IllegalActionExcept
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +20,9 @@ public abstract class BasicGame<GF> implements Game<GF> {
     @Getter(AccessLevel.PROTECTED)
     private final Queue<Action<GF>> actions = new LinkedList<>();
 
+    private final Sinks.Many<ActionData<GF>> actionsSink =
+            Sinks.many().replay().latest();
+
     /**
      * Perform a potentially-illegal action
      * @param action The action to attempt to perform
@@ -29,6 +34,7 @@ public abstract class BasicGame<GF> implements Game<GF> {
         if(legality.isLegal()) {
             getActions().add(action);
             action.performAction(gameField);
+            actionsSink.tryEmitNext(new ActionData<>(gameField, action));
         } else {
             throw new IllegalActionException(legality);
         }
@@ -46,5 +52,19 @@ public abstract class BasicGame<GF> implements Game<GF> {
                 .filter(ActionLegality::isIllegal)
                 .findFirst();
         return illegal.orElse(ActionLegality.legal());
+    }
+
+    /**
+     * A feed of actions that come as players play
+     * @return A flux which plays the actions
+     */
+    public Flux<ActionData<GF>> actionsFeed() {
+        return actionsSink.asFlux();
+    }
+
+    @Data
+    public static class ActionData<GF> {
+        private final GF postAction;
+        private final Action<GF> action;
     }
 }

@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.magic.platform.NonePerson;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.modules.games.standard.action.AdvanceAction;
+import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.spring.command.annotation.*;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
 import discord4j.common.util.Snowflake;
@@ -25,6 +27,7 @@ public class CheckersManager {
         String id = generateId();
         Session session = new Session(id, new Checkers(), red, black);
         games.put(id, session);
+        session.start();
         return session;
     }
 
@@ -87,7 +90,7 @@ public class CheckersManager {
                             if(s.isPlayer(sender)) {
                                 return Mono.just("Can't watch your own match!");
                             } else {
-                                s.getSpectators().add(sender);
+                                s.addSpectator(sender);
                                 return Mono.just("Now spectating match " + s.id);
                             }
                         })
@@ -112,6 +115,42 @@ public class CheckersManager {
 
         public boolean isPlayer(Person person) {
             return red.equals(person) || black.equals(person);
+        }
+
+        public void start() {
+            game.actionsFeed()
+                    .bufferUntil(a -> a.getAction() instanceof AdvanceAction)
+                    .flatMap(turn -> {
+                        //Determine the player
+                        InTurnAction<Checkerboard, Color> ma = (InTurnAction<Checkerboard, Color>) turn.get(0).getAction();
+                        Color player = ma.getPlayer();
+                        if(player == Color.RED) {
+                            if(turn.size() == 1) {
+                                System.out.println("Red passed!");
+                            } else {
+                                System.out.println("Red played!");
+                            }
+                        } else {
+                            if(turn.size() == 1) {
+                                System.out.println("Black passed!");
+                            } else {
+                                System.out.println("Black played!");
+                            }
+                        }
+                        return Mono.empty();
+                    })
+                    .subscribe();
+        }
+
+        public void addSpectator(Person player) {
+            game.actionsFeed()
+                    .bufferUntil(a -> a.getAction() instanceof AdvanceAction)
+                    .flatMap(turn -> {
+                        Checkerboard board = turn.get(0).getPostAction();
+                        System.out.println("Displaying to " + player.getName());
+                        return Mono.empty();
+                    })
+                    .subscribe();
         }
     }
 }
