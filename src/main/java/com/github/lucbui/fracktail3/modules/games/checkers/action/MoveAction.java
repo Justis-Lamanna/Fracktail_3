@@ -35,6 +35,8 @@ public class MoveAction implements
                     if(isPromote(field)) {
                         piece.king();
                     }
+
+                    field.advanceTurn();
                 });
     }
 

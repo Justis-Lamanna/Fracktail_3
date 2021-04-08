@@ -35,6 +35,10 @@ public abstract class BasicGame<GF> implements Game<GF> {
             getActions().add(action);
             action.performAction(gameField);
             actionsSink.tryEmitNext(new ActionData<>(gameField, action));
+
+            if(isComplete()) {
+                actionsSink.tryEmitComplete();
+            }
         } else {
             throw new IllegalActionException(legality);
         }
