@@ -1,8 +1,6 @@
 package com.github.lucbui.fracktail3.discord.context;
 
-import com.github.lucbui.fracktail3.magic.platform.Message;
-import com.github.lucbui.fracktail3.magic.platform.Person;
-import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.magic.platform.*;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.Data;
 import reactor.core.publisher.Mono;
@@ -30,9 +28,13 @@ public class DiscordMessage implements Message {
                 .map(a -> URI.create(a.getUrl()))
                 .toArray(URI[]::new);
         this.sender = message.getAuthor()
-                .map(DiscordPerson::new)
-                .orElse(null);
-        this.sentFrom = new DiscordPlace(message.getChannel().block(Duration.ofSeconds(5)));
+                .map(u -> (Person) (u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u)))
+                .orElse(NonePerson.INSTANCE);
+        this.sentFrom = message.getChannel()
+                .map(DiscordPlace::new)
+                .cast(Place.class)
+                .blockOptional(Duration.ofSeconds(5))
+                .orElse(NonePlace.INSTANCE);
     }
 
     @Override
