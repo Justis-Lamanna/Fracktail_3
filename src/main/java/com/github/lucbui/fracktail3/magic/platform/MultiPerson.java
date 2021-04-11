@@ -31,4 +31,9 @@ public class MultiPerson implements Person {
                 .collectList()
                 .map(MultiPlace::new);
     }
+
+    @Override
+    public boolean isBot() {
+        return Arrays.stream(persons).allMatch(Person::isBot);
+    }
 }

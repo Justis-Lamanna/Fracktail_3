@@ -14,4 +14,9 @@ public enum NonePerson implements Person {
     public Mono<Place> getPrivateChannel() {
         return Mono.just(NonePlace.INSTANCE);
     }
+
+    @Override
+    public boolean isBot() {
+        return false;
+    }
 }

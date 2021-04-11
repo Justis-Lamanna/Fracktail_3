@@ -1,12 +1,14 @@
 package com.github.lucbui.fracktail3.discord.context;
 
-import com.github.lucbui.fracktail3.magic.platform.*;
+import com.github.lucbui.fracktail3.magic.platform.Message;
+import com.github.lucbui.fracktail3.magic.platform.NonePerson;
+import com.github.lucbui.fracktail3.magic.platform.Person;
+import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.time.Duration;
 
 /**
  * Wrapper around a text message in Discord
@@ -16,7 +18,6 @@ public class DiscordMessage implements Message {
     private String content;
     private URI[] attachments;
     private Person sender;
-    private Place sentFrom;
 
     private discord4j.core.object.entity.Message wrappedMsg;
     private MessageCreateEvent event;
@@ -28,13 +29,15 @@ public class DiscordMessage implements Message {
                 .map(a -> URI.create(a.getUrl()))
                 .toArray(URI[]::new);
         this.sender = message.getAuthor()
-                .map(u -> (Person) (u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u)))
+                .map(u -> (Person) new DiscordPerson(u))
                 .orElse(NonePerson.INSTANCE);
-        this.sentFrom = message.getChannel()
+    }
+
+    @Override
+    public Mono<Place> getOrigin() {
+        return wrappedMsg.getChannel()
                 .map(DiscordPlace::new)
-                .cast(Place.class)
-                .blockOptional(Duration.ofSeconds(5))
-                .orElse(NonePlace.INSTANCE);
+                .cast(Place.class);
     }
 
     @Override

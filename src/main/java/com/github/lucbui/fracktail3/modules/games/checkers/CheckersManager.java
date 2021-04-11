@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
-import com.github.lucbui.fracktail3.discord.context.DiscordBotPerson;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.magic.platform.MultiMessage;
 import com.github.lucbui.fracktail3.magic.platform.NonePerson;
@@ -139,7 +138,7 @@ public class CheckersManager {
                     .flatMap(opp -> {
                         if(opp == NonePerson.INSTANCE) {
                             return Mono.just("I have no idea who that person is, unfortunately.");
-                        } else if(opp instanceof DiscordBotPerson) {
+                        } else if(opp.isBot()) {
                             return Mono.just("You can't play checkers with a bot.");
                         } else if(opp.equals(sender)) {
                             return Mono.just("You can't play checkers with yourself!");

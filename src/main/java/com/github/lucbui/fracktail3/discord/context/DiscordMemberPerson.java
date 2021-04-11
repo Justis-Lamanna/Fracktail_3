@@ -32,6 +32,11 @@ public class DiscordMemberPerson implements Person, Formattable {
     }
 
     @Override
+    public boolean isBot() {
+        return member.isBot();
+    }
+
+    @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision) {
         boolean alternate = (flags & FormattableFlags.ALTERNATE) == FormattableFlags.ALTERNATE;
         String output = alternate ? member.getMention() : getName();

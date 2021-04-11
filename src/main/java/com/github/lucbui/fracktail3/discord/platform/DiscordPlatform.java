@@ -11,7 +11,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +65,15 @@ public class DiscordPlatform implements Platform {
 
         gateway.updatePresence(configuration.getPresence()).block();
 
-        gateway.on(MessageCreateEvent.class)
-                .flatMap(msg -> discordCommandHandler.execute(bot, this, msg))
+//        gateway.on(MessageCreateEvent.class)
+//                .flatMap(msg -> discordCommandHandler.execute(bot, this, msg))
+//                .subscribe();
+        getPlace("*")
+                .flatMapMany(Place::getMessageFeed)
+                .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
+                .filter(msg -> !msg.getSender().isBot())
+                .doOnNext(msg -> System.out.println(msg.getSender().getName() + ": " + msg.getContent()))
+                //.flatMap(msg -> discordCommandHandler.execute(bot, this, msg))
                 .subscribe();
 
         return gateway.onDisconnect().thenReturn(true);
@@ -95,22 +101,23 @@ public class DiscordPlatform implements Platform {
                 switch (typeAndOthers[0]) {
                     case "member":
                         return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
-                                .map(m -> m.isBot() ? new DiscordBotPerson(m) : new DiscordMemberPerson(m));
+                                .map(DiscordMemberPerson::new);
                     case "role":
                         return gateway.getRoleById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
                                 .map(DiscordRolePerson::new);
                     case "user":
                         return gateway.getUserById(Snowflake.of(typeAndOthers[1]))
-                                .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u));
+                                .map(DiscordPerson::new);
                     default:
                         return Mono.error(
                                 new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]));
                 }
             } else {
                 return gateway.getUserById(Snowflake.of(id))
-                        .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u));
+                        .map(DiscordPerson::new);
             }
         })
+        .cast(Person.class)
         .defaultIfEmpty(NonePerson.INSTANCE)
         .onErrorReturn(NonePerson.INSTANCE);
     }

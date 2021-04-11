@@ -23,8 +23,8 @@ public enum NoneMessage implements Message {
     }
 
     @Override
-    public Place getSentFrom() {
-        return NonePlace.INSTANCE;
+    public Mono<Place> getOrigin() {
+        return Mono.just(NonePlace.INSTANCE);
     }
 
     @Override

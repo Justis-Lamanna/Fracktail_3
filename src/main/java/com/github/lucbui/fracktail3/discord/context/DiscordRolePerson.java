@@ -40,6 +40,11 @@ public class DiscordRolePerson implements Person, Formattable {
     }
 
     @Override
+    public boolean isBot() {
+        return false;
+    }
+
+    @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision) {
         boolean alternate = (flags & FormattableFlags.ALTERNATE) == FormattableFlags.ALTERNATE;
         String output = alternate ? role.getMention() : getName();

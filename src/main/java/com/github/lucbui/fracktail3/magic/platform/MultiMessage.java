@@ -39,10 +39,11 @@ public class MultiMessage implements Message {
     }
 
     @Override
-    public Place getSentFrom() {
-        return Arrays.stream(messages)
-                .map(Message::getSentFrom)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), MultiPlace::new));
+    public Mono<Place> getOrigin() {
+        return Flux.fromArray(messages)
+                .flatMap(Message::getOrigin)
+                .collectList()
+                .map(MultiPlace::new);
     }
 
     @Override

@@ -30,7 +30,7 @@ public interface Message {
      * Get the place this message came from
      * @return The place this message came from
      */
-    Place getSentFrom();
+    Mono<Place> getOrigin();
 
     /**
      * Edit this message appropriately

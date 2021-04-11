@@ -17,4 +17,10 @@ public interface Person {
      * @return A mono which completes when a private DM is created
      */
     Mono<Place> getPrivateChannel();
+
+    /**
+     * Check if this person is a bot or not
+     * @return True if this is bot
+     */
+    boolean isBot();
 }
