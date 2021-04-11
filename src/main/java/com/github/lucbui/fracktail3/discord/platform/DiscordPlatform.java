@@ -11,6 +11,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,8 +104,14 @@ public class DiscordPlatform implements Platform {
                         return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
                                 .map(DiscordMemberPerson::new);
                     case "role":
-                        return gateway.getRoleById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
-                                .map(DiscordRolePerson::new);
+                        if(typeAndOthers[2].equals("*")) {
+                            return gateway.getGuildById(Snowflake.of(typeAndOthers[1]))
+                                    .flatMap(Guild::getEveryoneRole)
+                                    .map(DiscordRolePerson::new);
+                        } else {
+                            return gateway.getRoleById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
+                                    .map(DiscordRolePerson::new);
+                        }
                     case "user":
                         return gateway.getUserById(Snowflake.of(typeAndOthers[1]))
                                 .map(DiscordPerson::new);
