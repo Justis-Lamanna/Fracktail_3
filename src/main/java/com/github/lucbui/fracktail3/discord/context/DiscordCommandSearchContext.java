@@ -13,8 +13,6 @@ import java.util.Locale;
  * Basic context for MessageCreateEvent
  */
 public class DiscordCommandSearchContext extends DiscordBasePlatformContext<MessageCreateEvent> {
-    private ResponseType responseType = ResponseType.INLINE;
-
     private Mono<Locale> cached;
 
     /**
@@ -40,22 +38,6 @@ public class DiscordCommandSearchContext extends DiscordBasePlatformContext<Mess
      */
     public DiscordCommandSearchContext(Bot bot, DiscordPlatform platform, Locale locale, MessageCreateEvent payload) {
         super(bot, platform, payload);
-    }
-
-    /**
-     * Get the response type
-     * @return The response type
-     */
-    public ResponseType getResponseType() {
-        return responseType;
-    }
-
-    /**
-     * Set the response type
-     * @param responseType The response type
-     */
-    public void setResponseType(ResponseType responseType) {
-        this.responseType = responseType;
     }
 
     @Override

@@ -12,11 +12,17 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 
+/**
+ * Represents 'everywhere' in Discord
+ *
+ * Note that this is just wherever the bot is.
+ * Sending messages to everywhere does nothing.
+ */
 @Data
 public class DiscordEverywhere implements Place {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordEverywhere.class);
 
-    private GatewayDiscordClient client;
+    private final GatewayDiscordClient client;
 
     @Override
     public String getName() {

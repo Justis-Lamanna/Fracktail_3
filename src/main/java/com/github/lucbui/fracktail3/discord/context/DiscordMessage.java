@@ -10,6 +10,9 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.time.Duration;
 
+/**
+ * Wrapper around a text message in Discord
+ */
 @Data
 public class DiscordMessage implements Message {
     private String content;

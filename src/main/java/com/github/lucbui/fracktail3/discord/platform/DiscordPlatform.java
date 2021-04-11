@@ -1,10 +1,7 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
-import com.github.lucbui.fracktail3.discord.context.DiscordBotPerson;
-import com.github.lucbui.fracktail3.discord.context.DiscordMemberPerson;
-import com.github.lucbui.fracktail3.discord.context.DiscordPerson;
-import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
+import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -93,25 +90,29 @@ public class DiscordPlatform implements Platform {
             if(gateway == null) {
                 return Mono.error(
                         new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
-            } else if(id.contains("/")) {
-                String[] typeAndOthers = id.split("/");
-                if(typeAndOthers[0].equals("member")) {
-                    return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
-                            .map(m -> m.isBot() ? new DiscordBotPerson(m) : new DiscordMemberPerson(m))
-                            .cast(Person.class)
-                            .defaultIfEmpty(NonePerson.INSTANCE)
-                            .onErrorReturn(NonePerson.INSTANCE);
-                } else {
-                    throw new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]);
+            } else if(id.contains(":")) {
+                String[] typeAndOthers = id.split(":");
+                switch (typeAndOthers[0]) {
+                    case "member":
+                        return gateway.getMemberById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
+                                .map(m -> m.isBot() ? new DiscordBotPerson(m) : new DiscordMemberPerson(m));
+                    case "role":
+                        return gateway.getRoleById(Snowflake.of(typeAndOthers[1]), Snowflake.of(typeAndOthers[2]))
+                                .map(DiscordRolePerson::new);
+                    case "user":
+                        return gateway.getUserById(Snowflake.of(typeAndOthers[1]))
+                                .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u));
+                    default:
+                        return Mono.error(
+                                new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]));
                 }
             } else {
                 return gateway.getUserById(Snowflake.of(id))
-                        .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u))
-                        .cast(Person.class)
-                        .defaultIfEmpty(NonePerson.INSTANCE)
-                        .onErrorReturn(NonePerson.INSTANCE);
+                        .map(u -> u.isBot() ? new DiscordBotPerson(u) : new DiscordPerson(u));
             }
-        });
+        })
+        .defaultIfEmpty(NonePerson.INSTANCE)
+        .onErrorReturn(NonePerson.INSTANCE);
     }
 
     @Override
@@ -121,13 +122,17 @@ public class DiscordPlatform implements Platform {
                 return Mono.error(
                         new BotConfigurationException("Attempted to retrieve place on Discord, but platform was not running"));
             }
-            Snowflake place = Snowflake.of(id);
-            return gateway.getChannelById(place)
-                    .cast(TextChannel.class)
-                    .map(DiscordPlace::new)
-                    .cast(Place.class)
-                    .defaultIfEmpty(NonePlace.INSTANCE)
-                    .onErrorReturn(NonePlace.INSTANCE);
+            if(id.equals("*")) {
+                return Mono.just(new DiscordEverywhere(gateway));
+            } else {
+                Snowflake place = Snowflake.of(id);
+                return gateway.getChannelById(place)
+                        .cast(TextChannel.class)
+                        .map(DiscordPlace::new)
+                        .cast(Place.class)
+                        .defaultIfEmpty(NonePlace.INSTANCE)
+                        .onErrorReturn(NonePlace.INSTANCE);
+            }
         });
     }
 
