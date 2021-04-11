@@ -10,7 +10,6 @@ import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
 import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.BoardDisplay;
-import com.github.lucbui.fracktail3.modules.games.standard.action.AdvanceAction;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import com.github.lucbui.fracktail3.spring.command.annotation.*;
@@ -64,7 +63,6 @@ public class CheckersManager {
     @Usage("Play Checkers! Commands are as follows:\n" +
             "\t!checkers start <@opponent> - Start a game with an opponent.\n" +
             "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example: A1)\n" +
-            "\t!checkers play <id?> pass - Skip your turn\n" +
             "\t!checkers watch <id> - Spectate on a match")
     public Mono<String> checkers(@InjectPlatform Platform platform,
                                  @InjectPerson Person sender,
@@ -88,7 +86,7 @@ public class CheckersManager {
             } else if(parameters.length == 2) {
                 return doPlayWithExplicitId(sender, parameters[0], parameters[1]);
             } else {
-                return Mono.just("Usage: !checkers play <id?> <move>. Moves are either 'pass' or '[position of piece]:[place to move]'");
+                return Mono.just("Usage: !checkers play <id?> <move>. Move format is '[position of piece]:[place to move]'");
             }
         } else {
             return Mono.just("Usage: Heck u");
@@ -157,19 +155,15 @@ public class CheckersManager {
     }
 
     private Action<Checkerboard> parseAction(Checkerboard board, Color player, String playStr) {
-        if(playStr.equals("pass")) {
-            return new AdvanceAction<>(player);
-        } else {
-            String[] fromTo = playStr.split(":");
-            if(fromTo.length != 2) {
-                throw new IllegalArgumentException("Unknown format");
-            }
-            Position from = Position.parse(fromTo[0]);
-            Position to = Position.parse(fromTo[1]);
-            Piece piece = board.getPiece(from)
-                    .orElseThrow(() -> new IllegalArgumentException("No piece at position " + fromTo[0]));
-            return new MoveAction(player, piece, to);
+        String[] fromTo = playStr.split(":");
+        if(fromTo.length != 2) {
+            throw new IllegalArgumentException("Unknown format");
         }
+        Position from = Position.parse(fromTo[0]);
+        Position to = Position.parse(fromTo[1]);
+        Piece piece = board.getPiece(from)
+                .orElseThrow(() -> new IllegalArgumentException("No piece at position " + fromTo[0]));
+        return new MoveAction(player, piece, to);
     }
 
     private Mono<String> doAction(Action<Checkerboard> action, Checkers game) {
@@ -225,21 +219,11 @@ public class CheckersManager {
                         String toRedMessage;
                         String toBlackMessage;
                         if(player == Color.RED) {
-                            if(ma instanceof AdvanceAction) {
-                                toRedMessage = "You passed. " + black.getName() + "'s turn!";
-                                toBlackMessage = red.getName() + " has passed. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
-                            } else {
-                                toRedMessage = "You played. " + black.getName() + "'s turn!";
-                                toBlackMessage = red.getName() + " has played. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
-                            }
+                            toRedMessage = "You played. " + black.getName() + "'s turn!";
+                            toBlackMessage = red.getName() + " has played. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
                         } else {
-                            if(ma instanceof AdvanceAction) {
-                                toRedMessage = black.getName() + " has passed. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
-                                toBlackMessage = "You passed. " + red.getName() + "'s turn!";
-                            } else {
-                                toRedMessage = black.getName() + " has played. Your turn!\n"  + BoardDisplay.display(turn.getPostAction());
-                                toBlackMessage = "You played. " + red.getName() + "'s turn!";
-                            }
+                            toRedMessage = black.getName() + " has played. Your turn!\n"  + BoardDisplay.display(turn.getPostAction());
+                            toBlackMessage = "You played. " + red.getName() + "'s turn!";
                         }
                         return Flux.merge(
                                 red.getPrivateChannel().flatMap(place -> place.sendMessage(toRedMessage)),
@@ -273,12 +257,7 @@ public class CheckersManager {
                     .flatMap(turn -> {
                         InTurnAction<Checkerboard, Color> ma = (InTurnAction<Checkerboard, Color>) turn.getAction();
                         Color player = ma.getPlayer();
-                        String message;
-                        if(ma instanceof AdvanceAction) {
-                            message = getPlayer(player).getName() + " passed.";
-                        } else {
-                            message = getPlayer(player).getName() + " played.";
-                        }
+                        String message = getPlayer(player).getName() + " played.";
                         return spectator.getPrivateChannel().flatMap(place -> place.sendMessage(message +
                                 "\n" + BoardDisplay.display(turn.getPostAction())));
                     })
