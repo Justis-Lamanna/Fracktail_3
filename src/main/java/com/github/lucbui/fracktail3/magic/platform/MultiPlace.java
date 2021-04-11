@@ -30,6 +30,14 @@ public class MultiPlace implements Place {
         return Flux.fromArray(places)
                 .flatMap(place -> place.sendMessage(content, attachments))
                 .collectList()
-                .map(messages -> new MultiMessage(messages));
+                .map(MultiMessage::new);
+    }
+
+    @Override
+    public Flux<Message> getMessageFeed() {
+        return Flux.merge(
+                Arrays.stream(places)
+                        .map(Place::getMessageFeed)
+                        .collect(Collectors.toList()));
     }
 }

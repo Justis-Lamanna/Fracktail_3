@@ -3,11 +3,13 @@ package com.github.lucbui.fracktail3.discord.context;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.common.util.Snowflake;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.MessageCreateSpec;
 import lombok.Data;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -44,6 +46,15 @@ public class DiscordPlace implements Place, Formattable {
     @Override
     public Mono<Message> sendMessage(String content, File... attachments) {
         return place.createMessage(spec -> createSpec(spec, content, attachments))
+                .map(DiscordMessage::new);
+    }
+
+    @Override
+    public Flux<Message> getMessageFeed() {
+        return place.getClient()
+                .on(MessageCreateEvent.class)
+                .map(MessageCreateEvent::getMessage)
+                .filter(m -> m.getChannelId().equals(place.getId()))
                 .map(DiscordMessage::new);
     }
 

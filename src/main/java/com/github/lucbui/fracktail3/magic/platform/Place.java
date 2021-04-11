@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.platform;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -21,4 +22,10 @@ public interface Place {
      * @return A mono which completes when the message was sent
      */
     Mono<Message> sendMessage(String content, File... attachments);
+
+    /**
+     * Get a flow of messages originating from this place
+     * @return A flux which outputs messages as they come
+     */
+    Flux<Message> getMessageFeed();
 }
