@@ -37,7 +37,7 @@ public class VariableStrategy implements ParameterComponentStrategy, ParameterSc
     public Optional<ParameterScheduledComponent> createSchedule(Object obj, Method method, Parameter parameter) {
         if(parameter.isAnnotationPresent(Variable.class)) {
             Variable annot = parameter.getAnnotation(Variable.class);
-            return Optional.of(new ParameterScheduledComponent(new VariableToObjectConverterFunction(parameter.getType(), annot.value(), converters)));
+//            return Optional.of(new ParameterScheduledComponent(new VariableToObjectConverterFunction(parameter.getType(), annot.value(), converters)));
         }
         return Optional.empty();
     }

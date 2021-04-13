@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic.platform;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.config.Config;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -14,12 +13,6 @@ import java.io.File;
  * rather than using the CommandContext's class.
  */
 public interface Platform extends Id {
-    /**
-     * Get the configuration of this platform
-     * @return The platform's configuration
-     */
-    Config getConfig();
-
     /**
      * Asynchronously start the bot
      * @param bot The bot to start

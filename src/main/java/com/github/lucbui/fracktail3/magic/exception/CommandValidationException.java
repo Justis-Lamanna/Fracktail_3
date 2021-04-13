@@ -1,8 +1,6 @@
 package com.github.lucbui.fracktail3.magic.exception;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import reactor.core.publisher.Mono;
 
 /**
  * Exception indicating validation of a command's parameter failed.
@@ -34,14 +32,5 @@ public class CommandValidationException extends RuntimeException {
      */
     public String getMessage() {
         return message.getRaw();
-    }
-
-    /**
-     * Format the message as appropriate
-     * @param ctx The context to use
-     * @return Asynchronous formatted message
-     */
-    public Mono<String> getFormattedMessage(CommandUseContext ctx) {
-        return message.getFor(ctx);
     }
 }

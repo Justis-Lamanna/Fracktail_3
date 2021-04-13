@@ -21,8 +21,9 @@ public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrat
 
     @Override
     public Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method) {
-        return converters.getHandlerForType(method.getReturnType())
-                .map(ReturnScheduledComponent::new);
+//        return converters.getHandlerForType(method.getReturnType())
+//                .map(ReturnScheduledComponent::new);
+        return Optional.empty();
     }
 
     @Override
@@ -32,8 +33,9 @@ public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrat
 
     @Override
     public Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field) {
-        return converters.getHandlerForType(field.getType())
-                .map(ReturnScheduledComponent::new);
+//        return converters.getHandlerForType(field.getType())
+//                .map(ReturnScheduledComponent::new);
+        return Optional.empty();
     }
 
     @Override

@@ -89,7 +89,7 @@ public class StdReturnConverterFunctions {
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
-                    ((FormattedString)o).getFor(context, Collections.emptyMap())
+                    ((FormattedString)o).getFor(Collections.emptyMap())
                         .zipWith(context.getMessage().getOrigin())
                         .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
                         .then();
@@ -106,7 +106,7 @@ public class StdReturnConverterFunctions {
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
-                    ((BotResponse)o).respondWith().getFor(context, Collections.emptyMap())
+                    ((BotResponse)o).respondWith().getFor(Collections.emptyMap())
                             .zipWith(context.getMessage().getOrigin())
                             .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
                             .then();

@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3;
 
-import com.github.lucbui.fracktail3.discord.config.DiscordConfigurationBuilder;
+import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import discord4j.core.object.presence.Activity;
@@ -16,9 +16,10 @@ public class Config {
     @Bean
     public Platform discord(@Value("${token}") String token) {
         return new DiscordPlatform.Builder()
-            .withConfiguration(new DiscordConfigurationBuilder(token)
-                .withPrefix("!")
-                .withPresence(Presence.doNotDisturb(Activity.watching("you be such a cutie"))))
+                .withConfiguration(new DiscordConfiguration(
+                        token,
+                        "!",
+                        Presence.doNotDisturb(Activity.watching("you be such a cutie"))))
             .build();
     }
 }

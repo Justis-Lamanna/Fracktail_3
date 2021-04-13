@@ -24,7 +24,7 @@ public class InjectPlatformStrategy implements ParameterScheduledComponentStrate
         if(parameter.isAnnotationPresent(InjectPlatform.class)) {
             Class<? extends Platform> pType = validateParameterClass(parameter);
             String key = getPlatformIdIfPresent(parameter);
-            return Optional.of(new ParameterScheduledComponent(new InjectPlatformHandler(key, pType)));
+//            return Optional.of(new ParameterScheduledComponent(new InjectPlatformHandler(key, pType)));
         }
         return Optional.empty();
     }

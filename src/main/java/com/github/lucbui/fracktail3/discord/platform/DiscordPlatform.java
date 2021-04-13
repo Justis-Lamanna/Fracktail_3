@@ -63,7 +63,6 @@ public class DiscordPlatform implements Platform {
         return "discord";
     }
 
-    @Override
     public DiscordConfiguration getConfig() {
         return configuration;
     }
@@ -95,7 +94,7 @@ public class DiscordPlatform implements Platform {
                 .flatMap(message -> {
                     return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
                             .flatMap(c -> Flux.fromIterable(c.getNames()).map(name -> Tuples.of(name, c)))
-                            .filter(t -> message.getContent().startsWith(t.getT1()))
+                            .filter(t -> message.getContent().startsWith(configuration.getPrefix() + t.getT1()))
                             .map(t -> {
                                 String cmdStr = t.getT1();
                                 String pStr = StringUtils.removeStart(message.getContent(), cmdStr);

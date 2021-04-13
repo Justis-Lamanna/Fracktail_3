@@ -1,49 +1,19 @@
 package com.github.lucbui.fracktail3.discord.config;
 
-import com.github.lucbui.fracktail3.magic.Localizable;
-import com.github.lucbui.fracktail3.magic.config.Config;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
-
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Subclass of a Configuration for a Discord bot.
  */
-public class DiscordConfiguration implements Config, Localizable {
+@RequiredArgsConstructor
+@Getter
+public class DiscordConfiguration {
     private final String token;
     private final String prefix;
     private final StatusUpdate presence;
-    private final String i18nPath;
-
-    /**
-     * Initialize a bot Configuration
-     * @param token The Discord Token to use.
-     * @param prefix The command prefix to use.
-     * @param i18nPath The path for a Localization bundle.
-     * @param presence The presence this bot should have.
-     */
-    public DiscordConfiguration(
-            String token, String prefix, String i18nPath,
-            StatusUpdate presence) {
-        this.token = token;
-        this.prefix = prefix;
-        this.presence = presence;
-        this.i18nPath = i18nPath;
-    }
-
-    /**
-     * Initialize a bot Configuration with no owner or i18n.
-     * @param token The Discord Token to use.
-     * @param prefix The command prefix to use.
-     * @param presence The presence this bot should have.
-     */
-    public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, presence);
-    }
 
     /**
      * Initialize a bot Configuration with no owner or i18n, and a general online presence.
@@ -52,58 +22,5 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public DiscordConfiguration(String token, String prefix) {
         this(token, prefix, Presence.online());
-    }
-
-    /**
-     * Get the token of this bot.
-     * @return The bot's token.
-     */
-    public String getToken() {
-        return token;
-    }
-
-    /**
-     * Get the prefix of this bot.
-     * @return The bot's prefix.
-     */
-    public String getPrefix() {
-        return prefix;
-    }
-
-    /**
-     * Get the presence of this bot.
-     * @return The bot's presence.
-     */
-    public StatusUpdate getPresence() {
-        return presence;
-    }
-
-    /**
-     * Get the path to the resource bundle.
-     * @return The resource bundle's path, or empty if none registered.
-     */
-    public Optional<String> getI18nPath() {
-        return Optional.ofNullable(i18nPath);
-    }
-
-    /**
-     * Test is i18n is enabled.
-     * @return True, if i18n is supported.
-     */
-    public boolean hasI18nEnabled() {
-        return i18nPath != null;
-    }
-
-    @Override
-    public ResourceBundle getResourceBundle(Locale locale) {
-        if(!isLocalizationEnabled()) {
-            throw new NoSuchElementException("Localization is disabled");
-        }
-        return ResourceBundle.getBundle(i18nPath, locale);
-    }
-
-    @Override
-    public boolean isLocalizationEnabled() {
-        return i18nPath != null;
     }
 }

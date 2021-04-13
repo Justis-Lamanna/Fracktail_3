@@ -14,10 +14,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 public abstract class BaseFracktailTest {
     @Mock
-    protected CommandUseContext<?> context;
+    protected CommandUseContext context;
 
     @Mock
     protected Platform platform;
@@ -75,9 +73,6 @@ public abstract class BaseFracktailTest {
         when(context.getPlatform()).thenReturn(platform);
         when(context.getParameters()).thenReturn(parameters);
         when(context.getCommand()).thenReturn(command);
-        when(context.getLocale()).thenReturn(Mono.just(Locale.ENGLISH));
-
-        when(context.respond(anyString())).thenReturn(Mono.empty());
 
         when(bot.getSpec()).thenReturn(botSpec);
         when(bot.getPlatforms()).thenReturn(Collections.singletonList(platform));
