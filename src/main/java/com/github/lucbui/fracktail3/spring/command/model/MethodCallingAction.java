@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -71,11 +70,11 @@ public class MethodCallingAction implements CommandAction {
     }
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         return doActionUnguarded(context);
     }
 
-    public Mono<Void> doActionUnguarded(CommandUseContext<?> context) {
+    public Mono<Void> doActionUnguarded(CommandUseContext context) {
         Object[] params = parameterComponents.stream()
                 .map(pc -> pc.func.apply(context))
                 .toArray();
@@ -93,7 +92,7 @@ public class MethodCallingAction implements CommandAction {
     }
 
     @Override
-    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+    public Mono<Boolean> guard(CommandUseContext context) {
         return Stream.concat(
                     methodComponent.guards.stream(),
                     parameterComponents.stream().flatMap(pc -> pc.guards.stream())

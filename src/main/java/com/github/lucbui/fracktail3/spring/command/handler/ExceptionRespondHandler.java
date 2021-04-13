@@ -10,7 +10,7 @@ import java.util.Collections;
 /**
  * An ExceptionHandler which responds with a certain FormattedString
  */
-public class ExceptionRespondHandler implements ExceptionBaseComponent.ExceptionHandler<CommandUseContext<?>> {
+public class ExceptionRespondHandler implements ExceptionBaseComponent.ExceptionHandler<CommandUseContext> {
     private final FormattedString fString;
 
     /**
@@ -32,8 +32,8 @@ public class ExceptionRespondHandler implements ExceptionBaseComponent.Exception
     }
 
     @Override
-    public Mono<Void> apply(CommandUseContext<?> context, Throwable throwable) {
+    public Mono<Void> apply(CommandUseContext context, Throwable throwable) {
         return fString.getFor(context, Collections.singletonMap("message", throwable.getMessage()))
-                .flatMap(context::respond).then();
+                .flatMap(str -> context.getMessage().getOrigin().flatMap(place -> place.sendMessage(str))).then();
     }
 }

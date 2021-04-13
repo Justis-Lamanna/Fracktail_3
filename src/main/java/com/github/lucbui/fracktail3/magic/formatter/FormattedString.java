@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import reactor.core.publisher.Mono;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * Class which encapsulates a formattable string
  */
 public class FormattedString implements BotResponse {
-    private static ContextFormatter _default = new ICU4JDecoratorFormatter();
+    private static ContextFormatter _default = (raw, ctx, addlVars) -> Mono.just(raw);
 
     private final String raw;
     private final ContextFormatter formatter;
@@ -79,7 +79,7 @@ public class FormattedString implements BotResponse {
      * @param ctx The context of the string
      * @return The formatted value
      */
-    public Mono<String> getFor(BaseContext<?> ctx) {
+    public Mono<String> getFor(CommandUseContext ctx) {
         return formatter.format(raw, ctx, Collections.emptyMap());
     }
 
@@ -89,7 +89,7 @@ public class FormattedString implements BotResponse {
      * @param addlVariables Additional variables to use
      * @return The formatted value
      */
-    public Mono<String> getFor(BaseContext<?> ctx, Map<String, Object> addlVariables) {
+    public Mono<String> getFor(CommandUseContext ctx, Map<String, Object> addlVariables) {
         return formatter.format(raw, ctx, addlVariables);
     }
 

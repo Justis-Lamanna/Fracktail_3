@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic.formatter;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.platform.Message;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

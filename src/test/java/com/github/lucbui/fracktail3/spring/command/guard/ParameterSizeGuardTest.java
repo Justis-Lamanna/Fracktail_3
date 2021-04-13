@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.guard;
 
 import com.github.lucbui.fracktail3.BaseFracktailTest;
-import com.github.lucbui.fracktail3.modules.meta.CommandLookupContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;

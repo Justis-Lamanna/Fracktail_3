@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.spring.command.annotation.Payload;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;

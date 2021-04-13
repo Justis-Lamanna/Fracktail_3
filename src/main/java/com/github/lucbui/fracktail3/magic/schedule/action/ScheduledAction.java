@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.schedule.action;
 
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -12,5 +12,5 @@ public interface ScheduledAction {
      * @param context The context of the execution
      * @return Asynchronous indication of completion
      */
-    Mono<Void> execute(ScheduledUseContext context);
+    Mono<Void> execute(ScheduleUseContext context);
 }

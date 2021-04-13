@@ -2,8 +2,8 @@ package com.github.lucbui.fracktail3.magic.schedule;
 
 import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
+import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ScheduleEventTrigger;
 import reactor.core.publisher.Mono;
 
@@ -76,7 +76,7 @@ public class ScheduledEvent implements Id, Disableable {
      * @param context The execution context
      * @return Asynchronous indication of completion
      */
-    public Mono<Void> execute(ScheduledUseContext context) {
+    public Mono<Void> execute(ScheduleUseContext context) {
         triggerState = TriggerState.RUNNING;
         return action.execute(context);
     }

@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.spring.service;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;

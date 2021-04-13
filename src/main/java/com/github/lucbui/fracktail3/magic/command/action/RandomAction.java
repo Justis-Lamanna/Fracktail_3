@@ -1,12 +1,10 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -39,16 +37,8 @@ public class RandomAction implements CommandAction {
     }
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         return actions.sample().doAction(context);
-    }
-
-    @Override
-    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-        return Flux.fromIterable(actions.getPmf())
-                .filter(p -> p.getSecond() != null && p.getSecond() != 0.0)
-                .filterWhen(p -> p.getFirst().guard(context))
-                .hasElements();
     }
 
     /**

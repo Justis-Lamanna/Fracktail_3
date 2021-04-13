@@ -18,7 +18,7 @@ public class LoggingAction implements CommandAction {
 
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         LOGGER.info(msg);
         return Mono.empty();
     }

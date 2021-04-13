@@ -8,7 +8,7 @@ import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 /**
  * A ParameterConverterFunction which converts a parameter into some type
  */
-public class ParameterToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext<?>> {
+public class ParameterToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext> {
     private final Class<?> paramType;
     private final int param;
     private final ParameterConverters converters;
@@ -26,7 +26,7 @@ public class ParameterToObjectConverterFunction implements ParameterBaseComponen
     }
 
     @Override
-    public Object apply(CommandUseContext<?> context) {
+    public Object apply(CommandUseContext context) {
         return context.getParameters().getParameter(param)
                 .map(s -> (Object)converters.convertToType(s, paramType))
                 .orElseGet(() -> Defaults.getDefault(paramType));

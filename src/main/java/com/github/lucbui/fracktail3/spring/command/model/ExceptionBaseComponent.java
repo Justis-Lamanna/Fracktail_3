@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -12,7 +11,7 @@ import java.util.function.BiFunction;
 /**
  * A base component which handles exceptions thrown in the course of execution
  */
-public abstract class ExceptionBaseComponent<T extends BaseContext<?>> {
+public abstract class ExceptionBaseComponent<T> {
     protected final Map<Class<? extends Throwable>, ExceptionHandler<? super T>> candidates;
 
     /**
@@ -63,5 +62,5 @@ public abstract class ExceptionBaseComponent<T extends BaseContext<?>> {
     /**
      * Describes a handler which accepts the CommandUseContext and Throwable
      */
-    public interface ExceptionHandler<T extends BaseContext<?>> extends BiFunction<T, Throwable, Mono<Void>> {}
+    public interface ExceptionHandler<T> extends BiFunction<T, Throwable, Mono<Void>> {}
 }

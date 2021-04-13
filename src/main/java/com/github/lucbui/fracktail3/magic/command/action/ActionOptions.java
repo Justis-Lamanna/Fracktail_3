@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 import reactor.core.publisher.Flux;
@@ -45,19 +44,12 @@ public class ActionOptions extends IdStore<ActionOption> implements CommandActio
     }
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         return Flux.fromIterable(getAll())
                 .filterWhen(ao -> ao.matches(context))
                 .map(ActionOption::getAction)
                 .next().defaultIfEmpty(_default)
                 .flatMap(action -> action.doAction(context));
-    }
-
-    @Override
-    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-        return Flux.fromIterable(getAll())
-                .filterWhen(ao -> ao.matches(context))
-                .hasElements();
     }
 
     /**

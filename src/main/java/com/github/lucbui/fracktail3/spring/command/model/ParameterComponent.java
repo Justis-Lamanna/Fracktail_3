@@ -10,14 +10,14 @@ import java.util.List;
 /**
  * A piece of a MethodCallingAction which resolves the context into a parameter to be injected into the method
  */
-public class ParameterComponent extends ParameterBaseComponent<CommandUseContext<?>> {
+public class ParameterComponent extends ParameterBaseComponent<CommandUseContext> {
     List<Guard> guards;
 
     /**
      * Initialize this component with a function
      * @param func The function to use
      */
-    public ParameterComponent(ParameterConverterFunction<? super CommandUseContext<?>> func) {
+    public ParameterComponent(ParameterConverterFunction<? super CommandUseContext> func) {
         super(func);
         this.guards = new ArrayList<>();
     }

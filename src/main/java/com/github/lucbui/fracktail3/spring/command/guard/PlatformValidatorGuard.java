@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.guard;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import org.apache.commons.lang3.ClassUtils;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +21,7 @@ public class PlatformValidatorGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
+    public Mono<Boolean> matches(CommandUseContext ctx) {
         return Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), platform));
     }
 

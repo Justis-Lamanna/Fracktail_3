@@ -1,12 +1,12 @@
 package com.github.lucbui.fracktail3.spring.schedule.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
 import com.github.lucbui.fracktail3.spring.service.Defaults;
 import org.apache.commons.lang3.ClassUtils;
 
-public class InjectPlatformHandler implements ParameterBaseComponent.ParameterConverterFunction<BaseContext<?>> {
+public class InjectPlatformHandler implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext> {
     private final String id;
     private final Class<? extends Platform> platformClazz;
 
@@ -29,7 +29,7 @@ public class InjectPlatformHandler implements ParameterBaseComponent.ParameterCo
     }
 
     @Override
-    public Object apply(BaseContext<?> context) {
+    public Object apply(CommandUseContext context) {
         if(id == null) {
             return context.getBot()
                     .getPlatforms()

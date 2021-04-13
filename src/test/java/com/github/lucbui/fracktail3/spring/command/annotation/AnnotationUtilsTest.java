@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.spring.command.annotation;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.ContextFormatter;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.CronTrigger;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ExecuteAfterDurationTrigger;

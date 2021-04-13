@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * A ParameterConverterFunction which converts a range of parameters into an array of some type
  */
-public class ParameterRangeToArrayConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext<?>> {
+public class ParameterRangeToArrayConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext> {
     private final int start;
     private final int end;
     private final Class<?> memberType;
@@ -33,7 +33,7 @@ public class ParameterRangeToArrayConverterFunction implements ParameterBaseComp
     }
 
     @Override
-    public Object apply(CommandUseContext<?> context) {
+    public Object apply(CommandUseContext context) {
         return context.getParameters().getParameters(start, end).stream()
                 .map(opt -> opt.map(s -> (Object)converters.convertToType(s, memberType))
                         .orElseGet(() -> Defaults.getDefault(memberType)))

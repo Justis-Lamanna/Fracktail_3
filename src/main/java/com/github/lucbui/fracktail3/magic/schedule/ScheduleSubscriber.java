@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -13,9 +13,9 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleSubscriber.class);
 
     private final ScheduledEvent event;
-    private final Function<Instant, ? extends ScheduledUseContext> contextCreator;
+    private final Function<Instant, ScheduleUseContext> contextCreator;
 
-    public ScheduleSubscriber(ScheduledEvent event, Function<Instant, ? extends ScheduledUseContext> contextCreator) {
+    public ScheduleSubscriber(ScheduledEvent event, Function<Instant, ScheduleUseContext> contextCreator) {
         this.event = event;
         this.contextCreator = contextCreator;
     }
@@ -29,7 +29,7 @@ public class ScheduleSubscriber implements Subscriber<Instant> {
     @Override
     public void onNext(Instant instant) {
         if(event.isEnabled()) {
-            ScheduledUseContext ctx = contextCreator.apply(instant);
+            ScheduleUseContext ctx = contextCreator.apply(instant);
             event.execute(ctx).subscribe();
         }
     }

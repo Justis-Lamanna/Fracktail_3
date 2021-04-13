@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -15,7 +15,7 @@ public interface ContextFormatter {
      * @param ctx The context to use in the formatting
      * @return Asynchronously-determined formatted string
      */
-    Mono<String> format(String raw, BaseContext<?> ctx, Map<String, Object> addlVars);
+    Mono<String> format(String raw, CommandUseContext ctx, Map<String, Object> addlVars);
 
     /**
      * Formatter which simply returns the input

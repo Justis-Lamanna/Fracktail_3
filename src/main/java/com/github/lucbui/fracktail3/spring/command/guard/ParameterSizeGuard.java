@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.command.guard;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -23,9 +22,9 @@ public class ParameterSizeGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
+    public Mono<Boolean> matches(CommandUseContext ctx) {
         if (ctx instanceof CommandUseContext) {
-            CommandUseContext<?> cctx = (CommandUseContext<?>) ctx;
+            CommandUseContext cctx = (CommandUseContext) ctx;
             int size = cctx.getParameters().getNumberOfParameters();
             return Mono.just(size >= minimum && size <= maximum);
         }

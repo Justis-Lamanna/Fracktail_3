@@ -1,14 +1,14 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
 /**
  * An action which responds to the context in some way.
  * The context should implement "RespondingContext" to fully support this action.
  */
-public class RespondingAction implements PlatformBasicAction {
+public class RespondingAction implements CommandAction {
     private final FormattedString text;
 
     /**
@@ -28,8 +28,7 @@ public class RespondingAction implements PlatformBasicAction {
     }
 
     @Override
-    public Mono<Void> doAction(PlatformBaseContext<?> context) {
-        return text.getFor(context)
-                .flatMap(context::respond).then();
+    public Mono<Void> doAction(CommandUseContext context) {
+        return Mono.empty();
     }
 }

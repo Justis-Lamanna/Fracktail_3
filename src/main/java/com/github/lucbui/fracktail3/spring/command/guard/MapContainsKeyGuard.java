@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.guard;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -19,9 +19,8 @@ public class MapContainsKeyGuard implements Guard {
     }
 
     @Override
-    public Mono<Boolean> matches(PlatformBaseContext<?> ctx) {
-        if(ctx.getMap() == null) return Mono.just(false);
-        return Mono.just(ctx.getMap().containsKey(key));
+    public Mono<Boolean> matches(CommandUseContext ctx) {
+        return Mono.just(false);
     }
 
     /**

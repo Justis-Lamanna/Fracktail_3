@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.spring.service;
 
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnBaseComponent;
@@ -19,7 +18,7 @@ public class ReturnConverters {
      * @param clazz The class to get a handler for
      * @return A ReturnConverterFunction to handle that class, if it exists
      */
-    public Optional<ReturnBaseComponent.ReturnConverterFunction<? super BaseContext<?>>> getHandlerForType(Class<?> clazz) {
+    public Optional<ReturnBaseComponent.ReturnConverterFunction<?>> getHandlerForType(Class<?> clazz) {
         if (clazz.equals(Void.class) || clazz.equals(Void.TYPE)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if (clazz.equals(Mono.class)) {

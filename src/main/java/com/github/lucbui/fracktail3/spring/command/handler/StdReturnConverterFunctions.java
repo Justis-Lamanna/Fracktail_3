@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnBaseComponent;
 import reactor.core.publisher.Flux;
@@ -18,9 +18,9 @@ public class StdReturnConverterFunctions {
      * ReturnConverterFunction which handles a void or Void return.
      * This simply does nothing with the return, since there is no return
      */
-    public static class Voids implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class Voids implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return Mono.empty();
         }
     }
@@ -30,9 +30,9 @@ public class StdReturnConverterFunctions {
      * The returned Mono completes when the input mono completes.
      * If null, this returns an empty Mono
      */
-    public static class Monos implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class Monos implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> {
                 if(s == null) {
                     return new Monos().apply(context, null);
@@ -58,9 +58,9 @@ public class StdReturnConverterFunctions {
      * The returned Mono completes when the input flux completes.
      * If null, this returns an empty Mono
      */
-    public static class Fluxs implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class Fluxs implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ? Mono.empty() : ((Flux<?>)o).then();
         }
     }
@@ -70,12 +70,12 @@ public class StdReturnConverterFunctions {
      * The returned string is sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class Strings implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class Strings implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
-                    context.respond((String)o).then();
+                    context.getMessage().getOrigin().flatMap(p -> p.sendMessage((String)o)).then();
         }
     }
 
@@ -84,13 +84,13 @@ public class StdReturnConverterFunctions {
      * The returned FormattedString is resolved and sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class FStrings implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class FStrings implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
                     ((FormattedString)o).getFor(context, Collections.emptyMap())
-                        .zipWith(context.getTriggerPlace())
+                        .zipWith(context.getMessage().getOrigin())
                         .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
                         .then();
         }
@@ -101,13 +101,13 @@ public class StdReturnConverterFunctions {
      * The returned BotResponse is resolved and sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class BotResponses implements ReturnBaseComponent.ReturnConverterFunction<BaseContext<?>> {
+    public static class BotResponses implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
         @Override
-        public Mono<Void> apply(BaseContext<?> context, Object o) {
+        public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
                     ((BotResponse)o).respondWith().getFor(context, Collections.emptyMap())
-                            .zipWith(context.getTriggerPlace())
+                            .zipWith(context.getMessage().getOrigin())
                             .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
                             .then();
         }

@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.schedule.model;
 
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
+import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,7 +62,7 @@ public class MethodCallingScheduledAction implements ScheduledAction {
     }
 
     @Override
-    public Mono<Void> execute(ScheduledUseContext context) {
+    public Mono<Void> execute(ScheduleUseContext context) {
         Object[] params = parameterComponents.stream()
                 .map(pc -> pc.getFunc().apply(context))
                 .toArray();

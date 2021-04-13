@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
-import com.github.lucbui.fracktail3.magic.platform.context.BaseContext;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * A base component which determines how the method's response should be handled
  */
-public abstract class ReturnBaseComponent<T extends BaseContext<?>> {
+public abstract class ReturnBaseComponent<T> {
     protected final ReturnConverterFunction<? super T> func;
     protected final List<Consumer<Object>> consumers;
 
@@ -54,5 +53,5 @@ public abstract class ReturnBaseComponent<T extends BaseContext<?>> {
     /**
      * Describes a function which performs some action when the method or field returns.
      */
-    public interface ReturnConverterFunction<T extends BaseContext<?>> extends BiFunction<T, Object, Mono<Void>> {}
+    public interface ReturnConverterFunction<T> extends BiFunction<T, Object, Mono<Void>> {}
 }

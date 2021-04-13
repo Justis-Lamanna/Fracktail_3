@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -38,7 +37,7 @@ public class FieldCallingAction implements CommandAction {
     }
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         return Mono.fromCallable(() -> fieldToRetrieve.get(objToInvokeOn))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
                 .flatMap(o -> returnComponent.func.apply(context, o))
@@ -53,7 +52,7 @@ public class FieldCallingAction implements CommandAction {
     }
 
     @Override
-    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
+    public Mono<Boolean> guard(CommandUseContext context) {
         return methodComponent.guards.stream()
                 .map(guard -> guard.matches(context))
                 .reduce(Mono.just(true), BooleanUtils::and);

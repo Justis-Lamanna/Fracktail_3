@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.spring.schedule.handler;
 
 import com.github.lucbui.fracktail3.BaseFracktailTest;
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.trigger.ExecuteRepeatedlyTrigger;
 import com.github.lucbui.fracktail3.spring.schedule.exception.CancelTaskException;

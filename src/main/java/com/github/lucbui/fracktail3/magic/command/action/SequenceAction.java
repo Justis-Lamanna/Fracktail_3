@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.PlatformBaseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,18 +34,11 @@ public class SequenceAction implements CommandAction {
     }
 
     @Override
-    public Mono<Void> doAction(CommandUseContext<?> context) {
+    public Mono<Void> doAction(CommandUseContext context) {
         return Flux.fromIterable(subActions)
                 .filterWhen(c -> c.guard(context))
                 .concatMap(a -> a.doAction(context))
                 .then();
-    }
-
-    @Override
-    public Mono<Boolean> guard(PlatformBaseContext<?> context) {
-        return Flux.fromIterable(getSubActions())
-                .filterWhen(c -> c.guard(context))
-                .hasElements();
     }
 
     /**

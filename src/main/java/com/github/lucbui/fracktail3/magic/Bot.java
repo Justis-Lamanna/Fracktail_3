@@ -2,11 +2,11 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.context.ScheduledUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
+import com.github.lucbui.fracktail3.magic.schedule.context.BasicScheduleUseContext;
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
@@ -75,7 +75,7 @@ public class Bot extends IdStore<Platform> {
         for(ScheduledEvent event : botSpec.getScheduledEvents().getAll()) {
             event.getTrigger()
                     .schedule(scheduler)
-                    .subscribe(new ScheduleSubscriber(event, instant -> new ScheduledUseContext(this, instant, event)));
+                    .subscribe(new ScheduleSubscriber(event, instant -> new BasicScheduleUseContext(this, instant)));
         }
 
         return Flux.fromIterable(getAll())
