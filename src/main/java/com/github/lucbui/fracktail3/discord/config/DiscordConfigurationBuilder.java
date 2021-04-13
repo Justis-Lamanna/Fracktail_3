@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.discord.config;
 
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
-import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 import org.apache.commons.lang3.ObjectUtils;
@@ -12,7 +11,6 @@ import org.apache.commons.lang3.ObjectUtils;
 public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguration> {
     private final String token;
     private String prefix;
-    private Snowflake owner;
     private StatusUpdate presence;
     private String i18nPath;
 
@@ -31,30 +29,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
      */
     public DiscordConfigurationBuilder withPrefix(String prefix) {
         this.prefix = prefix;
-        return this;
-    }
-
-    /**
-     * Set the owner of this bot
-     * In most cases, this is the developer.
-     * Alerts will be DMed to this owner, and an "owner" userset will be created automatically.
-     * @param owner The ID of the owner of the bot
-     * @return This builder.
-     */
-    public DiscordConfigurationBuilder withOwner(Snowflake owner) {
-        this.owner = owner;
-        return this;
-    }
-
-    /**
-     * Set the owner of this bot
-     * In most cases, this is the developer. However, this field is optional.
-     * If present and "owner" userset will be created automatically.
-     * @param owner The ID of the owner of the bot
-     * @return This builder.
-     */
-    public DiscordConfigurationBuilder withOwner(long owner) {
-        this.owner = Snowflake.of(owner);
         return this;
     }
 
@@ -86,7 +60,6 @@ public class DiscordConfigurationBuilder implements IBuilder<DiscordConfiguratio
         return new DiscordConfiguration(
                 token,
                 ObjectUtils.defaultIfNull(prefix, ""),
-                owner,
                 i18nPath,
                 ObjectUtils.defaultIfNull(presence, Presence.online()));
     }

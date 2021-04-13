@@ -18,7 +18,6 @@ public class Config {
         return new DiscordPlatform.Builder()
             .withConfiguration(new DiscordConfigurationBuilder(token)
                 .withPrefix("!")
-                .withOwner(248612704019808258L)
                 .withPresence(Presence.doNotDisturb(Activity.watching("you be such a cutie"))))
             .build();
     }

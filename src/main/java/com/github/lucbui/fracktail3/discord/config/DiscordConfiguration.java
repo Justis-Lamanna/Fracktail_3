@@ -2,11 +2,9 @@ package com.github.lucbui.fracktail3.discord.config;
 
 import com.github.lucbui.fracktail3.magic.Localizable;
 import com.github.lucbui.fracktail3.magic.config.Config;
-import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,7 +16,6 @@ import java.util.ResourceBundle;
 public class DiscordConfiguration implements Config, Localizable {
     private final String token;
     private final String prefix;
-    private final Snowflake owner;
     private final StatusUpdate presence;
     private final String i18nPath;
 
@@ -26,16 +23,14 @@ public class DiscordConfiguration implements Config, Localizable {
      * Initialize a bot Configuration
      * @param token The Discord Token to use.
      * @param prefix The command prefix to use.
-     * @param owner The owner of this bot (can be null).
      * @param i18nPath The path for a Localization bundle.
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(
-            String token, String prefix, @Nullable Snowflake owner, String i18nPath,
+            String token, String prefix, String i18nPath,
             StatusUpdate presence) {
         this.token = token;
         this.prefix = prefix;
-        this.owner = owner;
         this.presence = presence;
         this.i18nPath = i18nPath;
     }
@@ -47,7 +42,7 @@ public class DiscordConfiguration implements Config, Localizable {
      * @param presence The presence this bot should have.
      */
     public DiscordConfiguration(String token, String prefix, StatusUpdate presence) {
-        this(token, prefix, null, null, presence);
+        this(token, prefix, null, presence);
     }
 
     /**
@@ -81,14 +76,6 @@ public class DiscordConfiguration implements Config, Localizable {
      */
     public StatusUpdate getPresence() {
         return presence;
-    }
-
-    /**
-     * Get the owner of the bot, if it exists.
-     * @return The bot's owner, or empty if none registered.
-     */
-    public Optional<Snowflake> getOwner() {
-        return Optional.ofNullable(owner);
     }
 
     /**
