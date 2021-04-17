@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
+import com.github.lucbui.fracktail3.modules.games.checkers.action.ForfeitAction;
 import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.BoardDisplay;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
@@ -65,6 +66,7 @@ public class CheckersManager {
     @Usage("Play Checkers! Commands are as follows:\n" +
             "\t!checkers start <@opponent> - Start a game with an opponent.\n" +
             "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example: A1)\n" +
+            "\t!checkers play <id?> forfeit - Forfeit the game.\n" +
             "\t!checkers watch <id> - Spectate on a match\n" +
             "\t!checkers unwatch <id?> - Stop watching a match. If no ID specified, all matches are unwatched.\n" +
             "\t!checkers view <id> - View the board and current player of a match.\n" +
@@ -201,6 +203,9 @@ public class CheckersManager {
     }
 
     private Action<Checkerboard> parseAction(Checkerboard board, Color player, String playStr) {
+        if(playStr.equalsIgnoreCase("forfeit")) {
+            return new ForfeitAction(player);
+        }
         String[] fromTo = playStr.split(":");
         if(fromTo.length != 2) {
             throw new IllegalArgumentException("Unknown format");
@@ -300,6 +305,7 @@ public class CheckersManager {
                     .subscribe();
 
             game.actionsFeed()
+                    .filter(turn -> !(turn.getAction() instanceof ForfeitAction))
                     .flatMap(turn -> {
                         //Determine the player
                         InTurnAction<Checkerboard, Color> ma = (InTurnAction<Checkerboard, Color>) turn.getAction();
@@ -308,9 +314,9 @@ public class CheckersManager {
                         String toBlackMessage;
                         if(player == Color.RED) {
                             toRedMessage = "You played. " + black.getName() + "'s turn!";
-                            toBlackMessage = red.getName() + " has played. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
+                            toBlackMessage = "(" + id + ") " + red.getName() + " has played. Your turn!\n" + BoardDisplay.display(turn.getPostAction());
                         } else {
-                            toRedMessage = black.getName() + " has played. Your turn!\n"  + BoardDisplay.display(turn.getPostAction());
+                            toRedMessage = "(" + id + ") " + black.getName() + " has played. Your turn!\n"  + BoardDisplay.display(turn.getPostAction());
                             toBlackMessage = "You played. " + red.getName() + "'s turn!";
                         }
                         return Flux.merge(
@@ -324,14 +330,14 @@ public class CheckersManager {
                         String toRedMessage;
                         String toBlackMessage;
                         Map<Color, Long> standings = game.getGameField().getStandings();
-                        if(standings.get(Color.RED) == 0) {
-                            toRedMessage = "You lost. Better luck next time!";
-                            toBlackMessage = "You won, congrats!";
-                        } else if(standings.get(Color.BLACK) == 0) {
-                            toBlackMessage = "You lost. Better luck next time!";
-                            toRedMessage = "You won, congrats!";
+                        if(standings.get(Color.RED) == 0 || game.getGameField().getForfeitedPlayer() == Color.RED) {
+                            toRedMessage = "(" + id + ") You lost. Better luck next time!";
+                            toBlackMessage = "(" + id + ") You won, congrats!";
+                        } else if(standings.get(Color.BLACK) == 0 || game.getGameField().getForfeitedPlayer() == Color.BLACK) {
+                            toBlackMessage = "(" + id + ") You lost. Better luck next time!";
+                            toRedMessage = "(" + id + ") You won, congrats!";
                         } else {
-                            toBlackMessage = toRedMessage = "It was a draw. Better luck next time!";
+                            toBlackMessage = toRedMessage = "(" + id + ") It was a draw. Better luck next time!";
                         }
 
                         red.getPrivateChannel().flatMap(place -> place.sendMessage(toRedMessage)).subscribe();
@@ -345,7 +351,7 @@ public class CheckersManager {
                     .flatMap(turn -> {
                         InTurnAction<Checkerboard, Color> ma = (InTurnAction<Checkerboard, Color>) turn.getAction();
                         Color player = ma.getPlayer();
-                        String message = getPlayer(player).getName() + " played.";
+                        String message = "(" + id + ") " + getPlayer(player).getName() + " played.";
                         return spectator.getPrivateChannel().flatMap(place -> place.sendMessage(message +
                                 "\n" + BoardDisplay.display(turn.getPostAction())));
                     })

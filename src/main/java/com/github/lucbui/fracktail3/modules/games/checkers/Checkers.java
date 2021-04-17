@@ -43,7 +43,12 @@ public class Checkers extends BasicGame<Checkerboard> {
 
     @Override
     public boolean isComplete() {
-        Map<Color, Long> standings = getGameField().getStandings();
+        Checkerboard field = getGameField();
+        if(field.getForfeitedPlayer() != null) {
+            return true;
+        }
+
+        Map<Color, Long> standings = field.getStandings();
         return standings.get(Color.RED) == 0 || standings.get(Color.BLACK) == 0;
     }
 }
