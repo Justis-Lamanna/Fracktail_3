@@ -1,10 +1,8 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.github.lucbui.fracktail3.magic.platform.MultiMessage;
-import com.github.lucbui.fracktail3.magic.platform.NonePerson;
-import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
 import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
@@ -22,11 +20,15 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
 public class CheckersManager {
+    private static final Duration CHECKERS_INVITE_TIMEOUT = Duration.ofMinutes(5);
+
     private final Map<String, Session> games = new HashMap<>();
 
     public synchronized Session startGame(Person red, Person black) {
@@ -63,7 +65,11 @@ public class CheckersManager {
     @Usage("Play Checkers! Commands are as follows:\n" +
             "\t!checkers start <@opponent> - Start a game with an opponent.\n" +
             "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example: A1)\n" +
-            "\t!checkers watch <id> - Spectate on a match")
+            "\t!checkers watch <id> - Spectate on a match\n" +
+            "\t!checkers unwatch <id?> - Stop watching a match. If no ID specified, all matches are unwatched.\n" +
+            "\t!checkers view <id> - View the board and current player of a match.\n" +
+            "\t!checkers games - View all the games you are current participating in."
+    )
     public Mono<String> checkers(@InjectPlatform Platform platform,
                                  @InjectPerson Person sender,
                                  @Parameter(0) String subCommand,
@@ -103,6 +109,8 @@ public class CheckersManager {
                 //!checkers view <id> - Show the board of a single match
                 return doViewById(parameters[0]);
             }
+        } else if(StringUtils.equalsIgnoreCase(subCommand, "games")) {
+            return doGames(sender);
         } else {
             return Mono.just("Usage: Heck u");
         }
@@ -159,9 +167,32 @@ public class CheckersManager {
                         } else if(opp.equals(sender)) {
                             return Mono.just("You can't play checkers with yourself!");
                         } else {
-                            //TODO: Consent
-                            Session s = startGame(sender, opp);
-                            return Mono.just("Started a new game with ID: " + s.id);
+                            //Get their consent first! It's polite.
+                            opp.getPrivateChannel()
+                                    .flatMap(dms ->
+                                            dms.sendMessage(sender.getName() + " wants to play Checkers with you! If you would like to play, please send \"Y\". Otherwise, send \"N\".")
+                                            .thenReturn(dms)
+                                    ).flatMapMany(Place::getMessageFeed)
+                                    .filter(response -> StringUtils.equalsAnyIgnoreCase(response.getContent(), "y", "n"))
+                                    .next()
+                                    .timeout(CHECKERS_INVITE_TIMEOUT)
+                                    .flatMap(response -> {
+                                        if(StringUtils.equalsIgnoreCase(response.getContent(), "y")) {
+                                            startGame(opp, sender);
+                                            return Mono.empty();
+                                        } else {
+                                            return Flux.merge(
+                                                    sender.getPrivateChannel().flatMap(place -> place.sendMessage(opp.getName() + " declined your match")),
+                                                    opp.getPrivateChannel().flatMap(place -> place.sendMessage("No worries! Maybe next time."))
+                                            ).then();
+                                        }
+                                    })
+                                    .onErrorResume(TimeoutException.class, e -> Flux.merge(
+                                            sender.getPrivateChannel().flatMap(place -> place.sendMessage(opp.getName() + " didn't reply to your match invitation.")),
+                                            opp.getPrivateChannel().flatMap(place -> place.sendMessage("I can see you're busy! Maybe next time."))
+                                    ).then())
+                                    .subscribe();
+                            return Mono.just("Sure, I'll shoot them an invite.");
                         }
                     });
         } catch (NumberFormatException e) {
@@ -208,6 +239,19 @@ public class CheckersManager {
         Color currentPlayer = session.game.getGameField().getCurrentPlayer();
         return Mono.just("It is currently " + session.getPlayer(currentPlayer).getName() + "'s (" + StringUtils.capitalize(currentPlayer.name()) + ") turn.\n" +
                 BoardDisplay.display(session.game.getGameField()));
+    }
+
+    private Mono<String> doGames(Person sender) {
+        List<Session> sessions = getGame(sender);
+        if(sessions.isEmpty()) {
+            return Mono.just("You aren't playing any games");
+        } else {
+            return Mono.just(
+                    sessions.stream()
+                    .map(s -> "\t-" + s.id + ": " + s.red.getName() + " vs " + s.black.getName())
+                    .collect(Collectors.joining("\n", "Current Games: \n", ""))
+            );
+        }
     }
 
     private Mono<String> doAction(Action<Checkerboard> action, Checkers game) {
