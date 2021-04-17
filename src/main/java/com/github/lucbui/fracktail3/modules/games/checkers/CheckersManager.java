@@ -18,6 +18,7 @@ import lombok.Data;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -77,7 +78,7 @@ public class CheckersManager {
             if(parameters.length == 0) {
                 return Mono.just("Usage: !checkers watch <id>");
             } else {
-                return doWatchGame(sender, parameters[1]);
+                return doWatchGame(sender, parameters[0]);
             }
         } else if(StringUtils.equalsIgnoreCase(subCommand, "play")) {
             if(parameters.length == 1) {
@@ -86,6 +87,21 @@ public class CheckersManager {
                 return doPlayWithExplicitId(sender, parameters[0], parameters[1]);
             } else {
                 return Mono.just("Usage: !checkers play <id?> <move>. Move format is '[position of piece]:[place to move]'");
+            }
+        } else if(StringUtils.equalsIgnoreCase(subCommand, "unwatch")) {
+            if(parameters.length == 0) {
+                //!checkers unwatch
+                return doUnwatchAll(sender);
+            } else {
+                //!checkers unwatch <id>
+                return doUnwatchById(sender, parameters[0]);
+            }
+        } else if(StringUtils.equalsIgnoreCase(subCommand, "view")) {
+            if(parameters.length == 0) {
+                return Mono.just("Usage: !checkers view <id>");
+            } else {
+                //!checkers view <id> - Show the board of a single match
+                return doViewById(parameters[0]);
             }
         } else {
             return Mono.just("Usage: Heck u");
@@ -165,6 +181,35 @@ public class CheckersManager {
         return new MoveAction(player, piece, to);
     }
 
+    private Mono<String> doUnwatchAll(Person sender) {
+        games.values()
+                .forEach(s -> s.removeSpectator(sender));
+
+        return Mono.just("Stopped watching all games.");
+    }
+
+    private Mono<String> doUnwatchById(Person sender, String id) {
+        Session game = games.get(id);
+        if(game == null) {
+            return Mono.just("Unknown game ID.");
+        }
+
+        return game.removeSpectator(sender) ?
+                Mono.just("Stopped watching game " + id) :
+                Mono.just("You are not watching game " + id);
+    }
+
+    private Mono<String> doViewById(String id) {
+        Session session = games.get(id);
+        if(session == null) {
+            return Mono.just("Unknown game ID.");
+        }
+
+        Color currentPlayer = session.game.getGameField().getCurrentPlayer();
+        return Mono.just("It is currently " + session.getPlayer(currentPlayer).getName() + "'s (" + StringUtils.capitalize(currentPlayer.name()) + ") turn.\n" +
+                BoardDisplay.display(session.game.getGameField()));
+    }
+
     private Mono<String> doAction(Action<Checkerboard> action, Checkers game) {
         ActionLegality legality = game.canPerformAction(action);
         if(legality.isLegal()) {
@@ -181,7 +226,7 @@ public class CheckersManager {
         final Checkers game;
         final Person red;
         final Person black;
-        final List<Person> spectators = new ArrayList<>();
+        final List<Spectator> spectators = new ArrayList<>();
 
         public boolean isPlayer(Person person) {
             return red.equals(person) || black.equals(person);
@@ -252,7 +297,7 @@ public class CheckersManager {
         }
 
         public void addSpectator(Person spectator) {
-            game.actionsFeed()
+            Disposable unsubscribe = game.actionsFeed()
                     .flatMap(turn -> {
                         InTurnAction<Checkerboard, Color> ma = (InTurnAction<Checkerboard, Color>) turn.getAction();
                         Color player = ma.getPlayer();
@@ -272,7 +317,26 @@ public class CheckersManager {
                     })
                     .subscribe();
 
-            this.spectators.add(spectator);
+            this.spectators.add(new Spectator(spectator, unsubscribe));
         }
+
+        public boolean removeSpectator(Person spectator) {
+            Optional<Spectator> found = this.spectators.stream()
+                    .filter(s -> s.person.equals(spectator))
+                    .findFirst();
+
+            if(found.isPresent()) {
+                found.get().cancel.dispose();
+                this.spectators.remove(found.get());
+                return true;
+            }
+            return false;
+        }
+    }
+
+    @Data
+    private static class Spectator {
+        private final Person person;
+        private final Disposable cancel;
     }
 }

@@ -33,6 +33,21 @@ public class DiscordMessage implements Message {
                 .orElse(NonePerson.INSTANCE);
     }
 
+    public DiscordMessage(MessageCreateEvent event) {
+        this.wrappedMsg = event.getMessage();
+        this.content = event.getMessage().getContent();
+        this.attachments = event.getMessage().getAttachments().stream()
+                .map(a -> URI.create(a.getUrl()))
+                .toArray(URI[]::new);
+        if(event.getMember().isPresent()) {
+            this.sender = new DiscordMemberPerson(event.getMember().get());
+        } else if(event.getMessage().getAuthor().isPresent()) {
+            this.sender = new DiscordPerson(event.getMessage().getAuthor().get());
+        } else {
+            this.sender = NonePerson.INSTANCE;
+        }
+    }
+
     @Override
     public Mono<Place> getOrigin() {
         return wrappedMsg.getChannel()

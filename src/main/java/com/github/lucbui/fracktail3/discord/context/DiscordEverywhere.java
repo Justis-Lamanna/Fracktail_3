@@ -48,7 +48,6 @@ public class DiscordEverywhere implements Place {
     @Override
     public Flux<Message> getMessageFeed() {
         return client.on(MessageCreateEvent.class)
-                .map(MessageCreateEvent::getMessage)
                 .map(DiscordMessage::new);
     }
 

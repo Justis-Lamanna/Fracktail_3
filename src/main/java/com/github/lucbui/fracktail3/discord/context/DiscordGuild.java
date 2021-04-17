@@ -38,7 +38,6 @@ public class DiscordGuild implements Place {
     public Flux<Message> getMessageFeed() {
         return guild.getClient().on(MessageCreateEvent.class)
                 .filter(mce -> mce.getGuildId().map(id -> guild.getId().equals(id)).orElse(false))
-                .map(MessageCreateEvent::getMessage)
                 .map(DiscordMessage::new);
     }
 

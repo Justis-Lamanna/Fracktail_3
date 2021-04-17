@@ -89,7 +89,6 @@ public class DiscordPlatform implements Platform {
                 .flatMapMany(Place::getMessageFeed)
                 .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
                 .filter(msg -> !msg.getSender().isBot())
-                .doOnNext(msg -> System.out.println(msg.getSender().getName() + ": " + msg.getContent()))
                 .filter(message -> message.getContent().startsWith(configuration.getPrefix()))
                 .flatMap(message -> {
                     return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
@@ -97,14 +96,15 @@ public class DiscordPlatform implements Platform {
                             .filter(t -> message.getContent().startsWith(configuration.getPrefix() + t.getT1()))
                             .map(t -> {
                                 String cmdStr = t.getT1();
-                                String pStr = StringUtils.removeStart(message.getContent(), cmdStr);
+                                String pStr = StringUtils.removeStart(message.getContent(), configuration.getPrefix() + cmdStr)
+                                        .trim();
                                 String[] pArray = SPLIT_PATTERN.split(pStr);
                                 return new BasicCommandUseContext(bot, this, message, t.getT2(), new Parameters(pStr, pArray));
-                            });
+                            })
+                            .filterWhen(CommandUseContext::matches)
+                            .next()
+                            .flatMap(CommandUseContext::doAction);
                 })
-                .filterWhen(CommandUseContext::matches)
-                .next()
-                .flatMap(CommandUseContext::doAction)
                 .subscribe();
 
         return gateway.onDisconnect().thenReturn(true);
