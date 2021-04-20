@@ -40,7 +40,7 @@ public class DiscordMessage implements Message {
                 .map(a -> URI.create(a.getUrl()))
                 .toArray(URI[]::new);
         if(event.getMember().isPresent()) {
-            this.sender = new DiscordMemberPerson(event.getMember().get());
+            this.sender = new DiscordPerson(event.getMember().get());
         } else if(event.getMessage().getAuthor().isPresent()) {
             this.sender = new DiscordPerson(event.getMessage().getAuthor().get());
         } else {

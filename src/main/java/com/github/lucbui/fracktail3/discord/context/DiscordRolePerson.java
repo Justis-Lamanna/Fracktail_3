@@ -33,8 +33,8 @@ public class DiscordRolePerson implements Person, Formattable {
         return role.getGuild()
                 .flatMapMany(Guild::getMembers)
                 .filter(m -> m.getRoleIds().contains(role.getId()))
-                .map(DiscordMemberPerson::new)
-                .flatMap(DiscordMemberPerson::getPrivateChannel)
+                .map(DiscordPerson::new)
+                .flatMap(DiscordPerson::getPrivateChannel)
                 .collectList()
                 .map(MultiPlace::new);
     }

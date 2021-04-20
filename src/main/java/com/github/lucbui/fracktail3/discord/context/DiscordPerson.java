@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.discord.context;
 
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import discord4j.core.object.entity.Member;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +22,9 @@ public class DiscordPerson implements Person, Formattable {
 
     @Override
     public String getName() {
-        return user.getUsername();
+        return user instanceof Member ?
+                ((Member) user).getDisplayName() :
+                user.getUsername();
     }
 
     @Override

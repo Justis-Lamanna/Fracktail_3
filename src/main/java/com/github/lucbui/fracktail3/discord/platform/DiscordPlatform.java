@@ -174,7 +174,7 @@ public class DiscordPlatform implements Platform {
 
     private Mono<Person> getPersonByGuildAndUserId(String guildId, String userId) {
         return gateway.getMemberById(Snowflake.of(guildId), Snowflake.of(userId))
-                .map(DiscordMemberPerson::new);
+                .map(DiscordPerson::new);
     }
 
     private Mono<Person> getPersonByGuild(String guildId) {
