@@ -78,4 +78,8 @@ public class Position {
                 .mapToObj(indCol -> interpolate(other, indCol))
                 .collect(Collectors.toList());
     }
+
+    public Position add(int rows, int cols) {
+        return new Position(this.row + rows, this.col + cols);
+    }
 }
