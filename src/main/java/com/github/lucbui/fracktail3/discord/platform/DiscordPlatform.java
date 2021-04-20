@@ -103,7 +103,14 @@ public class DiscordPlatform implements Platform {
                             })
                             .filterWhen(CommandUseContext::matches)
                             .next()
-                            .flatMap(CommandUseContext::doAction);
+                            .flatMap(CommandUseContext::doAction)
+                            .onErrorResume(Throwable.class, e -> {
+                                e.printStackTrace();
+                                return message.getOrigin()
+                                        .flatMap(place ->
+                                                place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
+                                        .then();
+                            });
                 })
                 .subscribe();
 

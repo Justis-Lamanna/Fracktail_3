@@ -17,7 +17,7 @@ public class FormatUtils {
     private static final String MARKDOWN_MULTILINE_QUOTE_BLOCK = ">>> ";
     private static final String MARKDOWN_SPOILER = "||";
 
-    private static final String AT_USER = "<@!";
+    private static final String AT_USER = "<@";
     private static final String AT_ROLE = "<@&";
     private static final String END_AT = ">";
 
@@ -172,6 +172,7 @@ public class FormatUtils {
      */
     public static Snowflake fromUserMention(String mention) {
         String trimmed = StringUtils.removeEnd(StringUtils.removeStart(mention, AT_USER), END_AT);
+        trimmed = StringUtils.removeStart(trimmed, "!");
         return Snowflake.of(trimmed);
     }
 
