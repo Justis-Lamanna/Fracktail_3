@@ -8,6 +8,7 @@ import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MoveDirectionRuleTest {
@@ -77,5 +78,32 @@ class MoveDirectionRuleTest {
 
         MoveAction action = new MoveAction(Color.BLACK, piece, new Position(5, 4));
         assertTrue(RULE.isLegalMove(action, board).isLegal());
+    }
+
+    @Test
+    public void redMoveDownIntoKingAndBackUpIsLegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+        Position start = new Position(6, 1);
+        Position middle = new Position(7, 2);
+        Position end = new Position(6, 3);
+        board.addPiece(piece, start);
+
+        MoveAction action = new MoveAction(Color.RED, piece, middle, new Position[]{end});
+        assertTrue(RULE.isLegalMove(action, board).isLegal());
+        assertEquals(Type.KING, piece.getType());
+    }
+
+    @Test
+    public void redMoveDownAndUpIsIllegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+        Position start = new Position(4, 5);
+        Position middle = new Position(5, 4);
+        Position end = new Position(4, 3);
+        board.addPiece(piece, start);
+
+        MoveAction action = new MoveAction(Color.RED, piece, middle, new Position[]{end});
+        assertTrue(RULE.isLegalMove(action, board).isIllegal());
     }
 }

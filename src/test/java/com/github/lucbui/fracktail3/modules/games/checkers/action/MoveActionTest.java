@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class IMoveActionTest {
+class MoveActionTest {
     @Test
     public void testStandardMoveAction() {
         Checkerboard board = new Checkerboard(8);
@@ -60,5 +60,30 @@ class IMoveActionTest {
         assertFalse(board.getPiece(middle).isPresent());
         assertEquals(piece, board.getPiece(end).orElseGet(Assertions::fail));
         assertEquals(1, board.getGraveyard().size());
+    }
+
+    @Test
+    public void testMultiJump() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+        Piece toJump = new Piece(Color.BLACK);
+        Piece secondJump = new Piece(Color.BLACK);
+        Position start = new Position(0, 1);
+        Position toJumpPosition = new Position(1, 2);
+        Position middle = new Position(2, 3);
+        Position secondJumpPosition = new Position(3, 4);
+        Position end = new Position(4, 5);
+
+        board.addPiece(piece, start);
+        board.addPiece(toJump, toJumpPosition);
+        board.addPiece(secondJump, secondJumpPosition);
+
+        MoveAction action = new MoveAction(Color.RED, piece, middle, new Position[]{end});
+
+        action.performAction(board);
+        assertFalse(board.getPiece(start).isPresent());
+        assertFalse(board.getPiece(middle).isPresent());
+        assertEquals(piece, board.getPiece(end).orElseGet(Assertions::fail));
+        assertEquals(2, board.getGraveyard().size());
     }
 }

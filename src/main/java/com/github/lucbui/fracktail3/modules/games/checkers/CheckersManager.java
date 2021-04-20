@@ -65,7 +65,8 @@ public class CheckersManager {
     @Command
     @Usage("Play Checkers! Commands are as follows:\n" +
             "\t!checkers start <@opponent> - Start a game with an opponent.\n" +
-            "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example: A1)\n" +
+            "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example - A1:B2)\n" +
+            "\t\tNote that you can do multi jump by appending more :<position> values (example - A1:C3:E5)\n" +
             "\t!checkers play <id?> forfeit - Forfeit the game.\n" +
             "\t!checkers watch <id> - Spectate on a match\n" +
             "\t!checkers unwatch <id?> - Stop watching a match. If no ID specified, all matches are unwatched.\n" +
@@ -207,14 +208,23 @@ public class CheckersManager {
             return new ForfeitAction(player);
         }
         String[] fromTo = playStr.split(":");
-        if(fromTo.length != 2) {
+        if(fromTo.length < 2) {
             throw new IllegalArgumentException("Unknown format");
         }
         Position from = Position.parse(fromTo[0]);
         Position to = Position.parse(fromTo[1]);
+
         Piece piece = board.getPiece(from)
                 .orElseThrow(() -> new IllegalArgumentException("No piece at position " + fromTo[0]));
-        return new MoveAction(player, piece, to);
+
+        if(fromTo.length > 2) {
+            Position[] more = Arrays.stream(fromTo).skip(2)
+                    .map(Position::parse)
+                    .toArray(Position[]::new);
+            return new MoveAction(player, piece, to, more);
+        } else {
+            return new MoveAction(player, piece, to);
+        }
     }
 
     private Mono<String> doUnwatchAll(Person sender) {

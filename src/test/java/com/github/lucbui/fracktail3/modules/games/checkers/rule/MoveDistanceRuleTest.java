@@ -89,4 +89,73 @@ class MoveDistanceRuleTest {
         MoveAction ma = new MoveAction(Color.RED, new Piece(Color.RED), new Position(6, 7));
         assertTrue(RULE.isLegalMove(ma, board).isIllegal());
     }
+
+    @Test
+    public void multiJumpIsLegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+        Piece black = new Piece(Color.BLACK);
+        Piece black2 = new Piece(Color.BLACK);
+
+        Position start = new Position(0, 1);
+        Position blackP = new Position(1, 2);
+        Position mid = new Position(2, 3);
+        Position black2P = new Position(3, 4);
+        Position end = new Position(4, 5);
+
+        board.addPiece(piece, start);
+        board.addPiece(black, blackP);
+        board.addPiece(black2, black2P);
+
+        MoveAction ma = new MoveAction(Color.RED, piece, mid, new Position[]{end});
+        assertTrue(RULE.isLegalMove(ma, board).isLegal());
+    }
+
+    @Test
+    public void multiJumpPartiallyOverNothingIsIllegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+        Piece black = new Piece(Color.BLACK);
+
+        Position start = new Position(0, 1);
+        Position blackP = new Position(1, 2);
+        Position mid = new Position(2, 3);
+        Position end = new Position(4, 5);
+
+        board.addPiece(piece, start);
+        board.addPiece(black, blackP);
+
+        MoveAction ma = new MoveAction(Color.RED, piece, mid, new Position[]{end});
+        assertTrue(RULE.isLegalMove(ma, board).isIllegal());
+    }
+
+    @Test
+    public void multiJumpOverNothingIsIllegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+
+        Position start = new Position(0, 1);
+        Position mid = new Position(2, 3);
+        Position end = new Position(4, 5);
+
+        board.addPiece(piece, start);
+
+        MoveAction ma = new MoveAction(Color.RED, piece, mid, new Position[]{end});
+        assertTrue(RULE.isLegalMove(ma, board).isIllegal());
+    }
+
+    @Test
+    public void multiRegularMoveIsIllegal() {
+        Checkerboard board = new Checkerboard(8);
+        Piece piece = new Piece(Color.RED);
+
+        Position start = new Position(0, 1);
+        Position mid = new Position(1, 2);
+        Position end = new Position(3, 4);
+
+        board.addPiece(piece, start);
+
+        MoveAction ma = new MoveAction(Color.RED, piece, mid, new Position[]{end});
+        assertTrue(RULE.isLegalMove(ma, board).isIllegal());
+    }
 }

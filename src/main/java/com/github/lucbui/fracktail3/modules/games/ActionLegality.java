@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.modules.games;
 
+import java.util.function.Supplier;
+
 public class ActionLegality {
     private static final ActionLegality LEGAL = new ActionLegality(null);
 
@@ -34,5 +36,20 @@ public class ActionLegality {
             throw new IllegalStateException("Move is legal");
         }
         return failureReason;
+    }
+
+    public ActionLegality and(Supplier<ActionLegality> other) {
+        if(isIllegal()) {
+            return this;
+        } else {
+            return other.get();
+        }
+    }
+
+    public ActionLegality doIfLegal(Runnable action) {
+        if(isLegal()) {
+            action.run();
+        }
+        return this;
     }
 }

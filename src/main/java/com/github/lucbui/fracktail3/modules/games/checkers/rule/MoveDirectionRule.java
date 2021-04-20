@@ -16,19 +16,45 @@ public class MoveDirectionRule implements Rule<Checkerboard> {
         if(action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
             Piece piece = ma.getPiece();
-            if(piece.getType() == Type.MAN) {
-                Position end = ma.getPosition();
-                return board.getPositionOfPiece(piece)
+            Position end = ma.getPosition();
+            if(ma.isMultiAction()) {
+                Checkerboard simulation = new Checkerboard(board);
+                return simulation.getPositionOfPiece(piece)
                         .map(start -> {
-                            if(piece.getColor() == Color.RED) {
-                                return ActionLegality.test(end.isBelow(start), "Can only move red men down");
-                            } else {
-                                return ActionLegality.test(end.isAbove(start), "Can only move black men up");
+                            ActionLegality legality = isMovingTheRightDirection(piece, start, end)
+                                    .doIfLegal(() -> performSimulatedKing(simulation, ma.getPlayer(), piece, end));
+                            if(legality.isIllegal()) return legality;
+                            Position current = end;
+                            for(Position future : ma.getOtherPositions()) {
+                                legality = isMovingTheRightDirection(piece, current, future)
+                                        .doIfLegal(() -> performSimulatedKing(simulation, ma.getPlayer(), piece, future));
+                                if(legality.isIllegal()) return legality;
+                                current = future;
                             }
+                            return ActionLegality.legal();
                         })
+                        .orElse(ActionLegality.illegal("Piece does not exist"));
+            } else {
+                return board.getPositionOfPiece(piece)
+                        .map(start -> isMovingTheRightDirection(piece, start, end))
                         .orElse(ActionLegality.illegal("Piece does not exist"));
             }
         }
         return ActionLegality.legal();
+    }
+
+    protected ActionLegality isMovingTheRightDirection(Piece piece, Position start, Position end) {
+        if(piece.getType() == Type.KING) {
+            return ActionLegality.legal();
+        } else if(piece.getColor() == Color.RED) {
+            return ActionLegality.test(end.isBelow(start), "Can only move red men down");
+        } else {
+            return ActionLegality.test(end.isAbove(start), "Can only move black men up");
+        }
+    }
+
+    protected void performSimulatedKing(Checkerboard board, Color player, Piece piece, Position next) {
+        MoveAction ma = new MoveAction(player, piece, next);
+        ma.performAction(board);
     }
 }

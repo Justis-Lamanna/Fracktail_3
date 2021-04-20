@@ -32,6 +32,18 @@ public class Checkerboard extends Board<Piece> implements TurnBasedGameField<Col
         this.height = dimension;
     }
 
+    /**
+     * Create a copy of this checkerboard
+     * @param toClone board to clone
+     */
+    public Checkerboard(Checkerboard toClone) {
+        super(toClone);
+        width = toClone.width;
+        height = toClone.height;
+        currentPlayer = toClone.currentPlayer;
+        forfeitedPlayer = toClone.forfeitedPlayer;
+    }
+
     public int getTopRow() { return 0; }
     public int getBottomRow() { return this.height - 1; }
     public int getLeftColumn() { return 0; }
