@@ -22,13 +22,4 @@ public interface CommandAction {
      * @return Asynchronous marker indicating action completed
      */
     Mono<Void> doAction(CommandUseContext context);
-
-    /**
-     * Guard this command from use in a certain context
-     * @param context The context to check against
-     * @return The guard action
-     */
-    default Mono<Boolean> guard(CommandUseContext context) {
-        return Mono.just(true);
-    }
 }

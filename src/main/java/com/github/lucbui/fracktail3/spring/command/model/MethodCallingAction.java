@@ -71,7 +71,7 @@ public class MethodCallingAction implements CommandAction {
 
     @Override
     public Mono<Void> doAction(CommandUseContext context) {
-        return doActionUnguarded(context);
+        return guard(context).filter(t -> t).then(doActionUnguarded(context));
     }
 
     public Mono<Void> doActionUnguarded(CommandUseContext context) {
@@ -91,7 +91,6 @@ public class MethodCallingAction implements CommandAction {
                 .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 
-    @Override
     public Mono<Boolean> guard(CommandUseContext context) {
         return Stream.concat(
                     methodComponent.guards.stream(),

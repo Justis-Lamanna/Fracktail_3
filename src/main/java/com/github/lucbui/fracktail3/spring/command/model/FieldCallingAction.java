@@ -39,6 +39,7 @@ public class FieldCallingAction implements CommandAction {
     @Override
     public Mono<Void> doAction(CommandUseContext context) {
         return Mono.fromCallable(() -> fieldToRetrieve.get(objToInvokeOn))
+                .filterWhen(o -> guard(context))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
                 .flatMap(o -> returnComponent.func.apply(context, o))
                 .onErrorResume(InvocationTargetException.class, ex ->
@@ -51,7 +52,6 @@ public class FieldCallingAction implements CommandAction {
                 .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 
-    @Override
     public Mono<Boolean> guard(CommandUseContext context) {
         return methodComponent.guards.stream()
                 .map(guard -> guard.matches(context))

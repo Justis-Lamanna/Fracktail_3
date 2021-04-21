@@ -16,10 +16,4 @@ public @interface Usage {
      * @return raw string value
      */
     String value();
-
-    /**
-     * One or more formatters to transform the raw value
-     * @return The formatters to use
-     */
-    Formatter[] formatters() default {};
 }

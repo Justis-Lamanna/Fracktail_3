@@ -3,9 +3,7 @@ package com.github.lucbui.fracktail3.discord.platform;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.magic.Bot;
-import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
@@ -18,9 +16,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
-import discord4j.rest.service.ApplicationService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +23,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.time.Duration;
 import java.util.regex.Pattern;
 
 /**
@@ -125,58 +119,6 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
-    }
-
-    private void configureBotForSlashCommand(Bot bot) {
-        ApplicationService service = gateway.getRestClient().getApplicationService();
-
-        long applicationId = gateway.getRestClient().getApplicationId()
-                .blockOptional(Duration.ofMinutes(1))
-                .orElseThrow(() -> new BotConfigurationException("No Application ID"));
-
-        //Register slash commands with Discord
-        Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
-                .flatMap(command -> Flux.fromIterable(command.getNames()).map(name -> Tuples.of(name, command)))
-                .flatMap(tuple -> {
-                    String name = tuple.getT1();
-                    Command command = tuple.getT2();
-                    ImmutableApplicationCommandRequest.Builder builder = ApplicationCommandRequest.builder()
-                            .name(name);
-                    return Mono.justOrEmpty(command.getHelp())
-                            .flatMap(FormattedString::getFor)
-                            .defaultIfEmpty("Try it and find out!")
-                            .map(help -> StringUtils.abbreviate(help, 100))
-                            .map(builder::description)
-                            .defaultIfEmpty(builder)
-                            .map(ImmutableApplicationCommandRequest.Builder::build);
-                })
-                .flatMap(request -> service.createGlobalApplicationCommand(applicationId, request))
-                .doOnNext(response -> System.out.println("Registered " + response.id() + "(" + response.name() + ")"))
-                .subscribe();
-
-        // Listen for interactions and parse accordingly.
-//        gateway.on(InteractionCreateEvent.class)
-//                .flatMap(ice -> {
-//                    return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
-//                            .filter(cmd -> cmd.getNames().contains(ice.getCommandName()))
-//                            .map(cmd -> {
-//                                ice.getInteraction().getCommandInteraction().getOptions()
-//                                        .stream()
-//                                        .flatMap(acid -> acid.getValue().map(Stream::of).orElse(Stream.empty()))
-//                                        .map(acidov -> acidov.asString())
-//                                return new BasicCommandUseContext(bot, this, ice.getCommandName(), cmd, new Parameters(pStr, pArray));
-//                            })
-//                            .filterWhen(CommandUseContext::matches)
-//                            .next()
-//                            .flatMap(CommandUseContext::doAction)
-//                            .onErrorResume(Throwable.class, e -> {
-//                                e.printStackTrace();
-//                                return message.getOrigin()
-//                                        .flatMap(place ->
-//                                                place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
-//                                        .then();
-//                            });
-//                })
     }
 
     @Override

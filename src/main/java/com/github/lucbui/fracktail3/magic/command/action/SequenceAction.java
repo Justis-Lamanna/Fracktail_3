@@ -36,7 +36,6 @@ public class SequenceAction implements CommandAction {
     @Override
     public Mono<Void> doAction(CommandUseContext context) {
         return Flux.fromIterable(subActions)
-                .filterWhen(c -> c.guard(context))
                 .concatMap(a -> a.doAction(context))
                 .then();
     }

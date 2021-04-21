@@ -1,12 +1,10 @@
 package com.github.lucbui.fracktail3.magic.command;
 
-import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
-import reactor.bool.BooleanUtils;
+import lombok.Data;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -14,99 +12,13 @@ import java.util.*;
 /**
  * Encapsulation of a bot's command
  */
-public class Command implements Id, Disableable {
+@Data
+public class Command implements Id {
     private final String id;
     private final Set<String> names;
-    private final FormattedString help;
+    private final String help;
     private final CommandAction action;
-
-    private boolean enabled;
-
-    /**
-     * Creates a minimal command
-     * The name is the same as the ID, no filter is provided, and help text is "id.help".
-     * @param id The command's ID
-     * @param action The action to perform
-     */
-    public Command(String id, CommandAction action) {
-        this(id, Collections.singleton(id), action);
-    }
-
-    /**
-     * Creates a Command
-     * @param id The ID of the command
-     * @param name The name this command responds to
-     * @param action The action to perform when the command is run
-     */
-    public Command(String id, String name, CommandAction action) {
-        this(id, Collections.singleton(name), FormattedString.from(id + ".help"), action);
-    }
-
-    /**
-     * Creates a Command
-     * @param id The ID of the command
-     * @param names The name(s) this command responds to
-     * @param action The action to perform when the command is run
-     */
-    public Command(String id, Set<String> names, CommandAction action) {
-        this(id, names, FormattedString.from(id + ".help"), action);
-    }
-
-    /**
-     * Creates a Command
-     * @param id The ID of the command
-     * @param names The name(s) this command responds to
-     * @param help The help text
-     * @param action The action to perform when the command is run
-     */
-    public Command(String id, Set<String> names, FormattedString help, CommandAction action) {
-        this(id, true, names, help, action);
-    }
-
-    /**
-     * Creates a Command
-     * @param id The ID of the command
-     * @param enabled If this command is enabled or not
-     * @param names The name(s) this command responds to
-     * @param help The help text
-     * @param action The action to perform when the command is run
-     */
-    public Command(String id, boolean enabled, Set<String> names, FormattedString help, CommandAction action) {
-        this.id = id;
-        this.enabled = enabled;
-        this.names = names;
-        this.help = help;
-        this.action = action;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Get the command names
-     * @return The command names
-     */
-    public Set<String> getNames() {
-        return names;
-    }
-
-    /**
-     * Get the action this command executes
-     * @return The action
-     */
-    public CommandAction getAction() {
-        return action;
-    }
-
-    /**
-     * Get the help text of this command
-     * @return The help text
-     */
-    public FormattedString getHelp() {
-        return help;
-    }
+    private final List<Parameter> parameters;
 
     /**
      * Test if this guard matches
@@ -114,7 +26,7 @@ public class Command implements Id, Disableable {
      * @return Asynchronous boolean indicating if the guard passes
      */
     public Mono<Boolean> matches(CommandUseContext ctx) {
-        return BooleanUtils.and(Mono.just(enabled), action.guard(ctx));
+        return Mono.just(true); //TODO: Remove this call
     }
 
     /**
@@ -126,24 +38,12 @@ public class Command implements Id, Disableable {
         return action.doAction(ctx);
     }
 
-    /**
-     * Perform action if guard passes
-     * @param ctx The context of the commands usage
-     * @return Asynchronous marker indicating the action finished
-     */
-    public Mono<Void> doActionIfPasses(CommandUseContext ctx) {
-        return matches(ctx)
-                .flatMap(b -> b ? doAction(ctx) : Mono.empty());
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    @Data
+    public static class Parameter {
+        private final String name;
+        private final String description;
+        private final Class<?> type;
+        private final boolean optional;
     }
 
     /**
@@ -151,10 +51,10 @@ public class Command implements Id, Disableable {
      */
     public static class Builder implements IBuilder<Command> {
         private final String id;
-        private boolean enabled = true;
         private Set<String> names = new HashSet<>();
         private CommandAction action = CommandAction.NOOP;
-        private FormattedString help;
+        private String help;
+        private List<Parameter> parameters = new ArrayList<>();
 
         /**
          * Initialize Builder with Command ID
@@ -211,16 +111,6 @@ public class Command implements Id, Disableable {
          * @return This builder
          */
         public Builder withHelp(String helpText) {
-            this.help = FormattedString.from(helpText);
-            return this;
-        }
-
-        /**
-         * Set the help text of this command
-         * @param helpText The help text
-         * @return This builder
-         */
-        public Builder withHelp(FormattedString helpText) {
             this.help = helpText;
             return this;
         }
@@ -235,12 +125,12 @@ public class Command implements Id, Disableable {
         }
 
         /**
-         * Set if this command is enabled
-         * @param enabled True if enabled, false if disabled
+         * Add a parameter to this command
+         * @param parameter The parameter
          * @return This builder
          */
-        public Builder isEnabled(boolean enabled) {
-            this.enabled = enabled;
+        public Builder withParameter(Parameter parameter) {
+            this.parameters.add(parameter);
             return this;
         }
 
@@ -249,7 +139,7 @@ public class Command implements Id, Disableable {
             if(names.isEmpty()) {
                 names = Collections.singleton(id);
             }
-            return new Command(id, enabled, names, help, action);
+            return new Command(id, names, help, action, parameters);
         }
     }
 }

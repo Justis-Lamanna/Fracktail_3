@@ -39,8 +39,8 @@ public class AnnotationUtils {
      * @param usage The usage string to use
      * @return The constucted FormattedString
      */
-    public static FormattedString fromUsage(Usage usage) {
-        return parse(usage::value, usage::formatters);
+    public static String fromUsage(Usage usage) {
+        return usage.value();
     }
 
     /**
