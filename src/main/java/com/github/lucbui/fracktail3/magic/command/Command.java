@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.TypeDescriptor;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -39,11 +41,16 @@ public class Command implements Id {
     }
 
     @Data
+    @RequiredArgsConstructor
     public static class Parameter {
         private final String name;
         private final String description;
-        private final Class<?> type;
+        private final TypeDescriptor type;
         private final boolean optional;
+
+        public Parameter(String name, String description, Class<?> clazz, boolean optional) {
+            this(name, description, TypeDescriptor.valueOf(clazz), optional);
+        }
     }
 
     /**

@@ -9,9 +9,9 @@ import java.util.stream.IntStream;
 
 public class Parameters {
     private final String raw;
-    private final String[] parsed;
+    private final Object[] parsed;
 
-    public Parameters(String raw, String[] parsed) {
+    public Parameters(String raw, Object[] parsed) {
         this.raw = raw;
         this.parsed = parsed;
     }
@@ -20,28 +20,28 @@ public class Parameters {
         return raw;
     }
 
-    public String[] getParsed() {
+    public Object[] getParsed() {
         return parsed;
     }
 
-    public Optional<String> getParameter(int idx) {
+    public <T> Optional<T> getParameter(int idx) {
         if(idx >= parsed.length) {
             return Optional.empty();
         } else {
-            return Optional.of(parsed[idx]);
+            return Optional.ofNullable((T)parsed[idx]);
         }
     }
 
-    public List<Optional<String>> getParameters(int start, int end) {
+    public <T> List<Optional<T>> getParameters(int start, int end) {
         if(parsed.length == 0) {
             return Collections.emptyList();
         } else if(end < 0) {
             return Arrays.stream(parsed, start, parsed.length + end + 1)
-                    .map(Optional::of)
+                    .map(o -> Optional.ofNullable((T)o))
                     .collect(Collectors.toList());
         } else {
             return IntStream.rangeClosed(start, end)
-                .mapToObj(i -> i < parsed.length ? Optional.of(parsed[i]) : Optional.<String>empty())
+                .mapToObj(i -> i < parsed.length ? Optional.of((T)parsed[i]) : Optional.<T>empty())
                 .collect(Collectors.toList());
         }
     }

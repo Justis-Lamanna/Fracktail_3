@@ -1,8 +1,10 @@
 package com.github.lucbui.fracktail3;
 
+import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +17,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Config {
     @Bean
     public Platform discord(@Value("${token}") String token) {
-        return new DiscordPlatform.Builder()
-                .withConfiguration(new DiscordConfiguration(
-                        token,
-                        "!",
-                        Presence.doNotDisturb(Activity.watching("you be such a cutie"))))
-            .build();
+        return new DiscordPlatform(
+                new DiscordConfiguration(token, "!", Presence.doNotDisturb(Activity.watching("you be such a cutie")), CommandType.LEGACY),
+                new BasicParameterParser()
+        );
     }
 }

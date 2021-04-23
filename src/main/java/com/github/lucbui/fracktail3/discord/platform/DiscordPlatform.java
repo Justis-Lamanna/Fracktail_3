@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
+import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.magic.Bot;
@@ -7,8 +8,7 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
-import com.github.lucbui.fracktail3.magic.util.IBuilder;
+import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -16,6 +16,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.rest.service.ApplicationService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.util.regex.Pattern;
+import java.time.Duration;
 
 /**
  * A singleton which represents the Discord platform
@@ -45,17 +46,17 @@ public class DiscordPlatform implements Platform {
     private static final String MULTI_ID_DELIMITER = ";";
     private static final String URN_DELIMITER = ":";
 
-    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\s+");
-
     private final DiscordConfiguration configuration;
+    private final ParameterParser parameterParser;
     private GatewayDiscordClient gateway;
 
     /**
      * Initialize this platform with a configuration
      * @param configuration The configuration to use
      */
-    public DiscordPlatform(DiscordConfiguration configuration) {
+    public DiscordPlatform(DiscordConfiguration configuration, ParameterParser parameterParser) {
         this.configuration = configuration;
+        this.parameterParser = parameterParser;
     }
 
     @Override
@@ -83,9 +84,14 @@ public class DiscordPlatform implements Platform {
             throw new BotConfigurationException("Gateway was null");
         }
 
-        gateway.updatePresence(configuration.getPresence()).block();
+        gateway.updatePresence(configuration.getInitialPresence()).block();
 
-        configureBotForLegacyCommand(bot);
+        LOGGER.debug("Starting in {} mode", configuration.getCommandType());
+        if (configuration.getCommandType() == CommandType.SLASH) {
+            configureBotForSlashCommand(bot);
+        } else {
+            configureBotForLegacyCommand(bot);
+        }
 
         return gateway.onDisconnect().thenReturn(true);
     }
@@ -104,8 +110,7 @@ public class DiscordPlatform implements Platform {
                                 String cmdStr = t.getT1();
                                 String pStr = StringUtils.removeStart(message.getContent(), configuration.getPrefix() + cmdStr)
                                         .trim();
-                                String[] pArray = SPLIT_PATTERN.split(pStr);
-                                return new BasicCommandUseContext(bot, this, message, t.getT2(), new Parameters(pStr, pArray));
+                                return new BasicCommandUseContext(bot, this, message, t.getT2(), parameterParser.parseParametersFromMessage(t.getT2(), pStr));
                             })
                             .filterWhen(CommandUseContext::matches)
                             .next()
@@ -119,6 +124,17 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
+    }
+
+    private void configureBotForSlashCommand(Bot bot) {
+        ApplicationService service = gateway.getRestClient().getApplicationService();
+        long applicationId = gateway.getRestClient().getApplicationId()
+                .blockOptional(Duration.ofMinutes(1))
+                .orElseThrow(() -> new BotConfigurationException("No Application ID found"));
+
+        //potential to-do: de-register commands that are no longer relevant.
+        //register commands with Discord
+        //parse and activate commands with Discord
     }
 
     @Override
@@ -259,24 +275,5 @@ public class DiscordPlatform implements Platform {
         return gateway.getChannelById(place)
                 .cast(TextChannel.class)
                 .map(DiscordPlace::new);
-    }
-
-    public static class Builder implements IBuilder<DiscordPlatform> {
-        private DiscordConfiguration configuration;
-
-        public Builder withConfiguration(DiscordConfiguration configuration) {
-            this.configuration = configuration;
-            return this;
-        }
-
-        public Builder withConfiguration(IBuilder<DiscordConfiguration> configuration) {
-            this.configuration = configuration.build();
-            return this;
-        }
-
-        @Override
-        public DiscordPlatform build() {
-            return new DiscordPlatform(configuration);
-        }
     }
 }
