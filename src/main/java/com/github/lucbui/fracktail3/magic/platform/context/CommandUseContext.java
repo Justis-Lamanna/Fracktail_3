@@ -13,10 +13,6 @@ public interface CommandUseContext {
     Command getCommand();
     Parameters getParameters();
 
-    default Mono<Boolean> matches() {
-        return getCommand().matches(this);
-    }
-
     default Mono<Void> doAction() {
         return getCommand().doAction(this);
     }

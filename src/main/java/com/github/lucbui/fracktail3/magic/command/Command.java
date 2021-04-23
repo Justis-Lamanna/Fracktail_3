@@ -23,15 +23,6 @@ public class Command implements Id {
     private final List<Parameter> parameters;
 
     /**
-     * Test if this guard matches
-     * @param ctx The context of the commands usage
-     * @return Asynchronous boolean indicating if the guard passes
-     */
-    public Mono<Boolean> matches(CommandUseContext ctx) {
-        return Mono.just(true); //TODO: Remove this call
-    }
-
-    /**
      * Unconditionally perform the action
      * @param ctx The context of the commands usage
      * @return Asynchronous marker indicating the action finished
