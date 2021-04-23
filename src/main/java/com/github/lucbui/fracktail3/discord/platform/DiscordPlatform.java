@@ -110,9 +110,15 @@ public class DiscordPlatform implements Platform {
                                 String cmdStr = t.getT1();
                                 String pStr = StringUtils.removeStart(message.getContent(), configuration.getPrefix() + cmdStr)
                                         .trim();
-                                return new BasicCommandUseContext(bot, this, message, t.getT2(), parameterParser.parseParametersFromMessage(t.getT2(), pStr));
+                                return new BasicCommandUseContext(
+                                        bot,
+                                        this,
+                                        message,
+                                        message.getSender(),
+                                        message.getOrigin(),
+                                        t.getT2(),
+                                        parameterParser.parseParametersFromMessage(t.getT2(), pStr));
                             })
-                            .filterWhen(CommandUseContext::matches)
                             .next()
                             .flatMap(CommandUseContext::doAction)
                             .onErrorResume(Throwable.class, e -> {

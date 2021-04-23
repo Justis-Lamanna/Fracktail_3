@@ -34,6 +34,6 @@ public class ExceptionRespondHandler implements ExceptionBaseComponent.Exception
     @Override
     public Mono<Void> apply(CommandUseContext context, Throwable throwable) {
         return fString.getFor(Collections.singletonMap("message", throwable.getMessage()))
-                .flatMap(str -> context.getMessage().getOrigin().flatMap(place -> place.sendMessage(str))).then();
+                .flatMap(str -> context.getTriggerPlace().flatMap(place -> place.sendMessage(str))).then();
     }
 }
