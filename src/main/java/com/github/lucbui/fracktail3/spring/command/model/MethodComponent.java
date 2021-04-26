@@ -1,15 +1,23 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A piece of a MethodCallingAction or FieldCallingAction which handles top-level guards
  */
+@Getter
+@Setter
 public class MethodComponent {
+    protected String id;
+    protected Set<String> names;
+    protected String help;
     List<Guard> guards;
 
     /**

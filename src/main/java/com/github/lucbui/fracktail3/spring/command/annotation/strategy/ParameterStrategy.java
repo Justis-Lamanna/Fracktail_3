@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.TypeDescriptor;
@@ -16,6 +18,8 @@ import java.util.Optional;
 
 @Component
 public class ParameterStrategy implements ParameterComponentStrategy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterStrategy.class);
+
     @Autowired
     private ParameterConverters converters;
 
@@ -32,8 +36,12 @@ public class ParameterStrategy implements ParameterComponentStrategy {
                     descriptor,
                     new ParameterToObjectConverterFunction(paramType, value, converters),
                     StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
-            component.setHelp(pAnnot.description());
+            component.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), component.getName()));
             component.setOptional(pAnnot.optional());
+
+            LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,
+                    component.getName(), component.getType().getResolvableType(), component.getHelp(), component.isOptional());
+
             return Optional.of(component);
         }
         return Optional.empty();

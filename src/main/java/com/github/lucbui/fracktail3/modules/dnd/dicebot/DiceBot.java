@@ -1,7 +1,10 @@
 package com.github.lucbui.fracktail3.modules.dnd.dicebot;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.github.lucbui.fracktail3.spring.command.annotation.*;
+import com.github.lucbui.fracktail3.spring.command.annotation.Command;
+import com.github.lucbui.fracktail3.spring.command.annotation.OnExceptionRespond;
+import com.github.lucbui.fracktail3.spring.command.annotation.Parameter;
+import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import groovy.util.Eval;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -109,7 +112,7 @@ public class DiceBot {
 
     @Command
     @Usage("Roll a dice to get results.")
-    @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
+    @OnExceptionRespond(exception = IllegalArgumentException.class, value = "Something went wrong evaluating that. Check your syntax!")
     public String roll(@Parameter(0) String expression) {
         RollResult result = rollForExpression(expression);
         return result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr());

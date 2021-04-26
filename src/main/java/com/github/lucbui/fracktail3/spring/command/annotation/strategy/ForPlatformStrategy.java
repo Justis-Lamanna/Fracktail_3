@@ -31,7 +31,7 @@ public class ForPlatformStrategy implements MethodComponentStrategy {
 
     protected Guard compileForPlatform(ForPlatform forPlatform) {
         Class<? extends Platform> platform = forPlatform.value();
-        LOGGER.debug("Limiting command to usage with {} platform", platform.getCanonicalName());
+        LOGGER.debug("+-Limiting command to usage with {} platform", platform.getCanonicalName());
         return new PlatformValidatorGuard(platform);
     }
 }

@@ -52,24 +52,12 @@ public class CommandConfigurer extends FieldAndMethodBasedConfigurer {
 
     @Override
     protected void handleMethod(Object bean, Method method) {
-        String id = returnStringOrMemberName(method.getAnnotation(Command.class).value(), method);
-        LOGGER.debug("Adding @Command-annotated method {}", id);
-        com.github.lucbui.fracktail3.magic.command.Command.Builder c = new com.github.lucbui.fracktail3.magic.command.Command.Builder(id);
-        c.withAction(factory.createAction(bean, method));
-        handleAnnotations(method, c);
-
-        addOrMerge(c.build());
+        addOrMerge(factory.createCommand(bean, method));
     }
 
     @Override
     protected void handleField(Object bean, Field field) {
-        String id = returnStringOrMemberName(field.getAnnotation(Command.class).value(), field);
-        LOGGER.debug("Adding @Command-annotated method {}", id);
-        com.github.lucbui.fracktail3.magic.command.Command.Builder c = new com.github.lucbui.fracktail3.magic.command.Command.Builder(id);
-        c.withAction(factory.createAction(bean, field));
-        handleAnnotations(field, c);
-
-        addOrMerge(c.build());
+         addOrMerge(factory.createCommand(bean, field));
     }
 
     private void handleAnnotations(AnnotatedElement element, com.github.lucbui.fracktail3.magic.command.Command.Builder c) {

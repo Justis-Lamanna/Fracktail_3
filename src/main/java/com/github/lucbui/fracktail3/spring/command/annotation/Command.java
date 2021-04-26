@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.spring.command.annotation;
 
 import com.github.lucbui.fracktail3.spring.command.annotation.strategy.AutoReturnStrategy;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.IdNameHelpStrategy;
+import com.github.lucbui.fracktail3.spring.command.plugin.MethodStrategy;
 import com.github.lucbui.fracktail3.spring.command.plugin.ReturnStrategy;
 
 import java.lang.annotation.ElementType;
@@ -13,6 +15,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
+@MethodStrategy(IdNameHelpStrategy.class)
 @ReturnStrategy(AutoReturnStrategy.class)
 public @interface Command {
     /**

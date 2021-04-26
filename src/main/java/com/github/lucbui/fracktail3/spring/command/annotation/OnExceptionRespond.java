@@ -17,7 +17,7 @@ public @interface OnExceptionRespond {
      * The FormattedString to respond with
      * @return The FormattedString to respond with
      */
-    FString value();
+    String value();
 
     /**
      * One or more exceptions which should trigger this response.

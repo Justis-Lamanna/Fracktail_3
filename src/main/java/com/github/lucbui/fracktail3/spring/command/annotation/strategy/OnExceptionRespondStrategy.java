@@ -1,7 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
-import com.github.lucbui.fracktail3.spring.command.annotation.AnnotationUtils;
 import com.github.lucbui.fracktail3.spring.command.annotation.OnExceptionRespond;
 import com.github.lucbui.fracktail3.spring.command.handler.ExceptionRespondHandler;
 import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
@@ -36,10 +34,10 @@ public class OnExceptionRespondStrategy implements ExceptionComponentStrategy {
                 OnExceptionRespond.class, OnExceptionRespond.Wrapper.class);
 
         for(OnExceptionRespond annotation : annotations) {
-            FormattedString fString = AnnotationUtils.fromFString(annotation.value());
-            ExceptionComponent.ExceptionHandler handler = new ExceptionRespondHandler(fString);
+            String response = annotation.value();
+            ExceptionComponent.ExceptionHandler handler = new ExceptionRespondHandler(response);
             for(Class<? extends Throwable> clazz : annotation.exception()) {
-                LOGGER.debug("On exception {} will respond with {}", clazz.getCanonicalName(), annotation.value().value());
+                LOGGER.debug("+-On exception {} will respond with {}", clazz.getCanonicalName(), annotation.value());
                 component.addHandler(clazz, handler);
             }
         }

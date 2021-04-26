@@ -29,7 +29,6 @@ public class ReturnComponentFactory {
      * @return The created ReturnComponent
      */
     public ReturnComponent compileReturn(Object obj, Method method) {
-        LOGGER.debug("Compiling return of method {}", method.getName());
         return FactoryUtils.createAndDecorate(
                 extractor.getReturnStrategies(method),
                 strategy -> strategy.create(obj, method),

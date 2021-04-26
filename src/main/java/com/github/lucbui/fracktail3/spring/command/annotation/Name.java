@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Specify one or more names for a command
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Name {
     /**
      * One or more names for this command

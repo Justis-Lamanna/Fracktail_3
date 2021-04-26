@@ -32,7 +32,6 @@ public class ParameterComponentFactory {
      * @return A list of ParameterComponent, one for each parameter in the method
      */
     public List<ParameterComponent> compileParameters(Object obj, Method method) {
-        LOGGER.debug("Compiling parameters of method {}", method.getName());
         return Arrays.stream(method.getParameters())
                 .map(param -> compileParameter(obj, method, param))
                 .collect(Collectors.toList());
@@ -46,7 +45,6 @@ public class ParameterComponentFactory {
      * @return A ParameterComponent
      */
     public ParameterComponent compileParameter(Object obj, Method method, Parameter parameter) {
-        LOGGER.debug("Compiling parameter {} of method {}", parameter.getName(), method.getName());
         return FactoryUtils.createAndDecorate(extractor.getParameterStrategies(parameter),
                 strategy -> strategy.create(obj, method, parameter),
                 (strategy, component) -> strategy.decorate(obj, method, parameter, component))

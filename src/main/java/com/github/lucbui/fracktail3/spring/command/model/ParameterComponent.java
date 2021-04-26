@@ -13,7 +13,8 @@ import java.util.List;
 /**
  * A piece of a MethodCallingAction which resolves the context into a parameter to be injected into the method
  */
-@Getter @Setter
+@Getter
+@Setter
 public class ParameterComponent extends ParameterBaseComponent<CommandUseContext> {
     protected String name;
     protected String help;

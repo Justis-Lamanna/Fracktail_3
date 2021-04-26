@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
+import lombok.Getter;
 import org.springframework.core.convert.TypeDescriptor;
 
 import java.util.function.Function;
@@ -7,6 +8,7 @@ import java.util.function.Function;
 /**
  * A base component which resolves the context into a parameter to be injected into the method
  */
+@Getter
 public abstract class ParameterBaseComponent<T> {
     protected final TypeDescriptor type;
     protected final ParameterConverterFunction<? super T> func;
@@ -19,14 +21,6 @@ public abstract class ParameterBaseComponent<T> {
     public ParameterBaseComponent(TypeDescriptor type, ParameterConverterFunction<? super T> func) {
         this.type = type;
         this.func = func;
-    }
-
-    /**
-     * Get the ParameterConverterFunction being used
-     * @return The function used
-     */
-    public ParameterConverterFunction<? super T> getFunc() {
-        return func;
     }
 
     /**

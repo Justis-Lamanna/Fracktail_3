@@ -27,7 +27,6 @@ public class MethodComponentFactory {
      * @return The created component
      */
     public MethodComponent compileMethod(Object obj, Method method) {
-        LOGGER.debug("Compiling method {}", method.getName());
         return FactoryUtils.decorate(extractor.getMethodStrategies(method),
                 (strategy, component) -> strategy.decorate(obj, method, component), new MethodComponent());
     }
@@ -39,7 +38,6 @@ public class MethodComponentFactory {
      * @return The created component
      */
     public MethodComponent compileField(Object obj, Field field) {
-        LOGGER.debug("Compiling method {}", field.getName());
         return FactoryUtils.decorate(extractor.getMethodStrategies(field),
                 (strategy, component) -> strategy.decorate(obj, field, component), new MethodComponent());
     }
