@@ -5,6 +5,7 @@ import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.discord.context.slash.DiscordSlashPlace;
 import com.github.lucbui.fracktail3.magic.Bot;
+import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
@@ -16,6 +17,9 @@ import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
@@ -31,6 +35,9 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 /**
  * A singleton which represents the Discord platform
@@ -156,11 +163,12 @@ public class DiscordPlatform implements Platform {
                                 DiscordPerson person = new DiscordPerson(interaction.getMember()
                                         .map(u -> (User)u)
                                         .orElse(interaction.getUser()));
+//                                Holdover until this functionality works properly...
 //                                Mono<Place> place = interaction.getChannel().map(tc -> new DiscordSlashPlace(tc, ice));
                                 Mono<Place> place = gateway.getChannelById(interaction.getChannelId())
                                         .cast(MessageChannel.class)
                                         .map(mc -> new DiscordSlashPlace(mc, ice));
-                                Parameters parameters = new Parameters("", new Object[0]);
+                                Parameters parameters = parseParamsFromICE(ice, c);
                                 return new BasicCommandUseContext(bot, this, ice, person, place, c, parameters);
                             })
                             .flatMap(CommandUseContext::doAction)
@@ -170,6 +178,44 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
+    }
+
+    private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {
+        if(command.getParameters().isEmpty()) {
+            //Legacy, I guess.
+            String[] parsed = event.getInteraction().getCommandInteraction().getOptions()
+                    .stream()
+                    .flatMap(acio -> acio.getValue().map(Stream::of).orElseGet(Stream::empty))
+                    .map(ApplicationCommandInteractionOptionValue::getRaw)
+                    .toArray(String[]::new);
+            return new Parameters(String.join(" ", parsed), parsed);
+        }
+        ApplicationCommandInteraction acid = event.getInteraction().getCommandInteraction();
+        int idx = 0;
+        Object[] paramObjects = new Object[command.getParameters().size()];
+        StringJoiner message = new StringJoiner(" ");
+        for(Command.Parameter parameter : command.getParameters()) {
+            String name = parameter.getName();
+            Object value = acid.getOption(name)
+                    .flatMap(acio -> {
+                        switch (acio.getType()) {
+                            case INTEGER: return acio.getValue().map(ApplicationCommandInteractionOptionValue::asLong);
+                            case STRING: return acio.getValue().map(ApplicationCommandInteractionOptionValue::asString);
+                            case BOOLEAN: return acio.getValue().map(ApplicationCommandInteractionOptionValue::asBoolean);
+                            case ROLE:
+                            case USER:
+                            case CHANNEL: return acio.getValue().map(ApplicationCommandInteractionOptionValue::asSnowflake);
+                            default: return Optional.empty();
+                        }
+                    })
+                    .orElse(null);
+            paramObjects[idx++] = value;
+            acid.getOption(name)
+                    .flatMap(ApplicationCommandInteractionOption::getValue)
+                    .ifPresent(aciov -> message.add(aciov.getRaw()));
+        }
+
+        return new Parameters(message.toString(), paramObjects);
     }
 
     @Override
