@@ -6,15 +6,19 @@ import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.core.event.domain.InteractionCreateEvent;
-import discord4j.discordjson.json.WebhookMessageEditRequest;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class DiscordSlashMessage implements Message {
     private final InteractionCreateEvent ice;
+    private long flow = 0;
 
     @Override
     public String getContent() {
@@ -43,13 +47,13 @@ public class DiscordSlashMessage implements Message {
     @Override
     public Mono<Message> edit(String content) {
         return ice.getInteractionResponse()
-                .editInitialResponse(WebhookMessageEditRequest.builder().content(content).build())
-                .thenReturn(this);
+                .createFollowupMessage(content)
+                .thenReturn(new DiscordSlashMessage(ice, flow + 1));
     }
 
     @Override
     public Mono<Void> delete() {
         return ice.getInteractionResponse()
-                .deleteInitialResponse();
+                .deleteFollowupMessage(this.flow);
     }
 }

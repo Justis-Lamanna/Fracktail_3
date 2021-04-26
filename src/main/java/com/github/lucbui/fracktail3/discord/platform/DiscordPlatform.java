@@ -3,18 +3,24 @@ package com.github.lucbui.fracktail3.discord.platform;
 import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
+import com.github.lucbui.fracktail3.discord.context.slash.DiscordSlashPlace;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
+import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.service.ApplicationService;
 import org.apache.commons.lang3.StringUtils;
@@ -138,9 +144,32 @@ public class DiscordPlatform implements Platform {
                 .blockOptional(Duration.ofMinutes(1))
                 .orElseThrow(() -> new BotConfigurationException("No Application ID found"));
 
-        //potential to-do: de-register commands that are no longer relevant.
-        //register commands with Discord
-        //parse and activate commands with Discord
+        //potential to-do: register/de-register commands as necessary.
+        gateway.on(InteractionCreateEvent.class)
+                .flatMap(ice -> {
+                    Interaction interaction = ice.getInteraction();
+                    String command = ice.getCommandName();
+                    return Flux.fromIterable(bot.getSpec().getCommandList())
+                            .filter(c -> c.getNames().stream().anyMatch(name -> StringUtils.equalsIgnoreCase(command, name)))
+                            .next()
+                            .map(c -> {
+                                DiscordPerson person = new DiscordPerson(interaction.getMember()
+                                        .map(u -> (User)u)
+                                        .orElse(interaction.getUser()));
+//                                Mono<Place> place = interaction.getChannel().map(tc -> new DiscordSlashPlace(tc, ice));
+                                Mono<Place> place = gateway.getChannelById(interaction.getChannelId())
+                                        .cast(MessageChannel.class)
+                                        .map(mc -> new DiscordSlashPlace(mc, ice));
+                                Parameters parameters = new Parameters("", new Object[0]);
+                                return new BasicCommandUseContext(bot, this, ice, person, place, c, parameters);
+                            })
+                            .flatMap(CommandUseContext::doAction)
+                            .onErrorResume(Throwable.class, e -> {
+                                e.printStackTrace();
+                                return ice.reply("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info.");
+                            });
+                })
+                .subscribe();
     }
 
     @Override

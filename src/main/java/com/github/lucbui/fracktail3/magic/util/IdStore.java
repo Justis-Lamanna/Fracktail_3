@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * Collection of objects that can be retrieved by their ID
  * @param <ITEM> The item contained in the store
  */
-public class IdStore<ITEM extends Id>{
+public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
     private final Map<String, ITEM> store;
 
     /**
@@ -110,5 +110,10 @@ public class IdStore<ITEM extends Id>{
      */
     public static <T extends Id> IdStore<T> emptyIdStore() {
         return new IdStore<T>(Collections.emptyMap());
+    }
+
+    @Override
+    public Iterator<ITEM> iterator() {
+        return getAll().iterator();
     }
 }
