@@ -26,7 +26,8 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.rest.service.ApplicationService;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -100,9 +102,12 @@ public class DiscordPlatform implements Platform {
         gateway.updatePresence(configuration.getInitialPresence()).block();
 
         LOGGER.debug("Starting in {} mode", configuration.getCommandType());
-        if (configuration.getCommandType() == CommandType.SLASH) {
+        if (configuration.getCommandType() == CommandType.SLASH ) {
             configureBotForSlashCommand(bot);
+        } else if(configuration.getCommandType() == CommandType.LEGACY) {
+            configureBotForLegacyCommand(bot);
         } else {
+            configureBotForSlashCommand(bot);
             configureBotForLegacyCommand(bot);
         }
 
@@ -146,12 +151,6 @@ public class DiscordPlatform implements Platform {
     }
 
     private void configureBotForSlashCommand(Bot bot) {
-        ApplicationService service = gateway.getRestClient().getApplicationService();
-        long applicationId = gateway.getRestClient().getApplicationId()
-                .blockOptional(Duration.ofMinutes(1))
-                .orElseThrow(() -> new BotConfigurationException("No Application ID found"));
-
-        //potential to-do: register/de-register commands as necessary.
         gateway.on(InteractionCreateEvent.class)
                 .flatMap(ice -> {
                     Interaction interaction = ice.getInteraction();
@@ -171,13 +170,28 @@ public class DiscordPlatform implements Platform {
                                 Parameters parameters = parseParamsFromICE(ice, c);
                                 return new BasicCommandUseContext(bot, this, ice, person, place, c, parameters);
                             })
+                            .flatMap(c -> ice.acknowledgeEphemeral().thenReturn(c))
                             .flatMap(CommandUseContext::doAction)
                             .onErrorResume(Throwable.class, e -> {
                                 e.printStackTrace();
-                                return ice.reply("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info.");
+                                return ice.getInteractionResponse()
+                                        .createFollowupMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info.")
+                                        .then();
                             });
                 })
                 .subscribe();
+    }
+
+    private List<ApplicationCommandOptionData> createOptions(Command command) {
+        return command.getParameters().stream()
+                .map(p -> ApplicationCommandOptionData.builder()
+                        .name(p.getName())
+                        .description(p.getDescription())
+                        .required(!p.isOptional())
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {

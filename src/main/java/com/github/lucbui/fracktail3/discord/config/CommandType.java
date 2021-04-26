@@ -9,5 +9,10 @@ public enum CommandType {
     /**
      * New-style commands that Discord handles with custom UI and other tools.
      */
-    SLASH;
+    SLASH,
+
+    /**
+     * Support both legacy-syle and slash-style commands
+     */
+    ALL
 }
