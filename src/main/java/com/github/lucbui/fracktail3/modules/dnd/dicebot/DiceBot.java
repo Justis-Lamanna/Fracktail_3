@@ -108,12 +108,9 @@ public class DiceBot {
     }
 
     @Command
-    @Usage("Roll a dice to get results. The format is `d[number of faces]`.\n" +
-            "You can roll multiple dice by specifying a number before the 'd', such as `4d20`.\n" +
-            "You can append `k<number>` or `kl<number>` to keep the highest or lowest <number> of dice, and ignore the rest.\n" +
-            "`+`, `-`, `*`, and `/` are also supported, as are comparison operators `<`, `>`, `==`, `<=`, `>=`, and `!=` and parenthesis `()`.")
+    @Usage("Roll a dice to get results.")
     @OnExceptionRespond(exception = IllegalArgumentException.class, value = @FString("Something went wrong evaluating that. Check your syntax!"))
-    public String roll(@ParameterRange String expression) {
+    public String roll(@Parameter(0) String expression) {
         RollResult result = rollForExpression(expression);
         return result.getPrettyExpression() + " ⟶ " + FormatUtils.bold(result.getResultStr());
     }

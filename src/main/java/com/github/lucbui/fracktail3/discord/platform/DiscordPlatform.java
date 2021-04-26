@@ -26,8 +26,6 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.rest.util.ApplicationCommandOptionType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +33,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -180,18 +176,6 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
-    }
-
-    private List<ApplicationCommandOptionData> createOptions(Command command) {
-        return command.getParameters().stream()
-                .map(p -> ApplicationCommandOptionData.builder()
-                        .name(p.getName())
-                        .description(p.getDescription())
-                        .required(!p.isOptional())
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .build()
-                )
-                .collect(Collectors.toList());
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {

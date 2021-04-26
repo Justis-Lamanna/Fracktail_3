@@ -2,6 +2,9 @@ package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.core.convert.TypeDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,15 +13,21 @@ import java.util.List;
 /**
  * A piece of a MethodCallingAction which resolves the context into a parameter to be injected into the method
  */
+@Getter @Setter
 public class ParameterComponent extends ParameterBaseComponent<CommandUseContext> {
-    List<Guard> guards;
+    protected String name;
+    protected String help;
+    protected boolean optional;
+    protected List<Guard> guards;
 
-    /**
-     * Initialize this component with a function
-     * @param func The function to use
-     */
-    public ParameterComponent(ParameterConverterFunction<? super CommandUseContext> func) {
-        super(func);
+    public ParameterComponent(TypeDescriptor type, ParameterConverterFunction<? super CommandUseContext> func, String name) {
+        super(type, func);
+        this.name = name;
+        this.guards = new ArrayList<>();
+    }
+
+    public ParameterComponent(TypeDescriptor type, ParameterConverterFunction<? super CommandUseContext> func) {
+        super(type, func);
         this.guards = new ArrayList<>();
     }
 

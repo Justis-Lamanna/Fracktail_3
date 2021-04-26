@@ -4,7 +4,10 @@ import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectConv
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -23,8 +26,15 @@ public class ParameterStrategy implements ParameterComponentStrategy {
                     parameter.getAnnotation(com.github.lucbui.fracktail3.spring.command.annotation.Parameter.class);
             int value = pAnnot.value();
             Class<?> paramType = parameter.getType();
+            TypeDescriptor descriptor = new TypeDescriptor(MethodParameter.forParameter(parameter));
 
-            return Optional.of(new ParameterComponent(new ParameterToObjectConverterFunction(paramType, value, converters)));
+            ParameterComponent component = new ParameterComponent(
+                    descriptor,
+                    new ParameterToObjectConverterFunction(paramType, value, converters),
+                    StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
+            component.setHelp(pAnnot.description());
+            component.setOptional(pAnnot.optional());
+            return Optional.of(component);
         }
         return Optional.empty();
     }

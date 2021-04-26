@@ -18,7 +18,7 @@ public class Config {
     @Bean
     public Platform discord(@Value("${token}") String token) {
         return new DiscordPlatform(
-                new DiscordConfiguration(token, "!", Presence.doNotDisturb(Activity.watching("you be such a cutie")), CommandType.SLASH),
+                new DiscordConfiguration(token, "!", Presence.doNotDisturb(Activity.watching("you be such a cutie")), CommandType.LEGACY),
                 new BasicParameterParser()
         );
     }

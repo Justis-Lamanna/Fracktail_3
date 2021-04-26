@@ -1,7 +1,6 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
@@ -10,7 +9,10 @@ import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.BoardDisplay;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
-import com.github.lucbui.fracktail3.spring.command.annotation.*;
+import com.github.lucbui.fracktail3.spring.command.annotation.Command;
+import com.github.lucbui.fracktail3.spring.command.annotation.InjectPerson;
+import com.github.lucbui.fracktail3.spring.command.annotation.Parameter;
+import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
 import discord4j.common.util.Snowflake;
 import lombok.Data;
@@ -63,20 +65,12 @@ public class CheckersManager {
     }
 
     @Command
-    @Usage("Play Checkers! Commands are as follows:\n" +
-            "\t!checkers start <@opponent> - Start a game with an opponent.\n" +
-            "\t!checkers play <id?> <position start>:<position end> - Move a piece. Positions are in the form of Column/Row pairs (example - A1:B2)\n" +
-            "\t\tNote that you can do multi jump by appending more :<position> values (example - A1:C3:E5)\n" +
-            "\t!checkers play <id?> forfeit - Forfeit the game.\n" +
-            "\t!checkers watch <id> - Spectate on a match\n" +
-            "\t!checkers unwatch <id?> - Stop watching a match. If no ID specified, all matches are unwatched.\n" +
-            "\t!checkers view <id> - View the board and current player of a match.\n" +
-            "\t!checkers games - View all the games you are current participating in."
-    )
+    @Usage("Play Checkers with another user")
     public Mono<String> checkers(@InjectPlatform Platform platform,
                                  @InjectPerson Person sender,
                                  @Parameter(0) String subCommand,
-                                 @ParameterRange(lower = 1) String[] parameters) {
+                                 @Parameter(1) String params) {
+        String[] parameters = params.split("\\s+");
         if(StringUtils.equalsIgnoreCase(subCommand, "start")) {
             if(parameters.length == 0) {
                 return Mono.just("Usage: !checkers start <@opponent>");

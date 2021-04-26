@@ -10,6 +10,8 @@ import com.github.lucbui.fracktail3.spring.schedule.model.ParameterScheduledComp
 import com.github.lucbui.fracktail3.spring.schedule.plugin.ParameterScheduledComponentStrategy;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.TypeDescriptor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -39,7 +41,7 @@ public class InjectPlatformStrategy implements ParameterScheduledComponentStrate
         if(parameter.isAnnotationPresent(InjectPlatform.class)) {
             Class<? extends Platform> pType = validateParameterClass(parameter);
             String key = getPlatformIdIfPresent(parameter);
-            return Optional.of(new ParameterComponent(new InjectPlatformHandler(key, pType)));
+            return Optional.of(new ParameterComponent(new TypeDescriptor(MethodParameter.forParameter(parameter)), new InjectPlatformHandler(key, pType)));
         }
         return Optional.empty();
     }

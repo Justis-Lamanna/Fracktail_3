@@ -20,6 +20,10 @@ public @interface Parameter {
      * @return The index of the command parameter to inject
      */
     int value();
-    @Deprecated
+
+    String name() default "";
+
+    String description() default "";
+
     boolean optional() default false;
 }
