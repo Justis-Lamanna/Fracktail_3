@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.spring.configurer;
 
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
-import com.github.lucbui.fracktail3.spring.command.annotation.AnnotationUtils;
 import com.github.lucbui.fracktail3.spring.command.annotation.Command;
 import com.github.lucbui.fracktail3.spring.command.annotation.Name;
 import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
@@ -70,7 +69,7 @@ public class CommandConfigurer extends FieldAndMethodBasedConfigurer {
         if(element.isAnnotationPresent(Usage.class)) {
             Usage usageAnnotation = element.getAnnotation(Usage.class);
             LOGGER.debug("+-With help text as {}", usageAnnotation.value());
-            c.withHelp(AnnotationUtils.fromUsage(usageAnnotation));
+            c.withHelp(usageAnnotation.value());
         }
     }
 
