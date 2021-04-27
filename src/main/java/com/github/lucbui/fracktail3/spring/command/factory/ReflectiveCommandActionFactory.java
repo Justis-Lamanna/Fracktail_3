@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.spring.command.factory;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.spring.command.model.*;
 import com.github.lucbui.fracktail3.spring.schedule.model.*;
@@ -75,12 +77,18 @@ public class ReflectiveCommandActionFactory {
      * @param method The method to compile
      * @return A created ScheduledAction, constructed via object and method annotations
      */
-    public ScheduledAction createScheduledAction(Object obj, Method method) {
+    public ScheduledEvent createScheduledAction(Object obj, Method method) {
+        MethodScheduledComponent methodComponent = methodComponentFactory.compileScheduleMethod(obj, method);
+        if(methodComponent.getTrigger() == null) {
+            throw new BotConfigurationException("No trigger for Scheduled method " + methodComponent.getId());
+        }
+
         List<ParameterScheduledComponent> components = parameterComponentFactory.compileScheduleParameters(obj, method);
         ReturnScheduledComponent returnComponent = returnComponentFactory.compileScheduledReturn(obj, method);
         ExceptionScheduledComponent exceptionComponent = exceptionComponentFactory.compileScheduleException(obj, method);
 
-        return new MethodCallingScheduledAction(components, obj, method, returnComponent, exceptionComponent);
+        ScheduledAction action = new MethodCallingScheduledAction(components, obj, method, returnComponent, exceptionComponent);
+        return new ScheduledEvent(methodComponent.getId(), methodComponent.getTrigger(), action);
     }
 
     /**
@@ -89,10 +97,16 @@ public class ReflectiveCommandActionFactory {
      * @param field The field to compile
      * @return A created ScheduledAction, constructed via object and field annotations
      */
-    public ScheduledAction createScheduledAction(Object obj, Field field) {
+    public ScheduledEvent createScheduledAction(Object obj, Field field) {
+        MethodScheduledComponent methodComponent = methodComponentFactory.compileScheduleMethod(obj, field);
+        if(methodComponent.getTrigger() == null) {
+            throw new BotConfigurationException("No trigger for Scheduled method " + methodComponent.getId());
+        }
+
         ReturnScheduledComponent returnComponent = returnComponentFactory.compileScheduledReturn(obj, field);
         ExceptionScheduledComponent exceptionComponent = exceptionComponentFactory.compileScheduleException(obj, field);
 
-        return new FieldCallingScheduledAction(obj, field, returnComponent, exceptionComponent);
+        ScheduledAction action = new FieldCallingScheduledAction(obj, field, returnComponent, exceptionComponent);
+        return new ScheduledEvent(methodComponent.getId(), methodComponent.getTrigger(), action);
     }
 }

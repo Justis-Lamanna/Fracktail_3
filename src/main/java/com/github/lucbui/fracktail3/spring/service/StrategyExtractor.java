@@ -30,6 +30,10 @@ public class StrategyExtractor implements ApplicationContextAware {
         return getStrategies(element, MethodStrategy.class, MethodStrategy::value);
     }
 
+    public List<MethodScheduledComponentStrategy> getMethodScheduleStrategies(AnnotatedElement element) {
+        return getStrategies(element, MethodScheduleStrategy.class, MethodScheduleStrategy::value);
+    }
+
     public List<ExceptionComponentStrategy> getExceptionStrategies(AnnotatedElement element) {
         return getStrategies(element, ExceptionStrategy.class, ExceptionStrategy::value);
     }

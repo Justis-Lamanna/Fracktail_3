@@ -1,11 +1,9 @@
 package com.github.lucbui.fracktail3.spring.configurer;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 public abstract class FieldAndMethodBasedConfigurer implements BotConfigurer {
@@ -28,14 +26,6 @@ public abstract class FieldAndMethodBasedConfigurer implements BotConfigurer {
     protected abstract void handleMethod(Object obj, Method method);
 
     protected abstract void handleField(Object obj, Field field);
-
-    protected static String returnStringOrMemberName(String id, Member member) {
-        if(StringUtils.isBlank(id)) {
-            return member.getName();
-        } else {
-            return id;
-        }
-    }
 
     private class FieldAndMethodBasedParser implements ReflectionUtils.MethodCallback, ReflectionUtils.FieldCallback {
         private final Object bean;
