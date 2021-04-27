@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.schedule.trigger;
 
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
+import lombok.Data;
 import org.reactivestreams.Publisher;
 
 import java.time.Duration;
@@ -9,6 +10,7 @@ import java.time.Instant;
 /**
  * A trigger which fires after waiting some time first
  */
+@Data
 public class ExecuteAfterDurationTrigger implements ScheduleEventTrigger {
     private final Duration duration;
 
@@ -23,13 +25,5 @@ public class ExecuteAfterDurationTrigger implements ScheduleEventTrigger {
     @Override
     public Publisher<Instant> schedule(Scheduler scheduler) {
         return scheduler.wait(duration);
-    }
-
-    /**
-     * Get the amount of time to wait before executing
-     * @return The amount of time to wait before executing
-     */
-    public Duration getDuration() {
-        return duration;
     }
 }

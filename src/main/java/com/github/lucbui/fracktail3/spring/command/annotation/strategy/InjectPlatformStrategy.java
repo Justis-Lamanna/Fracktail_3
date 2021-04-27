@@ -1,10 +1,10 @@
-package com.github.lucbui.fracktail3.spring.schedule.annotation.strategy;
+package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.spring.command.annotation.InjectPlatform;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
-import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
 import com.github.lucbui.fracktail3.spring.schedule.handler.InjectPlatformHandler;
 import com.github.lucbui.fracktail3.spring.schedule.model.ParameterScheduledComponent;
 import com.github.lucbui.fracktail3.spring.schedule.plugin.ParameterScheduledComponentStrategy;

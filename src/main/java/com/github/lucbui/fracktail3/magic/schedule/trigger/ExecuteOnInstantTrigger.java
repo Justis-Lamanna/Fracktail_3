@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.schedule.trigger;
 
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
+import lombok.Data;
 import org.reactivestreams.Publisher;
 
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.time.ZonedDateTime;
 /**
  * A trigger which executes once, at a specific date and time
  */
+@Data
 public class ExecuteOnInstantTrigger implements ScheduleEventTrigger {
     private final Instant instant;
 
@@ -31,13 +33,5 @@ public class ExecuteOnInstantTrigger implements ScheduleEventTrigger {
     @Override
     public Publisher<Instant> schedule(Scheduler scheduler) {
         return scheduler.at(instant);
-    }
-
-    /**
-     * The instant to run the scheduled task at
-     * @return the instant to run the scheduled task at
-     */
-    public Instant getInstant() {
-        return instant;
     }
 }

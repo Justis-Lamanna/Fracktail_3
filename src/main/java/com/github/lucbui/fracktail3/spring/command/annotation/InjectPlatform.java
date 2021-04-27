@@ -1,7 +1,7 @@
-package com.github.lucbui.fracktail3.spring.schedule.annotation;
+package com.github.lucbui.fracktail3.spring.command.annotation;
 
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.InjectPlatformStrategy;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterStrategy;
-import com.github.lucbui.fracktail3.spring.schedule.annotation.strategy.InjectPlatformStrategy;
 import com.github.lucbui.fracktail3.spring.schedule.plugin.ParameterScheduleStrategy;
 
 import java.lang.annotation.ElementType;

@@ -1,5 +1,8 @@
 package com.github.lucbui.fracktail3.spring.schedule.annotation;
 
+import com.github.lucbui.fracktail3.spring.schedule.annotation.strategy.RunAtMethodStrategy;
+import com.github.lucbui.fracktail3.spring.schedule.plugin.MethodScheduleStrategy;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,6 +16,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
+@MethodScheduleStrategy(RunAtMethodStrategy.class)
 public @interface RunAt {
     /**
      * The time to run, according to ISO_DATE_TIME formatting

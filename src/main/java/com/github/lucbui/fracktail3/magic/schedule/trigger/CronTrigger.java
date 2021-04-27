@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.schedule.trigger;
 
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
+import lombok.Data;
 import org.reactivestreams.Publisher;
 
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.util.TimeZone;
 /**
  * A trigger which schedules on a cron expressions
  */
+@Data
 public class CronTrigger implements ScheduleEventTrigger {
     private final String cron;
     private final TimeZone timeZone;
@@ -21,22 +23,6 @@ public class CronTrigger implements ScheduleEventTrigger {
     public CronTrigger(String cron, TimeZone timeZone) {
         this.cron = cron;
         this.timeZone = timeZone;
-    }
-
-    /**
-     * The Cron expression to trigger the event on
-     * @return The cron expression
-     */
-    public String getCron() {
-        return cron;
-    }
-
-    /**
-     * The time zone to use when determining trigger time
-     * @return The timezone specified
-     */
-    public TimeZone getTimeZone() {
-        return timeZone;
     }
 
     /**

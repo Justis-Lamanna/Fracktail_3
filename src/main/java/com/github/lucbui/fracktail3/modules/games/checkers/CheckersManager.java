@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.modules.games.checkers;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
+import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.modules.games.Action;
 import com.github.lucbui.fracktail3.modules.games.ActionLegality;
@@ -9,11 +10,7 @@ import com.github.lucbui.fracktail3.modules.games.checkers.action.MoveAction;
 import com.github.lucbui.fracktail3.modules.games.standard.BoardDisplay;
 import com.github.lucbui.fracktail3.modules.games.standard.action.InTurnAction;
 import com.github.lucbui.fracktail3.modules.games.standard.field.Position;
-import com.github.lucbui.fracktail3.spring.command.annotation.Command;
-import com.github.lucbui.fracktail3.spring.command.annotation.InjectPerson;
-import com.github.lucbui.fracktail3.spring.command.annotation.Parameter;
-import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
-import com.github.lucbui.fracktail3.spring.schedule.annotation.InjectPlatform;
+import com.github.lucbui.fracktail3.spring.command.annotation.*;
 import discord4j.common.util.Snowflake;
 import lombok.Data;
 import org.apache.commons.lang3.RandomStringUtils;
