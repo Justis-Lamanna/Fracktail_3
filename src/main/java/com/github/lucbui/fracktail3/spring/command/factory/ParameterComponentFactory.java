@@ -7,6 +7,8 @@ import com.github.lucbui.fracktail3.spring.service.StrategyExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -45,10 +47,13 @@ public class ParameterComponentFactory {
      * @return A ParameterComponent
      */
     public ParameterComponent compileParameter(Object obj, Method method, Parameter parameter) {
-        return FactoryUtils.createAndDecorate(extractor.getParameterStrategies(parameter),
-                strategy -> strategy.create(obj, method, parameter),
-                (strategy, component) -> strategy.decorate(obj, method, parameter, component))
-            .orElseThrow(() -> new BotConfigurationException("Unequipped to compile parameter " + parameter.getName() + " for method " + method.getName()));
+        ParameterComponent c = FactoryUtils.decorate(extractor.getParameterStrategies(parameter),
+                (strategy, component) -> strategy.decorate(obj, method, parameter, component),
+                new ParameterComponent(new TypeDescriptor(MethodParameter.forParameter(parameter))));
+        if(c.getFunc() == null) {
+            throw new BotConfigurationException("Unable to parse parameter " + parameter.getName() + " of method " + method.getName());
+        }
+        return c;
     }
 
     /**
@@ -58,7 +63,6 @@ public class ParameterComponentFactory {
      * @return A list of ParameterComponent, one for each parameter in the method
      */
     public List<ParameterScheduledComponent> compileScheduleParameters(Object obj, Method method) {
-        LOGGER.debug("Compiling parameters of method {}", method.getName());
         return Arrays.stream(method.getParameters())
                 .map(param -> compileScheduleParameter(obj, method, param))
                 .collect(Collectors.toList());
@@ -72,10 +76,12 @@ public class ParameterComponentFactory {
      * @return A ParameterComponent
      */
     public ParameterScheduledComponent compileScheduleParameter(Object obj, Method method, Parameter parameter) {
-        LOGGER.debug("Compiling parameter {} of method {}", parameter.getName(), method.getName());
-        return FactoryUtils.createAndDecorate(extractor.getParameterScheduleStrategies(parameter),
-                strategy -> strategy.createSchedule(obj, method, parameter),
-                (strategy, component) -> strategy.decorateSchedule(obj, method, parameter, component))
-                .orElseThrow(() -> new BotConfigurationException("Unequipped to compile parameter " + parameter.getName() + " for method " + method.getName()));
+        ParameterScheduledComponent c = FactoryUtils.decorate(extractor.getParameterScheduleStrategies(parameter),
+                (strategy, component) -> strategy.decorateSchedule(obj, method, parameter, component),
+                new ParameterScheduledComponent(new TypeDescriptor(MethodParameter.forParameter(parameter))));
+        if(c.getFunc() == null) {
+            throw new BotConfigurationException("Unable to parse parameter " + parameter.getName() + " of method " + method.getName());
+        }
+        return c;
     }
 }

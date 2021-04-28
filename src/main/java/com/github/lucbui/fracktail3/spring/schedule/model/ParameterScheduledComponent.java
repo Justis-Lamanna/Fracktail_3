@@ -8,7 +8,7 @@ import org.springframework.core.convert.TypeDescriptor;
  * A piece of a MethodCallingScheduledAction which resolves the context into a parameter to be injected into the method
  */
 public class ParameterScheduledComponent extends ParameterBaseComponent<ScheduleUseContext> {
-    public ParameterScheduledComponent(TypeDescriptor type, ParameterConverterFunction<? super ScheduleUseContext> func) {
-        super(type, func);
+    public ParameterScheduledComponent(TypeDescriptor type) {
+        super(type);
     }
 }

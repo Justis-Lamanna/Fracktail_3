@@ -1,9 +1,9 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
+import lombok.Data;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -11,33 +11,16 @@ import java.util.function.Consumer;
 /**
  * A base component which determines how the method's response should be handled
  */
+@Data
 public abstract class ReturnBaseComponent<T> {
-    protected final ReturnConverterFunction<? super T> func;
+    protected ReturnConverterFunction<? super T> func;
     protected final List<Consumer<Object>> consumers;
 
     /**
      * Initialize this component with a handler
-     * @param func A function which does something with the value returned from the method or field
      */
-    protected ReturnBaseComponent(ReturnConverterFunction<? super T> func) {
-        this.func = func;
+    protected ReturnBaseComponent() {
         this.consumers = new ArrayList<>();
-    }
-
-    /**
-     * Get the ReturnConverterFunction used
-     * @return the ReturnConverterFunction used
-     */
-    public ReturnConverterFunction<? super T> getFunc() {
-        return func;
-    }
-
-    /**
-     * Get the consumers of the object used
-     * @return The object consumers
-     */
-    public List<Consumer<Object>> getConsumers() {
-        return Collections.unmodifiableList(consumers);
     }
 
     /**

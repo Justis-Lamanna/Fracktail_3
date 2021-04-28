@@ -7,7 +7,5 @@ import com.github.lucbui.fracktail3.spring.command.model.ReturnBaseComponent;
  * A piece of a MethodCallingScheduledAction or FieldCallingScheduledAction which determines how the method's response should be handled
  */
 public class ReturnScheduledComponent extends ReturnBaseComponent<ScheduleUseContext> {
-    public ReturnScheduledComponent(ReturnConverterFunction<? super ScheduleUseContext> func) {
-        super(func);
-    }
+
 }

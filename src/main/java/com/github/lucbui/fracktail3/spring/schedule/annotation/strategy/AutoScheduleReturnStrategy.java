@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 @Component
 public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrategy {
@@ -19,24 +18,24 @@ public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrat
     @Autowired
     private ReturnConverters converters;
 
-    @Override
-    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method) {
-//        return converters.getHandlerForType(method.getReturnType())
-//                .map(ReturnScheduledComponent::new);
-        return Optional.empty();
-    }
+//    @Override
+//    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method) {
+////        return converters.getHandlerForType(method.getReturnType())
+////                .map(ReturnScheduledComponent::new);
+//        return Optional.empty();
+//    }
 
     @Override
     public ReturnScheduledComponent decorateSchedule(Object obj, Method method, ReturnScheduledComponent base) {
         return base;
     }
 
-    @Override
-    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field) {
-//        return converters.getHandlerForType(field.getType())
-//                .map(ReturnScheduledComponent::new);
-        return Optional.empty();
-    }
+//    @Override
+//    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field) {
+////        return converters.getHandlerForType(field.getType())
+////                .map(ReturnScheduledComponent::new);
+//        return Optional.empty();
+//    }
 
     @Override
     public ReturnScheduledComponent decorateSchedule(Object obj, Field field, ReturnScheduledComponent base) {

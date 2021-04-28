@@ -29,11 +29,12 @@ public class ReturnComponentFactory {
      * @return The created ReturnComponent
      */
     public ReturnComponent compileReturn(Object obj, Method method) {
-        return FactoryUtils.createAndDecorate(
-                extractor.getReturnStrategies(method),
-                strategy -> strategy.create(obj, method),
-                (strategy, component) -> strategy.decorate(obj, method, component)
-        ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for method " + method.getName()));
+        ReturnComponent c = FactoryUtils.decorate(extractor.getReturnStrategies(method),
+                (strategy, component) -> strategy.decorate(obj, method, component), new ReturnComponent());
+        if(c.getFunc() == null) {
+            throw new BotConfigurationException("Unable to parse return of method " + method.getName());
+        }
+        return c;
     }
 
     /**
@@ -43,12 +44,8 @@ public class ReturnComponentFactory {
      * @return The created ReturnComponent
      */
     public ReturnComponent compileReturn(Object obj, Field field) {
-        LOGGER.debug("Compiling return of field {}", field.getName());
-        return FactoryUtils.createAndDecorate(
-                extractor.getReturnStrategies(field),
-                strategy -> strategy.create(obj, field),
-                (strategy, component) -> strategy.decorate(obj, field, component)
-        ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for field " + field.getName()));
+        return FactoryUtils.decorate(extractor.getReturnStrategies(field),
+                (strategy, component) -> strategy.decorate(obj, field, component), new ReturnComponent());
     }
 
     /**
@@ -58,12 +55,12 @@ public class ReturnComponentFactory {
      * @return The created ReturnScheduledComponent
      */
     public ReturnScheduledComponent compileScheduledReturn(Object obj, Method method) {
-        LOGGER.debug("Compiling return of method {}", method.getName());
-        return FactoryUtils.createAndDecorate(
-                extractor.getReturnScheduleStrategies(method),
-                strategy -> strategy.createSchedule(obj, method),
-                (strategy, component) -> strategy.decorateSchedule(obj, method, component)
-        ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for method " + method.getName()));
+        ReturnScheduledComponent c = FactoryUtils.decorate(extractor.getReturnScheduleStrategies(method),
+                (strategy, component) -> strategy.decorateSchedule(obj, method, component), new ReturnScheduledComponent());
+        if(c.getFunc() == null) {
+            throw new BotConfigurationException("Unable to parse return of method " + method.getName());
+        }
+        return c;
     }
 
     /**
@@ -73,11 +70,7 @@ public class ReturnComponentFactory {
      * @return The created ReturnScheduledComponent
      */
     public ReturnScheduledComponent compileScheduledReturn(Object obj, Field field) {
-        LOGGER.debug("Compiling return of field {}", field.getName());
-        return FactoryUtils.createAndDecorate(
-                extractor.getReturnScheduleStrategies(field),
-                strategy -> strategy.createSchedule(obj, field),
-                (strategy, component) -> strategy.decorateSchedule(obj, field, component)
-        ).orElseThrow(() -> new BotConfigurationException("Unequipped to compile return for field " + field.getName()));
+        return FactoryUtils.decorate(extractor.getReturnScheduleStrategies(field),
+                (strategy, component) -> strategy.decorateSchedule(obj, field, component), new ReturnScheduledComponent());
     }
 }

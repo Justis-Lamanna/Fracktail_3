@@ -21,14 +21,14 @@ public class ParameterComponent extends ParameterBaseComponent<CommandUseContext
     protected boolean optional;
     protected List<Guard> guards;
 
-    public ParameterComponent(TypeDescriptor type, ParameterConverterFunction<? super CommandUseContext> func, String name) {
-        super(type, func);
+    public ParameterComponent(TypeDescriptor type, String name) {
+        super(type);
         this.name = name;
         this.guards = new ArrayList<>();
     }
 
-    public ParameterComponent(TypeDescriptor type, ParameterConverterFunction<? super CommandUseContext> func) {
-        super(type, func);
+    public ParameterComponent(TypeDescriptor type) {
+        super(type);
         this.guards = new ArrayList<>();
     }
 

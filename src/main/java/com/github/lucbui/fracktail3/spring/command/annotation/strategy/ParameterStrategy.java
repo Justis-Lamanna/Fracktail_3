@@ -8,13 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Optional;
 
 @Component
 public class ParameterStrategy implements ParameterComponentStrategy {
@@ -24,31 +21,21 @@ public class ParameterStrategy implements ParameterComponentStrategy {
     private ParameterConverters converters;
 
     @Override
-    public Optional<ParameterComponent> create(Object obj, Method method, Parameter parameter) {
+    public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
         if(parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.command.annotation.Parameter.class)) {
             com.github.lucbui.fracktail3.spring.command.annotation.Parameter pAnnot =
                     parameter.getAnnotation(com.github.lucbui.fracktail3.spring.command.annotation.Parameter.class);
             int value = pAnnot.value();
             Class<?> paramType = parameter.getType();
-            TypeDescriptor descriptor = new TypeDescriptor(MethodParameter.forParameter(parameter));
 
-            ParameterComponent component = new ParameterComponent(
-                    descriptor,
-                    new ParameterToObjectConverterFunction(paramType, value, converters),
-                    StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
-            component.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), component.getName()));
-            component.setOptional(pAnnot.optional());
+            base.setFunc(new ParameterToObjectConverterFunction(paramType, value, converters));
+            base.setName(StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
+            base.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), base.getName()));
+            base.setOptional(pAnnot.optional());
 
             LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,
-                    component.getName(), component.getType().getResolvableType(), component.getHelp(), component.isOptional());
-
-            return Optional.of(component);
+                    base.getName(), base.getType().getResolvableType(), base.getHelp(), base.isOptional());
         }
-        return Optional.empty();
-    }
-
-    @Override
-    public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
         return base;
     }
 }

@@ -4,20 +4,11 @@ import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledCompone
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 /**
  * Describes a strategy for creating and decorating an ReturnComponent
  */
 public interface ReturnScheduledComponentStrategy {
-    /**
-     * Create a ReturnScheduledComponent
-     * @param obj The bean object
-     * @param method The method being compiled
-     * @return An Optional containing the created component, or empty if this strategy cannot handle.
-     */
-    Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method);
-
     /**
      * Decorate an ReturnScheduledComponent
      * @param obj The bean object
@@ -26,14 +17,6 @@ public interface ReturnScheduledComponentStrategy {
      * @return The decorated ReturnScheduledComponent
      */
     ReturnScheduledComponent decorateSchedule(Object obj, Method method, ReturnScheduledComponent base);
-
-    /**
-     * Create a ReturnScheduledComponent
-     * @param obj The bean object
-     * @param field The field being compiled
-     * @return An Optional containing the created component, or empty if this strategy cannot handle.
-     */
-    Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field);
 
     /**
      * Decorate an ReturnScheduledComponent
