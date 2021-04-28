@@ -20,9 +20,9 @@ import java.lang.reflect.Parameter;
 public class InjectPlatformStrategy implements ParameterScheduledComponentStrategy, ParameterComponentStrategy {
     @Override
     public ParameterScheduledComponent decorateSchedule(Object obj, Method method, Parameter parameter, ParameterScheduledComponent base) {
-//        Class<? extends Platform> pType = validateParameterClass(parameter);
-//        String key = getPlatformIdIfPresent(parameter);
-//        base.setFunc(new InjectPlatformHandler(key, pType));
+        Class<? extends Platform> pType = validateParameterClass(parameter);
+        String key = getPlatformIdIfPresent(parameter);
+        base.setFunc(new InjectPlatformHandler(key, pType));
         return base;
     }
 
