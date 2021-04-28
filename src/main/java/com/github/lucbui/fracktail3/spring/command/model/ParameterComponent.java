@@ -15,20 +15,22 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class ParameterComponent extends ParameterBaseComponent<CommandUseContext> {
+public class ParameterComponent {
+    protected final TypeDescriptor type;
+    protected PCFunction func;
     protected String name;
     protected String help;
     protected boolean optional;
     protected List<Guard> guards;
 
     public ParameterComponent(TypeDescriptor type, String name) {
-        super(type);
+        this.type = type;
         this.name = name;
         this.guards = new ArrayList<>();
     }
 
     public ParameterComponent(TypeDescriptor type) {
-        super(type);
+        this.type = type;
         this.guards = new ArrayList<>();
     }
 
@@ -46,5 +48,10 @@ public class ParameterComponent extends ParameterBaseComponent<CommandUseContext
      */
     public List<Guard> getGuards() {
         return Collections.unmodifiableList(guards);
+    }
+
+    @FunctionalInterface
+    public interface PCFunction {
+        Object apply(CommandUseContext context);
     }
 }

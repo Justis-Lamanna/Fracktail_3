@@ -79,7 +79,7 @@ public class ParameterComponentFactory {
         ParameterScheduledComponent c = FactoryUtils.decorate(extractor.getParameterScheduleStrategies(parameter),
                 (strategy, component) -> strategy.decorateSchedule(obj, method, parameter, component),
                 new ParameterScheduledComponent(new TypeDescriptor(MethodParameter.forParameter(parameter))));
-        if(c.getFunc() == null) {
+        if(c == null) {
             throw new BotConfigurationException("Unable to parse parameter " + parameter.getName() + " of method " + method.getName());
         }
         return c;

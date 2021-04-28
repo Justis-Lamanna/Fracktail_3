@@ -1,13 +1,13 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.ExceptionBaseComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import reactor.core.publisher.Mono;
 
 /**
  * An ExceptionHandler which responds with a certain FormattedString
  */
-public class ExceptionRespondHandler implements ExceptionBaseComponent.ExceptionHandler<CommandUseContext> {
+public class ExceptionRespondHandler implements ExceptionComponent.ECFunction {
     private final String fString;
 
     /**

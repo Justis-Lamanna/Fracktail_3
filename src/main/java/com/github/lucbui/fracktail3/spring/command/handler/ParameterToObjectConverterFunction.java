@@ -1,14 +1,14 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.service.Defaults;
 import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
 
 /**
  * A ParameterConverterFunction which converts a parameter into some type
  */
-public class ParameterToObjectConverterFunction implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext> {
+public class ParameterToObjectConverterFunction implements ParameterComponent.PCFunction {
     private final Class<?> paramType;
     private final int param;
     private final ParameterConverters converters;

@@ -11,8 +11,8 @@ import java.util.function.BiFunction;
 /**
  * A base component which handles exceptions thrown in the course of execution
  */
-public abstract class ExceptionBaseComponent<T> {
-    protected final Map<Class<? extends Throwable>, ExceptionHandler<? super T>> candidates;
+public abstract class ExceptionBaseComponent<FUNC> {
+    protected final Map<Class<? extends Throwable>, FUNC> candidates;
 
     /**
      * Initialize this component
@@ -27,7 +27,7 @@ public abstract class ExceptionBaseComponent<T> {
      * @param clazz The exception class this handler handles
      * @param handler The handler to use
      */
-    public void addHandler(Class<? extends Throwable> clazz, ExceptionHandler<? super T> handler) {
+    public void addHandler(Class<? extends Throwable> clazz, FUNC handler) {
         this.candidates.put(clazz, handler);
     }
 
@@ -35,7 +35,7 @@ public abstract class ExceptionBaseComponent<T> {
      * Get all candidates and their corresponding handler
      * @return An unmodifiable map of each throwable class and its handler
      */
-    public Map<Class<? extends Throwable>, ExceptionHandler<? super T>> getCandidates() {
+    public Map<Class<? extends Throwable>, FUNC> getCandidates() {
         return Collections.unmodifiableMap(candidates);
     }
 
@@ -46,7 +46,7 @@ public abstract class ExceptionBaseComponent<T> {
      * @param clazz The throwable class to attempt to handle
      * @return The ExceptionHandler for that class, or empty if none are available
      */
-    public Optional<ExceptionHandler<? super T>> getBestHandlerFor(Class<? extends Throwable> clazz) {
+    public Optional<FUNC> getBestHandlerFor(Class<? extends Throwable> clazz) {
         if(candidates.isEmpty()) return Optional.empty(); //Don't even bother.
         Class<?> current = clazz;
         //Iterate through the class tree until we find a suitable match.

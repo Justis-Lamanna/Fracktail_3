@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.schedule.annotation.strategy;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
 import com.github.lucbui.fracktail3.spring.schedule.plugin.ReturnScheduledComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.ReturnConverters;
@@ -18,27 +19,17 @@ public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrat
     @Autowired
     private ReturnConverters converters;
 
-//    @Override
-//    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Method method) {
-////        return converters.getHandlerForType(method.getReturnType())
-////                .map(ReturnScheduledComponent::new);
-//        return Optional.empty();
-//    }
-
     @Override
     public ReturnScheduledComponent decorateSchedule(Object obj, Method method, ReturnScheduledComponent base) {
+        base.setFunc(converters.getScheduleHandlerForType(method.getReturnType())
+                .orElseThrow(() -> new BotConfigurationException("Unable to compile return on method " + method.getName())));
         return base;
     }
 
-//    @Override
-//    public Optional<ReturnScheduledComponent> createSchedule(Object obj, Field field) {
-////        return converters.getHandlerForType(field.getType())
-////                .map(ReturnScheduledComponent::new);
-//        return Optional.empty();
-//    }
-
     @Override
     public ReturnScheduledComponent decorateSchedule(Object obj, Field field, ReturnScheduledComponent base) {
+        base.setFunc(converters.getScheduleHandlerForType(field.getType())
+                .orElseThrow(() -> new BotConfigurationException("Unable to compile return on field " + field.getName())));
         return base;
     }
 }

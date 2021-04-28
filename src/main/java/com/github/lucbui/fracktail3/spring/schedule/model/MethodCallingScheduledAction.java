@@ -2,16 +2,17 @@ package com.github.lucbui.fracktail3.spring.schedule.model;
 
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
+import lombok.Data;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Encapsulates a method call on an object, with relevant components, for scheduled actions
  */
+@Data
 public class MethodCallingScheduledAction implements ScheduledAction {
     private final List<ParameterScheduledComponent> parameterComponents;
     private final Object objToInvokeOn;
@@ -39,26 +40,6 @@ public class MethodCallingScheduledAction implements ScheduledAction {
         this.methodToCall = methodToCall;
         this.returnComponent = returnComponent;
         this.exceptionComponent = exceptionComponent;
-    }
-
-    public List<ParameterScheduledComponent> getParameterComponents() {
-        return Collections.unmodifiableList(parameterComponents);
-    }
-
-    public Object getObjToInvokeOn() {
-        return objToInvokeOn;
-    }
-
-    public Method getMethodToCall() {
-        return methodToCall;
-    }
-
-    public ReturnScheduledComponent getReturnComponent() {
-        return returnComponent;
-    }
-
-    public ExceptionScheduledComponent getExceptionComponent() {
-        return exceptionComponent;
     }
 
     @Override

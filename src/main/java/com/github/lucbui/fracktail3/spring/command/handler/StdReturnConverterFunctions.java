@@ -3,8 +3,10 @@ package com.github.lucbui.fracktail3.spring.command.handler;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
-import com.github.lucbui.fracktail3.spring.command.model.ReturnBaseComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
+import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,9 +20,14 @@ public class StdReturnConverterFunctions {
      * ReturnConverterFunction which handles a void or Void return.
      * This simply does nothing with the return, since there is no return
      */
-    public static class Voids implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class Voids implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
+            return Mono.empty();
+        }
+
+        @Override
+        public Mono<Void> apply(ScheduleUseContext context, Object returnVal) {
             return Mono.empty();
         }
     }
@@ -30,7 +37,7 @@ public class StdReturnConverterFunctions {
      * The returned Mono completes when the input mono completes.
      * If null, this returns an empty Mono
      */
-    public static class Monos implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class Monos implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> {
@@ -51,6 +58,11 @@ public class StdReturnConverterFunctions {
                 }
             });
         }
+
+        @Override
+        public Mono<Void> apply(ScheduleUseContext context, Object o) {
+            return o == null ? Mono.empty() : ((Mono<?>)o).then();
+        }
     }
 
     /**
@@ -58,9 +70,14 @@ public class StdReturnConverterFunctions {
      * The returned Mono completes when the input flux completes.
      * If null, this returns an empty Mono
      */
-    public static class Fluxs implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class Fluxs implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
+            return o == null ? Mono.empty() : ((Flux<?>)o).then();
+        }
+
+        @Override
+        public Mono<Void> apply(ScheduleUseContext context, Object o) {
             return o == null ? Mono.empty() : ((Flux<?>)o).then();
         }
     }
@@ -70,7 +87,7 @@ public class StdReturnConverterFunctions {
      * The returned string is sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class Strings implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class Strings implements ReturnComponent.RCFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
@@ -84,7 +101,7 @@ public class StdReturnConverterFunctions {
      * The returned FormattedString is resolved and sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class FStrings implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class FStrings implements ReturnComponent.RCFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
@@ -101,7 +118,7 @@ public class StdReturnConverterFunctions {
      * The returned BotResponse is resolved and sent to the command user as a response.
      * If null, this returns an empty Mono and does nothing.
      */
-    public static class BotResponses implements ReturnBaseComponent.ReturnConverterFunction<CommandUseContext> {
+    public static class BotResponses implements ReturnComponent.RCFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?

@@ -2,11 +2,11 @@ package com.github.lucbui.fracktail3.spring.schedule.handler;
 
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.ParameterBaseComponent;
+import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.service.Defaults;
 import org.apache.commons.lang3.ClassUtils;
 
-public class InjectPlatformHandler implements ParameterBaseComponent.ParameterConverterFunction<CommandUseContext> {
+public class InjectPlatformHandler implements ParameterComponent.PCFunction {
     private final String id;
     private final Class<? extends Platform> platformClazz;
 
