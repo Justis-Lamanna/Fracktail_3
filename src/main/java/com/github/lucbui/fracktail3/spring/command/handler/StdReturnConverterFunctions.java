@@ -61,14 +61,25 @@ public class StdReturnConverterFunctions {
      * If null, this returns an empty Mono
      */
     public static class Fluxs implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
+        private ReturnComponent.RCFunction thenFunc = (ctx, obj) -> Mono.empty();
+        private ReturnScheduledComponent.RCSFunction thenFuncSchedule = (ctx, obj) -> Mono.empty();
+
+        public Fluxs(ReturnComponent.RCFunction thenFunc) {
+            this.thenFunc = thenFunc;
+        }
+
+        public Fluxs(ReturnScheduledComponent.RCSFunction thenFuncSchedule) {
+            this.thenFuncSchedule = thenFuncSchedule;
+        }
+
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
-            return o == null ? Mono.empty() : ((Flux<?>)o).then();
+            return o == null ? Mono.empty() : ((Flux<?>)o).flatMap(s -> thenFunc.apply(context, s)).then();
         }
 
         @Override
         public Mono<Void> apply(ScheduleUseContext context, Object o) {
-            return o == null ? Mono.empty() : ((Flux<?>)o).then();
+            return o == null ? Mono.empty() : ((Flux<?>)o).flatMap(s -> thenFuncSchedule.apply(context, s)).then();
         }
     }
 

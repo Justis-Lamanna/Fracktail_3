@@ -33,7 +33,7 @@ public class ReturnConverters {
             ResolvableType innerType = descriptor.getResolvableType().getGeneric(0);
             ReturnComponent.RCFunction subCall = getHandlerForType(new TypeDescriptor(innerType, null, null))
                     .orElseThrow(() -> new BotConfigurationException("Unable to resolve generic " + innerType + " for type " + descriptor));
-            return Optional.of(new StdReturnConverterFunctions.Fluxs());
+            return Optional.of(new StdReturnConverterFunctions.Fluxs(subCall));
         }
         return Optional.empty();
     }
@@ -55,7 +55,7 @@ public class ReturnConverters {
             ResolvableType innerType = descriptor.getResolvableType().getGeneric(0);
             ReturnScheduledComponent.RCSFunction subCall = getScheduleHandlerForType(new TypeDescriptor(innerType, null, null))
                     .orElseThrow(() -> new BotConfigurationException("Unable to resolve generic " + innerType + " for type " + descriptor));
-            return Optional.of(new StdReturnConverterFunctions.Fluxs());
+            return Optional.of(new StdReturnConverterFunctions.Fluxs(subCall));
         }
         return Optional.empty();
     }
