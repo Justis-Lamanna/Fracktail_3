@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
-import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
@@ -34,26 +33,25 @@ public class StdReturnConverterFunctions {
      * If null, this returns an empty Mono
      */
     public static class Monos implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
+        private ReturnComponent.RCFunction thenFunc = (ctx, obj) -> Mono.empty();
+        private ReturnScheduledComponent.RCSFunction thenFuncSchedule = (ctx, obj) -> Mono.empty();
+
+        public Monos(ReturnComponent.RCFunction thenFunc) {
+            this.thenFunc = thenFunc;
+        }
+
+        public Monos(ReturnScheduledComponent.RCSFunction thenFuncSchedule) {
+            this.thenFuncSchedule = thenFuncSchedule;
+        }
+
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
-            return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> {
-                if(s == null) {
-                    return new Monos().apply(context, null);
-                } else if (s instanceof Mono) {
-                    return new Monos().apply(context, s);
-                } else if (s instanceof Flux) {
-                    return new Fluxs().apply(context, s);
-                } else if (s instanceof String) {
-                    return new Strings().apply(context, s);
-                } else {
-                    return Mono.error(new BotConfigurationException("Mono returned unknown type " + s.getClass().getCanonicalName()));
-                }
-            });
+            return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> thenFunc.apply(context, s));
         }
 
         @Override
         public Mono<Void> apply(ScheduleUseContext context, Object o) {
-            return o == null ? Mono.empty() : ((Mono<?>)o).then();
+            return o == null ? Mono.empty() : ((Mono<?>)o).flatMap(s -> thenFuncSchedule.apply(context, s));
         }
     }
 

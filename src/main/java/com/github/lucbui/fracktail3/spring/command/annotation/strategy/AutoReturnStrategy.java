@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ReturnComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.ReturnConverters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -17,14 +19,14 @@ public class AutoReturnStrategy implements ReturnComponentStrategy {
 
     @Override
     public ReturnComponent decorate(Object obj, Method method, ReturnComponent base) {
-        base.setFunc(converters.getHandlerForType(method.getReturnType())
+        base.setFunc(converters.getHandlerForType(new TypeDescriptor(ResolvableType.forMethodReturnType(method), null, null))
                 .orElseThrow(() -> new BotConfigurationException("Unable to find handler for type " + method.getReturnType())));
         return base;
     }
 
     @Override
     public ReturnComponent decorate(Object obj, Field field, ReturnComponent base) {
-        base.setFunc(converters.getHandlerForType(field.getType())
+        base.setFunc(converters.getHandlerForType(new TypeDescriptor(ResolvableType.forField(field), null, null))
                 .orElseThrow(() -> new BotConfigurationException("Unable to find handler for type " + field.getType())));
         return base;
     }

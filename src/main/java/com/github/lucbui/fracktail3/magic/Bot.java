@@ -75,7 +75,7 @@ public class Bot extends IdStore<Platform> {
         for(ScheduledEvent event : botSpec.getScheduledEvents().getAll()) {
             event.getTrigger()
                     .schedule(scheduler)
-                    .subscribe(new ScheduleSubscriber(event, instant -> new BasicScheduleUseContext(this, instant)));
+                    .subscribe(new ScheduleSubscriber(event, instant -> new BasicScheduleUseContext(this, instant, event)));
         }
 
         return Flux.fromIterable(getAll())
