@@ -10,6 +10,8 @@ import com.github.lucbui.fracktail3.spring.schedule.model.ParameterScheduledComp
 import com.github.lucbui.fracktail3.spring.schedule.plugin.ParameterScheduledComponentStrategy;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -18,16 +20,21 @@ import java.lang.reflect.Parameter;
  * A strategy which injects a specific Platform into this parameter
  */
 public class InjectPlatformStrategy implements ParameterScheduledComponentStrategy, ParameterComponentStrategy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InjectPlatformStrategy.class);
+
     @Override
-    public ParameterScheduledComponent decorateSchedule(Object obj, Method method, Parameter parameter, ParameterScheduledComponent base) {
+    public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
         Class<? extends Platform> pType = validateParameterClass(parameter);
         String key = getPlatformIdIfPresent(parameter);
+        if(pType.equals(Platform.class) && key == null) {
+            pType = null;
+        }
         base.setFunc(new InjectPlatformHandler(key, pType));
         return base;
     }
 
     @Override
-    public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
+    public ParameterScheduledComponent decorateSchedule(Object obj, Method method, Parameter parameter, ParameterScheduledComponent base) {
         Class<? extends Platform> pType = validateParameterClass(parameter);
         String key = getPlatformIdIfPresent(parameter);
         base.setFunc(new InjectPlatformHandler(key, pType));
@@ -43,6 +50,18 @@ public class InjectPlatformStrategy implements ParameterScheduledComponentStrate
 
     private String getPlatformIdIfPresent(Parameter parameter) {
         InjectPlatform annot = parameter.getAnnotation(InjectPlatform.class);
-        return StringUtils.defaultIfBlank(annot.value(), null);
+        String key = StringUtils.defaultIfBlank(annot.value(), null);
+
+        if(LOGGER.isDebugEnabled()) {
+            if(key == null && parameter.getType().equals(Platform.class)) {
+                LOGGER.debug("+-Injecting current platform");
+            } else if(key == null) {
+                LOGGER.debug("+-Injecting platform of type {}", parameter.getType());
+            } else {
+                LOGGER.debug("+-Injecting platform with id {}", key);
+            }
+        }
+
+        return key;
     }
 }

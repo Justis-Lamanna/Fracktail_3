@@ -24,7 +24,15 @@ public class InjectPersonStrategy implements ParameterComponentStrategy, Paramet
     @Override
     public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
         InjectPerson annotation = parameter.getAnnotation(InjectPerson.class);
-        LOGGER.debug("+-Injecting sender");
+        if(LOGGER.isDebugEnabled()) {
+            if(StringUtils.isAllBlank(annotation.platform(), annotation.id())) {
+                LOGGER.debug("+-Injecting sender");
+            } else if(StringUtils.isBlank(annotation.platform()) && StringUtils.isNotBlank(annotation.id())) {
+                LOGGER.debug("+-Injecting user {} of current platform", annotation.id());
+            } else {
+                LOGGER.debug("+-Injecting user {} of platform {}", annotation.id(), annotation.platform());
+            }
+        }
         base.setFunc(new PersonInjector(annotation.platform(), annotation.id()));
         return base;
     }
@@ -35,7 +43,7 @@ public class InjectPersonStrategy implements ParameterComponentStrategy, Paramet
         if(StringUtils.isAnyBlank(annotation.platform(), annotation.id())) {
             throw new BotConfigurationException("Must specify platform and ID when using @InjectPerson on a scheduled event.");
         }
-        LOGGER.debug("+-Injecting sender");
+        LOGGER.debug("+-Injecting user {} of platform {}", annotation.id(), annotation.platform());
         base.setFunc(new PersonInjector(annotation.platform(), annotation.id()));
         return base;
     }

@@ -37,7 +37,7 @@ public class OnExceptionRespondStrategy implements ExceptionComponentStrategy {
             String response = annotation.value();
             ExceptionComponent.ECFunction handler = new ExceptionRespondHandler(response);
             for(Class<? extends Throwable> clazz : annotation.exception()) {
-                LOGGER.debug("+-On exception {} will respond with {}", clazz.getCanonicalName(), annotation.value());
+                LOGGER.debug("+-On exception {} will respond with \"{}\"", clazz.getCanonicalName(), annotation.value());
                 component.addHandler(clazz, handler);
             }
         }

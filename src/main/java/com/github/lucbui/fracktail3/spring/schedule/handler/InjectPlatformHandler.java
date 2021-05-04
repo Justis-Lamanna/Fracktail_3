@@ -32,7 +32,9 @@ public class InjectPlatformHandler implements ParameterComponent.PCFunction, Par
 
     @Override
     public Object apply(CommandUseContext context) {
-        if(id == null) {
+        if (id == null && platformClazz == null) {
+            return context.getPlatform();
+        } else if(id == null) {
             return context.getBot()
                     .getPlatforms()
                     .stream()
@@ -49,7 +51,7 @@ public class InjectPlatformHandler implements ParameterComponent.PCFunction, Par
 
     @Override
     public Object apply(ScheduleUseContext context) {
-        if(id == null) {
+        if (id == null) {
             return context.getBot()
                     .getPlatforms()
                     .stream()
