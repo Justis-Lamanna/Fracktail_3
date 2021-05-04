@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
-import com.github.lucbui.fracktail3.magic.Disableable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
@@ -10,7 +9,7 @@ import reactor.core.publisher.Mono;
 /**
  * Encapsulates a scheduled event
  */
-public class ScheduledEvent implements Id, Disableable {
+public class ScheduledEvent implements Id {
     private final String id;
     private final ScheduleEventTrigger trigger;
     private final ScheduledAction action;
@@ -36,12 +35,10 @@ public class ScheduledEvent implements Id, Disableable {
         return this.id;
     }
 
-    @Override
     public boolean isEnabled() {
         return enabled;
     }
 
-    @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
