@@ -95,10 +95,15 @@ public class StdReturnConverterFunctions {
         public Mono<Void> apply(CommandUseContext context, Object o) {
             return o == null ?
                     Mono.empty() :
-                    context.getTriggerPlace().flatMap(p -> p.sendMessage((String)o)).then();
+                    context.respond((String)o);
         }
     }
 
+    /**
+     * ReturnConverterFunction which handles an Action return
+     * Allows for multiple reusable actions to be returned by a method or field. The returned CommandAction is called
+     * using the same context as this one.
+     */
     public static class Actions implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
         @Override
         public Mono<Void> apply(CommandUseContext context, Object o) {
