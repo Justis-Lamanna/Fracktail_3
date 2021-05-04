@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
+import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
@@ -94,6 +96,22 @@ public class StdReturnConverterFunctions {
             return o == null ?
                     Mono.empty() :
                     context.getTriggerPlace().flatMap(p -> p.sendMessage((String)o)).then();
+        }
+    }
+
+    public static class Actions implements ReturnComponent.RCFunction, ReturnScheduledComponent.RCSFunction {
+        @Override
+        public Mono<Void> apply(CommandUseContext context, Object o) {
+            return o == null ?
+                    Mono.empty() :
+                    ((CommandAction)o).doAction(context);
+        }
+
+        @Override
+        public Mono<Void> apply(ScheduleUseContext context, Object o) {
+            return o == null ?
+                    Mono.empty() :
+                    ((ScheduledAction)o).execute(context);
         }
     }
 }

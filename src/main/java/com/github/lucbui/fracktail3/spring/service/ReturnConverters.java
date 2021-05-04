@@ -1,9 +1,12 @@
 package com.github.lucbui.fracktail3.spring.service;
 
+import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
+import org.apache.commons.lang3.ClassUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
@@ -24,6 +27,8 @@ public class ReturnConverters {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if(objectType.equals(String.class)) {
             return Optional.of(new StdReturnConverterFunctions.Strings());
+        } else if(ClassUtils.isAssignable(objectType, CommandAction.class)) {
+            return Optional.of(new StdReturnConverterFunctions.Actions());
         } else if(objectType.equals(Mono.class)) {
             ResolvableType innerType = descriptor.getResolvableType().getGeneric(0);
             ReturnComponent.RCFunction subCall = getHandlerForType(new TypeDescriptor(innerType, null, null))
@@ -46,6 +51,8 @@ public class ReturnConverters {
         Class<?> objectType = descriptor.getObjectType();
         if(objectType.equals(Void.class)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
+        } else if(ClassUtils.isAssignable(objectType, ScheduledAction.class)) {
+            return Optional.of(new StdReturnConverterFunctions.Actions());
         } else if(objectType.equals(Mono.class)) {
             ResolvableType innerType = descriptor.getResolvableType().getGeneric(0);
             ReturnScheduledComponent.RCSFunction subCall = getScheduleHandlerForType(new TypeDescriptor(innerType, null, null))
