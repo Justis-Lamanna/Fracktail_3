@@ -4,7 +4,6 @@ import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
-import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
 import reactor.core.publisher.Flux;
@@ -51,8 +50,6 @@ public class StdReturnConverterFunctions {
                     return new Strings().apply(context, s);
                 } else if (s instanceof FormattedString) {
                     return new FStrings().apply(context, s);
-                } else if (s instanceof BotResponse) {
-                    return new BotResponses().apply(context, s);
                 } else {
                     return Mono.error(new BotConfigurationException("Mono returned unknown type " + s.getClass().getCanonicalName()));
                 }
@@ -110,23 +107,6 @@ public class StdReturnConverterFunctions {
                         .zipWith(context.getTriggerPlace())
                         .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
                         .then();
-        }
-    }
-
-    /**
-     * ReturnConverterFunction which handles a BotResponse return.
-     * The returned BotResponse is resolved and sent to the command user as a response.
-     * If null, this returns an empty Mono and does nothing.
-     */
-    public static class BotResponses implements ReturnComponent.RCFunction {
-        @Override
-        public Mono<Void> apply(CommandUseContext context, Object o) {
-            return o == null ?
-                    Mono.empty() :
-                    ((BotResponse)o).respondWith().getFor(Collections.emptyMap())
-                            .zipWith(context.getTriggerPlace())
-                            .flatMap(tuple -> tuple.getT2().sendMessage(tuple.getT1()))
-                            .then();
         }
     }
 }

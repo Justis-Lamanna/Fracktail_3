@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.formatter;
 
-import com.github.lucbui.fracktail3.spring.command.model.BotResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -9,7 +8,7 @@ import java.util.Map;
 /**
  * Class which encapsulates a formattable string
  */
-public class FormattedString implements BotResponse {
+public class FormattedString {
     private static ContextFormatter _default =  ContextFormatter.identity();
 
     private final String raw;
@@ -104,10 +103,5 @@ public class FormattedString implements BotResponse {
      */
     public static ContextFormatter getDefaultFormatter() {
         return _default;
-    }
-
-    @Override
-    public FormattedString respondWith() {
-        return this;
     }
 }
