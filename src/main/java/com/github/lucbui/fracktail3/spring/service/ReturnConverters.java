@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.spring.service;
 
-import com.github.lucbui.fracktail3.magic.formatter.FormattedString;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
@@ -26,8 +25,6 @@ public class ReturnConverters {
             return Optional.of(new StdReturnConverterFunctions.Fluxs());
         } else if(clazz.equals(String.class)) {
             return Optional.of(new StdReturnConverterFunctions.Strings());
-        } else if(clazz.equals(FormattedString.class)) {
-            return Optional.of(new StdReturnConverterFunctions.FStrings());
         }
         return Optional.empty();
     }
