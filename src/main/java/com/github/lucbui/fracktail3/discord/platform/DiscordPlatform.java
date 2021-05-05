@@ -95,6 +95,14 @@ public class DiscordPlatform implements Platform {
             throw new BotConfigurationException("Gateway was null");
         }
 
+        //Configure custom hooks
+        if(!configuration.getHooks().isEmpty()) {
+            LOGGER.debug("Applying custom hooks");
+            configuration.getHooks().forEach(hook -> gateway.on(hook).subscribe());
+        }
+
+        //Set presence properly
+        LOGGER.debug("Setting initial presence {}", configuration.getInitialPresence());
         gateway.updatePresence(configuration.getInitialPresence()).block();
 
         LOGGER.debug("Starting in {} mode", configuration.getCommandType());

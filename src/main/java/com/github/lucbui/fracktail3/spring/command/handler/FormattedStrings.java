@@ -16,7 +16,8 @@ import java.util.Map;
  * on syntax and capabilities.
  *
  * The CommandUseContext is passed in to the templating context, so it can be referenced as such. For
- * example, #{sender.name} will be replaced with the name of the command's user.
+ * example, #{sender.name} will be replaced with the name of the command's user. For Monos, normal methods
+ * can be used, as well as the 'async' field, which functions the same as block().
  */
 public class FormattedStrings extends StdReturnConverterFunctions.Strings {
     private static final ParserContext CONTEXT = new ParserContext() {
