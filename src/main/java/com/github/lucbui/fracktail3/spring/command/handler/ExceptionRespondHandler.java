@@ -20,6 +20,6 @@ public class ExceptionRespondHandler implements ExceptionComponent.ECFunction {
 
     @Override
     public Mono<Void> apply(CommandUseContext context, Throwable throwable) {
-        return context.getTriggerPlace().flatMap(place -> place.sendMessage(fString)).then();
+        return context.respond(fString);
     }
 }
