@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.service;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
+import com.github.lucbui.fracktail3.spring.command.handler.FormattedStrings;
 import com.github.lucbui.fracktail3.spring.command.handler.StdReturnConverterFunctions;
 import com.github.lucbui.fracktail3.spring.command.model.ReturnComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ReturnScheduledComponent;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 @Component
@@ -26,6 +28,9 @@ public class ReturnConverters {
         if(objectType.equals(Void.class)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if(objectType.equals(String.class)) {
+            if(descriptor.getSource() instanceof Field) {
+                return Optional.of(new FormattedStrings());
+            }
             return Optional.of(new StdReturnConverterFunctions.Strings());
         } else if(ClassUtils.isAssignable(objectType, CommandAction.class)) {
             return Optional.of(new StdReturnConverterFunctions.Actions());
