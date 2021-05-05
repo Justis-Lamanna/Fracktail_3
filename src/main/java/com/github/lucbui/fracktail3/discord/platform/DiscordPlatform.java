@@ -136,7 +136,7 @@ public class DiscordPlatform implements Platform {
                             .next()
                             .flatMap(CommandUseContext::doAction)
                             .onErrorResume(Throwable.class, e -> {
-                                e.printStackTrace();
+                                LOGGER.error("Error during action", e);
                                 return message.getOrigin()
                                         .flatMap(place ->
                                                 place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
@@ -167,7 +167,7 @@ public class DiscordPlatform implements Platform {
                                 return new BasicCommandUseContext(bot, this, ice, person, place, c, parameters);
                             })
                             .flatMap(c -> ice.acknowledgeEphemeral().thenReturn(c))
-                            .flatMap(CommandUseContext::doAction)
+                            .flatMap(c -> c.doAction()) //Compiler gets mad at me for using :: here??
                             .onErrorResume(Throwable.class, e -> {
                                 e.printStackTrace();
                                 return ice.getInteractionResponse()
