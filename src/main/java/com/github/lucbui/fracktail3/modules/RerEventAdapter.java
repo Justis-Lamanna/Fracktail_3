@@ -29,13 +29,13 @@ public class RerEventAdapter extends ReactiveEventAdapter {
                     .filter(member -> member.getRoleIds().contains(DRAGON_ROLE))
                     .map(member -> dragonCounter.incrementAndGet())
                     .filter(i -> i == 1)
-                    .flatMap(member -> event.getClient().getChannelById(BOT_TIME_ID)
+                    .flatMap(i -> event.getClient().getChannelById(BOT_TIME_ID)
                                 .cast(TextChannel.class)
-                                .flatMap(tc -> tc.createMessage("There's a rer in voice!")));
+                                .flatMap(tc -> tc.createMessage("```There's a rer in voice!```")));
         } else if(event.isLeaveEvent()) {
             return current.getMember()
                     .filter(member -> member.getRoleIds().contains(DRAGON_ROLE))
-                    .doOnNext(member -> dragonCounter.decrementAndGet());
+                    .map(member -> dragonCounter.getAndUpdate(i -> Math.max(i - 1, 0))); //Make sure we don't go negative!
         }
 
         return Mono.empty();
