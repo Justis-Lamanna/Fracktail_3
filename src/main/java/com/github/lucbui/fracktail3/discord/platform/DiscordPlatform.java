@@ -248,7 +248,7 @@ public class DiscordPlatform implements Platform {
     }
 
     private Mono<Person> getPersonById(String id) {
-        if(!id.contains(URN_DELIMITER)) {
+        if(!id.contains(URN_DELIMITER) && StringUtils.isNumeric(id)) {
             return getPersonByUserId(id);
         }
         String[] typeAndOthers = id.split(URN_DELIMITER);

@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.platform;
 
 import lombok.Data;
+import org.apache.commons.lang3.ArrayUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class MultiPerson implements Person {
+public class MultiPerson implements Person, PersonGroup {
     private final String name;
     private final Person[] persons;
 
@@ -35,5 +36,10 @@ public class MultiPerson implements Person {
     @Override
     public boolean isBot() {
         return Arrays.stream(persons).allMatch(Person::isBot);
+    }
+
+    @Override
+    public Mono<Boolean> isInGroup(Person person) {
+        return Mono.defer(() -> Mono.just(ArrayUtils.contains(this.persons, person)));
     }
 }

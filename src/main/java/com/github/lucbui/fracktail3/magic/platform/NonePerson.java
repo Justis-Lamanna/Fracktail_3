@@ -2,7 +2,7 @@ package com.github.lucbui.fracktail3.magic.platform;
 
 import reactor.core.publisher.Mono;
 
-public enum NonePerson implements Person {
+public enum NonePerson implements Person, PersonGroup {
     INSTANCE;
 
     @Override
@@ -18,5 +18,10 @@ public enum NonePerson implements Person {
     @Override
     public boolean isBot() {
         return false;
+    }
+
+    @Override
+    public Mono<Boolean> isInGroup(Person person) {
+        return Mono.just(false);
     }
 }

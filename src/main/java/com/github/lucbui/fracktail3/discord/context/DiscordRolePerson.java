@@ -2,9 +2,11 @@ package com.github.lucbui.fracktail3.discord.context;
 
 import com.github.lucbui.fracktail3.magic.platform.MultiPlace;
 import com.github.lucbui.fracktail3.magic.platform.Person;
+import com.github.lucbui.fracktail3.magic.platform.PersonGroup;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +22,7 @@ import java.util.Formatter;
  * and %#s will print a mention output ("@role"). All other flags, width, and precision are ignored.
  */
 @Data
-public class DiscordRolePerson implements Person, Formattable {
+public class DiscordRolePerson implements Person, PersonGroup, Formattable {
     private final Role role;
 
     @Override
@@ -49,5 +51,18 @@ public class DiscordRolePerson implements Person, Formattable {
         boolean alternate = (flags & FormattableFlags.ALTERNATE) == FormattableFlags.ALTERNATE;
         String output = alternate ? role.getMention() : getName();
         formatter.format(output);
+    }
+
+    @Override
+    public Mono<Boolean> isInGroup(Person person) {
+        if(person instanceof DiscordRolePerson) {
+            return Mono.just(equals(person));
+        } else if(person instanceof DiscordPerson) {
+            User user = ((DiscordPerson) person).getUser();
+            return user.asMember(role.getGuildId())
+                        .map(m -> m.getRoleIds().contains(role.getId()));
+        } else {
+            return Mono.just(false);
+        }
     }
 }
