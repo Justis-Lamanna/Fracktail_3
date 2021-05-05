@@ -12,6 +12,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -19,6 +20,7 @@ import java.lang.reflect.Parameter;
 /**
  * A strategy which injects a specific Platform into this parameter
  */
+@Order(0)
 public class InjectPlatformStrategy implements ParameterScheduledComponentStrategy, ParameterComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(InjectPlatformStrategy.class);
 

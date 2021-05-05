@@ -7,12 +7,14 @@ import com.github.lucbui.fracktail3.spring.command.plugin.ExceptionComponentStra
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+@Order(0)
 public class OnExceptionRespondStrategy implements ExceptionComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(OnExceptionRespondStrategy.class);
     @Override

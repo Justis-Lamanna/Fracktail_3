@@ -13,11 +13,13 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Duration;
 
+@Order(0)
 public class InjectPersonStrategy implements ParameterComponentStrategy, ParameterScheduledComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(InjectPersonStrategy.class);
 

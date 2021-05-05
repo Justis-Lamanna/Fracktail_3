@@ -5,10 +5,12 @@ import com.github.lucbui.fracktail3.spring.schedule.model.MethodScheduledCompone
 import com.github.lucbui.fracktail3.spring.schedule.plugin.MethodScheduledComponentStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+@Order(0)
 public class AutoScheduleMethodStrategy implements MethodScheduledComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoScheduleMethodStrategy.class);
 

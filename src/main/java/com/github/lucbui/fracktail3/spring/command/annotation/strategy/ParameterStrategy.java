@@ -8,12 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 @Component
+@Order(0)
 public class ParameterStrategy implements ParameterComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParameterStrategy.class);
 

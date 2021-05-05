@@ -8,6 +8,7 @@ import com.github.lucbui.fracktail3.spring.schedule.model.MethodScheduledCompone
 import com.github.lucbui.fracktail3.spring.schedule.plugin.MethodScheduledComponentStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+@Order(0)
 public class RunAtMethodStrategy implements MethodScheduledComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(RunAtMethodStrategy.class);
 

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 @Component
+@Order(0)
 public class AutoScheduleReturnStrategy implements ReturnScheduledComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoScheduleReturnStrategy.class);
 

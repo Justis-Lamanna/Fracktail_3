@@ -8,10 +8,12 @@ import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.MethodComponentStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+@Order(0)
 public class ForPlatformStrategy implements MethodComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(ForPlatformStrategy.class);
 

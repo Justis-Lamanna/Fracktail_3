@@ -8,6 +8,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
@@ -67,6 +68,7 @@ public class StrategyExtractor implements ApplicationContextAware {
                 .map(annotType -> annotType.getAnnotation(annotation))
                 .flatMap(a -> Arrays.stream(func.apply(a)))
                 .map(this::resolve)
+                .sorted(AnnotationAwareOrderComparator.INSTANCE)
                 .collect(Collectors.toList());
     }
 
