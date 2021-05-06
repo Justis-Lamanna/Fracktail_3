@@ -38,6 +38,7 @@ public class FieldCallingAction implements CommandAction {
 
     @Override
     public Mono<Void> doAction(CommandUseContext context) {
+        methodComponent.transformers.forEach(c -> c.accept(context));
         return Mono.fromCallable(() -> fieldToRetrieve.get(objToInvokeOn))
                 .filterWhen(o -> guard(context))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))

@@ -75,6 +75,7 @@ public class MethodCallingAction implements CommandAction {
     }
 
     public Mono<Void> doActionUnguarded(CommandUseContext context) {
+        methodComponent.transformers.forEach(c -> c.accept(context));
         Object[] params = parameterComponents.stream()
                 .map(pc -> pc.func.apply(context))
                 .toArray();
@@ -87,7 +88,9 @@ public class MethodCallingAction implements CommandAction {
                                 .flatMap(handler -> handler.apply(context, ex)))
                 .onErrorResume(ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                                .flatMap(func -> func.apply(context, ex)))
+                                .flatMap(func -> func.apply(context, ex))
+                                .switchIfEmpty(Mono.error(ex))
+                )
                 .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 

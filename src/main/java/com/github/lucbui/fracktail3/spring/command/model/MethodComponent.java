@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
 import com.github.lucbui.fracktail3.magic.guard.Guard;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * A piece of a MethodCallingAction or FieldCallingAction which handles top-level guards
@@ -18,13 +20,15 @@ public class MethodComponent {
     protected String id;
     protected Set<String> names;
     protected String help;
-    List<Guard> guards;
+    protected List<Guard> guards;
+    protected List<Consumer<CommandUseContext>> transformers;
 
     /**
      * Initialize this component
      */
     public MethodComponent() {
         this.guards = new ArrayList<>();
+        this.transformers = new ArrayList<>();
     }
 
     /**
@@ -41,5 +45,13 @@ public class MethodComponent {
      */
     public List<Guard> getGuards() {
         return Collections.unmodifiableList(guards);
+    }
+
+    /**
+     * Add a CommandUseContext consumer
+     * @param transformer The function which decorates the CommandUseContext
+     */
+    public void addTransformer(Consumer<CommandUseContext> transformer) {
+        transformers.add(transformer);
     }
 }

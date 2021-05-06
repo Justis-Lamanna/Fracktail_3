@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.platform;
 
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.net.URI;
 
 /**
@@ -44,4 +45,15 @@ public interface Message {
      * @return A mono which completes when the message was deleted
      */
     Mono<Void> delete();
+
+    /**
+     * Reply to this message.
+     * By default, this simply sends a message in the origin place
+     * @param content The contents to reply with
+     * @param files Any files to attach
+     * @return Asynchronous reference to the created response message
+     */
+    default Mono<Message> reply(String content, File... files) {
+        return getOrigin().flatMap(place -> place.sendMessage(content, files));
+    }
 }

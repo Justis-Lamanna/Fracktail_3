@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.util.DiscordUtils;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NonePerson;
 import com.github.lucbui.fracktail3.magic.platform.Person;
@@ -8,6 +9,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.net.URI;
 
 /**
@@ -53,6 +55,16 @@ public class DiscordMessage implements Message {
         return wrappedMsg.getChannel()
                 .map(DiscordPlace::new)
                 .cast(Place.class);
+    }
+
+    @Override
+    public Mono<Message> reply(String content, File... attachments) {
+        return wrappedMsg.getChannel()
+                .flatMap(mc -> mc.createMessage(spec -> {
+                    spec.setMessageReference(wrappedMsg.getId());
+                    DiscordUtils.createSpec(spec, content, attachments);;
+                }))
+                .map(DiscordMessage::new);
     }
 
     @Override

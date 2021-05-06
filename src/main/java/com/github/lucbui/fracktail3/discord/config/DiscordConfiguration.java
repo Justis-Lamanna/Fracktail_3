@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.config;
 
+import com.github.lucbui.fracktail3.discord.context.ReplyStyle;
 import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.object.presence.Presence;
 import discord4j.discordjson.json.gateway.StatusUpdate;
@@ -19,5 +20,6 @@ public class DiscordConfiguration {
     private final String prefix;
     @Builder.Default private final StatusUpdate initialPresence = Presence.online();
     @Builder.Default private final CommandType commandType = CommandType.LEGACY;
+    @Builder.Default private final ReplyStyle replyStyle = ReplyStyle.PLAIN;
     @Singular private final List<ReactiveEventAdapter> hooks;
 }
