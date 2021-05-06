@@ -7,6 +7,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import lombok.Data;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.Formattable;
 import java.util.FormattableFlags;
 import java.util.Formatter;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +48,11 @@ public class DiscordPlace implements Place, Formattable {
     @Override
     public Mono<Message> sendMessage(String content, File... attachments) {
         return place.createMessage(spec -> createSpec(spec, content, attachments))
+                .map(DiscordMessage::new);
+    }
+
+    public Mono<Message> sendEmbed(Consumer<? super EmbedCreateSpec> spec) {
+        return place.createEmbed(spec)
                 .map(DiscordMessage::new);
     }
 
