@@ -19,6 +19,10 @@ public interface CommandUseContext {
     Person getSender();
     Mono<Place> getTriggerPlace();
 
+    default Mono<Boolean> canDoAction() {
+        return getCommand().getRestriction().matches(this);
+    }
+
     default Mono<Void> doAction() {
         return getCommand().doAction(this);
     }
