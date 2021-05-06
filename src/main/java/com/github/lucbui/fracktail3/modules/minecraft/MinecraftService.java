@@ -39,13 +39,8 @@ public class MinecraftService {
             String description;
             if(s.getMotd() != null && ArrayUtils.isNotEmpty(s.getMotd().getClean())) {
                 String[] motds = s.getMotd().getClean();
-                if(motds.length > 1) {
-                    title = motds[0];
-                    description = motds[1];
-                } else {
-                    title = motds[0];
-                    description = StringUtils.firstNonEmpty(s.getHostname(), s.getIp());
-                }
+                title = StringUtils.firstNonEmpty(s.getHostname(), s.getIp());
+                description = motds[0];
             } else if(s.getHostname() != null && s.getIp() != null) {
                 title = s.getHostname();
                 description = s.getIp();
