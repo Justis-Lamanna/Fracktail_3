@@ -22,9 +22,11 @@ public class Defaults {
         suppliers.put(Integer.TYPE, () -> 0);
         suppliers.put(Long.TYPE, () -> 0L);
         suppliers.put(Double.TYPE, () -> 0.0);
+        suppliers.put(Boolean.TYPE, () -> false);
         suppliers.put(Integer.class, () -> 0);
         suppliers.put(Long.class, () -> 0L);
         suppliers.put(Double.class, () -> 0.0);
+        suppliers.put(Boolean.class, () -> false);
         suppliers.put(Optional.class, Optional::empty);
         suppliers.put(OptionalInt.class, OptionalInt::empty);
         suppliers.put(OptionalLong.class, OptionalLong::empty);
