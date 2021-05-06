@@ -54,9 +54,7 @@ public class MinecraftService {
                 description = null;
             }
             spec.setTitle(title);
-            if (description != null) {
-                spec.setDescription(description);
-            }
+            if (description != null) { spec.setDescription(description); }
             spec.setAuthor("Minecraft Server Status API", "https://api.mcsrvstat.us/", null);
             spec.setColor(Color.of(22, 22, 22));
             if(s.isOnline()) {
