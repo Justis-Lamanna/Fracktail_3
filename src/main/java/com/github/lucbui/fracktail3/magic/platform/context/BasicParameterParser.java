@@ -20,7 +20,7 @@ public class BasicParameterParser implements ParameterParser {
             return process(command, message, SPLIT_PATTERN.split(message));
         }
         String[] paramsAsStr = StringUtils.isEmpty(message) ?
-                validateAndNormalize(parameters, new String[0]) :
+                validateAndNormalize(parameters, fill(0)) :
                 validateAndNormalize(parameters, SPLIT_PATTERN.split(message, parameters.size()));
 
         Queue<Integer> indexes = getParameterIndices(parameters, paramsAsStr);
@@ -57,6 +57,12 @@ public class BasicParameterParser implements ParameterParser {
             indexes.add(optionals.remove());
         }
         return indexes;
+    }
+
+    private String[] fill(int size) {
+        String[] s = new String[size];
+        //Arrays.fill(s, null);
+        return s;
     }
 
     private String[] validateAndNormalize(List<Command.Parameter> parameters, String[] paramsAsStr) {
