@@ -33,34 +33,4 @@ public class Config {
                 new BasicParameterParser()
         );
     }
-//
-//    @Bean
-//    public Platform empty() {
-//        return new Platform() {
-//            @Override
-//            public Mono<Boolean> start(Bot bot) {
-//                return Mono.never();
-//            }
-//
-//            @Override
-//            public Mono<Boolean> stop(Bot bot) {
-//                return Mono.never();
-//            }
-//
-//            @Override
-//            public Mono<Person> getPerson(String id) {
-//                return Mono.just(NonePerson.INSTANCE);
-//            }
-//
-//            @Override
-//            public Mono<Place> getPlace(String id) {
-//                return Mono.just(NonePlace.INSTANCE);
-//            }
-//
-//            @Override
-//            public String getId() {
-//                return "empty";
-//            }
-//        };
-//    }
 }

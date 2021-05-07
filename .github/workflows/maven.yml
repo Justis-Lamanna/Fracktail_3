@@ -39,5 +39,3 @@ jobs:
           "${{ secrets.DOCKERHUB_USERNAME }}/fracktail:latest"
           "${{ secrets.DOCKERHUB_USERNAME }}/fracktail:${{ github.run_id }}"
         platforms: linux/amd64
-        secrets: |
-          "fracktail_secrets=${{ secrets.FRACKTAIL_SECRETS }}"
