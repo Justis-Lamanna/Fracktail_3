@@ -38,6 +38,6 @@ jobs:
         tags: |
           fracktail:latest
           "fracktail:${{ github.run_id }}"
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         secrets: |
           "fracktail_secrets=${{ secrets.FRACKTAIL_SECRETS }}"
