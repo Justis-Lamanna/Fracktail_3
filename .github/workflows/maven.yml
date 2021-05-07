@@ -36,8 +36,8 @@ jobs:
         context: .
         push: true
         tags: |
-          fracktail:latest
-          "fracktail:${{ github.run_id }}"
+          jlamanna/fracktail:latest
+          "jlamanna/fracktail:${{ github.run_id }}"
         platforms: linux/amd64
         secrets: |
           "fracktail_secrets=${{ secrets.FRACKTAIL_SECRETS }}"
