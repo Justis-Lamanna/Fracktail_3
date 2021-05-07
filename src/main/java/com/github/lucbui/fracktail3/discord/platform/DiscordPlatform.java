@@ -140,6 +140,7 @@ public class DiscordPlatform implements Platform {
                                         parameterParser.parseParametersFromMessage(t.getT2(), pStr),
                                         configuration.getReplyStyle());
                             })
+                            .filterWhen(CommandUseContext::canDoAction)
                             .next()
                             .flatMap(CommandUseContext::doAction)
                             .onErrorResume(Throwable.class, e -> {

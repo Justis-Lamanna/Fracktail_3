@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.command.factory;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.spring.command.model.*;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A factory which combines multiple factories to create a complete action for an object and method/field
@@ -53,7 +55,8 @@ public class ReflectiveCommandActionFactory {
         List<Command.Parameter> parameters = components.stream()
                 .map(pc -> new Command.Parameter(pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
                 .collect(Collectors.toList());
-        return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(), action, parameters);
+        return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(),
+                compileGuards(methodComponent, components), action, parameters);
     }
 
     /**
@@ -68,7 +71,8 @@ public class ReflectiveCommandActionFactory {
         ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, field);
 
         CommandAction action = new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
-        return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(), action, Collections.emptyList());
+        return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(),
+                compileGuards(methodComponent), action, Collections.emptyList());
     }
 
     /**
@@ -108,5 +112,19 @@ public class ReflectiveCommandActionFactory {
 
         ScheduledAction action = new FieldCallingScheduledAction(obj, field, returnComponent, exceptionComponent);
         return new ScheduledEvent(methodComponent.getId(), methodComponent.getTrigger(), action);
+    }
+
+    private Guard compileGuards(MethodComponent methods, List<ParameterComponent> parameters) {
+        Stream<Guard> paramGuards = parameters.stream()
+                .flatMap(pc -> pc.getGuards().stream());
+        return Stream.concat(methods.getGuards().stream(), paramGuards)
+                .reduce(Guard::and)
+                .orElseGet(() -> Guard.identity(true));
+    }
+
+    private Guard compileGuards(MethodComponent methods) {
+        return methods.getGuards().stream()
+                .reduce(Guard::and)
+                .orElseGet(() -> Guard.identity(true));
     }
 }

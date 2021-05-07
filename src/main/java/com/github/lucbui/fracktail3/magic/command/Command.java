@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.command;
 
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Command implements Id {
     private final String id;
     private final Set<String> names;
     private final String help;
+    private final Guard restriction;
     private final CommandAction action;
     private final List<Parameter> parameters;
 
@@ -50,6 +52,7 @@ public class Command implements Id {
     public static class Builder implements IBuilder<Command> {
         private final String id;
         private Set<String> names = new HashSet<>();
+        private Guard guard = null;
         private CommandAction action = CommandAction.NOOP;
         private String help;
         private List<Parameter> parameters = new ArrayList<>();
@@ -90,6 +93,44 @@ public class Command implements Id {
          */
         public Builder withNames(String... names) {
             return withNames(Arrays.asList(names));
+        }
+
+        /**
+         * Set the guard this command uses
+         * @param guard An asynchronous predicate which indicates this method is restricted in use
+         * @return This builder
+         */
+        public Builder withRestriction(Guard guard) {
+            this.guard = guard;
+            return this;
+        }
+
+        /**
+         * Add an additional guard, with the previous guard and this one and'ed together
+         * If no previous guard exists, the supplied guard becomes the new one.
+         * @param guard The guard to and
+         * @return This builder
+         */
+        public Builder andRestriction(Guard guard) {
+            if(this.guard == null) {
+                return withRestriction(guard);
+            }
+            this.guard = this.guard.and(guard);
+            return this;
+        }
+
+        /**
+         * Add an additional guard, with the previous guard and this one or'ed together
+         * If no previous guard exists, the supplied guard becomes the new one.
+         * @param guard The guard to or
+         * @return This builder
+         */
+        public Builder orRestriction(Guard guard) {
+            if(this.guard == null) {
+                return withRestriction(guard);
+            }
+            this.guard = this.guard.or(guard);
+            return this;
         }
 
         /**
@@ -137,7 +178,10 @@ public class Command implements Id {
             if(names.isEmpty()) {
                 names = Collections.singleton(id);
             }
-            return new Command(id, names, help, action, parameters);
+            if(guard == null) {
+                guard = Guard.identity(true);
+            }
+            return new Command(id, names, help, guard, action, parameters);
         }
     }
 }

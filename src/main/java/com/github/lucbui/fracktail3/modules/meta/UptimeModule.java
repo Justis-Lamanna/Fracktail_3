@@ -1,7 +1,5 @@
 package com.github.lucbui.fracktail3.modules.meta;
 
-import com.github.lucbui.fracktail3.discord.annotation.DiscordReply;
-import com.github.lucbui.fracktail3.discord.context.ReplyStyle;
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
 import com.github.lucbui.fracktail3.spring.command.annotation.Command;
@@ -45,6 +43,5 @@ public class UptimeModule {
 
     @Command
     @Usage("Evaluate an arbitrary math expression")
-    @DiscordReply(ReplyStyle.REPLY)
     public String math = "The answer is 3.";
 }
