@@ -24,7 +24,7 @@
       "secrets": [
         {
           "name": "discord.token",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:379634893371:secret:fracktail-YZVN8F"
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:379634893371:secret:fracktail-YZVN8F:DISCORD_TOKEN"
         }
       ],
       "memory": 400,
