@@ -19,7 +19,7 @@ import java.util.List;
 @EnableScheduling
 public class Config {
     @Bean
-    public Platform discord(@Value("${token}") String token, List<ReactiveEventAdapter> hooks) {
+    public Platform discord(@Value("${discord.token}") String token, List<ReactiveEventAdapter> hooks) {
         DiscordConfiguration configuration = DiscordConfiguration.builder()
                 .token(token)
                 .prefix("!")
