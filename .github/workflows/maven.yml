@@ -48,6 +48,7 @@ jobs:
         aws-region: us-east-1
 
     - name: Create ACS Task
+      id: render-web-container
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: fracktail-task-definition.json
