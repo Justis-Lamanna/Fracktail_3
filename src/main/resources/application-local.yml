@@ -1,3 +1,10 @@
 logging:
   level:
     com.github.lucbui.fracktail3: DEBUG
+
+discord:
+  prefix: '?'
+  status:
+    presence: DO_NOT_DISTURB
+    activity: PLAYING
+    string: i'm a baby fracktail
