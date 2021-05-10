@@ -3,10 +3,7 @@ package com.github.lucbui.fracktail3;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.ReplyStyle;
 import com.github.lucbui.fracktail3.discord.platform.Activity;
-import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.platform.Presence;
-import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
 import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,19 +26,14 @@ public class Config {
     }
 
     @Bean
-    public Platform discord(@Value("${discord.token}") String token, @Value("${discord.prefix:!}") String prefix,
+    public DiscordConfiguration discord(@Value("${discord.token}") String token, @Value("${discord.prefix:!}") String prefix,
                             StatusUpdate statusUpdate, List<ReactiveEventAdapter> hooks) {
-        DiscordConfiguration configuration = DiscordConfiguration.builder()
+        return DiscordConfiguration.builder()
                 .token(token)
                 .prefix(prefix)
                 .initialPresence(statusUpdate)
                 .replyStyle(ReplyStyle.REPLY)
                 .hooks(hooks)
                 .build();
-
-        return new DiscordPlatform(
-                configuration,
-                new BasicParameterParser()
-        );
     }
 }

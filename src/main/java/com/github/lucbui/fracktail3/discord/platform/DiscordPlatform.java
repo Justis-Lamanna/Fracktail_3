@@ -8,10 +8,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
-import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
-import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
+import com.github.lucbui.fracktail3.magic.platform.context.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -29,10 +26,15 @@ import discord4j.core.object.entity.channel.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
@@ -51,7 +53,8 @@ import java.util.stream.Stream;
  * - guild:* - Retrieve a place that multiplexes to everywhere the bot is (note: this won't send a message in every channel, only the system channel)
  * - channel:[channel id] - Retrieve a place as a channel
  */
-public class DiscordPlatform implements Platform {
+@Component
+public class DiscordPlatform implements Platform, HealthIndicator {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
     private static final String EVERYTHING_ID = "*";
     private static final String MULTI_ID_DELIMITER = ";";
@@ -65,9 +68,10 @@ public class DiscordPlatform implements Platform {
      * Initialize this platform with a configuration
      * @param configuration The configuration to use
      */
-    public DiscordPlatform(DiscordConfiguration configuration, ParameterParser parameterParser) {
+    @Autowired
+    public DiscordPlatform(DiscordConfiguration configuration) {
         this.configuration = configuration;
-        this.parameterParser = parameterParser;
+        this.parameterParser = new BasicParameterParser();
     }
 
     @Override
@@ -362,5 +366,30 @@ public class DiscordPlatform implements Platform {
         return gateway.getChannelById(place)
                 .cast(TextChannel.class)
                 .map(DiscordPlace::new);
+    }
+
+    @Override
+    public Health health() {
+        if(gateway == null) {
+            return Health.outOfService().withDetail("reason", "Not started").build();
+        } else {
+            try {
+                User user = gateway.getSelf().block(Duration.ofSeconds(10));
+                if(user == null) {
+                    return Health.unknown().withDetail("reason", "No Self?").build();
+                }
+                return Health.up()
+                        .withDetail("id", user.getId().asLong())
+                        .withDetail("name", user.getUsername())
+                        .withDetail("discriminator", user.getDiscriminator())
+                        .withDetail("tag", user.getTag())
+                        .build();
+            } catch (RuntimeException ex) {
+                return Health.down()
+                        .withDetail("reason", ex.getCause().getClass().getCanonicalName())
+                        .withDetail("message", ex.getCause().getMessage())
+                        .build();
+            }
+        }
     }
 }

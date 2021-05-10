@@ -2,6 +2,11 @@ logging:
   level:
     com.github.lucbui.fracktail3: DEBUG
 
+management:
+  endpoint:
+    health:
+      show-details: always
+
 discord:
   prefix: '?'
   status:
