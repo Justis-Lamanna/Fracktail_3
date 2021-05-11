@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.discord.context.ReplyStyle;
 import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.object.presence.Presence;
@@ -16,6 +17,7 @@ import java.util.List;
 @Getter
 @Builder
 public class DiscordConfiguration {
+    @JsonIgnore
     private final String token;
     private final String prefix;
     @Builder.Default private final StatusUpdate initialPresence = Presence.online();

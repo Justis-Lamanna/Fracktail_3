@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
@@ -38,6 +39,7 @@ public class Command implements Id {
     public static class Parameter {
         private final String name;
         private final String description;
+        @JsonIgnore
         private final TypeDescriptor type;
         private final boolean optional;
 

@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
@@ -29,14 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -54,14 +56,16 @@ import java.util.stream.Stream;
  * - channel:[channel id] - Retrieve a place as a channel
  */
 @Component
-public class DiscordPlatform implements Platform, HealthIndicator {
+public class DiscordPlatform implements Platform, HealthIndicator, InfoContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
     private static final String EVERYTHING_ID = "*";
     private static final String MULTI_ID_DELIMITER = ";";
     private static final String URN_DELIMITER = ":";
 
     private final DiscordConfiguration configuration;
+    @JsonIgnore
     private final ParameterParser parameterParser;
+    @JsonIgnore
     private GatewayDiscordClient gateway;
 
     /**
@@ -390,6 +394,24 @@ public class DiscordPlatform implements Platform, HealthIndicator {
                         .withDetail("message", ex.getCause().getMessage())
                         .build();
             }
+        }
+    }
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        if(gateway != null) {
+            try {
+                User user = gateway.getSelf().block(Duration.ofSeconds(10));
+                if(user != null) {
+                    Map<String, Object> discordObj = new HashMap<>(4);
+                    discordObj.put("id", user.getId().asLong());
+                    discordObj.put("name", user.getUsername());
+                    discordObj.put("discriminator", user.getDiscriminator());
+                    discordObj.put("tag", user.getTag());
+
+                    builder.withDetails(Collections.singletonMap("discord", discordObj));
+                }
+            } catch (RuntimeException ex) { }
         }
     }
 }
