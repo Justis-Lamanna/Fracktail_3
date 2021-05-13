@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,6 +55,7 @@ public class ReflectiveCommandActionFactory {
         CommandAction action = new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
 
         List<Command.Parameter> parameters = components.stream()
+                .filter(pc -> Objects.nonNull(pc.getName()))
                 .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
                 .sorted(Comparator.comparing(Command.Parameter::getIndex))
                 .collect(Collectors.toList());
@@ -121,12 +123,12 @@ public class ReflectiveCommandActionFactory {
                 .flatMap(pc -> pc.getGuards().stream());
         return Stream.concat(methods.getGuards().stream(), paramGuards)
                 .reduce(Guard::and)
-                .orElseGet(() -> Guard.identity(true));
+                .orElse(null);
     }
 
     private Guard compileGuards(MethodComponent methods) {
         return methods.getGuards().stream()
                 .reduce(Guard::and)
-                .orElseGet(() -> Guard.identity(true));
+                .orElse(null);
     }
 }

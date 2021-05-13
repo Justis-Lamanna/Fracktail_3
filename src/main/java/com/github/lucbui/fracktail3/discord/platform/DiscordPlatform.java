@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.discord.context.slash.DiscordSlashPlace;
+import com.github.lucbui.fracktail3.discord.exception.CancelHookException;
+import com.github.lucbui.fracktail3.discord.util.Disposables;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -16,6 +18,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -29,12 +32,20 @@ import discord4j.core.object.entity.channel.TextChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
-import java.util.Optional;
-import java.util.StringJoiner;
+import javax.annotation.PreDestroy;
+import java.time.Duration;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -51,32 +62,41 @@ import java.util.stream.Stream;
  * - guild:* - Retrieve a place that multiplexes to everywhere the bot is (note: this won't send a message in every channel, only the system channel)
  * - channel:[channel id] - Retrieve a place as a channel
  */
-public class DiscordPlatform implements Platform {
+@Component
+public class DiscordPlatform implements Platform, HealthIndicator, InfoContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
     private static final String EVERYTHING_ID = "*";
     private static final String MULTI_ID_DELIMITER = ";";
     private static final String URN_DELIMITER = ":";
+    private static final String COMMAND_FEED = "_command-feed";
 
-    private final DiscordConfiguration configuration;
-    private final ParameterParser parameterParser;
+    @Autowired
+    private DiscordConfiguration configuration;
+
+    @Autowired
+    private ParameterParser parameterParser;
+
+    private final Map<String, Disposable> subscriptionMap = new Disposables<>();
     private GatewayDiscordClient gateway;
-
-    /**
-     * Initialize this platform with a configuration
-     * @param configuration The configuration to use
-     */
-    public DiscordPlatform(DiscordConfiguration configuration, ParameterParser parameterParser) {
-        this.configuration = configuration;
-        this.parameterParser = parameterParser;
-    }
 
     @Override
     public String getId() {
         return "discord";
     }
 
-    public DiscordConfiguration getConfig() {
+    @Override
+    public DiscordConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public Set<String> getHooks() {
+        return subscriptionMap.keySet();
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        //Clean up all subscriptions when we are done
+        subscriptionMap.clear();
     }
 
     @Override
@@ -96,10 +116,7 @@ public class DiscordPlatform implements Platform {
         }
 
         //Configure custom hooks
-        configuration.getHooks().forEach(hook ->  {
-            LOGGER.debug("Applying custom hook {}", hook);
-            gateway.on(hook).subscribe();
-        });
+        configuration.getHooks().forEach(hook -> registerHook(hook.getId(), hook.getHook()));
 
         //Set presence properly
         LOGGER.debug("Setting initial presence {}", configuration.getInitialPresence());
@@ -119,7 +136,7 @@ public class DiscordPlatform implements Platform {
     }
 
     private void configureBotForLegacyCommand(Bot bot) {
-        getPlaceByEverywhere()
+        Disposable d = getPlaceByEverywhere()
                 .flatMapMany(Place::getMessageFeed)
                 .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
                 .filter(msg -> !msg.getSender().isBot())
@@ -152,10 +169,11 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
+        subscriptionMap.put(COMMAND_FEED, d);
     }
 
     private void configureBotForSlashCommand(Bot bot) {
-        gateway.on(InteractionCreateEvent.class)
+        Disposable d = gateway.on(InteractionCreateEvent.class)
                 .flatMap(ice -> {
                     Interaction interaction = ice.getInteraction();
                     String command = ice.getCommandName();
@@ -184,6 +202,7 @@ public class DiscordPlatform implements Platform {
                             });
                 })
                 .subscribe();
+        subscriptionMap.put(COMMAND_FEED, d);
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {
@@ -273,6 +292,8 @@ public class DiscordPlatform implements Platform {
                 return getPersonByUserId(typeAndOthers[1]);
             case "owner":
                 return getPersonByOwnerStatus();
+            case "self":
+                return getPersonBySelf();
             default:
                 return Mono.error(
                         new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]));
@@ -303,6 +324,11 @@ public class DiscordPlatform implements Platform {
     private Mono<Person> getPersonByOwnerStatus() {
         return gateway.getApplicationInfo()
                 .flatMap(ApplicationInfo::getOwner)
+                .map(DiscordPerson::new);
+    }
+
+    private Mono<Person> getPersonBySelf() {
+        return gateway.getSelf()
                 .map(DiscordPerson::new);
     }
 
@@ -362,5 +388,64 @@ public class DiscordPlatform implements Platform {
         return gateway.getChannelById(place)
                 .cast(TextChannel.class)
                 .map(DiscordPlace::new);
+    }
+
+    public void registerHook(String id, ReactiveEventAdapter hook) {
+        LOGGER.debug("Applying custom hook {}",id);
+        subscriptionMap.put(id, gateway.on(hook)
+                .doOnError(CancelHookException.class, ex -> deregisterHook(id))
+                .subscribe());
+    }
+
+    public void registerHook(ReactiveEventAdapter hook) {
+        registerHook(UUID.randomUUID().toString(), hook);
+    }
+
+    public void deregisterHook(String id) {
+        LOGGER.debug("Removing custom hook {}",id);
+        subscriptionMap.remove(id);
+    }
+
+    @Override
+    public Health health() {
+        if(gateway == null) {
+            return Health.outOfService().withDetail("reason", "Not started").build();
+        } else {
+            try {
+                User user = gateway.getSelf().block(Duration.ofSeconds(10));
+                if(user == null) {
+                    return Health.unknown().withDetail("reason", "No Self?").build();
+                }
+                return Health.up()
+                        .withDetail("id", user.getId().asLong())
+                        .withDetail("name", user.getUsername())
+                        .withDetail("discriminator", user.getDiscriminator())
+                        .withDetail("tag", user.getTag())
+                        .build();
+            } catch (RuntimeException ex) {
+                return Health.down()
+                        .withDetail("reason", ex.getCause().getClass().getCanonicalName())
+                        .withDetail("message", ex.getCause().getMessage())
+                        .build();
+            }
+        }
+    }
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        if(gateway != null) {
+            try {
+                User user = gateway.getSelf().block(Duration.ofSeconds(10));
+                if(user != null) {
+                    Map<String, Object> discordObj = new HashMap<>(4);
+                    discordObj.put("id", user.getId().asLong());
+                    discordObj.put("name", user.getUsername());
+                    discordObj.put("discriminator", user.getDiscriminator());
+                    discordObj.put("tag", user.getTag());
+
+                    builder.withDetails(Collections.singletonMap("discord", discordObj));
+                }
+            } catch (RuntimeException ex) { }
+        }
     }
 }

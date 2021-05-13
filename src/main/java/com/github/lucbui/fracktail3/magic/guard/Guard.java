@@ -1,12 +1,13 @@
 package com.github.lucbui.fracktail3.magic.guard;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
-import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
 /**
  * An abstract filter, or guard, to lock commands in certain contexts.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "_type")
 public interface Guard {
     /**
      * Check whether a command can be used in this context.
@@ -21,8 +22,7 @@ public interface Guard {
      * @return A filter representing this AND other
      */
     default Guard and(Guard other) {
-        Guard self = this;
-        return (ctx) -> BooleanUtils.and(self.matches(ctx), other.matches(ctx));
+        return new AndGuard(this, other);
     }
 
     /**
@@ -31,8 +31,7 @@ public interface Guard {
      * @return A filter representing this OR other
      */
     default Guard or(Guard other) {
-        Guard self = this;
-        return (ctx) -> BooleanUtils.or(self.matches(ctx), other.matches(ctx));
+        return new OrGuard(this, other);
     }
 
     /**
@@ -40,8 +39,7 @@ public interface Guard {
      * @return A filter representing !this
      */
     default Guard not() {
-        Guard self = this;
-        return (ctx) -> BooleanUtils.not(self.matches(ctx));
+        return new NotGuard(this);
     }
 
     /**
@@ -50,6 +48,6 @@ public interface Guard {
      * @return The created filter.
      */
     static Guard identity(boolean value) {
-        return (ctx) -> Mono.just(value);
+        return new IdentityGuard(value);
     }
 }
