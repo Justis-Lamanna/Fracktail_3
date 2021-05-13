@@ -6,6 +6,11 @@ import reactor.core.publisher.Mono;
 
 public class TestPlatform implements Platform {
     @Override
+    public Object getConfiguration() {
+        return null;
+    }
+
+    @Override
     public Mono<Boolean> start(Bot bot) {
         return null;
     }

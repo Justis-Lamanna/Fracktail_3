@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
@@ -21,6 +22,7 @@ public class Command implements Id {
     private final Set<String> names;
     private final String help;
     private final Guard restriction;
+    @JsonIgnore
     private final CommandAction action;
     private final List<Parameter> parameters;
 
@@ -38,11 +40,15 @@ public class Command implements Id {
     public static class Parameter {
         private final String name;
         private final String description;
-        private final TypeDescriptor type;
+        private final TypeLimits type;
         private final boolean optional;
 
-        public Parameter(String name, String description, Class<?> clazz, boolean optional) {
-            this(name, description, TypeDescriptor.valueOf(clazz), optional);
+        public Parameter(String name, String description, Class<?> descriptor, boolean optional) {
+            this(name, description, new ClassLimit(TypeDescriptor.valueOf(descriptor)), optional);
+        }
+
+        public Parameter(String name, String description, TypeDescriptor descriptor, boolean optional) {
+            this(name, description, new ClassLimit(descriptor), optional);
         }
     }
 
@@ -177,9 +183,6 @@ public class Command implements Id {
         public Command build() {
             if(names.isEmpty()) {
                 names = Collections.singleton(id);
-            }
-            if(guard == null) {
-                guard = Guard.identity(true);
             }
             return new Command(id, names, help, guard, action, parameters);
         }

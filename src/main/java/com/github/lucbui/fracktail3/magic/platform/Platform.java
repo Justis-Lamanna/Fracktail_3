@@ -14,6 +14,11 @@ import java.io.File;
  */
 public interface Platform extends Id {
     /**
+     * Get the configuration used by this platform
+     */
+    Object getConfiguration();
+
+    /**
      * Asynchronously start the bot
      * @param bot The bot to start
      * @return An asynchronous boolean, whether the bot was started or not. (note, boolean is ignored)

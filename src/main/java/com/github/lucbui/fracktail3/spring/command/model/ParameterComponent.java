@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
+import com.github.lucbui.fracktail3.magic.command.ClassLimit;
+import com.github.lucbui.fracktail3.magic.command.TypeLimits;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import lombok.Getter;
@@ -16,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ParameterComponent {
-    protected final TypeDescriptor type;
+    protected final TypeLimits type;
     protected PCFunction func;
     protected String name;
     protected String help;
@@ -24,13 +26,13 @@ public class ParameterComponent {
     protected List<Guard> guards;
 
     public ParameterComponent(TypeDescriptor type, String name) {
-        this.type = type;
+        this.type = new ClassLimit(type);
         this.name = name;
         this.guards = new ArrayList<>();
     }
 
     public ParameterComponent(TypeDescriptor type) {
-        this.type = type;
+        this.type = new ClassLimit(type);
         this.guards = new ArrayList<>();
     }
 
