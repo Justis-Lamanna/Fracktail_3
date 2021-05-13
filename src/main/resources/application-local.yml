@@ -4,8 +4,18 @@ logging:
 
 management:
   endpoint:
+    metrics:
+      enabled: true
     health:
       show-details: always
+    prometheus:
+      enabled: true
+    scheduledtasks:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics,scheduledtasks
 
 discord:
   prefix: '?'

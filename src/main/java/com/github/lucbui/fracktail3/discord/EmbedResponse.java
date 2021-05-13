@@ -19,6 +19,7 @@ public class EmbedResponse implements CommandAction {
                 .filter(p -> p instanceof DiscordPlace)
                 .cast(DiscordPlace.class)
                 .flatMap(dp -> dp.sendEmbed(spec))
+                .doOnError(Throwable::printStackTrace)
                 .then();
     }
 }

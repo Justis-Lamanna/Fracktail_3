@@ -284,6 +284,8 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
                 return getPersonByUserId(typeAndOthers[1]);
             case "owner":
                 return getPersonByOwnerStatus();
+            case "self":
+                return getPersonBySelf();
             default:
                 return Mono.error(
                         new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]));
@@ -314,6 +316,11 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     private Mono<Person> getPersonByOwnerStatus() {
         return gateway.getApplicationInfo()
                 .flatMap(ApplicationInfo::getOwner)
+                .map(DiscordPerson::new);
+    }
+
+    private Mono<Person> getPersonBySelf() {
+        return gateway.getSelf()
                 .map(DiscordPerson::new);
     }
 
