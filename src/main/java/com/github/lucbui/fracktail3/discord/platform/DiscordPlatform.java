@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.discord.context.slash.DiscordSlashPlace;
+import com.github.lucbui.fracktail3.discord.exception.CancelHookException;
+import com.github.lucbui.fracktail3.discord.util.Disposables;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
@@ -14,6 +16,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -33,6 +36,7 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
@@ -67,6 +71,8 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     private final ParameterParser parameterParser;
     @JsonIgnore
     private GatewayDiscordClient gateway;
+    @JsonIgnore
+    private Map<String, Disposable> subscriptionMap = new Disposables<>();
 
     /**
      * Initialize this platform with a configuration
@@ -104,10 +110,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
         }
 
         //Configure custom hooks
-        configuration.getHooks().forEach(hook ->  {
-            LOGGER.debug("Applying custom hook {}", hook);
-            gateway.on(hook).subscribe();
-        });
+        configuration.getHooks().forEach(hook -> registerHook(hook.getId(), hook.getHook()));
 
         //Set presence properly
         LOGGER.debug("Setting initial presence {}", configuration.getInitialPresence());
@@ -370,6 +373,22 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
         return gateway.getChannelById(place)
                 .cast(TextChannel.class)
                 .map(DiscordPlace::new);
+    }
+
+    public void registerHook(String id, ReactiveEventAdapter hook) {
+        LOGGER.debug("Applying custom hook {}",id);
+        subscriptionMap.put(id, gateway.on(hook)
+                .doOnError(CancelHookException.class, ex -> deregisterHook(id))
+                .subscribe());
+    }
+
+    public void registerHook(ReactiveEventAdapter hook) {
+        registerHook(UUID.randomUUID().toString(), hook);
+    }
+
+    public void deregisterHook(String id) {
+        LOGGER.debug("Removing custom hook {}",id);
+        subscriptionMap.remove(id);
     }
 
     @Override
