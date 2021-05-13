@@ -27,6 +27,8 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -73,15 +76,18 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     private GatewayDiscordClient gateway;
     @JsonIgnore
     private Map<String, Disposable> subscriptionMap = new Disposables<>();
+    @JsonIgnore
+    private MeterRegistry registry;
 
     /**
      * Initialize this platform with a configuration
      * @param configuration The configuration to use
      */
     @Autowired
-    public DiscordPlatform(DiscordConfiguration configuration) {
+    public DiscordPlatform(DiscordConfiguration configuration, MeterRegistry registry) {
         this.configuration = configuration;
         this.parameterParser = new BasicParameterParser();
+        this.registry = registry;
     }
 
     @Override
@@ -153,14 +159,31 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
                             })
                             .filterWhen(CommandUseContext::canDoAction)
                             .next()
-                            .flatMap(CommandUseContext::doAction)
+                            .flatMap(cuc -> {
+                                return cuc.doAction()
+                                        .switchIfEmpty(Mono.deferContextual(ctx -> {
+                                            Timer.Sample sample = ctx.get("timer");
+                                            sample.stop(registry.timer("bot.command",
+                                                    "command", cuc.getCommand().getId(),
+                                                    "platform", "discord"));
+                                            return Mono.empty();
+                                        }))
+                                        .contextWrite(ctx -> ctx.put("timer", Timer.start(registry)));
+                            })
                             .onErrorResume(Throwable.class, e -> {
                                 LOGGER.error("Error during action", e);
                                 return message.getOrigin()
                                         .flatMap(place ->
                                                 place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
                                         .then();
-                            });
+                            })
+                            .switchIfEmpty(Mono.deferContextual(ctx -> {
+                                Instant end = Instant.now();
+                                Instant start = ctx.get("start");
+                                System.out.println("Duration: " + Duration.between(start, end));
+                                return Mono.empty();
+                            }))
+                            .contextWrite(ctx -> ctx.put("start", Instant.now()));
                 })
                 .subscribe();
     }
