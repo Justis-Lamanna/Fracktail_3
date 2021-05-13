@@ -2,9 +2,7 @@ package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.github.lucbui.fracktail3.spring.command.annotation.Command;
-import com.github.lucbui.fracktail3.spring.command.annotation.InjectPlatform;
-import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
+import com.github.lucbui.fracktail3.spring.command.annotation.*;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.Cron;
 import com.github.lucbui.fracktail3.spring.schedule.annotation.Schedule;
 import discord4j.common.util.Snowflake;
@@ -43,5 +41,8 @@ public class UptimeModule {
 
     @Command
     @Usage("Evaluate an arbitrary math expression")
+    @Parameters(
+            @Parameter(value = 0, name = "expression", optional = true)
+    )
     public String math = "The answer is 3.";
 }

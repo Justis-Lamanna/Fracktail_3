@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,13 +51,8 @@ public class ReflectiveCommandActionFactory {
         ExceptionComponent exceptionComponent = exceptionComponentFactory.compileException(obj, method);
         CommandAction action = new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
 
-        List<Command.Parameter> parameters = components.stream()
-                .filter(pc -> Objects.nonNull(pc.getName()))
-                .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
-                .sorted(Comparator.comparing(Command.Parameter::getIndex))
-                .collect(Collectors.toList());
         return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(),
-                compileGuards(methodComponent, components), action, parameters);
+                compileGuards(methodComponent, components), action, compileParameter(methodComponent, components));
     }
 
     /**
@@ -76,7 +68,7 @@ public class ReflectiveCommandActionFactory {
 
         CommandAction action = new FieldCallingAction(methodComponent, obj, field, returnComponent, exceptionComponent);
         return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(),
-                compileGuards(methodComponent), action, Collections.emptyList());
+                compileGuards(methodComponent, null), action, compileParameter(methodComponent, null));
     }
 
     /**
@@ -119,16 +111,31 @@ public class ReflectiveCommandActionFactory {
     }
 
     private Guard compileGuards(MethodComponent methods, List<ParameterComponent> parameters) {
-        Stream<Guard> paramGuards = parameters.stream()
-                .flatMap(pc -> pc.getGuards().stream());
+        Stream<Guard> paramGuards = parameters == null ?
+                Stream.empty() :
+                parameters.stream().flatMap(pc -> pc.getGuards().stream());
         return Stream.concat(methods.getGuards().stream(), paramGuards)
                 .reduce(Guard::and)
                 .orElse(null);
     }
 
-    private Guard compileGuards(MethodComponent methods) {
-        return methods.getGuards().stream()
-                .reduce(Guard::and)
-                .orElse(null);
+    private List<Command.Parameter> compileParameter(MethodComponent methods, List<ParameterComponent> parameters) {
+        Map<Integer, Command.Parameter> bookkeeping = new HashMap<>();
+
+        if(parameters != null) {
+            parameters.stream()
+                    .filter(pc -> Objects.nonNull(pc.getName()))
+                    .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
+                    .forEach(pc -> bookkeeping.put(pc.getIndex(), pc));
+        }
+
+        methods.getAdditionalParams().stream()
+                .map(ap -> new Command.Parameter(ap.getIndex(), ap.getName(), ap.getHelp(), ap.getType(), ap.isOptional()))
+                .forEach(pc -> bookkeeping.put(pc.getIndex(), pc));
+
+        return bookkeeping.values()
+                .stream()
+                .sorted(Comparator.comparing(Command.Parameter::getIndex))
+                .collect(Collectors.toList());
     }
 }

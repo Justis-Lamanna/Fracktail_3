@@ -1,12 +1,13 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
+import com.github.lucbui.fracktail3.magic.command.TypeLimits;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -22,6 +23,7 @@ public class MethodComponent {
     protected String help;
     protected List<Guard> guards;
     protected List<Consumer<CommandUseContext>> transformers;
+    protected List<AdditionalParam> additionalParams;
 
     /**
      * Initialize this component
@@ -29,6 +31,7 @@ public class MethodComponent {
     public MethodComponent() {
         this.guards = new ArrayList<>();
         this.transformers = new ArrayList<>();
+        this.additionalParams = new ArrayList<>();
     }
 
     /**
@@ -40,18 +43,27 @@ public class MethodComponent {
     }
 
     /**
-     * Get a list of guards in this component
-     * @return The guards of this component
-     */
-    public List<Guard> getGuards() {
-        return Collections.unmodifiableList(guards);
-    }
-
-    /**
      * Add a CommandUseContext consumer
      * @param transformer The function which decorates the CommandUseContext
      */
     public void addTransformer(Consumer<CommandUseContext> transformer) {
         transformers.add(transformer);
+    }
+
+    /**
+     * Add an additional parameter
+     * @param param The parameter to add
+     */
+    public void addAdditionalParam(AdditionalParam param) {
+        additionalParams.add(param);
+    }
+
+    @Data
+    public static class AdditionalParam {
+        protected final TypeLimits type;
+        protected final int index;
+        protected final String name;
+        protected final String help;
+        protected final boolean optional;
     }
 }
