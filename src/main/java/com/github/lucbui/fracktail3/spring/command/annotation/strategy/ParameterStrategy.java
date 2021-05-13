@@ -36,7 +36,7 @@ public class ParameterStrategy implements ParameterComponentStrategy {
             base.setOptional(pAnnot.optional());
 
             LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,
-                    base.getName(), base.getType().getResolvableType(), base.getHelp(), base.isOptional());
+                    base.getName(), base.getType(), base.getHelp(), base.isOptional());
         }
         return base;
     }

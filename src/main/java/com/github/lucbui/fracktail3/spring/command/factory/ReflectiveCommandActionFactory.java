@@ -121,12 +121,12 @@ public class ReflectiveCommandActionFactory {
                 .flatMap(pc -> pc.getGuards().stream());
         return Stream.concat(methods.getGuards().stream(), paramGuards)
                 .reduce(Guard::and)
-                .orElseGet(() -> Guard.identity(true));
+                .orElse(null);
     }
 
     private Guard compileGuards(MethodComponent methods) {
         return methods.getGuards().stream()
                 .reduce(Guard::and)
-                .orElseGet(() -> Guard.identity(true));
+                .orElse(null);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
  * a context passes the provided guard, you're basically saying "this action is equipped to handle this particular instance".
  */
 @FunctionalInterface
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "_type")
 public interface CommandAction {
     /**
      * Action which does nothing at all

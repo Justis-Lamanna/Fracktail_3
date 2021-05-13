@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.magic.platform.context;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
@@ -20,7 +21,9 @@ public interface CommandUseContext {
     Mono<Place> getTriggerPlace();
 
     default Mono<Boolean> canDoAction() {
-        return getCommand().getRestriction().matches(this);
+        Guard guard = getCommand().getRestriction();
+        if(guard == null) return Mono.just(true);
+        return guard.matches(this);
     }
 
     default Mono<Void> doAction() {
