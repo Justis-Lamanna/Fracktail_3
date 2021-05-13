@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Optional;
 
 @Component
 @Order(0)
@@ -30,10 +31,11 @@ public class ParameterStrategy implements ParameterComponentStrategy {
             int value = pAnnot.value();
             Class<?> paramType = parameter.getType();
 
-            base.setFunc(new ParameterToObjectConverterFunction(paramType, value, converters));
+            base.setIndex(pAnnot.value());
             base.setName(StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
             base.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), base.getName()));
-            base.setOptional(pAnnot.optional());
+            base.setFunc(new ParameterToObjectConverterFunction(paramType, value, converters));
+            base.setOptional(paramType == Optional.class || pAnnot.optional());
 
             LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,
                     base.getName(), base.getType(), base.getHelp(), base.isOptional());

@@ -38,17 +38,18 @@ public class Command implements Id {
     @Data
     @RequiredArgsConstructor
     public static class Parameter {
+        private final int index;
         private final String name;
         private final String description;
         private final TypeLimits type;
         private final boolean optional;
 
-        public Parameter(String name, String description, Class<?> descriptor, boolean optional) {
-            this(name, description, new ClassLimit(TypeDescriptor.valueOf(descriptor)), optional);
+        public Parameter(int index, String name, String description, Class<?> descriptor, boolean optional) {
+            this(index, name, description, new ClassLimit(TypeDescriptor.valueOf(descriptor)), optional);
         }
 
-        public Parameter(String name, String description, TypeDescriptor descriptor, boolean optional) {
-            this(name, description, new ClassLimit(descriptor), optional);
+        public Parameter(int index, String name, String description, TypeDescriptor descriptor, boolean optional) {
+            this(index, name, description, new ClassLimit(descriptor), optional);
         }
     }
 
