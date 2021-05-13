@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,7 +54,8 @@ public class ReflectiveCommandActionFactory {
         CommandAction action = new MethodCallingAction(methodComponent, components, obj, method, returnComponent, exceptionComponent);
 
         List<Command.Parameter> parameters = components.stream()
-                .map(pc -> new Command.Parameter(pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
+                .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
+                .sorted(Comparator.comparing(Command.Parameter::getIndex))
                 .collect(Collectors.toList());
         return new Command(methodComponent.getId(), methodComponent.getNames(), methodComponent.getHelp(),
                 compileGuards(methodComponent, components), action, parameters);

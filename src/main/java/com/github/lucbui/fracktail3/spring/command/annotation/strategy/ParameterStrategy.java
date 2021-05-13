@@ -30,7 +30,7 @@ public class ParameterStrategy implements ParameterComponentStrategy {
             int value = pAnnot.value();
             Class<?> paramType = parameter.getType();
 
-            base.setFunc(new ParameterToObjectConverterFunction(paramType, value, converters));
+            base.setIndex(pAnnot.value());
             base.setName(StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
             base.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), base.getName()));
             base.setOptional(pAnnot.optional());

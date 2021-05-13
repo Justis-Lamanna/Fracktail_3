@@ -36,13 +36,14 @@ public class Command implements Id {
     @Data
     @RequiredArgsConstructor
     public static class Parameter {
+        private final int index;
         private final String name;
         private final String description;
         private final TypeDescriptor type;
         private final boolean optional;
 
-        public Parameter(String name, String description, Class<?> clazz, boolean optional) {
-            this(name, description, TypeDescriptor.valueOf(clazz), optional);
+        public Parameter(int index, String name, String description, Class<?> clazz, boolean optional) {
+            this(index, name, description, TypeDescriptor.valueOf(clazz), optional);
         }
     }
 

@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 public class ParameterComponent {
     protected final TypeDescriptor type;
+    protected int index;
     protected PCFunction func;
     protected String name;
     protected String help;
