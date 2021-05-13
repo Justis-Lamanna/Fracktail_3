@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
@@ -11,7 +10,10 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
-import com.github.lucbui.fracktail3.magic.platform.context.*;
+import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
+import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -27,8 +29,6 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +43,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import javax.annotation.PreDestroy;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -68,35 +68,35 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     private static final String EVERYTHING_ID = "*";
     private static final String MULTI_ID_DELIMITER = ";";
     private static final String URN_DELIMITER = ":";
+    private static final String COMMAND_FEED = "_command-feed";
 
-    private final DiscordConfiguration configuration;
-    @JsonIgnore
-    private final ParameterParser parameterParser;
-    @JsonIgnore
-    private GatewayDiscordClient gateway;
-    @JsonIgnore
-    private Map<String, Disposable> subscriptionMap = new Disposables<>();
-    @JsonIgnore
-    private MeterRegistry registry;
-
-    /**
-     * Initialize this platform with a configuration
-     * @param configuration The configuration to use
-     */
     @Autowired
-    public DiscordPlatform(DiscordConfiguration configuration, MeterRegistry registry) {
-        this.configuration = configuration;
-        this.parameterParser = new BasicParameterParser();
-        this.registry = registry;
-    }
+    private DiscordConfiguration configuration;
+
+    @Autowired
+    private ParameterParser parameterParser;
+
+    private final Map<String, Disposable> subscriptionMap = new Disposables<>();
+    private GatewayDiscordClient gateway;
 
     @Override
     public String getId() {
         return "discord";
     }
 
-    public DiscordConfiguration getConfig() {
+    @Override
+    public DiscordConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public Set<String> getHooks() {
+        return subscriptionMap.keySet();
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        //Clean up all subscriptions when we are done
+        subscriptionMap.clear();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     }
 
     private void configureBotForLegacyCommand(Bot bot) {
-        getPlaceByEverywhere()
+        Disposable d = getPlaceByEverywhere()
                 .flatMapMany(Place::getMessageFeed)
                 .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
                 .filter(msg -> !msg.getSender().isBot())
@@ -159,37 +159,21 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
                             })
                             .filterWhen(CommandUseContext::canDoAction)
                             .next()
-                            .flatMap(cuc -> {
-                                return cuc.doAction()
-                                        .switchIfEmpty(Mono.deferContextual(ctx -> {
-                                            Timer.Sample sample = ctx.get("timer");
-                                            sample.stop(registry.timer("bot.command",
-                                                    "command", cuc.getCommand().getId(),
-                                                    "platform", "discord"));
-                                            return Mono.empty();
-                                        }))
-                                        .contextWrite(ctx -> ctx.put("timer", Timer.start(registry)));
-                            })
+                            .flatMap(CommandUseContext::doAction)
                             .onErrorResume(Throwable.class, e -> {
                                 LOGGER.error("Error during action", e);
                                 return message.getOrigin()
                                         .flatMap(place ->
                                                 place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
                                         .then();
-                            })
-                            .switchIfEmpty(Mono.deferContextual(ctx -> {
-                                Instant end = Instant.now();
-                                Instant start = ctx.get("start");
-                                System.out.println("Duration: " + Duration.between(start, end));
-                                return Mono.empty();
-                            }))
-                            .contextWrite(ctx -> ctx.put("start", Instant.now()));
+                            });
                 })
                 .subscribe();
+        subscriptionMap.put(COMMAND_FEED, d);
     }
 
     private void configureBotForSlashCommand(Bot bot) {
-        gateway.on(InteractionCreateEvent.class)
+        Disposable d = gateway.on(InteractionCreateEvent.class)
                 .flatMap(ice -> {
                     Interaction interaction = ice.getInteraction();
                     String command = ice.getCommandName();
@@ -218,6 +202,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
                             });
                 })
                 .subscribe();
+        subscriptionMap.put(COMMAND_FEED, d);
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {
