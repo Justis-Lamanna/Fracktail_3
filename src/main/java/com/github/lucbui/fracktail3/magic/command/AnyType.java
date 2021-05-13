@@ -1,10 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command;
 
-public class AnyType implements TypeLimits {
-    public static final AnyType INSTANCE = new AnyType();
-
-    private AnyType() {
-    }
+public enum AnyType implements TypeLimits {
+    INSTANCE;
 
     @Override
     public boolean matches(Object obj) {
