@@ -10,7 +10,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Profile("local")
 @Component
 public class DiscordRegistryHook extends ReactiveEventAdapter {
     private final Map<Class<?>, AtomicInteger> counters = Collections.synchronizedMap(new HashMap<>());
