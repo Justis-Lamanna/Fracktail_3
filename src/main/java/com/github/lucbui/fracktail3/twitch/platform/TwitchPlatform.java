@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
+import com.github.lucbui.fracktail3.twitch.context.TwitchMessage;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
@@ -36,7 +37,7 @@ public class TwitchPlatform implements Platform {
     @Override
     public Mono<Boolean> start(Bot bot) {
         if(this.client != null) {
-            throw new BotConfigurationException("Twitch already started");    
+            throw new BotConfigurationException("Twitch already started");
         }
 
         OAuth2Credential credential = new OAuth2Credential("twitch", config.getOauth());
@@ -50,6 +51,10 @@ public class TwitchPlatform implements Platform {
                 .build();
 
         this.client.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
+            Message message = new TwitchMessage(this.client, event);
+            if(message.getContent().startsWith("!")) {
+                message.reply("ilu").block();
+            }
             System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
         });
 
