@@ -1,3 +1,6 @@
 spring:
   profiles:
     active: local
+
+twitch:
+  clientId: nbx1zu3hjyko0wsfmd0p8bsf3335op

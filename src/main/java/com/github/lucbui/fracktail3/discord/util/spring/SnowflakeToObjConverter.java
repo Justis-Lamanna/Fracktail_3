@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.discord.util.spring;
 
-import com.google.common.collect.ImmutableSet;
 import discord4j.common.util.Snowflake;
+import org.apache.commons.collections4.SetUtils;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class SnowflakeToObjConverter implements GenericConverter {
                 new ConvertiblePair(Snowflake.class, Number.class),
                 new ConvertiblePair(Snowflake.class, Instant.class)
         };
-        return ImmutableSet.copyOf(pairs);
+        return SetUtils.hashSet(pairs);
     }
 
     @Override

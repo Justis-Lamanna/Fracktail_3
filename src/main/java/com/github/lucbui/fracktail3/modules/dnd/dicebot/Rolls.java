@@ -1,8 +1,8 @@
 package com.github.lucbui.fracktail3.modules.dnd.dicebot;
 
 import com.github.lucbui.fracktail3.discord.util.FormatUtils;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
+import org.apache.commons.collections4.MultiSet;
+import org.apache.commons.collections4.multiset.HashMultiSet;
 
 import java.util.Comparator;
 import java.util.List;
@@ -70,7 +70,7 @@ public class Rolls {
 
     public String getPrettyExpression() {
         if(keep > 0) {
-            Multiset<Integer> keptRolls = getRollsStream().collect(Collectors.toCollection(HashMultiset::create));
+            MultiSet<Integer> keptRolls = getRollsStream().collect(Collectors.toCollection(HashMultiSet::new));
             StringJoiner sb = new StringJoiner("+", "(", ")");
             for(int roll : rolls) {
                 if(keptRolls.remove(roll)) {

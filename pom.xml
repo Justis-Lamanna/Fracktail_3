@@ -22,26 +22,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-webflux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>2.3.0.RELEASE</version>
+            <version>2.4.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!--Discord dependencies-->
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
             <version>3.1.5</version>
         </dependency>
-
-        <!--??? Why???-->
-        <!--Discord Bot Dependencies-->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
@@ -58,22 +54,27 @@
             <version>3.3.4.RELEASE</version>
         </dependency>
 
-
-        <!--Google Dependencies-->
+        <!--Twitch Bot Dependencies-->
         <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.23.0</version>
+            <groupId>com.github.twitch4j</groupId>
+            <artifactId>twitch4j</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <!--???-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.23.0</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.12.3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-calendar</artifactId>
-            <version>v3-rev305-1.23.0</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.3</version>
         </dependency>
 
         <!--Apache-->

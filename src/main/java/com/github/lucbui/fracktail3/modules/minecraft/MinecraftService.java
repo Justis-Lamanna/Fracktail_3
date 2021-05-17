@@ -7,37 +7,44 @@ import com.github.lucbui.fracktail3.spring.command.annotation.Usage;
 import discord4j.rest.util.Color;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
 @Component
 public class MinecraftService {
-    private final RestTemplate template;
+    private final WebClient template;
 
     public MinecraftService() {
-        template = new RestTemplateBuilder()
-                .build();
+        template = WebClient.create();
     }
 
-    public MinecraftServerStatus getStatus(String url, boolean bedrock) {
+    public Mono<MinecraftServerStatus> getStatus(String url, boolean bedrock) {
         String fullUrl = "https://api.mcsrvstat.us/" + (bedrock ? "bedrock/" : "") + "2/" + url;
 
-        return template.getForObject(fullUrl, MinecraftServerStatus.class);
+        return template.get()
+                .uri(fullUrl)
+                .exchange()
+                .flatMap(cr -> cr.bodyToMono(MinecraftServerStatus.class));
     }
 
     @Command
     @Usage("Get Minecraft server statistics")
     public EmbedResponse mc(@Parameter(value = 0, optional = true) String url) {
         String trueUrl = StringUtils.defaultString(url, "sint-maarten.apexmc.co");
-        MinecraftServerStatus s = getStatus(trueUrl, false);
+
+        MinecraftServerStatus s = getStatus(trueUrl, false).block();
 
         return new EmbedResponse(spec -> {
             String title;
             String description;
-            if(s.getMotd() != null && ArrayUtils.isNotEmpty(s.getMotd().getClean())) {
+            if(s == null) {
+                title = "???";
+                description = null;
+            }
+            else if(s.getMotd() != null && ArrayUtils.isNotEmpty(s.getMotd().getClean())) {
                 String[] motds = s.getMotd().getClean();
                 title = StringUtils.firstNonEmpty(s.getHostname(), s.getIp());
                 description = motds[0];
@@ -52,7 +59,7 @@ public class MinecraftService {
             if (description != null) { spec.setDescription(description); }
             spec.setAuthor("Minecraft Server Status API", "https://api.mcsrvstat.us/", null);
             spec.setColor(Color.of(22, 22, 22));
-            if(s.isOnline()) {
+            if(s != null && s.isOnline()) {
                 spec.setThumbnail("https://api.mcsrvstat.us/icon/" + trueUrl);
                 spec.addField("Status", "Online", true);
                 spec.addField("Version", s.getVersion(), true);
