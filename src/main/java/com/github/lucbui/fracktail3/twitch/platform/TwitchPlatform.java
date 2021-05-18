@@ -2,7 +2,10 @@ package com.github.lucbui.fracktail3.twitch.platform;
 
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.platform.*;
+import com.github.lucbui.fracktail3.magic.platform.BasePlatform;
+import com.github.lucbui.fracktail3.magic.platform.Person;
+import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.magic.platform.SimpleTextCommandProcessor;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicContextConstructor;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
@@ -13,20 +16,27 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class TwitchPlatform extends BasePlatform {
+public class TwitchPlatform extends BasePlatform implements HealthIndicator, InfoContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitchPlatform.class);
 
     @Autowired
@@ -54,6 +64,7 @@ public class TwitchPlatform extends BasePlatform {
         }
 
         OAuth2Credential credential = new OAuth2Credential("twitch", config.getOauth());
+        LOGGER.info("Starting Twitch API Client");
         this.client = TwitchClientBuilder.builder()
                 .withClientId(config.getClientId())
                 .withClientSecret(config.getClientSecret())
@@ -67,8 +78,12 @@ public class TwitchPlatform extends BasePlatform {
                 getEverywherePlace(), bot, this, config.getPrefix(), new BasicContextConstructor(parameterParser));
         registerSubscription(COMMAND_FEED, d);
 
+        LOGGER.info("Starting Twitch Chat Client");
         this.client.getChat().connect();
-        config.getAutojoinChannels().forEach(channel -> this.client.getChat().joinChannel(channel));
+        config.getAutojoinChannels().forEach(channel -> {
+            LOGGER.info("Joining channel #{}", channel);
+            this.client.getChat().joinChannel(channel);
+        });
 
         return Mono.just(true);
     }
@@ -78,6 +93,7 @@ public class TwitchPlatform extends BasePlatform {
         if(this.client == null) {
             throw new BotConfigurationException("Twitch not started");
         }
+        LOGGER.info("Stopping all Twitch Clients");
         return Mono.fromRunnable(() -> this.client.close()).thenReturn(true);
     }
 
@@ -106,10 +122,7 @@ public class TwitchPlatform extends BasePlatform {
                 .map(UserList::getUsers)
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
-                .map(user -> new TwitchPerson(client, user))
-                .cast(Person.class)
-                .defaultIfEmpty(NonePerson.INSTANCE)
-                .onErrorReturn(NonePerson.INSTANCE);
+                .map(user -> new TwitchPerson(client, user));
     }
 
     public Mono<Person> getPersonByName(String name) {
@@ -118,10 +131,7 @@ public class TwitchPlatform extends BasePlatform {
                 .map(UserList::getUsers)
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
-                .map(user -> new TwitchPerson(client, user))
-                .cast(Person.class)
-                .defaultIfEmpty(NonePerson.INSTANCE)
-                .onErrorReturn(NonePerson.INSTANCE);
+                .map(user -> new TwitchPerson(client, user));
     }
 
     public Mono<Person> getSelf() {
@@ -130,10 +140,7 @@ public class TwitchPlatform extends BasePlatform {
                 .map(UserList::getUsers)
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
-                .map(user -> new TwitchPerson(client, user))
-                .cast(Person.class)
-                .defaultIfEmpty(NonePerson.INSTANCE)
-                .onErrorReturn(NonePerson.INSTANCE);
+                .map(user -> new TwitchPerson(client, user));
     }
 
     @Override
@@ -165,8 +172,47 @@ public class TwitchPlatform extends BasePlatform {
                 .map(UserList::getUsers)
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
-                .map(user -> new TwitchPlace(client, new EventChannel(user.getId(), user.getDisplayName())))
-                .cast(Place.class)
-                .defaultIfEmpty(NonePlace.INSTANCE).onErrorReturn(NonePlace.INSTANCE);
+                .map(user -> new TwitchPlace(client, new EventChannel(user.getId(), user.getDisplayName())));
+    }
+
+    @Override
+    public Health health() {
+        if(client == null) {
+            return Health.outOfService().withDetail("reason", "Not started").build();
+        } else {
+            try {
+                UserList self = client.getHelix().getUsers(null, null, null).execute();
+                if(self.getUsers().isEmpty()) {
+                    return Health.unknown().withDetail("reason", "No Self?").build();
+                }
+                User user = self.getUsers().get(0);
+                return Health.up()
+                        .withDetail("id", user.getId())
+                        .withDetail("name", user.getDisplayName())
+                        .build();
+            } catch (RuntimeException ex) {
+                return Health.down()
+                        .withDetail("reason", ex.getCause().getClass().getCanonicalName())
+                        .withDetail("message", ex.getCause().getMessage())
+                        .build();
+            }
+        }
+    }
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        if(client != null) {
+            try {
+                UserList self = client.getHelix().getUsers(null, null, null).execute();
+                if(!self.getUsers().isEmpty()) {
+                    User user = self.getUsers().get(0);
+                    Map<String, Object> twitchObj = new HashMap<>(3);
+                    twitchObj.put("id", user.getId());
+                    twitchObj.put("name", user.getDisplayName());
+                    twitchObj.put("channels", client.getChat().getChannels());
+                    builder.withDetail("twitch", twitchObj);
+                }
+            } catch (RuntimeException ex) { }
+        }
     }
 }

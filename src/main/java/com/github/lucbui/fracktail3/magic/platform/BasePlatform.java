@@ -1,6 +1,8 @@
 package com.github.lucbui.fracktail3.magic.platform;
 
 import com.github.lucbui.fracktail3.discord.util.Disposables;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,7 +11,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class BasePlatform implements Platform {
+public abstract class BasePlatform implements Platform, DisposableBean {
     private final Map<String, Disposable> subscriptionMap = new Disposables<>();
 
     public static final String EVERYTHING_ID = "*";
@@ -25,10 +27,6 @@ public abstract class BasePlatform implements Platform {
         this.subscriptionMap.remove(id);
     }
 
-    protected void clearAllSubscriptions() {
-        this.subscriptionMap.clear();
-    }
-
     protected Set<String> getSubscriptions() {
         return subscriptionMap.keySet();
     }
@@ -37,17 +35,21 @@ public abstract class BasePlatform implements Platform {
     public Mono<Person> getPerson(String id) {
         return Mono.defer(() -> {
             if(id.contains(MULTI_ID_DELIMITER)) {
-                return Flux.fromArray(id.split(MULTI_ID_DELIMITER))
-                        .flatMap(this::getInidividualPerson)
-                        .collectList()
-                        .map(MultiPerson::new);
+                return getMultiPerson(id.split(MULTI_ID_DELIMITER));
             } else {
-                return getInidividualPerson(id);
+                return getSinglePerson(id);
             }
         }).defaultIfEmpty(NonePerson.INSTANCE).onErrorReturn(NonePerson.INSTANCE);
     }
 
-    private Mono<Person> getInidividualPerson(String id) {
+    protected Mono<Person> getMultiPerson(String[] ids) {
+        return Flux.fromArray(ids)
+                .flatMap(this::getSinglePerson)
+                .collectList()
+                .map(MultiPerson::new);
+    }
+
+    protected Mono<Person> getSinglePerson(String id) {
         if(id.contains(URN_DELIMITER)) {
             return getPersonByUri(URI.create(id));
         } else {
@@ -63,17 +65,21 @@ public abstract class BasePlatform implements Platform {
     public Mono<Place> getPlace(String id) {
         return Mono.defer(() -> {
             if(id.contains(MULTI_ID_DELIMITER)) {
-                return Flux.fromArray(id.split(MULTI_ID_DELIMITER))
-                        .flatMap(this::getInidividualPlace)
-                        .collectList()
-                        .map(MultiPlace::new);
+                return getMultiPlace(id.split(MULTI_ID_DELIMITER));
             } else {
-                return getInidividualPlace(id);
+                return getSinglePlace(id);
             }
         }).defaultIfEmpty(NonePlace.INSTANCE).onErrorReturn(NonePlace.INSTANCE);
     }
 
-    private Mono<Place> getInidividualPlace(String id) {
+    private Mono<Place> getMultiPlace(String[] ids) {
+        return Flux.fromArray(ids)
+                .flatMap(this::getSinglePlace)
+                .collectList()
+                .map(MultiPlace::new);
+    }
+
+    private Mono<Place> getSinglePlace(String id) {
         if(id.contains(URN_DELIMITER)) {
             return getPlaceByUri(URI.create(id));
         } else {
@@ -84,4 +90,10 @@ public abstract class BasePlatform implements Platform {
     protected abstract Mono<Place> getPlaceByNonUri(String id);
 
     protected abstract Mono<Place> getPlaceByUri(URI place);
+
+    @Override
+    public void destroy() throws Exception {
+        LoggerFactory.getLogger(getClass()).info("Destroying open subscriptions for platform " + getId());
+        this.subscriptionMap.clear();
+    }
 }

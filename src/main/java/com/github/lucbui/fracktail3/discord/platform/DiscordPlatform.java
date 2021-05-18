@@ -43,7 +43,6 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PreDestroy;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
@@ -86,11 +85,6 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
 
     public Set<String> getHooks() {
         return getSubscriptions();
-    }
-
-    @PreDestroy
-    public void onDestroy() {
-        clearAllSubscriptions();
     }
 
     @Override
