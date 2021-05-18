@@ -12,8 +12,10 @@ import java.util.Set;
 public abstract class BasePlatform implements Platform {
     private final Map<String, Disposable> subscriptionMap = new Disposables<>();
 
+    public static final String EVERYTHING_ID = "*";
     public static final String MULTI_ID_DELIMITER = ";";
     public static final String URN_DELIMITER = ":";
+    public static final String COMMAND_FEED = "_command-feed";
 
     protected void registerSubscription(String id, Disposable disposable) {
         this.subscriptionMap.put(id, disposable);

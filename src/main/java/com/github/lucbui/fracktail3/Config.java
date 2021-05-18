@@ -17,6 +17,7 @@ public class Config {
                 .clientId(clientId)
                 .clientSecret(secret)
                 .oauth(token)
+                .autojoinChannel("milo_marten")
                 .build();
     }
 }

@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.twitch.platform;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
+import com.github.lucbui.fracktail3.magic.platform.context.BasicContextConstructor;
+import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
 import com.github.lucbui.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.lucbui.fracktail3.twitch.context.TwitchPerson;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -29,10 +32,13 @@ public class TwitchPlatform extends BasePlatform {
     @Autowired
     private TwitchConfig config;
 
+    @Autowired
+    private ParameterParser parameterParser;
+
     private TwitchClient client;
 
     @Override
-    public Object getConfiguration() {
+    public TwitchConfig getConfiguration() {
         return config;
     }
 
@@ -57,14 +63,14 @@ public class TwitchPlatform extends BasePlatform {
                 .withChatAccount(credential)
                 .build();
 
-        new TwitchEverywhere(this.client).getMessageFeed()
-                .doOnNext(System.out::println)
-                .subscribe();
+        Disposable d = SimpleTextCommandProcessor.listenForCommands(
+                getEverywherePlace(), bot, this, config.getPrefix(), new BasicContextConstructor(parameterParser));
+        registerSubscription(COMMAND_FEED, d);
 
-        return Mono.fromRunnable(() -> this.client.getChat().connect())
-                .then(getPlaceByName("milo_marten"))
-                .flatMap(place -> place.sendMessage("I love you"))
-                .thenReturn(true);
+        this.client.getChat().connect();
+        config.getAutojoinChannels().forEach(channel -> this.client.getChat().joinChannel(channel));
+
+        return Mono.just(true);
     }
 
     @Override
@@ -132,6 +138,9 @@ public class TwitchPlatform extends BasePlatform {
 
     @Override
     protected Mono<Place> getPlaceByNonUri(String id) {
+        if(id.equals(EVERYTHING_ID)) {
+            return getEverywherePlace();
+        }
         return getPlaceByName(id);
     }
 
@@ -144,6 +153,10 @@ public class TwitchPlatform extends BasePlatform {
                 return Mono.error(
                         new IllegalArgumentException("Unknown place ID format " + place.getScheme()));
         }
+    }
+
+    public Mono<Place> getEverywherePlace() {
+        return Mono.just(new TwitchEverywhere(client));
     }
 
     public Mono<Place> getPlaceByName(String name) {

@@ -9,11 +9,10 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.BasePlatform;
-import com.github.lucbui.fracktail3.magic.platform.NonePerson;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.magic.platform.SimpleTextCommandProcessor;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
 import discord4j.common.util.Snowflake;
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
 import javax.annotation.PreDestroy;
 import java.net.URI;
@@ -68,8 +66,6 @@ import java.util.stream.Stream;
 @Component
 public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
-    private static final String EVERYTHING_ID = "*";
-    private static final String COMMAND_FEED = "_command-feed";
 
     @Autowired
     private DiscordConfiguration configuration;
@@ -134,39 +130,8 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
     }
 
     private void configureBotForLegacyCommand(Bot bot) {
-        Disposable d = getPlaceByEverywhere()
-                .flatMapMany(Place::getMessageFeed)
-                .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
-                .filter(msg -> !msg.getSender().isBot())
-                .filter(message -> message.getContent().startsWith(configuration.getPrefix()))
-                .flatMap(message -> {
-                    return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
-                            .flatMap(c -> Flux.fromIterable(c.getNames()).map(name -> Tuples.of(name, c)))
-                            .filter(t -> message.getContent().startsWith(configuration.getPrefix() + t.getT1()))
-                            .map(t -> {
-                                String cmdStr = t.getT1();
-                                String pStr = StringUtils.removeStart(message.getContent(), configuration.getPrefix() + cmdStr)
-                                        .trim();
-                                return new DiscordCommandUseContext(
-                                        bot,
-                                        this,
-                                        message,
-                                        t.getT2(),
-                                        parameterParser.parseParametersFromMessage(t.getT2(), pStr),
-                                        configuration.getReplyStyle());
-                            })
-                            .filterWhen(CommandUseContext::canDoAction)
-                            .next()
-                            .flatMap(CommandUseContext::doAction)
-                            .onErrorResume(Throwable.class, e -> {
-                                LOGGER.error("Error during action", e);
-                                return message.getOrigin()
-                                        .flatMap(place ->
-                                                place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
-                                        .then();
-                            });
-                })
-                .subscribe();
+        Disposable d = SimpleTextCommandProcessor.listenForCommands(getPlaceByEverywhere(), bot, this, configuration.getPrefix(),
+                new DiscordContextConstructor(parameterParser, configuration.getReplyStyle()));
         registerSubscription(COMMAND_FEED + "-legacy", d);
     }
 
