@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.twitch.platform;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.BasePlatform;
@@ -134,6 +135,7 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
                 .map(user -> new TwitchPerson(client, user));
     }
 
+    @JsonIgnore
     public Mono<Person> getSelf() {
         CompletableFuture<UserList> future = CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, null).execute());
         return Mono.fromFuture(future)
@@ -162,6 +164,7 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
         }
     }
 
+    @JsonIgnore
     public Mono<Place> getEverywherePlace() {
         return Mono.just(new TwitchEverywhere(client));
     }
