@@ -6,9 +6,11 @@ import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
 import com.github.lucbui.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.lucbui.fracktail3.twitch.context.TwitchPerson;
+import com.github.lucbui.fracktail3.twitch.context.TwitchPlace;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.helix.domain.UserList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class TwitchPlatform implements Platform {
+public class TwitchPlatform extends BasePlatform {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitchPlatform.class);
 
     @Autowired
@@ -57,7 +61,10 @@ public class TwitchPlatform implements Platform {
                 .doOnNext(System.out::println)
                 .subscribe();
 
-        return Mono.fromRunnable(() -> this.client.getChat().connect()).thenReturn(true);
+        return Mono.fromRunnable(() -> this.client.getChat().connect())
+                .then(getPlaceByName("milo_marten"))
+                .flatMap(place -> place.sendMessage("I love you"))
+                .thenReturn(true);
     }
 
     @Override
@@ -69,18 +76,84 @@ public class TwitchPlatform implements Platform {
     }
 
     @Override
-    public Mono<Person> getPerson(String id) {
-        return Mono.fromFuture(CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, null).execute()))
+    protected Mono<Person> getPersonByNonUri(String id) {
+        if(id.equals("self")) {
+            return getSelf();
+        }
+        return getPersonByName(id);
+    }
+
+    @Override
+    protected Mono<Person> getPersonByUri(URI person) {
+        String[] args = person.getSchemeSpecificPart().split(URN_DELIMITER);
+        switch (person.getScheme()) {
+            case "user": return getPersonByName(args[0]);
+            case "id": return getPersonById(args[0]);
+            default: return Mono.error(
+                    new IllegalArgumentException("Unknown person ID format " + person.getScheme()));
+        }
+    }
+
+    public Mono<Person> getPersonById(String name) {
+        CompletableFuture<UserList> future = CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, Collections.singletonList(name), null).execute());
+        return Mono.fromFuture(future)
                 .map(UserList::getUsers)
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
                 .map(user -> new TwitchPerson(client, user))
                 .cast(Person.class)
-                .defaultIfEmpty(NonePerson.INSTANCE);
+                .defaultIfEmpty(NonePerson.INSTANCE)
+                .onErrorReturn(NonePerson.INSTANCE);
+    }
+
+    public Mono<Person> getPersonByName(String name) {
+        CompletableFuture<UserList> future = CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, Collections.singletonList(name)).execute());
+        return Mono.fromFuture(future)
+                .map(UserList::getUsers)
+                .filter(l -> l.size() > 0)
+                .map(l -> l.get(0))
+                .map(user -> new TwitchPerson(client, user))
+                .cast(Person.class)
+                .defaultIfEmpty(NonePerson.INSTANCE)
+                .onErrorReturn(NonePerson.INSTANCE);
+    }
+
+    public Mono<Person> getSelf() {
+        CompletableFuture<UserList> future = CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, null).execute());
+        return Mono.fromFuture(future)
+                .map(UserList::getUsers)
+                .filter(l -> l.size() > 0)
+                .map(l -> l.get(0))
+                .map(user -> new TwitchPerson(client, user))
+                .cast(Person.class)
+                .defaultIfEmpty(NonePerson.INSTANCE)
+                .onErrorReturn(NonePerson.INSTANCE);
     }
 
     @Override
-    public Mono<Place> getPlace(String id) {
-        return Mono.just(NonePlace.INSTANCE);
+    protected Mono<Place> getPlaceByNonUri(String id) {
+        return getPlaceByName(id);
+    }
+
+    @Override
+    protected Mono<Place> getPlaceByUri(URI place) {
+        String[] args = place.getSchemeSpecificPart().split(URN_DELIMITER);
+        switch (place.getScheme()) {
+            case "channel": return getPlaceByName(args[0]);
+            default:
+                return Mono.error(
+                        new IllegalArgumentException("Unknown place ID format " + place.getScheme()));
+        }
+    }
+
+    public Mono<Place> getPlaceByName(String name) {
+        CompletableFuture<UserList> future = CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, Collections.singletonList(name)).execute());
+        return Mono.fromFuture(future)
+                .map(UserList::getUsers)
+                .filter(l -> l.size() > 0)
+                .map(l -> l.get(0))
+                .map(user -> new TwitchPlace(client, new EventChannel(user.getId(), user.getDisplayName())))
+                .cast(Place.class)
+                .defaultIfEmpty(NonePlace.INSTANCE).onErrorReturn(NonePlace.INSTANCE);
     }
 }
