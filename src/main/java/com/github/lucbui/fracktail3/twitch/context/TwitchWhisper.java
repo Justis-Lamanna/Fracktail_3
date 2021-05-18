@@ -1,20 +1,22 @@
 package com.github.lucbui.fracktail3.twitch.context;
 
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NoneMessage;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Data;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Optional;
 
 @Data
-public class TwitchMessage implements Message {
+public class TwitchWhisper implements Message {
     private final TwitchClient client;
-    private final ChannelMessageEvent message;
+    private final PrivateMessageEvent message;
 
     @Override
     public String getContent() {
@@ -28,23 +30,22 @@ public class TwitchMessage implements Message {
 
     @Override
     public Person getSender() {
-        return new TwitchBasicPerson(client, message.getUser(), message.getMessageEvent().getTagValue("display-name"));
+        return new TwitchBasicPerson(client, message.getUser(), Optional.empty());
     }
 
     @Override
     public Mono<Place> getOrigin() {
-        return Mono.just(new TwitchPlace(client, message.getChannel()));
+        return Mono.just(new TwitchWhisperPlace(client, message.getUser()));
     }
 
     @Override
     public Mono<Message> edit(String content) {
-        boolean sent = message.getTwitchChat().sendMessage(message.getChannel().getName(), content);
-        return sent ? Mono.just(NoneMessage.INSTANCE) : Mono.error(new RuntimeException("Unable to edit message \"" + message.getMessage() + "\""));
+        client.getChat().sendPrivateMessage(message.getUser().getName(), content);
+        return Mono.just(NoneMessage.INSTANCE);
     }
 
     @Override
     public Mono<Void> delete() {
-        boolean deleted = message.getTwitchChat().delete(message.getChannel().getName(), message.getEventId());
-        return deleted ? Mono.empty() : Mono.error(new RuntimeException("Unable to delete message \"" + message.getMessage() + "\""));
+        return Mono.error(new BotConfigurationException("Cannot delete DM messages"));
     }
 }

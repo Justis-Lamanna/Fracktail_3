@@ -4,16 +4,19 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.*;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
-import com.github.lucbui.fracktail3.twitch.context.TwitchMessage;
+import com.github.lucbui.fracktail3.twitch.context.TwitchEverywhere;
+import com.github.lucbui.fracktail3.twitch.context.TwitchPerson;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.helix.domain.UserList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class TwitchPlatform implements Platform {
@@ -50,13 +53,9 @@ public class TwitchPlatform implements Platform {
                 .withChatAccount(credential)
                 .build();
 
-        this.client.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
-            Message message = new TwitchMessage(this.client, event);
-            if(message.getContent().startsWith("!")) {
-                message.reply("ilu").block();
-            }
-            System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
-        });
+        new TwitchEverywhere(this.client).getMessageFeed()
+                .doOnNext(System.out::println)
+                .subscribe();
 
         return Mono.fromRunnable(() -> this.client.getChat().connect()).thenReturn(true);
     }
@@ -71,7 +70,13 @@ public class TwitchPlatform implements Platform {
 
     @Override
     public Mono<Person> getPerson(String id) {
-        return Mono.just(NonePerson.INSTANCE);
+        return Mono.fromFuture(CompletableFuture.supplyAsync(() -> client.getHelix().getUsers(null, null, null).execute()))
+                .map(UserList::getUsers)
+                .filter(l -> l.size() > 0)
+                .map(l -> l.get(0))
+                .map(user -> new TwitchPerson(client, user))
+                .cast(Person.class)
+                .defaultIfEmpty(NonePerson.INSTANCE);
     }
 
     @Override

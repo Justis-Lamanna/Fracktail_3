@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NoneMessage;
 import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.Data;
 import reactor.core.publisher.Flux;
@@ -29,6 +30,12 @@ public class TwitchPlace implements Place {
 
     @Override
     public Flux<Message> getMessageFeed() {
-        return Flux.never();
+        return Flux.push(sink -> {
+            client.getEventManager().onEvent(ChannelMessageEvent.class, e -> {
+                if(e.getChannel().getId().equals(channel.getId())) {
+                    sink.next(new TwitchMessage(client, e));
+                }
+            });
+        });
     }
 }
