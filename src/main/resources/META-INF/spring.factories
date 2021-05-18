@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.github.lucbui.fracktail3.spring.FracktailConfiguration,\
-com.github.lucbui.fracktail3.discord.util.spring.DiscordSpringConfig
+com.github.lucbui.fracktail3.discord.util.spring.DiscordSpringConfig,\
+com.github.lucbui.fracktail3.twitch.util.spring.TwitchSpringConfig
