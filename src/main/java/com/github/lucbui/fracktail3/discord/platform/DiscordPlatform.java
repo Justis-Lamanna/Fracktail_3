@@ -5,13 +5,14 @@ import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
 import com.github.lucbui.fracktail3.discord.context.slash.DiscordSlashPlace;
 import com.github.lucbui.fracktail3.discord.exception.CancelHookException;
-import com.github.lucbui.fracktail3.discord.util.Disposables;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
-import com.github.lucbui.fracktail3.magic.platform.*;
+import com.github.lucbui.fracktail3.magic.platform.BasePlatform;
+import com.github.lucbui.fracktail3.magic.platform.Person;
+import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.magic.platform.SimpleTextCommandProcessor;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
-import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
 import discord4j.common.util.Snowflake;
@@ -41,9 +42,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
-import javax.annotation.PreDestroy;
+import java.net.URI;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Stream;
@@ -63,20 +63,14 @@ import java.util.stream.Stream;
  * - channel:[channel id] - Retrieve a place as a channel
  */
 @Component
-public class DiscordPlatform implements Platform, HealthIndicator, InfoContributor {
+public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
-    private static final String EVERYTHING_ID = "*";
-    private static final String MULTI_ID_DELIMITER = ";";
-    private static final String URN_DELIMITER = ":";
-    private static final String COMMAND_FEED = "_command-feed";
 
     @Autowired
     private DiscordConfiguration configuration;
 
     @Autowired
     private ParameterParser parameterParser;
-
-    private final Map<String, Disposable> subscriptionMap = new Disposables<>();
     private GatewayDiscordClient gateway;
 
     @Override
@@ -90,13 +84,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     }
 
     public Set<String> getHooks() {
-        return subscriptionMap.keySet();
-    }
-
-    @PreDestroy
-    public void onDestroy() {
-        //Clean up all subscriptions when we are done
-        subscriptionMap.clear();
+        return getSubscriptions();
     }
 
     @Override
@@ -136,40 +124,9 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     }
 
     private void configureBotForLegacyCommand(Bot bot) {
-        Disposable d = getPlaceByEverywhere()
-                .flatMapMany(Place::getMessageFeed)
-                .filter(msg -> !msg.getSender().equals(NonePerson.INSTANCE))
-                .filter(msg -> !msg.getSender().isBot())
-                .filter(message -> message.getContent().startsWith(configuration.getPrefix()))
-                .flatMap(message -> {
-                    return Flux.fromIterable(bot.getSpec().getCommandList().getCommands())
-                            .flatMap(c -> Flux.fromIterable(c.getNames()).map(name -> Tuples.of(name, c)))
-                            .filter(t -> message.getContent().startsWith(configuration.getPrefix() + t.getT1()))
-                            .map(t -> {
-                                String cmdStr = t.getT1();
-                                String pStr = StringUtils.removeStart(message.getContent(), configuration.getPrefix() + cmdStr)
-                                        .trim();
-                                return new DiscordCommandUseContext(
-                                        bot,
-                                        this,
-                                        message,
-                                        t.getT2(),
-                                        parameterParser.parseParametersFromMessage(t.getT2(), pStr),
-                                        configuration.getReplyStyle());
-                            })
-                            .filterWhen(CommandUseContext::canDoAction)
-                            .next()
-                            .flatMap(CommandUseContext::doAction)
-                            .onErrorResume(Throwable.class, e -> {
-                                LOGGER.error("Error during action", e);
-                                return message.getOrigin()
-                                        .flatMap(place ->
-                                                place.sendMessage("I ran into an error there, sorry: " + e.getMessage() + ". Check the logs for more info."))
-                                        .then();
-                            });
-                })
-                .subscribe();
-        subscriptionMap.put(COMMAND_FEED, d);
+        Disposable d = SimpleTextCommandProcessor.listenForCommands(getPlaceByEverywhere(), bot, this, configuration.getPrefix(),
+                new DiscordContextConstructor(parameterParser, configuration.getReplyStyle()));
+        registerSubscription(COMMAND_FEED + "-legacy", d);
     }
 
     private void configureBotForSlashCommand(Bot bot) {
@@ -202,7 +159,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
                             });
                 })
                 .subscribe();
-        subscriptionMap.put(COMMAND_FEED, d);
+        registerSubscription(COMMAND_FEED + "-slash", d);
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {
@@ -255,48 +212,34 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     }
 
     @Override
-    public Mono<Person> getPerson(String id) {
-        return Mono.defer(() -> {
-            if(gateway == null) {
-                return Mono.error(
-                        new BotConfigurationException("Attempted to retrieve person on Discord, but it was never running"));
-            } else if(id.contains(MULTI_ID_DELIMITER)) {
-                return Flux.fromArray(id.split(MULTI_ID_DELIMITER))
-                        .flatMap(this::getPersonById)
-                        .collectList()
-                        .map(MultiPerson::new);
-            } else {
-                return getPersonById(id);
-            }
-        })
-        .cast(Person.class)
-        .defaultIfEmpty(NonePerson.INSTANCE)
-        .onErrorReturn(NonePerson.INSTANCE);
-    }
-
-    private Mono<Person> getPersonById(String id) {
-        if(!id.contains(URN_DELIMITER) && StringUtils.isNumeric(id)) {
-            return getPersonByUserId(id);
-        }
-        String[] typeAndOthers = id.split(URN_DELIMITER);
-        switch (typeAndOthers[0]) {
-            case "member":
-                return getPersonByGuildAndUserId(typeAndOthers[1], typeAndOthers[2]);
-            case "role":
-                if(typeAndOthers[2].equals(EVERYTHING_ID)) {
-                    return getPersonByGuild(typeAndOthers[1]);
-                } else {
-                    return getPersonByGuildAndRoleId(typeAndOthers[1], typeAndOthers[2]);
-                }
-            case "user":
-                return getPersonByUserId(typeAndOthers[1]);
+    protected Mono<Person> getPersonByNonUri(String id) {
+        switch (id) {
             case "owner":
                 return getPersonByOwnerStatus();
             case "self":
                 return getPersonBySelf();
             default:
+                return getPersonByUserId(id);
+        }
+    }
+
+    @Override
+    protected Mono<Person> getPersonByUri(URI person) {
+        String[] typeAndOthers = person.getSchemeSpecificPart().split(URN_DELIMITER);
+        switch (person.getScheme()) {
+            case "member":
+                return getPersonByGuildAndUserId(typeAndOthers[0], typeAndOthers[1]);
+            case "role":
+                if(typeAndOthers[2].equals(EVERYTHING_ID)) {
+                    return getPersonByGuild(typeAndOthers[0]);
+                } else {
+                    return getPersonByGuildAndRoleId(typeAndOthers[0], typeAndOthers[1]);
+                }
+            case "user":
+                return getPersonByUserId(typeAndOthers[0]);
+            default:
                 return Mono.error(
-                        new IllegalArgumentException("Unknown person ID format " + typeAndOthers[0]));
+                        new IllegalArgumentException("Unknown person ID format " + person.getScheme()));
         }
     }
 
@@ -333,44 +276,25 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
     }
 
     @Override
-    public Mono<Place> getPlace(String id) {
-        return Mono.defer(() -> {
-            if(gateway == null) {
-                return Mono.error(
-                        new BotConfigurationException("Attempted to retrieve place on Discord, but platform was not running"));
-            }
-            if (id.contains(MULTI_ID_DELIMITER)) {
-                String[] ids = id.split(MULTI_ID_DELIMITER);
-                return Flux.fromArray(ids)
-                        .flatMap(this::getPlaceById)
-                        .collectList()
-                        .map(MultiPlace::new);
-            } else {
-                return getPlaceById(id);
-            }
-        })
-        .cast(Place.class)
-        .defaultIfEmpty(NonePlace.INSTANCE)
-        .onErrorReturn(NonePlace.INSTANCE);
+    protected Mono<Place> getPlaceByNonUri(String id) {
+        return getPlaceByChannelId(id);
     }
 
-    private Mono<Place> getPlaceById(String id) {
-        if(!id.contains(URN_DELIMITER)) {
-            return getPlaceByChannelId(id);
-        }
-        String[] typeAndOthers = id.split(URN_DELIMITER);
-        switch (typeAndOthers[0]) {
+    @Override
+    protected Mono<Place> getPlaceByUri(URI place) {
+        String[] typeAndOthers = place.getSchemeSpecificPart().split(URN_DELIMITER);
+        switch (place.getScheme()) {
             case "guild":
                 if(typeAndOthers[1].equals(EVERYTHING_ID)) {
                     return getPlaceByEverywhere();
                 } else {
-                    return getPlaceByGuildId(typeAndOthers[1]);
+                    return getPlaceByGuildId(typeAndOthers[0]);
                 }
             case "channel":
-                return getPlaceByChannelId(typeAndOthers[1]);
+                return getPlaceByChannelId(typeAndOthers[0]);
             default:
                 return Mono.error(
-                        new IllegalArgumentException("Unknown place ID format " + typeAndOthers[0]));
+                        new IllegalArgumentException("Unknown place ID format " + place.getScheme()));
         }
     }
 
@@ -392,7 +316,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
 
     public void registerHook(String id, ReactiveEventAdapter hook) {
         LOGGER.debug("Applying custom hook {}",id);
-        subscriptionMap.put(id, gateway.on(hook)
+        registerSubscription(id, gateway.on(hook)
                 .doOnError(CancelHookException.class, ex -> deregisterHook(id))
                 .subscribe());
     }
@@ -403,7 +327,7 @@ public class DiscordPlatform implements Platform, HealthIndicator, InfoContribut
 
     public void deregisterHook(String id) {
         LOGGER.debug("Removing custom hook {}",id);
-        subscriptionMap.remove(id);
+        clearSubscription(id);
     }
 
     @Override

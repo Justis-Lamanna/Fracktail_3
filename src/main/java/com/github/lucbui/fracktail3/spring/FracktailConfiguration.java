@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
+import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import org.slf4j.Logger;
@@ -51,5 +53,11 @@ public class FracktailConfiguration {
     @ConditionalOnMissingBean
     public Bot bot(BotSpec botSpec, Scheduler scheduler) {
         return new Bot(botSpec, scheduler);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ParameterParser parameterParser() {
+        return new BasicParameterParser();
     }
 }

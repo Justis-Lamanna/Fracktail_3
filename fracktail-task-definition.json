@@ -25,6 +25,14 @@
         {
           "name": "discord.token",
           "valueFrom": "arn:aws:secretsmanager:us-east-1:379634893371:secret:fracktail-YZVN8F:DISCORD_TOKEN::"
+        },
+        {
+          "name": "twitch.secret",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:379634893371:secret:fracktail-YZVN8F:TWITCH_SECRET::"
+        },
+        {
+          "name": "twitch.oauth",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:379634893371:secret:fracktail-YZVN8F:TWITCH_OAUTH::"
         }
       ],
       "memory": 400,
