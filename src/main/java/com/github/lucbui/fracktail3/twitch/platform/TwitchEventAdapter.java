@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.twitch.platform;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
+import com.github.twitch4j.events.*;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -174,6 +175,30 @@ public abstract class TwitchEventAdapter {
         return Mono.empty();
     }
 
+    public Publisher<?> onChannelGoLiveEvent(ChannelGoLiveEvent event) {
+        return Mono.empty();
+    }
+
+    public Publisher<?> onChannelGoOfflineEvent(ChannelGoOfflineEvent event) {
+        return Mono.empty();
+    }
+
+    public Publisher<?> onChannelChangeGameEvent(ChannelChangeGameEvent event) {
+        return Mono.empty();
+    }
+
+    public Publisher<?> onChannelChangeTitleEvent(ChannelChangeTitleEvent event) {
+        return Mono.empty();
+    }
+
+    public Publisher<?> onChannelFollowCountUpdateEvent(ChannelFollowCountUpdateEvent event) {
+        return Mono.empty();
+    }
+
+    public Publisher<?> onChannelViewerCountUpdateEvent(ChannelViewerCountUpdateEvent event) {
+        return Mono.empty();
+    }
+
     public Publisher<?> onUnknownEvent(Object object) {
         return Mono.empty();
     }
@@ -259,6 +284,18 @@ public abstract class TwitchEventAdapter {
             return onSlowModeEvent((SlowModeEvent) o);
         } else if (o instanceof SubscribersOnlyEvent) {
             return onSubscribersOnlyEvent((SubscribersOnlyEvent) o);
+        } else if (o instanceof ChannelGoLiveEvent) {
+            return onChannelGoLiveEvent((ChannelGoLiveEvent) o);
+        } else if (o instanceof ChannelGoOfflineEvent) {
+            return onChannelGoOfflineEvent((ChannelGoOfflineEvent) o);
+        } else if (o instanceof ChannelChangeGameEvent) {
+            return onChannelChangeGameEvent((ChannelChangeGameEvent) o);
+        } else if (o instanceof ChannelChangeTitleEvent) {
+            return onChannelChangeTitleEvent((ChannelChangeTitleEvent) o);
+        } else if (o instanceof ChannelViewerCountUpdateEvent) {
+            return onChannelViewerCountUpdateEvent((ChannelViewerCountUpdateEvent) o);
+        } else if (o instanceof ChannelFollowCountUpdateEvent) {
+            return onChannelFollowCountUpdateEvent((ChannelFollowCountUpdateEvent) o);
         } else {
             return onUnknownEvent(o);
         }

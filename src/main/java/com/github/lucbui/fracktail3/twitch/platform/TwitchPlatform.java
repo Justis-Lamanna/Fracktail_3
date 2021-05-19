@@ -92,6 +92,8 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
             LOGGER.info("Joining channel #{}", channel);
             this.client.getChat().joinChannel(channel);
         });
+        this.client.getClientHelper().enableStreamEventListener(config.getAutojoinChannels());
+        this.client.getClientHelper().enableFollowEventListener(config.getAutojoinChannels());
 
         return Mono.just(true);
     }
