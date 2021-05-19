@@ -23,3 +23,6 @@ discord:
     presence: DO_NOT_DISTURB
     activity: PLAYING
     string: i'm a baby fracktail
+
+twitch:
+  prefix: '?'

@@ -16,12 +16,14 @@ public class TwitchSpringConfig {
     public TwitchConfig twitchConfig(@Value("${twitch.clientId}") String clientId,
                                      @Value("${twitch.secret}") String secret,
                                      @Value("${twitch.oauth}") String token,
+                                     @Value("${twitch.prefix:!}") String prefix,
                                      @Value("${twitch.autojoin}") List<String> channels,
                                      Map<String, TwitchEventAdapter> hooks) {
         return TwitchConfig.builder()
                 .clientId(clientId)
                 .clientSecret(secret)
                 .oauth(token)
+                .prefix(prefix)
                 .autojoinChannels(channels)
                 .hooks(TwitchHook.fromMap(hooks))
                 .build();
