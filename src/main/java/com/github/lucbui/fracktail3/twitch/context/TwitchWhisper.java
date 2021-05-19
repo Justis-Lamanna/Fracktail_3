@@ -5,6 +5,8 @@ import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NoneMessage;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
+import com.github.lucbui.fracktail3.twitch.platform.TwitchPlatform;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Data;
@@ -14,6 +16,7 @@ import java.net.URI;
 import java.util.Optional;
 
 @Data
+@PlatformModel(TwitchPlatform.class)
 public class TwitchWhisper implements Message {
     private final TwitchClient client;
     private final PrivateMessageEvent message;

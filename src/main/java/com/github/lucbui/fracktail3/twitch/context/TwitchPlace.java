@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.twitch.context;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NoneMessage;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
+import com.github.lucbui.fracktail3.twitch.platform.TwitchPlatform;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
@@ -13,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 
 @Data
+@PlatformModel(TwitchPlatform.class)
 public class TwitchPlace implements Place {
     private final TwitchClient client;
     private final EventChannel channel;

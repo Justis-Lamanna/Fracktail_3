@@ -1,7 +1,9 @@
 package com.github.lucbui.fracktail3.discord.context.slash;
 
 import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Message;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import lombok.EqualsAndHashCode;
@@ -12,6 +14,7 @@ import java.io.File;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@PlatformModel(DiscordPlatform.class)
 public class DiscordSlashPlace extends DiscordPlace {
     private final InteractionCreateEvent ice;
 

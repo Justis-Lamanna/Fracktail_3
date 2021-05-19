@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NoneMessage;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
+import com.github.lucbui.fracktail3.twitch.platform.TwitchPlatform;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import lombok.Data;
@@ -12,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @Data
+@PlatformModel(TwitchPlatform.class)
 public class TwitchMessage implements Message {
     private final TwitchClient client;
     private final ChannelMessageEvent message;

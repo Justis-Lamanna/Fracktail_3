@@ -1,8 +1,10 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.DiscordUtils;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
  * and %#s will print a mention output ("#channel"). All other flags, width, and precision are ignored.
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordPlace implements Place, Formattable {
     private final String name;
     private final MessageChannel place;

@@ -1,9 +1,11 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.DiscordUtils;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.MultiMessage;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -22,6 +24,7 @@ import java.io.File;
  * Sending messages to everywhere does nothing.
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordEverywhere implements Place {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordEverywhere.class);
 

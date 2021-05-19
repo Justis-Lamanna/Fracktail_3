@@ -2,9 +2,11 @@ package com.github.lucbui.fracktail3.discord.context.slash;
 
 import com.github.lucbui.fracktail3.discord.context.DiscordPerson;
 import com.github.lucbui.fracktail3.discord.context.DiscordPlace;
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.discordjson.json.WebhookMessageEditRequest;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,7 @@ import java.net.URI;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
+@PlatformModel(DiscordPlatform.class)
 public class DiscordSlashMessage implements Message {
     private final InteractionCreateEvent ice;
     private long flow = 0;
