@@ -83,7 +83,7 @@ Basic Spring Actuator is supported, allowing admins to retrieve information on t
 returns information on the platforms, the commands, and scheduled actions. Additional info may be provided for each platform.
 
 ## Using Discord
-Discord is, so far, the only platform I've created so far. Configuration uses a `DiscordConfiguration` object, which can be
+Discord Platform allows the bot to communicate via Discord. Configuration uses a `DiscordConfiguration` object, which can be
 injected directly as a bean, or assumed using the environment:
 - The `discord.token` environment variable should have your bot's token, and is required.
 - The `discord.prefix` environment variable should have your bot's prefix. If no prefix exists, `!` is used.
@@ -152,6 +152,53 @@ The Discord Platform supplies some additional info via Spring Actuator:
 - `/info` includes this information specifically for Discord:
     - Under `.discord`, the same information as the `/health` `UP` state.
     - The configuration used. The token is *not* present in this information.
+- `/metrics` and `/prometheus` includes the following:
+    - `discord.events` contains a number of counters, one for each type of event received. Note that a counter will only
+    be created once the event is encountered.
+    
+## Using Twitch
+Discord Platform allows the bot to communicate via Twitch, via its API and live in chat. Configuration uses a `TwitchConfig`
+object, which can be directly injected as a bean, or assumed via the environment:
+- The `twitch.clientId` environment variable specifies the Client ID, used when calling the API.
+- The `twitch.secret` environment variable specifies your Client Secret, for authentication through the API.
+- The `twitch.oauth` environment variable specifies an OAuth token for the bot to use in the chat client. This corresponds
+to the bot's username on Twitch, and can be generated [here](https://twitchapps.com/tmi/).
+- The `twitch.autojoin` environment variable specifies a list of channels to join on bot startup. These channels are also watched
+for follow, Go Live, and Offline events.
+- The `twitch.prefix` environment variable specifies the command prefix. `!` is the default.
+- Any `TwitchEventAdapter` beans will be automatically registered under the bean name.
+
+### Custom Hooks
+All Twitch events can be hooked into, either via the configuration or at runtime through the `TwitchPlatform` object.
+The simplest way is to simply define a Bean which subclasses `TwitchEventAdapter`. Hooks can be disabled via the
+`TwitchPlatform` object, or by throwing a `CancelHookException` in the hook itself.
+
+### Person Format
+The following Person IDs are supported by `TwitchPlatform.getPerson`. Multiple people can be retrieved by separating
+the IDs with a semicolon. When a plain string is supplied, it is treated as if it was a lookup by Username. Any other formats
+will return a `NonePerson`.
+- `user:<name>` - Retrieve a user by their username
+- `id:<id>` - Retrieves a user by their ID.
+- `self` - Retrieves the bot as a user.
+
+### Place Format
+The following Place IDs are supported by `TwitchPlatform.getPlace`. Multiple places can be retrieved by separating
+the IDs with a semicolon. When a plain string is supplied, it is treated as if it was a lookup by Username. Any other formats
+will return a `NonePlace`.
+
+- `channel:<name>` - Retrieve a channel by the broadcaster's username
+the message in the guild's registered System Channel; However, the message feed shows all messages in all channels of the Guild.
+- `*` - Retrieve all channels the bot has joined.
+
+### Spring Actuator
+The Twitch Platform supplies some additional info via Spring Actuator:
+- `/health` includes these states for the Discord platform:
+    - `OUT_OF_SERVICE` if the bot was not started for some reason.
+    - `DOWN` if the bot could not connect to Twitch API. `reason` contains the exception, and `message` contains the exception message.
+    - `UP` if the bot is connected to Twitch API, `id` contains the Bot's user ID, and `name` contains the Bot's display name.
+- `/info` includes this information specifically for Twitch:
+    - Under `.twitch`, the same information as the `/health` `UP` state, plus the channels the bot is in.
+    - The configuration used. The Client secret and OAuth token is *not* present in this information.
 - `/metrics` and `/prometheus` includes the following:
     - `discord.events` contains a number of counters, one for each type of event received. Note that a counter will only
     be created once the event is encountered.

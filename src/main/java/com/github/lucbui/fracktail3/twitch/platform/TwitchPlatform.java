@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.twitch.platform;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lucbui.fracktail3.discord.exception.CancelHookException;
 import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.BasePlatform;
@@ -14,6 +15,7 @@ import com.github.lucbui.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.lucbui.fracktail3.twitch.context.TwitchPerson;
 import com.github.lucbui.fracktail3.twitch.context.TwitchPlace;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.reactor.ReactorEventHandler;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.common.events.domain.EventChannel;
@@ -28,12 +30,14 @@ import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Component
@@ -73,7 +77,10 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
                 .withEnableHelix(true)
                 .withEnableChat(true)
                 .withChatAccount(credential)
+                .withDefaultEventHandler(ReactorEventHandler.class)
                 .build();
+
+        config.getHooks().forEach(hook -> registerHook(hook.getId(), hook.getHook()));
 
         Disposable d = SimpleTextCommandProcessor.listenForCommands(
                 getEverywherePlace(), bot, this, config.getPrefix(), new BasicContextConstructor(parameterParser));
@@ -85,6 +92,8 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
             LOGGER.info("Joining channel #{}", channel);
             this.client.getChat().joinChannel(channel);
         });
+        this.client.getClientHelper().enableStreamEventListener(config.getAutojoinChannels());
+        this.client.getClientHelper().enableFollowEventListener(config.getAutojoinChannels());
 
         return Mono.just(true);
     }
@@ -176,6 +185,24 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
                 .filter(l -> l.size() > 0)
                 .map(l -> l.get(0))
                 .map(user -> new TwitchPlace(client, new EventChannel(user.getId(), user.getDisplayName())));
+    }
+
+    public void registerHook(String id, TwitchEventAdapter hook) {
+        LOGGER.debug("Applying custom hook {}",id);
+        Disposable d = Flux.push(sink -> client.getEventManager().onEvent(Object.class, sink::next))
+                .flatMap(hook::onEvent)
+                .doOnError(CancelHookException.class, ex -> deregisterHook(id))
+                .subscribe();
+        registerSubscription(id, d);
+    }
+
+    public void registerHook(TwitchEventAdapter hook) {
+        registerHook(UUID.randomUUID().toString(), hook);
+    }
+
+    public void deregisterHook(String id) {
+        LOGGER.debug("Removing custom hook {}",id);
+        clearSubscription(id);
     }
 
     @Override

@@ -4,3 +4,6 @@ spring:
 
 discord:
   prefix: '!'
+
+twitch:
+  prefix: '!'

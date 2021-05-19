@@ -40,6 +40,7 @@ public class UptimeModule {
     static {
         STAT_GROUPS.put("memory", Arrays.asList("jvm.memory.used", "jvm.memory.committed", "jvm.memory.max"));
         STAT_GROUPS.put("discord", Collections.singletonList("discord.events"));
+        STAT_GROUPS.put("twitch", Collections.singletonList("events4j.published"));
         STAT_GROUPS.put("threads", Arrays.asList("jvm.threads.states", "jvm.threads.live", "jvm.threads.peak"));
         STAT_GROUPS.put("gc", Arrays.asList("jvm.gc.memory.allocated", "jvm.gc.memory.promoted", "jvm.gc.live.data.size", "jvm.gc.max.data.size", "jvm.gc.pause"));
         STAT_GROUPS.put("uptime", Collections.singletonList("process.start.time"));

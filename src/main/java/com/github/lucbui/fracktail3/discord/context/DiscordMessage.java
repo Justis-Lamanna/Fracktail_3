@@ -1,10 +1,12 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.DiscordUtils;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.NonePerson;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.Data;
 import reactor.core.publisher.Mono;
@@ -16,6 +18,7 @@ import java.net.URI;
  * Wrapper around a text message in Discord
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordMessage implements Message {
     private String content;
     private URI[] attachments;

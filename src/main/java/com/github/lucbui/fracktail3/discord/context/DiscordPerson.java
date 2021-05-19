@@ -1,7 +1,9 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.object.entity.Member;
 import lombok.Data;
 import reactor.core.publisher.Mono;
@@ -17,6 +19,7 @@ import java.util.Formatter;
  * and %#s will print a ping output ("@user"). All other flags, width, and precision are ignored.
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordPerson implements Person, Formattable {
     private final discord4j.core.object.entity.User user;
 

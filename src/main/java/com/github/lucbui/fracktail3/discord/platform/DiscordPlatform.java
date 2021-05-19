@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.discord.platform;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.discord.config.CommandType;
 import com.github.lucbui.fracktail3.discord.config.DiscordConfiguration;
 import com.github.lucbui.fracktail3.discord.context.*;
@@ -76,6 +77,11 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
     @Override
     public String getId() {
         return "discord";
+    }
+
+    @JsonIgnore
+    public GatewayDiscordClient getClient() {
+        return gateway;
     }
 
     @Override

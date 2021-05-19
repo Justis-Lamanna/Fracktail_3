@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 @Order(0)
 public class ForPlatformStrategy implements MethodComponentStrategy {
@@ -34,6 +35,6 @@ public class ForPlatformStrategy implements MethodComponentStrategy {
     protected Guard compileForPlatform(ForPlatform forPlatform) {
         Class<? extends Platform> platform = forPlatform.value();
         LOGGER.debug("+-Limiting command to usage with {} platform", platform.getCanonicalName());
-        return new PlatformValidatorGuard(platform);
+        return new PlatformValidatorGuard(Collections.singletonList(platform));
     }
 }

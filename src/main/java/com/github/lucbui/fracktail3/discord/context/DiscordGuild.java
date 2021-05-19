@@ -1,8 +1,10 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.discord.util.DiscordUtils;
 import com.github.lucbui.fracktail3.magic.platform.Message;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import lombok.Data;
@@ -17,6 +19,7 @@ import java.io.File;
  * Messages sent to this place are posted to the System Channel of the corresponding Guild.
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordGuild implements Place {
     private final Guild guild;
 

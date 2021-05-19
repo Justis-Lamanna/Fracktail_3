@@ -3,33 +3,23 @@ package com.github.lucbui.fracktail3.spring.command.guard;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import lombok.Data;
 import org.apache.commons.lang3.ClassUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collection;
 
 /**
  * A guard which enforces a certain type of platform
  */
+@Data
 public class PlatformValidatorGuard implements Guard {
-    private final Class<? extends Platform> platform;
-
-    /**
-     * Initialize
-     * @param platform The class of platform to allow
-     */
-    public PlatformValidatorGuard(Class<? extends Platform> platform) {
-        this.platform = platform;
-    }
+    private final Collection<Class<? extends Platform>> platforms;
 
     @Override
     public Mono<Boolean> matches(CommandUseContext ctx) {
-        return Mono.just(ClassUtils.isAssignable(ctx.getPlatform().getClass(), platform));
-    }
-
-    /**
-     * Get the allowable platform class
-     * @return Platform class
-     */
-    public Class<? extends Platform> getPlatform() {
-        return platform;
+        return Flux.fromIterable(platforms)
+                .all(clazz -> ClassUtils.isAssignable(ctx.getPlatform().getClass(), clazz));
     }
 }

@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.twitch.context;
 
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
+import com.github.lucbui.fracktail3.twitch.platform.TwitchPlatform;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.helix.domain.User;
@@ -13,6 +15,7 @@ import java.util.FormattableFlags;
 import java.util.Formatter;
 
 @Data
+@PlatformModel(TwitchPlatform.class)
 public class TwitchPerson implements Person, Formattable {
     private final TwitchClient client;
     private final User user;

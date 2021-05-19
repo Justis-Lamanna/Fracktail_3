@@ -1,9 +1,11 @@
 package com.github.lucbui.fracktail3.discord.context;
 
+import com.github.lucbui.fracktail3.discord.platform.DiscordPlatform;
 import com.github.lucbui.fracktail3.magic.platform.MultiPlace;
 import com.github.lucbui.fracktail3.magic.platform.Person;
 import com.github.lucbui.fracktail3.magic.platform.PersonGroup;
 import com.github.lucbui.fracktail3.magic.platform.Place;
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.PlatformModel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
@@ -22,6 +24,7 @@ import java.util.Formatter;
  * and %#s will print a mention output ("@role"). All other flags, width, and precision are ignored.
  */
 @Data
+@PlatformModel(DiscordPlatform.class)
 public class DiscordRolePerson implements Person, PersonGroup, Formattable {
     private final Role role;
 
