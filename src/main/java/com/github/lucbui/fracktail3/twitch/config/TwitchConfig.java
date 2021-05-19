@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.twitch.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lucbui.fracktail3.twitch.platform.TwitchHook;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -15,4 +16,5 @@ public class TwitchConfig {
     @JsonIgnore private final String oauth;
     @Builder.Default private final String prefix = "!";
     @Singular private final List<String> autojoinChannels;
+    @Singular private final List<TwitchHook> hooks;
 }
