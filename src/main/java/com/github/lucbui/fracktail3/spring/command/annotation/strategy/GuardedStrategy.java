@@ -18,6 +18,9 @@ import reactor.core.publisher.Mono;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/**
+ * Strategy which parses a @Guarded annotation
+ */
 public class GuardedStrategy implements MethodComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(GuardedStrategy.class);
     private static final ExpressionParser PARSER = new SpelExpressionParser();

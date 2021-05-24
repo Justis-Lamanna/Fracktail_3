@@ -3,6 +3,8 @@ package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.annotation.RoleExpression;
+import com.github.lucbui.fracktail3.spring.command.handler.MonoPropertyAccessor;
+import com.github.lucbui.fracktail3.spring.command.handler.SetPropertyAccessor;
 import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.MethodComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.RoleService;
@@ -19,8 +21,12 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * A strategy which parses an @RoleExpression annotation
+ */
 @Component
 public class RoleExpressionStrategy implements MethodComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(RoleExpressionStrategy.class);
@@ -56,7 +62,13 @@ public class RoleExpressionStrategy implements MethodComponentStrategy {
         public Mono<Boolean> matches(CommandUseContext ctx) {
             return roleService.getRolesForPerson(ctx.getSender())
                     .map(roles -> {
-                        StandardEvaluationContext evalContext = new StandardEvaluationContext(Collections.singletonMap("roles", roles));
+                        Map<String, Object> roleCtx = new HashMap<>();
+                        roleCtx.put("roles", roles);
+                        roleCtx.put("ctx", ctx);
+                        StandardEvaluationContext evalContext = new StandardEvaluationContext(roleCtx);
+                        evalContext.addPropertyAccessor(SetPropertyAccessor.INSTANCE);
+                        evalContext.addPropertyAccessor(MonoPropertyAccessor.INSTANCE);
+
                         return expression.getValue(evalContext, Boolean.class);
                     });
         }

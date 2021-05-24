@@ -10,6 +10,12 @@ import reactor.core.publisher.Mono;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Role Service that services DiscordPersons
+ * If the DiscordPerson is a Member, their roles are retrieved in the format role:[role snowflake].
+ * The guild is also retrieved, in the format guild:[guild snowflake].
+ * In all cases, the user's snowflake is returned as a role, as well as if they are or are not a bot.
+ */
 @Service
 public class DiscordRoleService extends PlatformSpecificRoleService<DiscordPerson> {
     public DiscordRoleService() {
@@ -26,6 +32,7 @@ public class DiscordRoleService extends PlatformSpecificRoleService<DiscordPerso
             roles.add("guild:" + member.getGuildId().asString());
         }
         roles.add(user.getId().asString());
+        roles.add(user.isBot() ? "bot" : "not-bot");
         return Mono.just(roles);
     }
 }

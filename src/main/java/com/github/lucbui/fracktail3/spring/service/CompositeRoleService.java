@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A RoleService which combines all the PlatformSpecificRoleServices into one
+ */
 @Data
 public class CompositeRoleService implements RoleService {
     private final List<PlatformSpecificRoleService<? extends Person>> platformSpecificRoleServices;

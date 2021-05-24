@@ -17,6 +17,9 @@ import reactor.core.publisher.Mono;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/**
+ * Strategy which parses a @Role annotation
+ */
 @Component
 @Order(0)
 public class RoleStrategy implements MethodComponentStrategy {
