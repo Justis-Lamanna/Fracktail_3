@@ -70,6 +70,7 @@ public class FracktailConfiguration {
         if(services.isEmpty()) {
             return new BasicRoleService();
         } else {
+            LOGGER.info("Using Platform Specific Role Services: {}", services);
             return new CompositeRoleService(services);
         }
     }

@@ -93,6 +93,7 @@ public class UptimeModule {
 
     @Command
     @Usage("Get the stats of this bot")
+    @Role("248612704019808258")
     public EmbedResponse stats(@InjectPerson(id = "self") DiscordPerson myself, @Parameter(value = 0, optional = true) String keyword) {
         return new EmbedResponse(spec -> {
             spec.setTitle(myself.getName() + " Stats");
