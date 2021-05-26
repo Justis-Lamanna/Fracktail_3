@@ -20,7 +20,7 @@ public class FullMoonScheduleEventTrigger implements ScheduleEventTrigger {
 
     @Override
     public Publisher<Instant> schedule(Scheduler scheduler) {
-        return scheduler.cron("0 0 9 * * *")
+        return scheduler.cron("0 0 21 * * *")
                 .filter(instant -> isFullMoon(instant.atZone(ZoneId.systemDefault())));
     }
 

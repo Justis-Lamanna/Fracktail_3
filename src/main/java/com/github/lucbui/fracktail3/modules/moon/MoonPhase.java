@@ -7,11 +7,11 @@ public class MoonPhase {
     private final double angle;
 
     public boolean isFull() {
-        return angle > 99.9;
+        return getCoverage() > 99.5;
     }
 
     public boolean isNew() {
-        return angle < 0 && angle > -0.1;
+        return getCoverage() < 0.5;
     }
 
     public boolean isWaning() {

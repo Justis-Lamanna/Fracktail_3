@@ -21,7 +21,7 @@ class FullMoonScheduleEventTriggerTest {
     @Test
     public void phaseCalculatesCorrectly_FullMoon() {
         ZonedDateTime day = LocalDate.of(2021, Month.MAY, 26)
-                .atTime(LocalTime.of(6, 14, 0, 0))
+                .atTime(LocalTime.of(21, 0, 0, 0))
                 .atZone(ZoneId.of("GMT-5"));
 
         double jDay = FullMoonScheduleEventTrigger.toJulian(day);
