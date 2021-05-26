@@ -28,6 +28,15 @@ public class ScheduleConfigurer extends FieldAndMethodBasedConfigurer {
     }
 
     @Override
+    public void configure(Object bean, String name) {
+        if(bean instanceof ScheduledEvent) {
+            LOGGER.debug("Adding Schedule Bean of id {}", name);
+            addOrMerge((ScheduledEvent) bean);
+        }
+        super.configure(bean, name);
+    }
+
+    @Override
     protected void handleMethod(Object obj, Method method) {
         addOrMerge(factory.createScheduledAction(obj, method));
     }
