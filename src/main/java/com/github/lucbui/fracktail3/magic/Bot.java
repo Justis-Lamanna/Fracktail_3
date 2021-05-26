@@ -116,4 +116,17 @@ public class Bot extends IdStore<Platform> {
     public Optional<Platform> getPlatform(String id) {
         return getById(id);
     }
+
+    /**
+     * Get a platform by its class
+     * @param clazz The class the platform is
+     * @param <T> THe type of the platform
+     * @return The found platform, if present
+     */
+    public <T extends Platform> Optional<T> getPlatform(Class<T> clazz) {
+        return getAll().stream()
+                .filter(clazz::isInstance)
+                .map(clazz::cast)
+                .findFirst();
+    }
 }
