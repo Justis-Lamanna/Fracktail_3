@@ -18,62 +18,64 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 @Configuration
-public class HelpCommand implements CommandAction {
+public class HelpCommand{
     @Bean
     public Command helpCmd() {
         return new Command.Builder("_help_cmd")
                 .withName("help")
                 .withHelp("Get information on how to use a command.")
-                .withAction(new HelpCommand())
+                .withAction(new HelpCommand.Action())
                 .withParameter(new Command.Parameter(0, "command", "The command to look up", String.class, true))
                 .build();
     }
 
-    @Override
-    public Mono<Void> doAction(CommandUseContext context) {
-        Optional<Object> obj = context.getParameters().getParameter(0);
-        if(obj.isPresent()) {
-            String searchCmd = (String)obj.get();
-            return Flux.fromIterable(context.getBot().getSpec().getCommandList().getCommands())
-                    .filter(c -> c.getNames().contains(searchCmd))
-                    .filterWhen(c -> new HelpSearchContext(context, c).canDoAction())
-                    .next()
-                    .map(this::getFancyHelp)
-                    .defaultIfEmpty("Sorry, I don't know that command.")
-                    .flatMap(help -> context.respond(help));
-        } else {
-            return context.respond(getFancyHelp(context.getCommand()));
-        }
-    }
-
-    private String getFancyHelp(Command command) {
-        Tuple2<String, List<String>> names = getNames(command);
-        StringJoiner parameterStr = new StringJoiner(" ");
-        StringJoiner parameterHelpStr = new StringJoiner("\n\t");
-        parameterStr.add("!" + names.getT1());
-        for(Command.Parameter p : command.getParameters()) {
-            parameterStr.add("<" + p.getName() + (p.isOptional() ? "?" : "") + ">");
-            parameterHelpStr.add(p.getName() + ": " + p.getDescription() + (p.isOptional() ? "(Optional)" : ""));
+    private static class Action implements CommandAction {
+        @Override
+        public Mono<Void> doAction(CommandUseContext context) {
+            Optional<Object> obj = context.getParameters().getParameter(0);
+            if (obj.isPresent()) {
+                String searchCmd = (String) obj.get();
+                return Flux.fromIterable(context.getBot().getSpec().getCommandList())
+                        .filter(c -> c.getNames().contains(searchCmd))
+                        .filterWhen(c -> new CommandSearchContext(context, c).canDoAction())
+                        .next()
+                        .map(this::getFancyHelp)
+                        .defaultIfEmpty("Sorry, I don't know that command.")
+                        .flatMap(help -> context.respond(help));
+            } else {
+                return context.respond(getFancyHelp(context.getCommand()));
+            }
         }
 
-        String fancyHelp = StringUtils.appendIfMissing(command.getHelp(), ".") +
-                "\n\tUsage: " + parameterStr.toString();
+        private String getFancyHelp(Command command) {
+            Tuple2<String, List<String>> names = getNames(command);
+            StringJoiner parameterStr = new StringJoiner(" ");
+            StringJoiner parameterHelpStr = new StringJoiner("\n\t");
+            parameterStr.add("!" + names.getT1());
+            for (Command.Parameter p : command.getParameters()) {
+                parameterStr.add("<" + p.getName() + (p.isOptional() ? "?" : "") + ">");
+                parameterHelpStr.add(p.getName() + ": " + p.getDescription() + (p.isOptional() ? "(Optional)" : ""));
+            }
 
-        if(!names.getT2().isEmpty()) {
-            fancyHelp += "\n\tAliases: " + String.join(", ", names.getT2());
+            String fancyHelp = StringUtils.appendIfMissing(command.getHelp(), ".") +
+                    "\n\tUsage: " + parameterStr.toString();
+
+            if (!names.getT2().isEmpty()) {
+                fancyHelp += "\n\tAliases: " + String.join(", ", names.getT2());
+            }
+
+            if (!command.getParameters().isEmpty()) {
+                fancyHelp += "\nWhere:\n\t" + parameterHelpStr;
+            }
+
+            return fancyHelp;
         }
 
-        if(!command.getParameters().isEmpty()) {
-            fancyHelp += "\nWhere:\n\t" + parameterHelpStr;
+        private Tuple2<String, List<String>> getNames(Command command) {
+            Iterator<String> names = command.getNames().iterator();
+            String name = names.next();
+            List<String> remaining = IteratorUtils.toList(names, command.getNames().size());
+            return Tuples.of(name, remaining);
         }
-
-        return fancyHelp;
-    }
-
-    private Tuple2<String, List<String>> getNames(Command command) {
-        Iterator<String> names = command.getNames().iterator();
-        String name = names.next();
-        List<String> remaining = IteratorUtils.toList(names, command.getNames().size());
-        return Tuples.of(name, remaining);
     }
 }

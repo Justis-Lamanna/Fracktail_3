@@ -11,7 +11,7 @@ import lombok.Data;
 import reactor.core.publisher.Mono;
 
 @Data
-public class HelpSearchContext implements CommandUseContext {
+public class CommandSearchContext implements CommandUseContext {
     private final CommandUseContext baseContext;
     private final Command command;
 
