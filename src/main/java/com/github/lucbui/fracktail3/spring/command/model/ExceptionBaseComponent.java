@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
  * A base component which handles exceptions thrown in the course of execution
  */
 public abstract class ExceptionBaseComponent<FUNC> {
-    protected final Map<Class<? extends Throwable>, FUNC> candidates;
+    protected final Map<Class<?>, FUNC> candidates;
 
     /**
      * Initialize this component
@@ -27,7 +27,7 @@ public abstract class ExceptionBaseComponent<FUNC> {
      * @param clazz The exception class this handler handles
      * @param handler The handler to use
      */
-    public void addHandler(Class<? extends Throwable> clazz, FUNC handler) {
+    public void addHandler(Class<?> clazz, FUNC handler) {
         this.candidates.put(clazz, handler);
     }
 
@@ -35,7 +35,7 @@ public abstract class ExceptionBaseComponent<FUNC> {
      * Get all candidates and their corresponding handler
      * @return An unmodifiable map of each throwable class and its handler
      */
-    public Map<Class<? extends Throwable>, FUNC> getCandidates() {
+    public Map<Class<?>, FUNC> getCandidates() {
         return Collections.unmodifiableMap(candidates);
     }
 

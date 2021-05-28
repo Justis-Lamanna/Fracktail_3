@@ -82,10 +82,7 @@ public class MethodCallingAction implements CommandAction {
         return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
                 .flatMap(o -> returnComponent.func.apply(context, o))
-                .onErrorResume(InvocationTargetException.class, ex ->
-                        Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                                .switchIfEmpty(Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getTargetException().getClass())))
-                                .flatMap(handler -> handler.apply(context, ex)))
+                .onErrorResume(InvocationTargetException.class, ex -> Mono.error(ex.getTargetException()))
                 .onErrorResume(ex ->
                         Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
                                 .flatMap(func -> func.apply(context, ex))
