@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
-import com.github.lucbui.fracktail3.magic.command.ClassLimit;
-import com.github.lucbui.fracktail3.magic.command.TypeLimits;
+import com.github.lucbui.fracktail3.magic.command.params.ClassLimit;
+import com.github.lucbui.fracktail3.magic.command.params.TypeLimits;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import lombok.Getter;

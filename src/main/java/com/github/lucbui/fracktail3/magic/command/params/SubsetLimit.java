@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.command;
+package com.github.lucbui.fracktail3.magic.command.params;
 
 import lombok.Getter;
 import org.springframework.core.convert.TypeDescriptor;

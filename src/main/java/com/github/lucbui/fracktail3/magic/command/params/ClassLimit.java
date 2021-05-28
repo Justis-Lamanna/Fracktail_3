@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.command;
+package com.github.lucbui.fracktail3.magic.command.params;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
