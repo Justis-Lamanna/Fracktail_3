@@ -1,4 +1,4 @@
-package com.github.lucbui.fracktail3.magic.command.params;
+package com.github.lucbui.fracktail3.magic.params;
 
 import lombok.Getter;
 import org.springframework.core.convert.TypeDescriptor;
@@ -6,10 +6,18 @@ import org.springframework.core.convert.TypeDescriptor;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * A Limit which indicates a list of objects is expected
+ */
 @Getter
 public class ListLimit extends ClassLimit {
     private final TypeLimits innerLimit;
 
+    /**
+     * Create this limit
+     * @param collectionType The type of the *collection*
+     * @param innerLimit TypeLimit to enforce on the members of the collection
+     */
     public ListLimit(TypeDescriptor collectionType, TypeLimits innerLimit) {
         super(collectionType);
         this.innerLimit = innerLimit;

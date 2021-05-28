@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
-import com.github.lucbui.fracktail3.magic.command.params.AnyType;
+import com.github.lucbui.fracktail3.magic.params.AnyType;
 import com.github.lucbui.fracktail3.spring.command.annotation.Parameter;
 import com.github.lucbui.fracktail3.spring.command.annotation.Parameters;
 import com.github.lucbui.fracktail3.spring.command.model.MethodComponent;

@@ -1,12 +1,18 @@
-package com.github.lucbui.fracktail3.magic.command.params;
+package com.github.lucbui.fracktail3.magic.params;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.core.convert.TypeDescriptor;
 
+/**
+ * A basic TypeLimit which enforces that an object must be a specific type
+ */
 @Data
 public class ClassLimit implements TypeLimits {
+    /**
+     * The descriptor of this type.
+     */
     private final TypeDescriptor type;
 
     @JsonProperty("type")
