@@ -36,7 +36,7 @@ public class MiloGoLiveAdapter extends TwitchEventAdapter {
     public Publisher<?> onChannelGoLiveEvent(ChannelGoLiveEvent event) {
         goLiveMessage.updateAndGet(oldM -> {
             if(oldM != null) {
-                oldM.delete("Stream ended").block();
+                return oldM;
             }
             return createMessage(event.getStream());
         });
