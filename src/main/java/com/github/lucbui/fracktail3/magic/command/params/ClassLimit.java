@@ -7,12 +7,16 @@ import org.springframework.core.convert.TypeDescriptor;
 
 @Data
 public class ClassLimit implements TypeLimits {
-    @JsonIgnore
     private final TypeDescriptor type;
 
     @JsonProperty("type")
     public Class<?> getType() {
         return type.getType();
+    }
+
+    @JsonIgnore
+    public TypeDescriptor getTypeDescriptor() {
+        return type;
     }
 
     @Override

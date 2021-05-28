@@ -1,19 +1,16 @@
 package com.github.lucbui.fracktail3.magic.command.params;
 
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.core.convert.TypeDescriptor;
-
-import java.util.Comparator;
 
 @Getter
 public class RangeLimit<T extends Comparable<T>> extends ClassLimit {
-    private Comparator<T> comparator;
     private final T lower;
     private final T upper;
 
-    public RangeLimit(TypeDescriptor type, T lower, T upper) {
+    public RangeLimit(TypeDescriptor type, @Nullable T lower, @Nullable T upper) {
         super(type);
-        this.comparator = Comparator.naturalOrder();
         this.lower = lower;
         this.upper = upper;
     }
@@ -21,7 +18,7 @@ public class RangeLimit<T extends Comparable<T>> extends ClassLimit {
     @Override
     public boolean matches(Object obj) {
         return super.matches(obj) &&
-                comparator.compare((T)obj, lower) >= 0 &&
-                comparator.compare((T)obj, upper) <= 0;
+                (lower == null || ((T)obj).compareTo(lower) >= 0) &&
+                (upper == null || ((T)obj).compareTo(upper) <= 0);
     }
 }
