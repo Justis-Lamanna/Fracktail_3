@@ -1,5 +1,7 @@
 package com.github.lucbui.fracktail3.spring.command.factory;
 
+import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.spring.command.model.ExceptionComponent;
 import com.github.lucbui.fracktail3.spring.schedule.model.ExceptionScheduledComponent;
 import com.github.lucbui.fracktail3.spring.service.StrategyExtractor;
@@ -28,8 +30,10 @@ public class ExceptionComponentFactory {
      * @return The created component
      */
     public ExceptionComponent compileException(Object obj, Method method) {
+        ExceptionComponent c = new ExceptionComponent();
+        c.addHandler(CommandAction.class, CommandActionExceptionHandler.INSTANCE);
         return FactoryUtils.decorate(extractor.getExceptionStrategies(method),
-                (strategy, component) -> strategy.decorate(obj, method, component), new ExceptionComponent());
+                (strategy, component) -> strategy.decorate(obj, method, component), c);
     }
 
     /**
@@ -39,8 +43,10 @@ public class ExceptionComponentFactory {
      * @return The created component
      */
     public ExceptionComponent compileException(Object obj, Field field) {
+        ExceptionComponent c = new ExceptionComponent();
+        c.addHandler(CommandAction.class, CommandActionExceptionHandler.INSTANCE);
         return FactoryUtils.decorate(extractor.getExceptionStrategies(field),
-                (strategy, component) -> strategy.decorate(obj, field, component), new ExceptionComponent());
+                (strategy, component) -> strategy.decorate(obj, field, component), c);
     }
 
     /**
@@ -50,6 +56,8 @@ public class ExceptionComponentFactory {
      * @return The created component
      */
     public ExceptionScheduledComponent compileScheduleException(Object obj, Method method) {
+        ExceptionScheduledComponent c = new ExceptionScheduledComponent();
+        c.addHandler(ScheduledAction.class, CommandActionExceptionHandler.INSTANCE);
         return FactoryUtils.decorate(extractor.getExceptionScheduleStrategies(method),
                 (strategy, component) -> strategy.decorateSchedule(obj, method, component), new ExceptionScheduledComponent());
     }
@@ -61,7 +69,9 @@ public class ExceptionComponentFactory {
      * @return The created component
      */
     public ExceptionScheduledComponent compileScheduleException(Object obj, Field field) {
+        ExceptionScheduledComponent c = new ExceptionScheduledComponent();
+        c.addHandler(ScheduledAction.class, CommandActionExceptionHandler.INSTANCE);
         return FactoryUtils.decorate(extractor.getExceptionScheduleStrategies(field),
-                (strategy, component) -> strategy.decorateSchedule(obj, field, component), new ExceptionScheduledComponent());
+                (strategy, component) -> strategy.decorateSchedule(obj, field, component), c);
     }
 }

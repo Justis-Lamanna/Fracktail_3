@@ -29,6 +29,37 @@ public class HelpCommand{
                 .build();
     }
 
+    private static String getFancyHelp(Command command) {
+        Tuple2<String, List<String>> names = getNames(command);
+        StringJoiner parameterStr = new StringJoiner(" ");
+        StringJoiner parameterHelpStr = new StringJoiner("\n\t");
+        parameterStr.add("!" + names.getT1());
+        for (Command.Parameter p : command.getParameters()) {
+            parameterStr.add("<" + p.getName() + (p.isOptional() ? "?" : "") + ">");
+            parameterHelpStr.add(p.getName() + ": " + p.getDescription() + (p.isOptional() ? "(Optional)" : ""));
+        }
+
+        String fancyHelp = StringUtils.appendIfMissing(command.getHelp(), ".") +
+                "\n\tUsage: " + parameterStr.toString();
+
+        if (!names.getT2().isEmpty()) {
+            fancyHelp += "\n\tAliases: " + String.join(", ", names.getT2());
+        }
+
+        if (!command.getParameters().isEmpty()) {
+            fancyHelp += "\nWhere:\n\t" + parameterHelpStr;
+        }
+
+        return fancyHelp;
+    }
+
+    private static Tuple2<String, List<String>> getNames(Command command) {
+        Iterator<String> names = command.getNames().iterator();
+        String name = names.next();
+        List<String> remaining = IteratorUtils.toList(names, command.getNames().size());
+        return Tuples.of(name, remaining);
+    }
+
     private static class Action implements CommandAction {
         @Override
         public Mono<Void> doAction(CommandUseContext context) {
@@ -39,43 +70,25 @@ public class HelpCommand{
                         .filter(c -> c.getNames().contains(searchCmd))
                         .filterWhen(c -> new CommandSearchContext(context, c).canDoAction())
                         .next()
-                        .map(this::getFancyHelp)
+                        .map(HelpCommand::getFancyHelp)
                         .defaultIfEmpty("Sorry, I don't know that command.")
                         .flatMap(help -> context.respond(help));
             } else {
                 return context.respond(getFancyHelp(context.getCommand()));
             }
         }
+    }
 
-        private String getFancyHelp(Command command) {
-            Tuple2<String, List<String>> names = getNames(command);
-            StringJoiner parameterStr = new StringJoiner(" ");
-            StringJoiner parameterHelpStr = new StringJoiner("\n\t");
-            parameterStr.add("!" + names.getT1());
-            for (Command.Parameter p : command.getParameters()) {
-                parameterStr.add("<" + p.getName() + (p.isOptional() ? "?" : "") + ">");
-                parameterHelpStr.add(p.getName() + ": " + p.getDescription() + (p.isOptional() ? "(Optional)" : ""));
-            }
-
-            String fancyHelp = StringUtils.appendIfMissing(command.getHelp(), ".") +
-                    "\n\tUsage: " + parameterStr.toString();
-
-            if (!names.getT2().isEmpty()) {
-                fancyHelp += "\n\tAliases: " + String.join(", ", names.getT2());
-            }
-
-            if (!command.getParameters().isEmpty()) {
-                fancyHelp += "\nWhere:\n\t" + parameterHelpStr;
-            }
-
-            return fancyHelp;
+    /**
+     * Exception that, when thrown, responds with the help text of the command
+     */
+    public static class DisplayHelpException extends Throwable implements CommandAction {
+        public DisplayHelpException() {
         }
 
-        private Tuple2<String, List<String>> getNames(Command command) {
-            Iterator<String> names = command.getNames().iterator();
-            String name = names.next();
-            List<String> remaining = IteratorUtils.toList(names, command.getNames().size());
-            return Tuples.of(name, remaining);
+        @Override
+        public Mono<Void> doAction(CommandUseContext context) {
+            return context.respond(getFancyHelp(context.getCommand()));
         }
     }
 }
