@@ -24,14 +24,18 @@ public class PlatformModelStrategy implements MethodComponentStrategy {
     @Override
     public MethodComponent decorate(Object obj, Method method, MethodComponent base) {
         Set<Class<? extends Platform>> platforms = getPlatformModelClasses(ResolvableType.forMethodReturnType(method), method.getParameters());
-        base.addGuard(new PlatformValidatorGuard(platforms));
+        if(!platforms.isEmpty()) {
+            base.addGuard(new PlatformValidatorGuard(platforms));
+        }
         return base;
     }
 
     @Override
     public MethodComponent decorate(Object obj, Field field, MethodComponent base) {
         Set<Class<? extends Platform>> platforms = getPlatformModelClasses(ResolvableType.forField(field), null);
-        base.addGuard(new PlatformValidatorGuard(platforms));
+        if(!platforms.isEmpty()) {
+            base.addGuard(new PlatformValidatorGuard(platforms));
+        }
         return base;
     }
 
@@ -39,7 +43,7 @@ public class PlatformModelStrategy implements MethodComponentStrategy {
         Set<Class<? extends Platform>> platforms = new HashSet<>(ArrayUtils.getLength(parameters) + 1);
         if(parameters != null) {
             for (Parameter p : parameters) {
-                if(ClassUtils.isAssignable(p.getType(), Platform.class)) {
+                if(ClassUtils.isAssignable(p.getType(), Platform.class) && p.getType() != Platform.class) {
                     platforms.add((Class<Platform>)p.getType());
                 }
 

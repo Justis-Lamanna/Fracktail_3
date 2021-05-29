@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.annotation.RoleExpression;
@@ -40,7 +41,7 @@ public class RoleExpressionStrategy implements MethodComponentStrategy {
     public MethodComponent decorate(Object obj, Method method, MethodComponent base) {
         RoleExpression roleExpression = method.getAnnotation(RoleExpression.class);
         Expression expression = PARSER.parseExpression(roleExpression.value());
-        base.addGuard(new RoleExpressionGuard(expression));
+        base.addGuard(new RoleExpressionGuard(expression, roleService));
         LOGGER.info("+-With role expression: {}", roleExpression.value());
         return base;
     }
@@ -49,14 +50,15 @@ public class RoleExpressionStrategy implements MethodComponentStrategy {
     public MethodComponent decorate(Object obj, Field field, MethodComponent base) {
         RoleExpression roleExpression = field.getAnnotation(RoleExpression.class);
         Expression expression = PARSER.parseExpression(roleExpression.value());
-        base.addGuard(new RoleExpressionGuard(expression));
+        base.addGuard(new RoleExpressionGuard(expression, roleService));
         LOGGER.info("+-With role expression: {}", roleExpression.value());
         return base;
     }
 
     @Data
-    private class RoleExpressionGuard implements Guard {
-        private final Expression expression;
+    public static class RoleExpressionGuard implements Guard {
+        @JsonIgnore private final Expression expression;
+        @JsonIgnore private final RoleService roleService;
 
         @Override
         public Mono<Boolean> matches(CommandUseContext ctx) {

@@ -3,7 +3,6 @@ package com.github.lucbui.fracktail3.magic;
 import com.github.lucbui.fracktail3.magic.params.EntryField;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * An interface which marks some item as editable
@@ -11,9 +10,9 @@ import java.util.Map;
 public interface Editable {
     /**
      * Edit this item using the provided values
-     * @param values Key/value pairs provided in the edit functionality
+     * @param spec Key/value pairs provided in the edit functionality
      */
-    void edit(Map<String, Object> values);
+    void edit(Spec spec);
 
     /**
      * Get the fields that are supported by this editable object

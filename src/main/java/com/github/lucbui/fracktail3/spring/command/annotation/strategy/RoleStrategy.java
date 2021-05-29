@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.annotation.Role;
@@ -31,7 +32,7 @@ public class RoleStrategy implements MethodComponentStrategy {
     @Override
     public MethodComponent decorate(Object obj, Method method, MethodComponent base) {
         Role role = method.getAnnotation(Role.class);
-        base.addGuard(new RoleGuard(role.value()));
+        base.addGuard(new RoleGuard(role.value(), roleService));
         LOGGER.info("+-With role restriction:" + role.value());
         return base;
     }
@@ -39,14 +40,15 @@ public class RoleStrategy implements MethodComponentStrategy {
     @Override
     public MethodComponent decorate(Object obj, Field field, MethodComponent base) {
         Role role = field.getAnnotation(Role.class);
-        base.addGuard(new RoleGuard(role.value()));
+        base.addGuard(new RoleGuard(role.value(), roleService));
         LOGGER.info("+-With role restriction:" + role.value());
         return base;
     }
 
     @Data
-    private class RoleGuard implements Guard {
+    public static class RoleGuard implements Guard {
         private final String roleNeeded;
+        @JsonIgnore private final RoleService roleService;
 
         @Override
         public Mono<Boolean> matches(CommandUseContext ctx) {

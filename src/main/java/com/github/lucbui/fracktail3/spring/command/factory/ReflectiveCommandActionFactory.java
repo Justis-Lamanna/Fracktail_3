@@ -3,6 +3,7 @@ package com.github.lucbui.fracktail3.spring.command.factory;
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
+import com.github.lucbui.fracktail3.magic.guard.AndGuard;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
@@ -114,9 +115,10 @@ public class ReflectiveCommandActionFactory {
         Stream<Guard> paramGuards = parameters == null ?
                 Stream.empty() :
                 parameters.stream().flatMap(pc -> pc.getGuards().stream());
-        return Stream.concat(methods.getGuards().stream(), paramGuards)
-                .reduce(Guard::and)
-                .orElse(null);
+        Guard[] guards = Stream.concat(methods.getGuards().stream(), paramGuards).toArray(Guard[]::new);
+        if(guards.length == 0) return null;
+        else if(guards.length == 1) return guards[0];
+        else return new AndGuard(guards);
     }
 
     private List<Command.Parameter> compileParameter(MethodComponent methods, List<ParameterComponent> parameters) {

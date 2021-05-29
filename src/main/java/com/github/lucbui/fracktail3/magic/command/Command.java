@@ -1,6 +1,5 @@
 package com.github.lucbui.fracktail3.magic.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
@@ -24,7 +23,6 @@ public class Command implements Id {
     private final Set<String> names;
     private final String help;
     private final Guard restriction;
-    @JsonIgnore
     private final CommandAction action;
     private final List<Parameter> parameters;
 
@@ -111,34 +109,6 @@ public class Command implements Id {
          */
         public Builder withRestriction(Guard guard) {
             this.guard = guard;
-            return this;
-        }
-
-        /**
-         * Add an additional guard, with the previous guard and this one and'ed together
-         * If no previous guard exists, the supplied guard becomes the new one.
-         * @param guard The guard to and
-         * @return This builder
-         */
-        public Builder andRestriction(Guard guard) {
-            if(this.guard == null) {
-                return withRestriction(guard);
-            }
-            this.guard = this.guard.and(guard);
-            return this;
-        }
-
-        /**
-         * Add an additional guard, with the previous guard and this one or'ed together
-         * If no previous guard exists, the supplied guard becomes the new one.
-         * @param guard The guard to or
-         * @return This builder
-         */
-        public Builder orRestriction(Guard guard) {
-            if(this.guard == null) {
-                return withRestriction(guard);
-            }
-            this.guard = this.guard.or(guard);
             return this;
         }
 
