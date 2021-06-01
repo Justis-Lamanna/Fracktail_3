@@ -39,6 +39,21 @@ public class GenericSpec {
     }
 
     /**
+     * Get a value from its key, throwing an exception if it is not present
+     * @param key The key to look up
+     * @param <T> The type to return
+     * @return The value for that key
+     * @throws FailedSpecException Key is not present in the spec
+     */
+    public <T> T getRequired(String key) {
+        Object obj = this.map.get(key);
+        if(obj == null) {
+            throw new FailedSpecException(key + " was required, but not present");
+        }
+        return (T)obj;
+    }
+
+    /**
      * Get a value from its key, wrapped in an Optional
      * @param key The key to get
      * @param clazz The class of the retrieved value
@@ -51,6 +66,21 @@ public class GenericSpec {
             return Optional.empty();
         } else {
             return Optional.of(clazz.cast(obj));
+        }
+    }
+
+    /**
+     * Get a value from its key, wrapped in an Optional
+     * @param key The key to get
+     * @param <T> The type to return
+     * @return The value for that key, or an empty Optional if not present/null
+     */
+    public <T> Optional<T> getOptional(String key) {
+        Object obj = this.map.get(key);
+        if(obj == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of((T)obj);
         }
     }
 
@@ -86,5 +116,14 @@ public class GenericSpec {
      */
     public void forEach(BiConsumer<? super String, ? super Object> consumer) {
         this.map.forEach(consumer);
+    }
+
+    /**
+     * Check if this spec is empty.
+     * This may indicate that the object is entirely unchanged.
+     * @return True if the spec is empty
+     */
+    public boolean isEmpty() {
+        return this.map.isEmpty();
     }
 }

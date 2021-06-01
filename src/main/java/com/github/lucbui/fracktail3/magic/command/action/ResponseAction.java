@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.BasicEditable;
+import com.github.lucbui.fracktail3.magic.Editable;
 import com.github.lucbui.fracktail3.magic.GenericSpec;
 import com.github.lucbui.fracktail3.magic.params.EntryField;
 import com.github.lucbui.fracktail3.magic.params.StringLengthLimit;
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
-public class ResponseAction implements CommandAction, BasicEditable<ResponseAction> {
+public class ResponseAction implements CommandAction, Editable<ResponseAction> {
     private final String respondString;
 
     @Override

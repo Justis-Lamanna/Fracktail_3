@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command;
 
 import com.github.lucbui.fracktail3.magic.Editable;
+import com.github.lucbui.fracktail3.magic.GenericSpec;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
@@ -21,7 +22,7 @@ import java.util.*;
  * Encapsulation of a bot's command
  */
 @Data
-public class Command implements Id, Editable<Command, CommandSpec> {
+public class Command implements Id, Editable<Command> {
     private final String id;
     private final Set<String> names;
     private final String help;
@@ -39,15 +40,30 @@ public class Command implements Id, Editable<Command, CommandSpec> {
     }
 
     @Override
-    public Command edit(CommandSpec commandSpec) {
-        return new Command(id, commandSpec.getNames(), commandSpec.getHelp(), restriction, action, parameters);
+    public Command edit(GenericSpec spec) {
+        return new Command(id,
+                spec.<Set<String>>getOptional("names").orElse(names),
+                spec.getOptional("help", String.class).orElse(help),
+                restriction, action, parameters);
     }
 
     @Override
     public List<EntryField> getEditFields() {
         return Arrays.asList(
-                EntryField.builder().id("names").name("Names").description("Command phrase that call this command").typeLimit(new ListLimit(Set.class, String.class)).build(),
-                EntryField.builder().id("help").name("Help").description("Description of how to use this command").typeLimit(new ClassLimit(String.class)).build()
+                EntryField.builder()
+                        .id("names")
+                        .name("Names")
+                        .description("Command phrase that call this command")
+                        .typeLimit(new ListLimit(Set.class, String.class))
+                        .optional(true)
+                        .build(),
+                EntryField.builder()
+                        .id("help")
+                        .name("Help")
+                        .description("Description of how to use this command")
+                        .typeLimit(new ClassLimit(String.class))
+                        .optional(true)
+                        .build()
         );
     }
 
