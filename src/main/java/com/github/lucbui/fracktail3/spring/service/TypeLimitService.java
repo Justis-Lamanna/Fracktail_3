@@ -35,14 +35,6 @@ public class TypeLimitService {
         }
     }
 
-    public Object getDefault(TypeLimits limits) {
-        if(limits instanceof ClassLimit) {
-            ClassLimit cl = (ClassLimit) limits;
-            return Defaults.getDefault(cl.getType());
-        }
-        return null;
-    }
-
     private Object convert(Object input, TypeLimits limits, boolean optional) {
         if(limits instanceof ClassLimit) {
             ClassLimit cl = (ClassLimit) limits;
@@ -50,24 +42,25 @@ public class TypeLimitService {
             if(conversionService.canConvert(inputType, cl.getTypeDescriptor())) {
                 try {
                     Object finalVal = conversionService.convert(input, inputType, cl.getTypeDescriptor());
-                    if(finalVal == null && !optional) {
+                    if (finalVal == null && !optional) {
                         throw new IllegalArgumentException("Unable to convert " + input + " to match TypeLimit " + limits + "(null + non-optional)");
                     }
                     return finalVal;
                 } catch (ConversionException ex) {
-                    if(optional) return getDefault(limits);
+                    if (optional) return limits.getDefault();
                     else throw ex;
                 }
-            } else if(optional) {
-                return getDefault(limits);
             } else {
-                throw new ConverterNotFoundException(inputType, cl.getTypeDescriptor());
+                if(optional) return limits.getDefault();
+                else throw new ConverterNotFoundException(inputType, cl.getTypeDescriptor());
             }
         } else {
-            if(input == null && !optional) {
-                throw new IllegalArgumentException("Unable to convert " + input + " to match TypeLimit " + limits + "(null + non-optional)");
+            if(input == null) {
+                if(optional) return limits.getDefault();
+                else throw new IllegalArgumentException("Unable to convert null to match TypeLimit " + limits + "(null + non-optional)");
+            } else {
+                return input;
             }
-            return input;
         }
     }
 }
