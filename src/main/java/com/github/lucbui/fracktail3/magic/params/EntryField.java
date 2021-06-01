@@ -1,11 +1,13 @@
 package com.github.lucbui.fracktail3.magic.params;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
  * Attempts to represent a legal create/edit field that can be represented on a variety of platforms
  */
 @Data
+@Builder
 public class EntryField {
     /**
      * The ID of the field
@@ -22,5 +24,10 @@ public class EntryField {
     /**
      * The type of this field, and any limits to it.
      */
-    private final TypeLimits typeLimit;
+    @Builder.Default private final TypeLimits typeLimit = AnyType.INSTANCE;
+
+    /**
+     * Whether this field is optional or not
+     */
+    @Builder.Default private final boolean optional = false;
 }

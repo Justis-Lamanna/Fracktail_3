@@ -1,6 +1,6 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
-import com.github.lucbui.fracktail3.magic.Editable;
+import com.github.lucbui.fracktail3.magic.BasicEditable;
 import com.github.lucbui.fracktail3.magic.GenericSpec;
 import com.github.lucbui.fracktail3.magic.params.EntryField;
 import com.github.lucbui.fracktail3.magic.params.StringLengthLimit;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
-public class ResponseAction implements CommandAction, Editable<GenericSpec> {
-    private String respondString;
+public class ResponseAction implements CommandAction, BasicEditable<ResponseAction> {
+    private final String respondString;
 
     @Override
     public Mono<Void> doAction(CommandUseContext context) {
@@ -21,14 +21,14 @@ public class ResponseAction implements CommandAction, Editable<GenericSpec> {
     }
 
     @Override
-    public void edit(GenericSpec spec) {
-        respondString = spec.getRequired("response", String.class);
+    public ResponseAction edit(GenericSpec spec) {
+        return new ResponseAction(spec.getRequired("response", String.class));
     }
 
     @Override
-    public List<EntryField> getFields() {
+    public List<EntryField> getEditFields() {
         return Collections.singletonList(
-                new EntryField("response", "Response", "Text to respond with", StringLengthLimit.atMost(1024))
+                EntryField.builder().id("response").description("Response").description("Text to respond with").typeLimit(StringLengthLimit.atMost(1024)).build()
         );
     }
 }
