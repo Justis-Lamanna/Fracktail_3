@@ -1,12 +1,16 @@
 package com.github.lucbui.fracktail3.magic.command;
 
+import com.github.lucbui.fracktail3.magic.Editable;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.params.ClassLimit;
+import com.github.lucbui.fracktail3.magic.params.EntryField;
+import com.github.lucbui.fracktail3.magic.params.ListLimit;
 import com.github.lucbui.fracktail3.magic.params.TypeLimits;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.TypeDescriptor;
@@ -18,10 +22,11 @@ import java.util.*;
  * Encapsulation of a bot's command
  */
 @Data
-public class Command implements Id {
+@AllArgsConstructor
+public class Command implements Id, Editable<CommandSpec> {
     private final String id;
-    private final Set<String> names;
-    private final String help;
+    private Set<String> names;
+    private String help;
     private final Guard restriction;
     private final CommandAction action;
     private final List<Parameter> parameters;
@@ -33,6 +38,20 @@ public class Command implements Id {
      */
     public Mono<Void> doAction(CommandUseContext ctx) {
         return action.doAction(ctx);
+    }
+
+    @Override
+    public void edit(CommandSpec commandSpec) {
+        this.names = commandSpec.getNames();
+        this.help = commandSpec.getHelp();
+    }
+
+    @Override
+    public List<EntryField> getFields() {
+        return Arrays.asList(
+                new EntryField("names", "Names", "Command phrases that call this command", new ListLimit(Set.class, String.class)),
+                new EntryField("help", "Help", "Description of how to use this command", new ClassLimit(String.class))
+        );
     }
 
     @Data

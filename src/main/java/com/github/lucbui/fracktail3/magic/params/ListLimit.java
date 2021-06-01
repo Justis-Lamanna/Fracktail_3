@@ -23,6 +23,16 @@ public class ListLimit extends ClassLimit {
         this.innerLimit = innerLimit;
     }
 
+    /**
+     * Create this limit
+     * @param collectionClass The collection class
+     * @param innerClass The inner class
+     */
+    public ListLimit(Class<? extends Collection> collectionClass, Class<?> innerClass) {
+        super(TypeDescriptor.collection(collectionClass, TypeDescriptor.valueOf(innerClass)));
+        this.innerLimit = new ClassLimit(innerClass);
+    }
+
     @Override
     public boolean matches(Object obj) {
         return super.matches(obj) && innerMatches(obj);

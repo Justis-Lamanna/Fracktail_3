@@ -15,6 +15,14 @@ public class ClassLimit implements TypeLimits {
      */
     private final TypeDescriptor type;
 
+    public ClassLimit(Class<?> clazz) {
+        this.type = TypeDescriptor.valueOf(clazz);
+    }
+
+    public ClassLimit(TypeDescriptor type) {
+        this.type = type;
+    }
+
     @JsonProperty("type")
     public Class<?> getType() {
         return type.getType();
