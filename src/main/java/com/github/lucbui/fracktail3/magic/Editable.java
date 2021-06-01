@@ -29,4 +29,13 @@ public interface Editable<THIS> {
     default boolean isEditable() {
         return true;
     }
+
+    /**
+     * Test if an arbitrary object is editable
+     * @param obj
+     * @return
+     */
+    static boolean isEditable(Object obj) {
+        return obj instanceof Editable && ((Editable<?>)obj).isEditable();
+    }
 }
