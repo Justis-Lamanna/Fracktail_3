@@ -1,7 +1,7 @@
 package com.github.lucbui.fracktail3.magic.command.action;
 
 import com.github.lucbui.fracktail3.magic.Editable;
-import com.github.lucbui.fracktail3.magic.Spec;
+import com.github.lucbui.fracktail3.magic.GenericSpec;
 import com.github.lucbui.fracktail3.magic.params.EntryField;
 import com.github.lucbui.fracktail3.magic.params.StringLengthLimit;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
-public class ResponseAction implements CommandAction, Editable {
+public class ResponseAction implements CommandAction, Editable<GenericSpec> {
     private String respondString;
 
     @Override
@@ -21,7 +21,7 @@ public class ResponseAction implements CommandAction, Editable {
     }
 
     @Override
-    public void edit(Spec spec) {
+    public void edit(GenericSpec spec) {
         respondString = spec.getRequired("response", String.class);
     }
 

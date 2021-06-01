@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 /**
  * A generic spec that describes the creation or editing for an Editable item
  */
-public class Spec {
+public class GenericSpec {
     private final Map<String, Object> map = new HashMap<>();
 
     /**

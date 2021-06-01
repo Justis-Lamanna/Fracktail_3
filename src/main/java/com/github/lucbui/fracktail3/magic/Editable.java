@@ -7,12 +7,12 @@ import java.util.List;
 /**
  * An interface which marks some item as editable
  */
-public interface Editable {
+public interface Editable<SPEC> {
     /**
      * Edit this item using the provided values
      * @param spec Key/value pairs provided in the edit functionality
      */
-    void edit(Spec spec);
+    void edit(SPEC spec);
 
     /**
      * Get the fields that are supported by this editable object
