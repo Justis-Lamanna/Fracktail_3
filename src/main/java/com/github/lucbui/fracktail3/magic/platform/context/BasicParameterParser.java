@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.magic.platform.context;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -15,25 +16,29 @@ public class BasicParameterParser implements ParameterParser {
     @Override
     public Parameters parseParametersFromMessage(Command command, String message) {
         List<Command.Parameter> parameters = command.getParameters();
-        if(parameters.size() == 0) {
-            //Legacy support I guess
-            return process(command, message, SPLIT_PATTERN.split(message));
-        }
         String[] paramsAsStr = StringUtils.isEmpty(message) ?
                 validateAndNormalize(parameters, fill(0)) :
                 validateAndNormalize(parameters, SPLIT_PATTERN.split(message, parameters.size()));
 
         Queue<Integer> indexes = getParameterIndices(parameters, paramsAsStr);
 
-        Object[] params = new Object[parameters.size()];
+        Parameters.Member[] params = new Parameters.Member[parameters.size()];
         int paramsIdx = 0;
         while(!indexes.isEmpty()) {
-            params[indexes.remove()] = paramsAsStr[paramsIdx++];
+            Command.Parameter correspondingParam = getParameterByIndex(command.getParameters(), paramsIdx);
+            params[indexes.remove()] = new Parameters.Member(correspondingParam, paramsAsStr[paramsIdx++]);
         }
         return process(command, message, params);
     }
 
-    protected Parameters process(Command command, String message, Object[] calculate) {
+    private Command.Parameter getParameterByIndex(List<Command.Parameter> parameters, int paramsIdx) {
+        return parameters.stream()
+                .filter(p -> p.getIndex() == paramsIdx)
+                .findFirst()
+                .orElseThrow(() -> new BotConfigurationException("No parameter for index " + paramsIdx + " for command"));
+    }
+
+    protected Parameters process(Command command, String message, Parameters.Member[] calculate) {
         return new Parameters(message, calculate);
     }
 
