@@ -4,6 +4,8 @@ import com.github.lucbui.fracktail3.magic.Id;
 import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.collections4.multiset.HashMultiSet;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,12 +17,17 @@ import java.util.stream.Collectors;
 public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
     private final Map<String, ITEM> store;
 
+    private final Sinks.Many<IdStoreAction<ITEM>> eventSink = Sinks.many().multicast().directBestEffort();
+
     /**
      * Initialize a store using a Map of ID-ITEM pairs
      * @param store The store state
      */
     public IdStore(Map<String, ITEM> store) {
         this.store = new HashMap<>(store);
+        if(!store.isEmpty()) {
+            eventSink.tryEmitNext(new MassCreateAction<>(store.values()));
+        }
     }
 
     /**
@@ -67,6 +74,7 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
             throw new IllegalArgumentException("Item with ID " + item.getId() + " already exists in-store");
         }
         store.put(item.getId(), item);
+        eventSink.tryEmitNext(new CreateAction<>(item));
     }
 
     /**
@@ -90,6 +98,9 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
         }
 
         items.forEach(i -> store.put(i.getId(), i));
+        if(!items.isEmpty()) {
+            eventSink.tryEmitNext(new MassCreateAction<>(items));
+        }
     }
 
     /**
@@ -100,6 +111,8 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
     public Optional<ITEM> replace(ITEM item) {
         Objects.requireNonNull(item);
         ITEM old = store.put(item.getId(), item);
+        if(old == null) eventSink.tryEmitNext(new CreateAction<>(item));
+        else eventSink.tryEmitNext(new UpdateAction<>(old, item));
         return Optional.ofNullable(old);
     }
 
@@ -118,7 +131,10 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
      */
     public void delete(ITEM item) {
         Objects.requireNonNull(item);
-        store.remove(item.getId());
+        ITEM old = store.remove(item.getId());
+        if(old != null) {
+            eventSink.tryEmitNext(new DeleteAction<>(old));
+        }
     }
 
     /**
@@ -126,11 +142,22 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
      * @param id The ID of the item to delete
      */
     public void deleteById(String id) {
-        store.remove(id);
+        ITEM old = store.remove(id);
+        if(old != null) {
+            eventSink.tryEmitNext(new DeleteAction<>(old));
+        }
     }
 
     @Override
     public Iterator<ITEM> iterator() {
         return getAll().iterator();
+    }
+
+    /**
+     * Get a stream of events, which are emitted as this store is modified
+     * @return A subscribable Flux which emits events in real time
+     */
+    public Flux<IdStoreAction<ITEM>> eventStream() {
+        return eventSink.asFlux();
     }
 }
