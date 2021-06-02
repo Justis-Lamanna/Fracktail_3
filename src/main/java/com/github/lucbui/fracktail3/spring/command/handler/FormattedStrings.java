@@ -1,6 +1,13 @@
 package com.github.lucbui.fracktail3.spring.command.handler;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lucbui.fracktail3.magic.Editable;
+import com.github.lucbui.fracktail3.magic.GenericSpec;
+import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.params.EntryField;
+import com.github.lucbui.fracktail3.magic.params.StringLengthLimit;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
+import lombok.Data;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
@@ -8,7 +15,9 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,5 +62,45 @@ public class FormattedStrings extends StdReturnConverterFunctions.Strings {
 
         String resolved = expression.getValue(evalContext, String.class);
         return super.apply(context, resolved);
+    }
+
+    @Data
+    public static class Action implements CommandAction, Editable<Action> {
+        @JsonIgnore
+        private final Expression expression;
+
+        public Action(String expString) {
+            expression = PARSER.parseExpression(expString, CONTEXT);
+        }
+
+        public String getRawExpression() {
+            return expression.getExpressionString();
+        }
+
+        @Override
+        public Mono<Void> doAction(CommandUseContext context) {
+            StandardEvaluationContext evalContext = new StandardEvaluationContext(context);
+            evalContext.addPropertyAccessor(MonoPropertyAccessor.INSTANCE);
+
+            String resolved = expression.getValue(evalContext, String.class);
+            return context.respond(resolved);
+        }
+
+        @Override
+        public Action edit(GenericSpec spec) {
+            return new Action(spec.getRequired("response"));
+        }
+
+        @Override
+        public List<EntryField> getEditFields() {
+            return Collections.singletonList(
+                    EntryField.builder()
+                            .id("response")
+                            .name("Response")
+                            .description("Response object (supports SpEL)")
+                            .typeLimit(StringLengthLimit.atMost(1024))
+                            .build()
+            );
+        }
     }
 }

@@ -49,6 +49,17 @@ public class CommandList extends IdStore<Command> {
     }
 
     /**
+     * Get a command by its name
+     * @param name The command name
+     * @return The command, if present
+     */
+    public Optional<Command> getCommandByName(String name) {
+        return getAll().stream()
+                .filter(c -> c.getNames().contains(name))
+                .findFirst();
+    }
+
+    /**
      * Get the number of commands in the list
      * @return The number of commands
      */

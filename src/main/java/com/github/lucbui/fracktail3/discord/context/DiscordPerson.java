@@ -41,6 +41,15 @@ public class DiscordPerson implements Person, Formattable {
         return user.isBot();
     }
 
+    /**
+     * Check if this person is the owner of the bot
+     * @return Async true, if bot owner
+     */
+    public Mono<Boolean> isOwner() {
+        return user.getClient().getApplicationInfo()
+                .map(ai -> ai.getOwnerId().equals(user.getId()));
+    }
+
     @Override
     public void formatTo(Formatter formatter, int flags, int width, int precision) {
         boolean alternate = (flags & FormattableFlags.ALTERNATE) == FormattableFlags.ALTERNATE;

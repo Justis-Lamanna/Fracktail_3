@@ -112,6 +112,23 @@ public class IdStore<ITEM extends Id> implements Iterable<ITEM> {
         return new IdStore<T>(Collections.emptyMap());
     }
 
+    /**
+     * Delete an item from the store
+     * @param item The item to delete
+     */
+    public void delete(ITEM item) {
+        Objects.requireNonNull(item);
+        store.remove(item.getId());
+    }
+
+    /**
+     * Delete an item from the store
+     * @param id The ID of the item to delete
+     */
+    public void deleteById(String id) {
+        store.remove(id);
+    }
+
     @Override
     public Iterator<ITEM> iterator() {
         return getAll().iterator();
