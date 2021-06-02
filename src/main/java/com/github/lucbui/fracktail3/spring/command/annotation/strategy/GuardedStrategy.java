@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.spring.command.annotation.Guarded;
@@ -44,7 +45,8 @@ public class GuardedStrategy implements MethodComponentStrategy {
     }
 
     @Data
-    private static class ExpressionGuard implements Guard {
+    public static class ExpressionGuard implements Guard {
+        @JsonIgnore
         private final Expression expression;
 
         @Override

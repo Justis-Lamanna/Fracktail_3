@@ -33,6 +33,9 @@ public class DiscordRoleService extends PlatformSpecificRoleService<DiscordPerso
         }
         roles.add(user.getId().asString());
         roles.add(user.isBot() ? "bot" : "not-bot");
-        return Mono.just(roles);
+        return Mono.just(roles)
+                .flatMap(set ->
+                        person.isOwner().filter(b -> b).thenReturn(set).doOnNext(s -> s.add("owner"))
+                );
     }
 }

@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.twitch.platform;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 /**
  * Adapter which allows for responding to different Twitch events
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "_type")
 public abstract class TwitchEventAdapter {
     public Publisher<?> onBitsBadgeEarnedEvent(BitsBadgeEarnedEvent event) {
         return Mono.empty();

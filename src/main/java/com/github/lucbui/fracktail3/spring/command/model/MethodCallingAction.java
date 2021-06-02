@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import reactor.bool.BooleanUtils;
@@ -14,11 +15,17 @@ import java.util.stream.Stream;
  * Encapsulates a method call on an object, with relevant components.
  */
 public class MethodCallingAction implements CommandAction {
+    @JsonIgnore
     private final MethodComponent methodComponent;
+    @JsonIgnore
     private final List<ParameterComponent> parameterComponents;
+    @JsonIgnore
     private final Object objToInvokeOn;
+    @JsonIgnore
     private final Method methodToCall;
+    @JsonIgnore
     private final ReturnComponent returnComponent;
+    @JsonIgnore
     private final ExceptionComponent exceptionComponent;
 
     /**

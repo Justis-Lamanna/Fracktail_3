@@ -1,9 +1,14 @@
 package com.github.lucbui.fracktail3.magic.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lucbui.fracktail3.magic.Editable;
+import com.github.lucbui.fracktail3.magic.GenericSpec;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
 import com.github.lucbui.fracktail3.magic.guard.Guard;
+import com.github.lucbui.fracktail3.magic.params.ClassLimit;
+import com.github.lucbui.fracktail3.magic.params.EntryField;
+import com.github.lucbui.fracktail3.magic.params.ListLimit;
+import com.github.lucbui.fracktail3.magic.params.TypeLimits;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import com.github.lucbui.fracktail3.magic.util.IBuilder;
 import lombok.Data;
@@ -17,12 +22,11 @@ import java.util.*;
  * Encapsulation of a bot's command
  */
 @Data
-public class Command implements Id {
+public class Command implements Id, Editable<Command> {
     private final String id;
     private final Set<String> names;
     private final String help;
     private final Guard restriction;
-    @JsonIgnore
     private final CommandAction action;
     private final List<Parameter> parameters;
 
@@ -33,6 +37,34 @@ public class Command implements Id {
      */
     public Mono<Void> doAction(CommandUseContext ctx) {
         return action.doAction(ctx);
+    }
+
+    @Override
+    public Command edit(GenericSpec spec) {
+        return new Command(id,
+                spec.<Set<String>>getOptional("names").orElse(names),
+                spec.getOptional("help", String.class).orElse(help),
+                restriction, action, parameters);
+    }
+
+    @Override
+    public List<EntryField> getEditFields() {
+        return Arrays.asList(
+                EntryField.builder()
+                        .id("names")
+                        .name("Names")
+                        .description("Command phrase that call this command")
+                        .typeLimit(new ListLimit(Set.class, String.class))
+                        .optional(true)
+                        .build(),
+                EntryField.builder()
+                        .id("help")
+                        .name("Help")
+                        .description("Description of how to use this command")
+                        .typeLimit(new ClassLimit(String.class))
+                        .optional(true)
+                        .build()
+        );
     }
 
     @Data
@@ -109,34 +141,6 @@ public class Command implements Id {
          */
         public Builder withRestriction(Guard guard) {
             this.guard = guard;
-            return this;
-        }
-
-        /**
-         * Add an additional guard, with the previous guard and this one and'ed together
-         * If no previous guard exists, the supplied guard becomes the new one.
-         * @param guard The guard to and
-         * @return This builder
-         */
-        public Builder andRestriction(Guard guard) {
-            if(this.guard == null) {
-                return withRestriction(guard);
-            }
-            this.guard = this.guard.and(guard);
-            return this;
-        }
-
-        /**
-         * Add an additional guard, with the previous guard and this one or'ed together
-         * If no previous guard exists, the supplied guard becomes the new one.
-         * @param guard The guard to or
-         * @return This builder
-         */
-        public Builder orRestriction(Guard guard) {
-            if(this.guard == null) {
-                return withRestriction(guard);
-            }
-            this.guard = this.guard.or(guard);
             return this;
         }
 

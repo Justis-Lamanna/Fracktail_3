@@ -3,7 +3,7 @@ package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectConverterFunction;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
-import com.github.lucbui.fracktail3.spring.service.ParameterConverters;
+import com.github.lucbui.fracktail3.spring.service.TypeLimitService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class ParameterStrategy implements ParameterComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParameterStrategy.class);
 
     @Autowired
-    private ParameterConverters converters;
+    private TypeLimitService typeLimitService;
 
     @Override
     public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
@@ -34,7 +34,7 @@ public class ParameterStrategy implements ParameterComponentStrategy {
             base.setIndex(pAnnot.value());
             base.setName(StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
             base.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), base.getName()));
-            base.setFunc(new ParameterToObjectConverterFunction(paramType, value, converters));
+            base.setFunc(new ParameterToObjectConverterFunction(value, typeLimitService));
             base.setOptional(paramType == Optional.class || pAnnot.optional());
 
             LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,

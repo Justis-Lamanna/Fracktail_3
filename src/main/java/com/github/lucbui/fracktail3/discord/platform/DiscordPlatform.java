@@ -47,7 +47,6 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * A singleton which represents the Discord platform
@@ -169,18 +168,9 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
     }
 
     private Parameters parseParamsFromICE(InteractionCreateEvent event, Command command) {
-        if(command.getParameters().isEmpty()) {
-            //Legacy, I guess.
-            String[] parsed = event.getInteraction().getCommandInteraction().getOptions()
-                    .stream()
-                    .flatMap(acio -> acio.getValue().map(Stream::of).orElseGet(Stream::empty))
-                    .map(ApplicationCommandInteractionOptionValue::getRaw)
-                    .toArray(String[]::new);
-            return new Parameters(String.join(" ", parsed), parsed);
-        }
         ApplicationCommandInteraction acid = event.getInteraction().getCommandInteraction();
         int idx = 0;
-        Object[] paramObjects = new Object[command.getParameters().size()];
+        Parameters.Member[] paramObjects = new Parameters.Member[command.getParameters().size()];
         StringJoiner message = new StringJoiner(" ");
         for(Command.Parameter parameter : command.getParameters()) {
             String name = parameter.getName();
@@ -197,7 +187,7 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
                         }
                     })
                     .orElse(null);
-            paramObjects[idx++] = value;
+            paramObjects[idx++] = new Parameters.Member(parameter, value);
             acid.getOption(name)
                     .flatMap(ApplicationCommandInteractionOption::getValue)
                     .ifPresent(aciov -> message.add(aciov.getRaw()));

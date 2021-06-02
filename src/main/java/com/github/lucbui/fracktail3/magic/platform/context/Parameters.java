@@ -1,5 +1,8 @@
 package com.github.lucbui.fracktail3.magic.platform.context;
 
+import com.github.lucbui.fracktail3.magic.command.Command;
+import lombok.Data;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -9,9 +12,9 @@ import java.util.stream.IntStream;
 
 public class Parameters {
     private final String raw;
-    private final Object[] parsed;
+    private final Member[] parsed;
 
-    public Parameters(String raw, Object[] parsed) {
+    public Parameters(String raw, Member[] parsed) {
         this.raw = raw;
         this.parsed = parsed;
     }
@@ -21,14 +24,15 @@ public class Parameters {
     }
 
     public Object[] getParsed() {
-        return parsed;
+        return Arrays.stream(parsed).map(Member::getValue).toArray();
     }
 
     public <T> Optional<T> getParameter(int idx) {
         if(idx >= parsed.length) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable((T)parsed[idx]);
+            if(parsed[idx] == null) return Optional.empty();
+            return Optional.ofNullable((T)(parsed[idx].getValue()));
         }
     }
 
@@ -48,5 +52,11 @@ public class Parameters {
 
     public int getNumberOfParameters() {
         return parsed.length;
+    }
+
+    @Data
+    public static class Member {
+        private final Command.Parameter parameter;
+        private final Object value;
     }
 }
