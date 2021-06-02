@@ -31,6 +31,7 @@ public class Parameters {
         if(idx >= parsed.length) {
             return Optional.empty();
         } else {
+            if(parsed[idx] == null) return Optional.empty();
             return Optional.ofNullable((T)(parsed[idx].getValue()));
         }
     }

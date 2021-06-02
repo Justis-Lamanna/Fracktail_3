@@ -25,7 +25,7 @@ class BasicParameterParserTest {
         String message = "parameter";
 
         Parameters p = parser.parseParametersFromMessage(command, message);
-        assertEquals(1, p.getParsed().length);
+        assertEquals(1, p.getNumberOfParameters());
         assertEquals("parameter", p.getParameter(0).orElseGet(Assertions::fail));
     }
 
@@ -36,7 +36,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "");
-        assertEquals(1, p.getParsed().length);
+        assertEquals(1, p.getNumberOfParameters());
         assertFalse(p.getParameter(0).isPresent());
     }
 
@@ -47,7 +47,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "parameter");
-        assertEquals(1, p.getParsed().length);
+        assertEquals(1, p.getNumberOfParameters());
         assertTrue(p.getParameter(0).isPresent());
     }
 
@@ -71,7 +71,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one two");
-        assertEquals(2, p.getParsed().length);
+        assertEquals(2, p.getNumberOfParameters());
         assertEquals("one", p.getParameter(0).orElseGet(Assertions::fail));
         assertEquals("two", p.getParameter(1).orElseGet(Assertions::fail));
     }
@@ -84,7 +84,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one two");
-        assertEquals(2, p.getParsed().length);
+        assertEquals(2, p.getNumberOfParameters());
         assertEquals("one", p.getParameter(0).orElseGet(Assertions::fail));
         assertEquals("two", p.getParameter(1).orElseGet(Assertions::fail));
     }
@@ -97,7 +97,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one");
-        assertEquals(2, p.getParsed().length);
+        assertEquals(2, p.getNumberOfParameters());
         assertEquals("one", p.getParameter(0).orElseGet(Assertions::fail));
         assertFalse(p.getParameter(1).isPresent());
     }
@@ -110,7 +110,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one");
-        assertEquals(2, p.getParsed().length);
+        assertEquals(2, p.getNumberOfParameters());
         assertEquals("one", p.getParameter(1).orElseGet(Assertions::fail));
         assertFalse(p.getParameter(0).isPresent());
     }
@@ -126,7 +126,7 @@ class BasicParameterParserTest {
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "a b c d");
-        assertEquals(5, p.getParsed().length);
+        assertEquals(5, p.getNumberOfParameters());
         assertEquals("a", p.getParameter(0).orElseGet(Assertions::fail));
         assertEquals("b", p.getParameter(1).orElseGet(Assertions::fail));
         assertEquals("c", p.getParameter(2).orElseGet(Assertions::fail));
