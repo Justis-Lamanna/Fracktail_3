@@ -2,11 +2,6 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.exception.BotConfigurationException;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.schedule.DefaultScheduler;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduleSubscriber;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvent;
-import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
-import com.github.lucbui.fracktail3.magic.schedule.context.BasicScheduleUseContext;
 import com.github.lucbui.fracktail3.magic.util.IdStore;
 import org.apache.commons.collections4.CollectionUtils;
 import reactor.core.publisher.Flux;
@@ -24,26 +19,15 @@ import java.util.stream.Collectors;
  */
 public class Bot extends IdStore<Platform> {
     private final BotSpec botSpec;
-    private final Scheduler scheduler;
-
-    /**
-     * Initialize the Bot with specific PlatformHandlers.
-     * @param botSpec The spec to use.
-     * @param scheduler The scheduler to use for timer operations
-     */
-    public Bot(BotSpec botSpec, Scheduler scheduler) {
-        super(botSpec.getPlatforms().stream()
-                .collect(Collectors.toMap(Platform::getId, Function.identity())));
-        this.botSpec = botSpec;
-        this.scheduler = scheduler;
-    }
 
     /**
      * Initialize the Bot with specific PlatformHandlers.
      * @param botSpec The spec to use.
      */
     public Bot(BotSpec botSpec) {
-        this(botSpec, new DefaultScheduler());
+        super(botSpec.getPlatforms().stream()
+                .collect(Collectors.toMap(Platform::getId, Function.identity())));
+        this.botSpec = botSpec;
     }
 
     /**
@@ -55,14 +39,6 @@ public class Bot extends IdStore<Platform> {
     }
 
     /**
-     * Get the scheduling service used by this bot
-     * @return The scheduler service to use
-     */
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    /**
      * Start the bot.
      * All PlatformHandlers are initialized.
      * @return A Mono which completes when all bots have started.
@@ -70,12 +46,6 @@ public class Bot extends IdStore<Platform> {
     public Mono<Boolean> start() {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
-        }
-
-        for(ScheduledEvent event : botSpec.getScheduledEvents().getAll()) {
-            event.getTrigger()
-                    .schedule(scheduler)
-                    .subscribe(new ScheduleSubscriber(event, instant -> new BasicScheduleUseContext(this, instant, event)));
         }
 
         return Flux.fromIterable(getAll())
@@ -92,8 +62,6 @@ public class Bot extends IdStore<Platform> {
         if(CollectionUtils.isEmpty(botSpec.getPlatforms())) {
             throw new BotConfigurationException("No Handlers specified");
         }
-
-        botSpec.getScheduledEvents().getAll().forEach(ScheduledEvent::cancel);
 
         return Flux.fromIterable(getAll())
                 .flatMap(handler -> handler.stop(this))

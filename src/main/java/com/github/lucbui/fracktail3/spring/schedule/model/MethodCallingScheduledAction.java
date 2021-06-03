@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import lombok.Data;
@@ -14,11 +15,11 @@ import java.util.List;
  */
 @Data
 public class MethodCallingScheduledAction implements ScheduledAction {
-    private final List<ParameterScheduledComponent> parameterComponents;
-    private final Object objToInvokeOn;
-    private final Method methodToCall;
-    private final ReturnScheduledComponent returnComponent;
-    private final ExceptionScheduledComponent exceptionComponent;
+    @JsonIgnore private final List<ParameterScheduledComponent> parameterComponents;
+    @JsonIgnore private final Object objToInvokeOn;
+    @JsonIgnore private final Method methodToCall;
+    @JsonIgnore private final ReturnScheduledComponent returnComponent;
+    @JsonIgnore private final ExceptionScheduledComponent exceptionComponent;
 
     /**
      * Initialize this action
