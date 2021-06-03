@@ -4,11 +4,8 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.platform.SchedulePlatform;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
-import com.github.lucbui.fracktail3.magic.schedule.Scheduler;
 import com.github.lucbui.fracktail3.spring.service.BasicRoleService;
 import com.github.lucbui.fracktail3.spring.service.CompositeRoleService;
 import com.github.lucbui.fracktail3.spring.service.PlatformSpecificRoleService;
@@ -18,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.TaskScheduler;
 
 import java.util.List;
 
@@ -30,23 +26,6 @@ public class FracktailConfiguration {
     @ConditionalOnMissingBean
     public CommandList commandList() {
         return CommandList.empty();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Scheduler springScheduler(TaskScheduler taskScheduler) {
-        return new SpringScheduler(taskScheduler);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ScheduledEvents scheduledEvents() {
-        return ScheduledEvents.empty();
-    }
-
-    @Bean
-    public SchedulePlatform schedulePlatform(Scheduler scheduler, ScheduledEvents events) {
-        return new SchedulePlatform(scheduler, events);
     }
 
     @Bean
