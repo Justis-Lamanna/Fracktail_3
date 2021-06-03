@@ -25,6 +25,7 @@ public class SchedulePlatform implements Platform, DisposableBean {
     @JsonIgnore
     private final Scheduler scheduler;
     private final ScheduledEvents events;
+    @JsonIgnore
     private Disposable disposable;
 
     @Override
