@@ -2,7 +2,6 @@ package com.github.lucbui.fracktail3.magic;
 
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
-import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
 
 import java.util.*;
 import java.util.function.Function;
@@ -20,12 +19,10 @@ import java.util.stream.Collectors;
 public class BotSpec {
     private final Map<String, Platform> platforms;
     private final CommandList commandList;
-    private final ScheduledEvents scheduledEvents;
 
-    public BotSpec(List<Platform> platforms, CommandList commandList, ScheduledEvents scheduledEvents) {
+    public BotSpec(List<Platform> platforms, CommandList commandList) {
         this.platforms = platforms.stream().collect(Collectors.toMap(Id::getId, Function.identity()));
         this.commandList = commandList;
-        this.scheduledEvents = scheduledEvents;
     }
 
     /**
@@ -51,13 +48,5 @@ public class BotSpec {
      */
     public CommandList getCommandList() {
         return commandList;
-    }
-
-    /**
-     * Get the list of scheduled events this bot performs.
-     * @return The list of events this bot performs.
-     */
-    public ScheduledEvents getScheduledEvents() {
-        return scheduledEvents;
     }
 }

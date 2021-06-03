@@ -25,7 +25,7 @@ public class ReturnConverters {
      */
     public Optional<ReturnComponent.RCFunction> getHandlerForType(TypeDescriptor descriptor) {
         Class<?> objectType = descriptor.getObjectType();
-        if(objectType.equals(Void.class)) {
+        if(objectType.equals(Void.class) || objectType.equals(Void.TYPE)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if(objectType.equals(String.class)) {
             if(descriptor.getSource() instanceof Field) {
@@ -54,7 +54,7 @@ public class ReturnConverters {
      */
     public Optional<ReturnScheduledComponent.RCSFunction> getScheduleHandlerForType(TypeDescriptor descriptor) {
         Class<?> objectType = descriptor.getObjectType();
-        if(objectType.equals(Void.class)) {
+        if(objectType.equals(Void.class) || objectType.equals(Void.TYPE)) {
             return Optional.of(new StdReturnConverterFunctions.Voids());
         } else if(ClassUtils.isAssignable(objectType, ScheduledAction.class)) {
             return Optional.of(new StdReturnConverterFunctions.Actions());

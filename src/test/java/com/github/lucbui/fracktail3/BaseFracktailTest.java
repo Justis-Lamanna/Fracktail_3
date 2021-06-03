@@ -82,7 +82,6 @@ public abstract class BaseFracktailTest {
         when(botSpec.getCommandList()).thenReturn(commandList);
         when(botSpec.getPlatforms()).thenReturn(Collections.singleton(platform));
         when(botSpec.getPlatform(anyString())).thenReturn(Optional.of(platform));
-        when(botSpec.getScheduledEvents()).thenReturn(scheduledEvents);
 
         when(commandList.getCommands()).thenReturn(Collections.singletonList(command));
         when(commandList.getNumberOfCommands()).thenReturn(1);

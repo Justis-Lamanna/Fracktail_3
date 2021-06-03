@@ -4,6 +4,7 @@ import com.github.lucbui.fracktail3.magic.Bot;
 import com.github.lucbui.fracktail3.magic.BotSpec;
 import com.github.lucbui.fracktail3.magic.command.CommandList;
 import com.github.lucbui.fracktail3.magic.platform.Platform;
+import com.github.lucbui.fracktail3.magic.platform.SchedulePlatform;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.magic.schedule.ScheduledEvents;
@@ -33,23 +34,27 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledEvents scheduledEvents() {
-        return ScheduledEvents.empty();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public Scheduler springScheduler(TaskScheduler taskScheduler) {
         return new SpringScheduler(taskScheduler);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public BotSpec botSpec(List<Platform> platforms, CommandList commandList, ScheduledEvents eventList) {
+    public ScheduledEvents scheduledEvents() {
+        return ScheduledEvents.empty();
+    }
+
+    @Bean
+    public SchedulePlatform schedulePlatform(Scheduler scheduler, ScheduledEvents events) {
+        return new SchedulePlatform(scheduler, events);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BotSpec botSpec(List<Platform> platforms, CommandList commandList) {
         return new BotSpec(
                 platforms,
-                commandList,
-                eventList
+                commandList
         );
     }
 
