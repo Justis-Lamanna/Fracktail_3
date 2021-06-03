@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.magic.schedule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.Id;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
@@ -14,6 +15,7 @@ public class ScheduledEvent implements Id {
     private final ScheduleEventTrigger trigger;
     private final ScheduledAction action;
 
+    @JsonIgnore
     private ScheduleSubscriber.Proxy proxy;
     private TriggerState triggerState;
     private boolean enabled;

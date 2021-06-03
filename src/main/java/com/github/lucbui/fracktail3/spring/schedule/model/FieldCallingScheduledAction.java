@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lucbui.fracktail3.magic.schedule.action.ScheduledAction;
 import com.github.lucbui.fracktail3.magic.schedule.context.ScheduleUseContext;
 import reactor.core.publisher.Mono;
@@ -13,10 +14,10 @@ import java.lang.reflect.InvocationTargetException;
  * are also supported by the Field call
  */
 public class FieldCallingScheduledAction implements ScheduledAction {
-    private final Object objToInvokeOn;
-    private final Field fieldToRetrieve;
-    private final ReturnScheduledComponent returnComponent;
-    private final ExceptionScheduledComponent exceptionComponent;
+    @JsonIgnore private final Object objToInvokeOn;
+    @JsonIgnore private final Field fieldToRetrieve;
+    @JsonIgnore private final ReturnScheduledComponent returnComponent;
+    @JsonIgnore private final ExceptionScheduledComponent exceptionComponent;
 
     /**
      * Initializes this action
