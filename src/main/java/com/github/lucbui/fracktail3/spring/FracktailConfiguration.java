@@ -60,8 +60,8 @@ public class FracktailConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Bot bot(BotSpec botSpec, Scheduler scheduler) {
-        return new Bot(botSpec, scheduler);
+    public Bot bot(BotSpec botSpec) {
+        return new Bot(botSpec);
     }
 
     @Bean
