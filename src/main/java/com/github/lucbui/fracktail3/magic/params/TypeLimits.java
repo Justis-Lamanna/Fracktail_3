@@ -20,4 +20,12 @@ public interface TypeLimits {
     default Object getDefault() {
         return Defaults.getDefault(getClass());
     }
+
+    default TypeLimits optional(boolean opt) {
+        if(opt) {
+            return new OptionalLimit(this);
+        } else {
+            return this;
+        }
+    }
 }
