@@ -2,6 +2,8 @@ package com.github.lucbui.fracktail3.magic.params.jsr380;
 
 import com.github.lucbui.fracktail3.magic.params.ClassLimit;
 
+import java.time.Instant;
+
 public class DateLimit extends ClassLimit {
     private final JSR380DateType type;
     private final Relative relative;
@@ -17,6 +19,11 @@ public class DateLimit extends ClassLimit {
     @Override
     public boolean matches(Object obj) {
         return super.matches(obj) && doRelativeMatch(obj);
+    }
+
+    @Override
+    public Object getDefault() {
+        return Instant.now();
     }
 
     private boolean doRelativeMatch(Object obj) {

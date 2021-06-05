@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Getter
 public class SubsetLimit<T> extends ClassLimit {
-    private List<T> acceptableValues;
+    private final List<T> acceptableValues;
 
     /**
      * Initialize this limit
@@ -27,5 +27,10 @@ public class SubsetLimit<T> extends ClassLimit {
     @Override
     public boolean matches(Object obj) {
         return super.matches(obj) && acceptableValues.contains(obj);
+    }
+
+    @Override
+    public Object getDefault() {
+        return isOptional() ? super.getDefault() : acceptableValues.get(0);
     }
 }

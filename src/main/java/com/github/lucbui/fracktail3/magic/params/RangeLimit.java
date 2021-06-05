@@ -48,6 +48,11 @@ public class RangeLimit<T extends Comparable<T>> extends ClassLimit {
                 (upper == null || ((T)obj).compareTo(upper) <= 0);
     }
 
+    @Override
+    public Object getDefault() {
+        return isOptional() ? super.getDefault() : lower;
+    }
+
     public static <T extends Comparable<T>> RangeLimit<T> merge(List<RangeLimit<T>> ranges) {
         T max = null;
         T min = null;

@@ -16,4 +16,9 @@ public class IsLimit<T> extends ClassLimit {
     public boolean matches(Object obj) {
         return super.matches(obj) && Objects.equals(this.obj, obj);
     }
+
+    @Override
+    public Object getDefault() {
+        return obj;
+    }
 }
