@@ -2,10 +2,13 @@ package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
 import com.github.lucbui.fracktail3.magic.params.ClassLimit;
 import com.github.lucbui.fracktail3.magic.params.TypeLimits;
+import com.github.lucbui.fracktail3.magic.params.jsr380.JSR380TypeDescriptors;
+import com.github.lucbui.fracktail3.magic.params.jsr380.JSR380Types;
 import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectConverterFunction;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
 import com.github.lucbui.fracktail3.spring.service.TypeLimitService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,62 +19,16 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.*;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.*;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.JapaneseDate;
-import java.time.chrono.MinguoDate;
-import java.time.chrono.ThaiBuddhistDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Order(0)
 public class ParameterStrategy implements ParameterComponentStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParameterStrategy.class);
-
-    private static final TypeDescriptor BOOLEAN = TypeDescriptor.valueOf(Boolean.class);
-
-    private static final TypeDescriptor BIG_INTEGER = TypeDescriptor.valueOf(BigInteger.class);
-    private static final TypeDescriptor BIG_DECIMAL = TypeDescriptor.valueOf(BigDecimal.class);
-    private static final TypeDescriptor BYTE = TypeDescriptor.valueOf(Byte.class);
-    private static final TypeDescriptor SHORT = TypeDescriptor.valueOf(Short.class);
-    private static final TypeDescriptor INTEGER = TypeDescriptor.valueOf(Integer.class);
-    private static final TypeDescriptor LONG = TypeDescriptor.valueOf(Long.class);
-    private static final TypeDescriptor[] NUMBER_TYPES = {
-            BIG_DECIMAL, BIG_INTEGER, BYTE, SHORT, INTEGER, LONG
-    };
-
-    private static final TypeDescriptor DATE = TypeDescriptor.valueOf(Date.class);
-    private static final TypeDescriptor CALENDAR = TypeDescriptor.valueOf(Calendar.class);
-    private static final TypeDescriptor INSTANT = TypeDescriptor.valueOf(Instant.class);
-    private static final TypeDescriptor LOCAL_DATE = TypeDescriptor.valueOf(LocalDate.class);
-    private static final TypeDescriptor LOCAL_DATE_TIME = TypeDescriptor.valueOf(LocalDateTime.class);
-    private static final TypeDescriptor LOCAL_TIME = TypeDescriptor.valueOf(LocalTime.class);
-    private static final TypeDescriptor MONTH_DAY = TypeDescriptor.valueOf(MonthDay.class);
-    private static final TypeDescriptor OFFSET_DATE_TIME = TypeDescriptor.valueOf(OffsetDateTime.class);
-    private static final TypeDescriptor OFFSET_TIME = TypeDescriptor.valueOf(OffsetTime.class);
-    private static final TypeDescriptor YEAR = TypeDescriptor.valueOf(Year.class);
-    private static final TypeDescriptor YEAR_MONTH = TypeDescriptor.valueOf(YearMonth.class);
-    private static final TypeDescriptor ZONED_DATE_TIME = TypeDescriptor.valueOf(ZonedDateTime.class);
-    private static final TypeDescriptor HIJRAH_DATE = TypeDescriptor.valueOf(HijrahDate.class);
-    private static final TypeDescriptor JAPANESE_DATE = TypeDescriptor.valueOf(JapaneseDate.class);
-    private static final TypeDescriptor MINGUO_DATE = TypeDescriptor.valueOf(MinguoDate.class);
-    private static final TypeDescriptor THAI_BUDDHIST_DATE = TypeDescriptor.valueOf(ThaiBuddhistDate.class);
-    private static final TypeDescriptor[] DATE_TIME_TYPES = {
-            DATE, CALENDAR, INSTANT, LOCAL_DATE, LOCAL_DATE_TIME, LOCAL_TIME, MONTH_DAY, OFFSET_DATE_TIME,
-            OFFSET_TIME, YEAR, YEAR_MONTH, ZONED_DATE_TIME, HIJRAH_DATE, JAPANESE_DATE, MINGUO_DATE, THAI_BUDDHIST_DATE
-    };
-
-    private static final TypeDescriptor CHAR_SEQUENCE = TypeDescriptor.valueOf(CharSequence.class);
-    private static final TypeDescriptor COLLECTION = TypeDescriptor.valueOf(Collection.class);
-    private static final TypeDescriptor MAP = TypeDescriptor.valueOf(Map.class);
-    private static final TypeDescriptor ARRAY = TypeDescriptor.valueOf(Object[].class);
-
-    private static final TypeDescriptor OBJECT = TypeDescriptor.valueOf(Object.class);
 
     @Autowired
     private TypeLimitService typeLimitService;
@@ -99,77 +56,49 @@ public class ParameterStrategy implements ParameterComponentStrategy {
     private TypeLimits getTypeLimits(Parameter parameter) {
         TypeDescriptor paramType = new TypeDescriptor(MethodParameter.forParameter(parameter));
 
-        Set<JSR380> annotations = getAnnotationSet(parameter);
-        TypeLimits limit = new ClassLimit(paramType);
+        JSR380Types type = JSR380TypeDescriptors.getJSR380ForType(paramType);
 
-        return limit;
+        boolean isOptional = !parameter.isAnnotationPresent(NotNull.class);
+        List<TypeLimits> limits = getLimits(parameter, type);
+        if(limits.isEmpty()) {
+            return new ClassLimit(paramType).optional(isOptional);
+        } else if(limits.size() == 1) {
+            return CollectionUtils.extractSingleton(limits).optional(isOptional);
+        } else {
+            LOGGER.warn("Multiple annotations specified...I don't know how to handle this yet, sorry.");
+            return new ClassLimit(paramType).optional(isOptional);
+        }
     }
 
-    private boolean assertOneOf(TypeDescriptor test, TypeDescriptor... options) {
-        for (TypeDescriptor option : options) {
-            if (!test.isAssignableTo(option)) {
-                return false;
-            }
+    private List<TypeLimits> getLimits(Parameter parameter, JSR380Types type) {
+        List<TypeLimits> list = new ArrayList<>();
+        if(parameter.isAnnotationPresent(Null.class)) list.add(type.isNull());
+        if(parameter.isAnnotationPresent(AssertFalse.class)) list.add(type.assertFalse());
+        if(parameter.isAnnotationPresent(AssertTrue.class))  list.add(type.assertTrue());
+        if(parameter.isAnnotationPresent(Min.class)) list.add(type.min(parameter.getAnnotation(Min.class).value()));
+        if(parameter.isAnnotationPresent(Max.class)) list.add(type.max(parameter.getAnnotation(Max.class).value()));
+        if(parameter.isAnnotationPresent(DecimalMin.class)) list.add(type.decimalMin(parameter.getAnnotation(DecimalMin.class).value()));
+        if(parameter.isAnnotationPresent(DecimalMax.class)) list.add(type.decimalMax(parameter.getAnnotation(DecimalMax.class).value()));
+        if(parameter.isAnnotationPresent(Positive.class)) list.add(type.positive(false));
+        if(parameter.isAnnotationPresent(PositiveOrZero.class)) list.add(type.positive(true));
+        if(parameter.isAnnotationPresent(Negative.class)) list.add(type.negative(false));
+        if(parameter.isAnnotationPresent(NegativeOrZero.class)) list.add(type.negative(true));
+        if(parameter.isAnnotationPresent(Digits.class)) {
+            Digits digits = parameter.getAnnotation(Digits.class);
+            list.add(type.digits(digits.integer(), digits.fraction()));
         }
-        return true;
-    }
-
-    private Set<JSR380> getAnnotationSet(Parameter parameter) {
-        TypeDescriptor paramType = new TypeDescriptor(MethodParameter.forParameter(parameter));
-        Set<JSR380> set = EnumSet.noneOf(JSR380.class);
-
-        for(JSR380 item : JSR380.values()) {
-            if(parameter.isAnnotationPresent(item.annotationClass)) {
-                if(assertOneOf(paramType, item.types)){
-                    set.add(item);
-                } else {
-                    LOGGER.warn("Parameter {} is annotated with @{}, but type {} is not supported. Ignoring...",
-                            parameter.getName(),
-                            item.annotationClass.getSimpleName(),
-                            paramType);
-                }
-            }
+        if(parameter.isAnnotationPresent(Email.class)) list.add(type.email());
+        if(parameter.isAnnotationPresent(NotBlank.class)) list.add(type.notBlank());
+        if(parameter.isAnnotationPresent(Pattern.class)) list.add(type.pattern(parameter.getAnnotation(Pattern.class).regexp()));
+        if(parameter.isAnnotationPresent(NotEmpty.class)) list.add(type.notEmpty());
+        if(parameter.isAnnotationPresent(Size.class)) {
+            Size size = parameter.getAnnotation(Size.class);
+            list.add(type.size(size.min(), size.max()));
         }
-
-        return set;
-    }
-
-    public enum JSR380 {
-        //All
-        NOT_NULL(NotNull.class),
-        NULL(Null.class),
-        //Boolean
-        ASSERT_FALSE(AssertFalse.class, BOOLEAN),
-        ASSERT_TRUE(AssertTrue.class, BOOLEAN),
-        //Numbers
-        MAX(Max.class, NUMBER_TYPES),
-        MIN(Min.class, NUMBER_TYPES),
-        DECIMAL_MAX(DecimalMax.class, BIG_DECIMAL, BIG_INTEGER, CHAR_SEQUENCE, BYTE, SHORT, INTEGER, LONG),
-        DECIMAL_MIN(DecimalMin.class, BIG_DECIMAL, BIG_INTEGER, CHAR_SEQUENCE, BYTE, SHORT, INTEGER, LONG),
-        DIGITS(Digits.class, BIG_DECIMAL, BIG_INTEGER, CHAR_SEQUENCE, BYTE, SHORT, INTEGER, LONG),
-        POSITIVE(Positive.class, NUMBER_TYPES),
-        POSITIVE_OR_ZERO(PositiveOrZero.class, NUMBER_TYPES),
-        NEGATIVE(Negative.class, NUMBER_TYPES),
-        NEGATIVE_OR_ZERO(NegativeOrZero.class, NUMBER_TYPES),
-        //Strings
-        EMAIL(Email.class, CHAR_SEQUENCE),
-        NOT_BLANK(NotBlank.class, CHAR_SEQUENCE),
-        PATTERN(Pattern.class, CHAR_SEQUENCE),
-        //Times
-        FUTURE(Future.class, DATE_TIME_TYPES),
-        FUTURE_OR_PRESENT(FutureOrPresent.class, DATE_TIME_TYPES),
-        PAST(Past.class, DATE_TIME_TYPES),
-        PAST_OR_PRESENT(PastOrPresent.class, DATE_TIME_TYPES),
-        //Sequences
-        NOT_EMPTY(NotEmpty.class, CHAR_SEQUENCE, COLLECTION, MAP, ARRAY),
-        SIZE(Size.class, CHAR_SEQUENCE, COLLECTION, MAP, ARRAY);
-
-        private final Class<? extends Annotation> annotationClass;
-        private final TypeDescriptor[] types;
-
-        JSR380(Class<? extends Annotation> annotationClass, TypeDescriptor... types) {
-            this.annotationClass = annotationClass;
-            this.types = types;
-        }
+        if(parameter.isAnnotationPresent(Past.class)) list.add(type.past(false));
+        if(parameter.isAnnotationPresent(PastOrPresent.class)) list.add(type.past(true));
+        if(parameter.isAnnotationPresent(Future.class)) list.add(type.future(false));
+        if(parameter.isAnnotationPresent(FutureOrPresent.class)) list.add(type.future(true));
+        return list;
     }
 }
