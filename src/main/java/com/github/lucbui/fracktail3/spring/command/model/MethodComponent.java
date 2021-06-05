@@ -64,6 +64,5 @@ public class MethodComponent {
         protected final int index;
         protected final String name;
         protected final String help;
-        protected final boolean optional;
     }
 }

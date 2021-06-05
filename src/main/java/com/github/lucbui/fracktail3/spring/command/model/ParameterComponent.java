@@ -21,7 +21,6 @@ public class ParameterComponent {
     protected PCFunction func;
     protected String name;
     protected String help;
-    protected boolean optional;
     protected List<Guard> guards;
 
     public ParameterComponent() {
