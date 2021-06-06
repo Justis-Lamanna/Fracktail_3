@@ -14,7 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.TypeDescriptor;
 
 import javax.validation.constraints.*;
-import java.lang.reflect.AnnotatedElement;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class JSR380ParameterStrategy implements ParameterComponentStrategy {
     @Override
     public ParameterComponent decorate(Object obj, Method method, Parameter parameter, ParameterComponent base) {
         if(parameter.isAnnotationPresent(com.github.lucbui.fracktail3.spring.command.annotation.Parameter.class)) {
-            TypeLimits limits = getTypeLimits(parameter, new TypeDescriptor(MethodParameter.forParameter(parameter)));
+            TypeLimits limits = getTypeLimits(new TypeDescriptor(MethodParameter.forParameter(parameter)));
             if(limits != null) {
                 base.setType(limits);
                 LOGGER.info("+-Adding JSR380 data: {}", base.getType());
@@ -36,50 +36,54 @@ public class JSR380ParameterStrategy implements ParameterComponentStrategy {
         return base;
     }
 
-    private TypeLimits getTypeLimits(AnnotatedElement element, TypeDescriptor paramType) {
-        JSR380Types type = JSR380TypeDescriptors.getJSR380ForType(paramType);
+    private TypeLimits getTypeLimits(TypeDescriptor paramType) {
+        JSR380Types jsr380Type = JSR380TypeDescriptors.getJSR380ForType(paramType);
 
-        boolean isOptional = !element.isAnnotationPresent(NotNull.class);
-        List<TypeLimits> limits = getLimits(element, type);
+        boolean isOptional = !isAnnotationPresent(paramType, NotNull.class);
+        List<TypeLimits> limits = getLimits(paramType, jsr380Type);
         if(limits.isEmpty()) {
             return isOptional ?  null : new ClassLimit(paramType).optional(false);
         } else if(limits.size() == 1) {
             return CollectionUtils.extractSingleton(limits).optional(isOptional);
         } else {
             LOGGER.warn("Multiple annotations specified...I don't know how to handle this yet, sorry.");
-            return new ClassLimit(paramType).optional(isOptional);
+            return null;
         }
     }
 
-    private List<TypeLimits> getLimits(AnnotatedElement element, JSR380Types type) {
+    private List<TypeLimits> getLimits(TypeDescriptor element, JSR380Types jsr380Type) {
         List<TypeLimits> list = new ArrayList<>();
-        if(element.isAnnotationPresent(Null.class)) list.add(type.isNull());
-        if(element.isAnnotationPresent(AssertFalse.class)) list.add(type.assertFalse());
-        if(element.isAnnotationPresent(AssertTrue.class))  list.add(type.assertTrue());
-        if(element.isAnnotationPresent(Min.class)) list.add(type.min(element.getAnnotation(Min.class).value()));
-        if(element.isAnnotationPresent(Max.class)) list.add(type.max(element.getAnnotation(Max.class).value()));
-        if(element.isAnnotationPresent(DecimalMin.class)) list.add(type.decimalMin(element.getAnnotation(DecimalMin.class).value()));
-        if(element.isAnnotationPresent(DecimalMax.class)) list.add(type.decimalMax(element.getAnnotation(DecimalMax.class).value()));
-        if(element.isAnnotationPresent(Positive.class)) list.add(type.positive(false));
-        if(element.isAnnotationPresent(PositiveOrZero.class)) list.add(type.positive(true));
-        if(element.isAnnotationPresent(Negative.class)) list.add(type.negative(false));
-        if(element.isAnnotationPresent(NegativeOrZero.class)) list.add(type.negative(true));
-        if(element.isAnnotationPresent(Digits.class)) {
+        if(isAnnotationPresent(element, Null.class)) list.add(jsr380Type.isNull());
+        if(isAnnotationPresent(element, AssertFalse.class)) list.add(jsr380Type.assertFalse());
+        if(isAnnotationPresent(element, AssertTrue.class))  list.add(jsr380Type.assertTrue());
+        if(isAnnotationPresent(element, Min.class)) list.add(jsr380Type.min(element.getAnnotation(Min.class).value()));
+        if(isAnnotationPresent(element, Max.class)) list.add(jsr380Type.max(element.getAnnotation(Max.class).value()));
+        if(isAnnotationPresent(element, DecimalMin.class)) list.add(jsr380Type.decimalMin(element.getAnnotation(DecimalMin.class).value()));
+        if(isAnnotationPresent(element, DecimalMax.class)) list.add(jsr380Type.decimalMax(element.getAnnotation(DecimalMax.class).value()));
+        if(isAnnotationPresent(element, Positive.class)) list.add(jsr380Type.positive(false));
+        if(isAnnotationPresent(element, PositiveOrZero.class)) list.add(jsr380Type.positive(true));
+        if(isAnnotationPresent(element, Negative.class)) list.add(jsr380Type.negative(false));
+        if(isAnnotationPresent(element, NegativeOrZero.class)) list.add(jsr380Type.negative(true));
+        if(isAnnotationPresent(element, Digits.class)) {
             Digits digits = element.getAnnotation(Digits.class);
-            list.add(type.digits(digits.integer(), digits.fraction()));
+            list.add(jsr380Type.digits(digits.integer(), digits.fraction()));
         }
-        if(element.isAnnotationPresent(Email.class)) list.add(type.email());
-        if(element.isAnnotationPresent(NotBlank.class)) list.add(type.notBlank());
-        if(element.isAnnotationPresent(Pattern.class)) list.add(type.pattern(element.getAnnotation(Pattern.class).regexp()));
-        if(element.isAnnotationPresent(NotEmpty.class)) list.add(type.notEmpty());
-        if(element.isAnnotationPresent(Size.class)) {
+        if(isAnnotationPresent(element, Email.class)) list.add(jsr380Type.email());
+        if(isAnnotationPresent(element, NotBlank.class)) list.add(jsr380Type.notBlank());
+        if(isAnnotationPresent(element, Pattern.class)) list.add(jsr380Type.pattern(element.getAnnotation(Pattern.class).regexp()));
+        if(isAnnotationPresent(element, NotEmpty.class)) list.add(jsr380Type.notEmpty());
+        if(isAnnotationPresent(element, Size.class)) {
             Size size = element.getAnnotation(Size.class);
-            list.add(type.size(size.min(), size.max()));
+            list.add(jsr380Type.size(size.min(), size.max()));
         }
-        if(element.isAnnotationPresent(Past.class)) list.add(type.past(false));
-        if(element.isAnnotationPresent(PastOrPresent.class)) list.add(type.past(true));
-        if(element.isAnnotationPresent(Future.class)) list.add(type.future(false));
-        if(element.isAnnotationPresent(FutureOrPresent.class)) list.add(type.future(true));
+        if(isAnnotationPresent(element, Past.class)) list.add(jsr380Type.past(false));
+        if(isAnnotationPresent(element, PastOrPresent.class)) list.add(jsr380Type.past(true));
+        if(isAnnotationPresent(element, Future.class)) list.add(jsr380Type.future(false));
+        if(isAnnotationPresent(element, FutureOrPresent.class)) list.add(jsr380Type.future(true));
         return list;
+    }
+
+    private boolean isAnnotationPresent(TypeDescriptor typeDescriptor, Class<? extends Annotation> annotation) {
+        return typeDescriptor.getAnnotation(annotation) != null;
     }
 }

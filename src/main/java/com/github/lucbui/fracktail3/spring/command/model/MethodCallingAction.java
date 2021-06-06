@@ -82,19 +82,20 @@ public class MethodCallingAction implements CommandAction {
     }
 
     public Mono<Void> doActionUnguarded(CommandUseContext context) {
-        methodComponent.transformers.forEach(c -> c.accept(context));
-        Object[] params = parameterComponents.stream()
-                .map(pc -> pc.func.apply(context))
-                .toArray();
+        Object[] params;
+        try {
+            methodComponent.transformers.forEach(c -> c.accept(context));
+            params = parameterComponents.stream()
+                    .map(pc -> pc.func.apply(context))
+                    .toArray();
+        } catch (RuntimeException ex) {
+            return handleException(context, ex);
+        }
         return Mono.fromCallable(() -> methodToCall.invoke(objToInvokeOn, params))
                 .doOnNext(o -> returnComponent.consumers.forEach(c -> c.accept(o)))
                 .flatMap(o -> returnComponent.func.apply(context, o))
                 .onErrorResume(InvocationTargetException.class, ex -> Mono.error(ex.getTargetException()))
-                .onErrorResume(ex ->
-                        Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
-                                .flatMap(func -> func.apply(context, ex))
-                                .switchIfEmpty(Mono.error(ex))
-                )
+                .onErrorResume(ex -> handleException(context, ex))
                 .onErrorResume(ex -> Mono.fromRunnable(ex::printStackTrace));
     }
 
@@ -105,5 +106,11 @@ public class MethodCallingAction implements CommandAction {
                 )
                 .map(guard -> guard.matches(context))
                 .reduce(Mono.just(true), BooleanUtils::and);
+    }
+
+    private Mono<Void> handleException(CommandUseContext context, Throwable ex) {
+        return Mono.justOrEmpty(exceptionComponent.getBestHandlerFor(ex.getClass()))
+                .flatMap(func -> func.apply(context, ex))
+                .switchIfEmpty(Mono.error(ex));
     }
 }
