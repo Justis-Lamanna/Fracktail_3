@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation;
 
+import com.github.lucbui.fracktail3.spring.command.annotation.strategy.JSR380ParameterStrategy;
 import com.github.lucbui.fracktail3.spring.command.annotation.strategy.ParameterStrategy;
 
 import java.lang.annotation.ElementType;
@@ -12,7 +13,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@com.github.lucbui.fracktail3.spring.command.plugin.ParameterStrategy(ParameterStrategy.class)
+@com.github.lucbui.fracktail3.spring.command.plugin.ParameterStrategy({ParameterStrategy.class, JSR380ParameterStrategy.class})
 public @interface Parameter {
     /**
      * The index of the command parameter to inject.

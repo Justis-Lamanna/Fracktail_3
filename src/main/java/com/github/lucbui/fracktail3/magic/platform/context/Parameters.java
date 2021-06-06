@@ -36,6 +36,24 @@ public class Parameters {
         }
     }
 
+    public Optional<Command.Parameter> getParameterMetadata(int idx) {
+        if(idx >= parsed.length) {
+            return Optional.empty();
+        } else {
+            if(parsed[idx] == null) return Optional.empty();
+            return Optional.ofNullable(parsed[idx].parameter);
+        }
+    }
+
+    public Optional<Member> getParameterData(int idx) {
+        if(idx >= parsed.length) {
+            return Optional.empty();
+        } else {
+            if(parsed[idx] == null) return Optional.empty();
+            return Optional.ofNullable(parsed[idx]);
+        }
+    }
+
     public <T> List<Optional<T>> getParameters(int start, int end) {
         if(parsed.length == 0) {
             return Collections.emptyList();
@@ -58,5 +76,9 @@ public class Parameters {
     public static class Member {
         private final Command.Parameter parameter;
         private final Object value;
+
+        public boolean validate() {
+            return parameter.getType().matches(value);
+        }
     }
 }

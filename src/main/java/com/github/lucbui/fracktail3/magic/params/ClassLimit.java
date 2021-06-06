@@ -14,13 +14,23 @@ public class ClassLimit implements TypeLimits {
      * The descriptor of this type.
      */
     private final TypeDescriptor type;
+    private boolean optional;
 
     public ClassLimit(Class<?> clazz) {
-        this.type = TypeDescriptor.valueOf(clazz);
+        this(TypeDescriptor.valueOf(clazz));
     }
 
     public ClassLimit(TypeDescriptor type) {
+        this(type, false);
+    }
+
+    public ClassLimit(Class<?> clazz, boolean optional) {
+        this(TypeDescriptor.valueOf(clazz), optional);
+    }
+
+    public ClassLimit(TypeDescriptor type, boolean optional) {
         this.type = type;
+        this.optional = optional;
     }
 
     @JsonProperty("type")
@@ -36,6 +46,13 @@ public class ClassLimit implements TypeLimits {
     @Override
     public boolean matches(Object obj) {
         TypeDescriptor objType = TypeDescriptor.forObject(obj);
+        if(objType == null && optional) return true;
         return objType != null && objType.isAssignableTo(type);
+    }
+
+    @Override
+    public TypeLimits optional(boolean opt) {
+        this.optional = opt;
+        return this;
     }
 }

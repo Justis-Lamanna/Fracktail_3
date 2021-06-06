@@ -26,7 +26,7 @@ public class ParameterToObjectConverterFunction implements ParameterComponent.PC
     public Object apply(CommandUseContext context) {
         Command.Parameter parameterInfo = context.getCommand().getParameters().get(param);
         return context.getParameters().getParameter(param)
-                .map(s -> typeLimitService.convertAndValidate(s, parameterInfo.getType(), parameterInfo.isOptional()))
+                .map(s -> typeLimitService.convert(s, parameterInfo.getType()))
                 .orElseThrow(() -> new IllegalArgumentException("No parameter " + param + " for context"));
     }
 }

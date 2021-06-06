@@ -49,7 +49,7 @@ public class ParameterComponentFactory {
     public ParameterComponent compileParameter(Object obj, Method method, Parameter parameter) {
         ParameterComponent c = FactoryUtils.decorate(extractor.getParameterStrategies(parameter),
                 (strategy, component) -> strategy.decorate(obj, method, parameter, component),
-                new ParameterComponent(new TypeDescriptor(MethodParameter.forParameter(parameter))));
+                new ParameterComponent());
         if(c.getFunc() == null) {
             throw new BotConfigurationException("Unable to parse parameter " + parameter.getName() + " of method " + method.getName());
         }

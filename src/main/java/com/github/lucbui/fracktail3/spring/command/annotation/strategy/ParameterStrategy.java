@@ -1,5 +1,6 @@
 package com.github.lucbui.fracktail3.spring.command.annotation.strategy;
 
+import com.github.lucbui.fracktail3.magic.params.ClassLimit;
 import com.github.lucbui.fracktail3.spring.command.handler.ParameterToObjectConverterFunction;
 import com.github.lucbui.fracktail3.spring.command.model.ParameterComponent;
 import com.github.lucbui.fracktail3.spring.command.plugin.ParameterComponentStrategy;
@@ -8,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -29,16 +32,16 @@ public class ParameterStrategy implements ParameterComponentStrategy {
             com.github.lucbui.fracktail3.spring.command.annotation.Parameter pAnnot =
                     parameter.getAnnotation(com.github.lucbui.fracktail3.spring.command.annotation.Parameter.class);
             int value = pAnnot.value();
-            Class<?> paramType = parameter.getType();
+            TypeDescriptor paramType = new TypeDescriptor(MethodParameter.forParameter(parameter));
 
+            base.setType(new ClassLimit(paramType).optional(parameter.getType() == Optional.class || pAnnot.optional()));
             base.setIndex(pAnnot.value());
             base.setName(StringUtils.defaultIfEmpty(pAnnot.name(), parameter.getName()));
             base.setHelp(StringUtils.defaultIfEmpty(pAnnot.description(), base.getName()));
             base.setFunc(new ParameterToObjectConverterFunction(value, typeLimitService));
-            base.setOptional(paramType == Optional.class || pAnnot.optional());
 
-            LOGGER.info("+-Parameter {},name:{},type:{},description:{},optional:{}", value,
-                    base.getName(), base.getType(), base.getHelp(), base.isOptional());
+            LOGGER.info("+-Parameter {},name:{},type:{},description:{}", value,
+                    base.getName(), base.getType(), base.getHelp());
         }
         return base;
     }

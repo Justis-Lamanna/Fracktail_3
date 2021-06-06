@@ -7,9 +7,9 @@ import org.springframework.core.convert.TypeDescriptor;
  * Allows for further refining of a String via an enforced size
  */
 @Getter
-public class StringLengthLimit extends LengthLimit {
-    private StringLengthLimit(int minLength, int maxLength) {
-        super(TypeDescriptor.valueOf(String.class), minLength, maxLength);
+public class ArrayLengthLimit extends LengthLimit {
+    private ArrayLengthLimit(int minLength, int maxLength) {
+        super(TypeDescriptor.valueOf(Object[].class), minLength, maxLength);
     }
 
     /**
@@ -17,8 +17,8 @@ public class StringLengthLimit extends LengthLimit {
      * @param minLength The minimum permissible length
      * @return The created limit
      */
-    public static StringLengthLimit atLeast(int minLength) {
-        return new StringLengthLimit(minLength, -1);
+    public static ArrayLengthLimit atLeast(int minLength) {
+        return new ArrayLengthLimit(minLength, -1);
     }
 
     /**
@@ -26,8 +26,8 @@ public class StringLengthLimit extends LengthLimit {
      * @param maxLength The maximum permissible length
      * @return The created limit
      */
-    public static StringLengthLimit atMost(int maxLength) {
-        return new StringLengthLimit(0, maxLength);
+    public static ArrayLengthLimit atMost(int maxLength) {
+        return new ArrayLengthLimit(0, maxLength);
     }
 
     /**
@@ -36,11 +36,11 @@ public class StringLengthLimit extends LengthLimit {
      * @param maxLength The maximum string length
      * @return The created limit
      */
-    public static StringLengthLimit between(int minLength, int maxLength) {
+    public static ArrayLengthLimit between(int minLength, int maxLength) {
         if(minLength > maxLength) {
             throw new IllegalArgumentException(minLength + " > " + maxLength);
         }
-        return new StringLengthLimit(minLength, maxLength);
+        return new ArrayLengthLimit(minLength, maxLength);
     }
 
     /**
@@ -48,13 +48,13 @@ public class StringLengthLimit extends LengthLimit {
      * @param length The length the string must be
      * @return The created limit
      */
-    public static StringLengthLimit exactly(int length) {
-        return new StringLengthLimit(length, length);
+    public static ArrayLengthLimit exactly(int length) {
+        return new ArrayLengthLimit(length, length);
     }
 
 
     @Override
     public int length(Object obj) {
-        return ((String)obj).length();
+        return ((Object[])obj).length;
     }
 }

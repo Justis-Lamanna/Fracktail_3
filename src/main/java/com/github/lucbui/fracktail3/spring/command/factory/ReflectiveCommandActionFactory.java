@@ -127,12 +127,12 @@ public class ReflectiveCommandActionFactory {
         if(parameters != null) {
             parameters.stream()
                     .filter(pc -> Objects.nonNull(pc.getName()))
-                    .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType(), pc.isOptional()))
+                    .map(pc -> new Command.Parameter(pc.getIndex(), pc.getName(), pc.getHelp(), pc.getType()))
                     .forEach(pc -> bookkeeping.put(pc.getIndex(), pc));
         }
 
         methods.getAdditionalParams().stream()
-                .map(ap -> new Command.Parameter(ap.getIndex(), ap.getName(), ap.getHelp(), ap.getType(), ap.isOptional()))
+                .map(ap -> new Command.Parameter(ap.getIndex(), ap.getName(), ap.getHelp(), ap.getType()))
                 .forEach(pc -> bookkeeping.put(pc.getIndex(), pc));
 
         return bookkeeping.values()

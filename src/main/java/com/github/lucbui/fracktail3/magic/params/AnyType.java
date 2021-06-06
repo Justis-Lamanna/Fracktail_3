@@ -10,4 +10,9 @@ public enum AnyType implements TypeLimits {
     public boolean matches(Object obj) {
         return true;
     }
+
+    @Override
+    public TypeLimits optional(boolean opt) {
+        return this;
+    }
 }

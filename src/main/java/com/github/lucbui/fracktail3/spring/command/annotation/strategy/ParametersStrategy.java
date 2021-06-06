@@ -32,8 +32,7 @@ public class ParametersStrategy implements MethodComponentStrategy {
                     AnyType.INSTANCE,
                     p.value(),
                     StringUtils.firstNonBlank(p.name(), placeholder),
-                    StringUtils.firstNonBlank(p.description(), p.name(), placeholder),
-                    p.optional()
+                    StringUtils.firstNonBlank(p.description(), p.name(), placeholder)
             ));
         }
     }
