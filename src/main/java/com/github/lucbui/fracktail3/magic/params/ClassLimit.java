@@ -21,8 +21,11 @@ public class ClassLimit implements TypeLimits {
     }
 
     public ClassLimit(TypeDescriptor type) {
-        this.type = type;
-        this.optional = false;
+        this(type, false);
+    }
+
+    public ClassLimit(Class<?> clazz, boolean optional) {
+        this(TypeDescriptor.valueOf(clazz), optional);
     }
 
     public ClassLimit(TypeDescriptor type, boolean optional) {

@@ -75,11 +75,11 @@ public class Command implements Id, Editable<Command> {
         private final String description;
         private final TypeLimits type;
 
-        public Parameter(int index, String name, String description, Class<?> descriptor, boolean optional) {
+        public Parameter(int index, String name, String description, Class<?> descriptor) {
             this(index, name, description, new ClassLimit(TypeDescriptor.valueOf(descriptor)));
         }
 
-        public Parameter(int index, String name, String description, TypeDescriptor descriptor, boolean optional) {
+        public Parameter(int index, String name, String description, TypeDescriptor descriptor) {
             this(index, name, description, new ClassLimit(descriptor));
         }
 

@@ -1,6 +1,7 @@
 package com.github.lucbui.fracktail3.spring;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
+import com.github.lucbui.fracktail3.magic.params.ClassLimit;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +21,7 @@ class BasicParameterParserTest {
     @Test
     void parseSingleArgumentParameter() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, false))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, false)))
                 .build();
         String message = "parameter";
 
@@ -32,7 +33,7 @@ class BasicParameterParserTest {
     @Test
     void parseSingleOptionalArgumentParameter_WithoutParameter() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, true))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, true)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "");
@@ -43,7 +44,7 @@ class BasicParameterParserTest {
     @Test
     void parseSingleOptionalArgumentParameter_WithParameter() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, true))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, true)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "parameter");
@@ -54,7 +55,7 @@ class BasicParameterParserTest {
     @Test
     void passingToFewArgumentsFails() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, false))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, false)))
                 .build();
         String message = "";
 
@@ -66,8 +67,8 @@ class BasicParameterParserTest {
     @Test
     void parseMultiArgument() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, false))
-                .withParameter(new Command.Parameter(1, "second", "", String.class, false))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, false)))
+                .withParameter(new Command.Parameter(1, "second", "", new ClassLimit(String.class, false)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one two");
@@ -79,8 +80,8 @@ class BasicParameterParserTest {
     @Test
     void parseMultiArgument_OneOptional_TwoPassed() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, false))
-                .withParameter(new Command.Parameter(1, "second", "", String.class, true))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, false)))
+                .withParameter(new Command.Parameter(1, "second", "", new ClassLimit(String.class, true)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one two");
@@ -92,8 +93,8 @@ class BasicParameterParserTest {
     @Test
     void parseMultiArgument_OneOptional_OnePassed() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, false))
-                .withParameter(new Command.Parameter(1, "second", "", String.class, true))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, false)))
+                .withParameter(new Command.Parameter(1, "second", "", new ClassLimit(String.class, true)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one");
@@ -105,8 +106,8 @@ class BasicParameterParserTest {
     @Test
     void parseMultiArgument_OneOptional_OnePassed_Reversed() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "first", "", String.class, true))
-                .withParameter(new Command.Parameter(1, "second", "", String.class, false))
+                .withParameter(new Command.Parameter(0, "first", "", new ClassLimit(String.class, true)))
+                .withParameter(new Command.Parameter(1, "second", "", new ClassLimit(String.class, false)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "one");
@@ -118,11 +119,11 @@ class BasicParameterParserTest {
     @Test
     void parseComplex() {
         Command command = new Command.Builder("test")
-                .withParameter(new Command.Parameter(0, "a", "", String.class, false))
-                .withParameter(new Command.Parameter(1, "b", "", String.class, true))
-                .withParameter(new Command.Parameter(2, "c", "", String.class, false))
-                .withParameter(new Command.Parameter(3, "d", "", String.class, true))
-                .withParameter(new Command.Parameter(4, "e", "", String.class, false))
+                .withParameter(new Command.Parameter(0, "a", "", new ClassLimit(String.class, false)))
+                .withParameter(new Command.Parameter(1, "b", "", new ClassLimit(String.class, true)))
+                .withParameter(new Command.Parameter(2, "c", "", new ClassLimit(String.class, false)))
+                .withParameter(new Command.Parameter(3, "d", "", new ClassLimit(String.class, true)))
+                .withParameter(new Command.Parameter(4, "e", "", new ClassLimit(String.class, false)))
                 .build();
 
         Parameters p = parser.parseParametersFromMessage(command, "a b c d");

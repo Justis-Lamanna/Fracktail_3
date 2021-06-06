@@ -2,6 +2,7 @@ package com.github.lucbui.fracktail3.modules.meta;
 
 import com.github.lucbui.fracktail3.magic.command.Command;
 import com.github.lucbui.fracktail3.magic.command.action.CommandAction;
+import com.github.lucbui.fracktail3.magic.params.ClassLimit;
 import com.github.lucbui.fracktail3.magic.platform.context.CommandUseContext;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +26,7 @@ public class HelpCommand{
                 .withName("help")
                 .withHelp("Get information on how to use a command.")
                 .withAction(new HelpCommand.Action())
-                .withParameter(new Command.Parameter(0, "command", "The command to look up", String.class, true))
+                .withParameter(new Command.Parameter(0, "command", "The command to look up", new ClassLimit(String.class, true)))
                 .build();
     }
 
