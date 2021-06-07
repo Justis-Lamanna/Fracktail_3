@@ -16,6 +16,9 @@ import com.github.lucbui.fracktail3.magic.platform.SimpleTextCommandProcessor;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicCommandUseContext;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
 import com.github.lucbui.fracktail3.magic.platform.context.Parameters;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Formatting;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Intent;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Semantic;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -47,6 +50,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * A singleton which represents the Discord platform
@@ -63,7 +67,7 @@ import java.util.*;
  * - channel:[channel id] - Retrieve a place as a channel
  */
 @Component
-public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor {
+public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor, Semantic {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
 
     @Autowired
@@ -367,5 +371,24 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
                 }
             } catch (RuntimeException ex) { }
         }
+    }
+
+    private static final Pattern QUOTE_PATTERN = Pattern.compile("(\n|^)");
+    private static final Map<Intent, Formatting> intentMap;
+    static {
+        intentMap = new EnumMap<>(Intent.class);
+        intentMap.put(Intent.CODE, Formatting.wrapped("```"));
+        intentMap.put(Intent.EMPHASIS, Formatting.wrapped("*"));
+        intentMap.put(Intent.STRONG, Formatting.wrapped("**"));
+        intentMap.put(Intent.SPOILER, Formatting.wrapped("||"));
+        intentMap.put(Intent.ROLEPLAY, Formatting.wrapped("*"));
+        intentMap.put(Intent.RETCON, Formatting.wrapped("~~"));
+        intentMap.put(Intent.QUOTE, Formatting.transforming(msg -> QUOTE_PATTERN.matcher(msg).replaceAll("$1> ")));
+        intentMap.put(Intent.CITE, Formatting.wrapped("*"));
+    }
+
+    @Override
+    public Formatting forIntent(Intent intent) {
+        return intentMap.getOrDefault(intent, Formatting.NONE);
     }
 }
