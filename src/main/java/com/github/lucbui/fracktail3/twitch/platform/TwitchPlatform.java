@@ -10,6 +10,9 @@ import com.github.lucbui.fracktail3.magic.platform.Place;
 import com.github.lucbui.fracktail3.magic.platform.SimpleTextCommandProcessor;
 import com.github.lucbui.fracktail3.magic.platform.context.BasicContextConstructor;
 import com.github.lucbui.fracktail3.magic.platform.context.ParameterParser;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Formatting;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Intent;
+import com.github.lucbui.fracktail3.magic.platform.formatting.Semantic;
 import com.github.lucbui.fracktail3.twitch.config.TwitchConfig;
 import com.github.lucbui.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.lucbui.fracktail3.twitch.context.TwitchPerson;
@@ -41,7 +44,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class TwitchPlatform extends BasePlatform implements HealthIndicator, InfoContributor {
+public class TwitchPlatform extends BasePlatform implements HealthIndicator, InfoContributor, Semantic {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitchPlatform.class);
 
     @Autowired
@@ -244,5 +247,13 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
                 }
             } catch (RuntimeException ex) { }
         }
+    }
+
+    @Override
+    public Formatting forIntent(Intent intent) {
+        if(intent == Intent.ROLEPLAY) {
+            return new Formatting("/me ", "");
+        }
+        return Formatting.NONE;
     }
 }
