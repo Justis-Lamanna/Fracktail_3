@@ -111,7 +111,7 @@ public class SemanticMessage implements CommandAction {
         StringBuilder message = new StringBuilder();
         for(Token token : tokens) {
             Formatting formatting = semantic.forIntent(token.getIntent());
-            message.append(formatting.getPrefix()).append(token.message).append(formatting.getSuffix());
+            message.append(formatting.getPrefix()).append(formatting.getMessageTransformer().apply(token.message)).append(formatting.getSuffix());
         }
         return message.toString();
     }
