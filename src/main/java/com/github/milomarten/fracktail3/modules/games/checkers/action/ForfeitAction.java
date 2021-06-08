@@ -1,0 +1,16 @@
+package com.github.milomarten.fracktail3.modules.games.checkers.action;
+
+import com.github.milomarten.fracktail3.modules.games.checkers.Checkerboard;
+import com.github.milomarten.fracktail3.modules.games.checkers.Color;
+import com.github.milomarten.fracktail3.modules.games.standard.action.InTurnAction;
+import lombok.Data;
+
+@Data
+public class ForfeitAction implements InTurnAction<Checkerboard, Color> {
+    private final Color player;
+
+    @Override
+    public void performAction(Checkerboard gameState) {
+        gameState.setForfeitedPlayer(player);
+    }
+}

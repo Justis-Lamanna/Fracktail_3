@@ -1,5 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.lucbui.fracktail3.spring.FracktailConfiguration,\
-com.github.lucbui.fracktail3.spring.ScheduleConfiguration,\
-com.github.lucbui.fracktail3.discord.util.spring.DiscordSpringConfig,\
-com.github.lucbui.fracktail3.twitch.util.spring.TwitchSpringConfig
+com.github.milomarten.fracktail3.spring.FracktailConfiguration,\
+com.github.milomarten.fracktail3.spring.ScheduleConfiguration,\
+com.github.milomarten.fracktail3.discord.util.spring.DiscordSpringConfig,\
+com.github.milomarten.fracktail3.twitch.util.spring.TwitchSpringConfig
