@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-FROM openjdk:8-jdk-alpine
+FROM openjdk:13-jdk-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 COPY target/*.jar app.jar

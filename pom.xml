@@ -17,6 +17,10 @@
     <name>Fracktail</name>
     <description>Code for Fracktail: A Chat Bot</description>
 
+    <properties>
+        <java.version>13</java.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
