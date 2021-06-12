@@ -1,7 +1,6 @@
 package com.github.milomarten.fracktail3.magic.platform;
 
 import com.github.milomarten.fracktail3.magic.Bot;
-import com.github.milomarten.fracktail3.magic.platform.context.CommandUseContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import reactor.core.Disposable;
@@ -25,9 +24,9 @@ public class SimpleTextCommandProcessor {
                                         .trim();
                                 return constructor.constructContext(bot, platform, message, t.getT2(), pStr);
                             })
-                            .filterWhen(CommandUseContext::canDoAction)
+                            .filterWhen(ctx -> ctx.canDoAction())
                             .next()
-                            .flatMap(CommandUseContext::doAction)
+                            .flatMap(ctx -> ctx.doAction())
                             .onErrorResume(Throwable.class, e -> {
                                 LoggerFactory.getLogger(bot.getClass()).error("Error during action", e);
                                 return message.getOrigin()
