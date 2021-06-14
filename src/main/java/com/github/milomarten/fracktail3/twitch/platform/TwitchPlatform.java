@@ -252,7 +252,7 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
     @Override
     public Formatting forIntent(Intent intent) {
         if(intent == Intent.ROLEPLAY) {
-            return new Formatting("/me ", "");
+            return Formatting.prefixed("/me ");
         }
         return Formatting.NONE;
     }
