@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SemanticMessageTest {
+class SemanticSupportMessageTest {
     @Test
     public void testCreateWithObjectArray() {
         SemanticMessage message = SemanticMessage.create(
@@ -18,7 +18,7 @@ class SemanticMessageTest {
         SemanticMessage message = SemanticMessage.create(
                 "Hello, my name is ", Intent.CITE, "Fracktail", Intent.NONE, ". It's nice to meet you!");
 
-        Semantic semantic = intent -> {
+        SemanticSupport semantic = intent -> {
             if(intent == Intent.CITE) {
                 return Formatting.wrapped("~~");
             } else {
@@ -34,7 +34,7 @@ class SemanticMessageTest {
         SemanticMessage message = SemanticMessage.create(
                 "Hello, my name is ", Intent.CITE, "Fracktail", Intent.NONE, ". It's nice to meet you!");
 
-        Semantic semantic = intent -> {
+        SemanticSupport semantic = intent -> {
             if(intent == Intent.CITE) {
                 return Formatting.transforming(String::toUpperCase);
             } else {

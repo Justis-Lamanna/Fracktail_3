@@ -18,7 +18,7 @@ import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
 import com.github.milomarten.fracktail3.magic.platform.context.Parameters;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Formatting;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Semantic;
+import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticSupport;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -67,7 +67,7 @@ import java.util.regex.Pattern;
  * - channel:[channel id] - Retrieve a place as a channel
  */
 @Component
-public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor, Semantic {
+public class DiscordPlatform extends BasePlatform implements HealthIndicator, InfoContributor, SemanticSupport {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiscordPlatform.class);
 
     @Autowired
@@ -383,7 +383,7 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
         intentMap.put(Intent.SPOILER, Formatting.wrapped("||"));
         intentMap.put(Intent.ROLEPLAY, Formatting.wrapped("*"));
         intentMap.put(Intent.RETCON, Formatting.wrapped("~~"));
-        intentMap.put(Intent.QUOTE, Formatting.transforming(msg -> QUOTE_PATTERN.matcher(msg).replaceAll("$1> ")));
+        intentMap.put(Intent.QUOTE, Formatting.replace(QUOTE_PATTERN, "$1> "));
         intentMap.put(Intent.CITE, Formatting.wrapped("*"));
     }
 

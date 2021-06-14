@@ -8,8 +8,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -21,13 +19,22 @@ public class SemanticMessage implements CommandAction {
     }
 
     /**
+     * Create a plain message with no intent
+     * @param message The message to convert
+     * @return A SemanticMessage with no intent
+     */
+    public static SemanticMessage create(String message) {
+        return create(Intent.NONE, message);
+    }
+
+    /**
      * Creator message for a simple message with one global intent
      * @param intent The global intent
      * @param message The text to be said
      * @return A SemanticMessage
      */
     public static SemanticMessage create(Intent intent, String message) {
-        return new SemanticMessage(Collections.singletonList(new Token(intent, message)));
+        return create(new Token(intent, message));
     }
 
     /**
@@ -67,7 +74,7 @@ public class SemanticMessage implements CommandAction {
      * @return A SemanticMessage
      */
     public static SemanticMessage create(Token... tokens) {
-        return new SemanticMessage(Arrays.asList(tokens));
+        return new SemanticMessage(List.of(tokens));
     }
 
     /**
@@ -93,6 +100,39 @@ public class SemanticMessage implements CommandAction {
         return builder;
     }
 
+    /**
+     * Concatenate two semantic messages together
+     * @param message The message to concatenate with this one
+     * @return A new SemanticMessage which is the sum of this one and the provided one
+     */
+    public SemanticMessage concat(SemanticMessage message) {
+        List<Token> newTokens = new ArrayList<>(this.tokens);
+        newTokens.addAll(message.tokens);
+        return new SemanticMessage(newTokens);
+    }
+
+    /**
+     * Concatenate a semantic message and a plain string
+     * The input message is assumed to have no Intent.
+     * @param message The message to concatenate with this one.
+     * @return A new SemanticMessage which is the sum of this one and the provided message
+     */
+    public SemanticMessage concat(String message) {
+        return concat(Intent.NONE, message);
+    }
+
+    /**
+     * Concatenate a semantic message and a plain string with intent
+     * @param intent The intent of the appended message
+     * @param message The message to concatenate with this one.
+     * @return A new SemanticMessage which is the sum of this one and the provided message
+     */
+    public SemanticMessage concat(Intent intent, String message) {
+        List<Token> newTokens = new ArrayList<>(this.tokens);
+        newTokens.add(new Token(intent, message));
+        return new SemanticMessage(newTokens);
+    }
+
     @Override
     public String toString() {
         StringBuilder message = new StringBuilder();
@@ -107,7 +147,7 @@ public class SemanticMessage implements CommandAction {
      * @param semantic The semantics to use
      * @return The created String
      */
-    public String toString(Semantic semantic) {
+    public String toString(SemanticSupport semantic) {
         StringBuilder message = new StringBuilder();
         for(Token token : tokens) {
             Formatting formatting = semantic.forIntent(token.getIntent());
@@ -120,8 +160,8 @@ public class SemanticMessage implements CommandAction {
     public Mono<Void> doAction(CommandUseContext context) {
         Platform platform = context.getPlatform();
         String message;
-        if(platform instanceof Semantic) {
-            message = toString((Semantic)platform);
+        if(platform instanceof SemanticSupport) {
+            message = toString((SemanticSupport)platform);
         } else {
             message = toString();
         }

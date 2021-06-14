@@ -12,7 +12,7 @@ import com.github.milomarten.fracktail3.magic.platform.context.BasicContextConst
 import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Formatting;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Semantic;
+import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticSupport;
 import com.github.milomarten.fracktail3.twitch.config.TwitchConfig;
 import com.github.milomarten.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.milomarten.fracktail3.twitch.context.TwitchPerson;
@@ -44,7 +44,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class TwitchPlatform extends BasePlatform implements HealthIndicator, InfoContributor, Semantic {
+public class TwitchPlatform extends BasePlatform implements HealthIndicator, InfoContributor, SemanticSupport {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitchPlatform.class);
 
     @Autowired
