@@ -36,11 +36,23 @@ public class Config {
     }
 
     @Command
+    public String cats = "We now have five cats: Magpie, Oz, August, Voxel, and Peach. Voxel and Peach are our newest kittens, and very big troublemakers.";
+
+    @Command
     public String magpie = "Magpie is our special princess cat who visits stream sometimes. She is a grouchy old lady (11 years old) who very much wants you to pet her.";
 
     @Command
-    public String august = "August is our youngest cat, and our biggest troublemaker. He is the only one who explores the neighborhood around our house, although he always comes home when called. He is golden and has a very very tiny meow.";
+    public String august = "August is our middle cat, and one of our biggest troublemakers. He is the only one who explores the neighborhood around our house, although he always comes home when called. He is golden and has a very very tiny meow.";
 
     @Command
-    public String oz = "Oz is the middle cat, and terrified of everything. He is part Siamese, and is perfectly happy just napping and hiding under furniture in the house. He has a surprising taste for human food that the other cats don't have.";
+    public String oz = "Oz is the second-oldest cat, and terrified of everything. He is part Siamese, and is perfectly happy just napping and hiding under furniture in the house. He has a surprising taste for human food that the other cats don't have.";
+
+    @Command
+    public String voxel = "Voxel is one of our newest kittens. He is extremely chill, and loves to sleep.";
+
+    @Command
+    public String peach = "Peach is one of our newest kittens. She likes to spend her time on the barstool in our kitchen.";
+
+    @Command
+    public String kittens = "Kitten pics -> https://imgur.com/18piqXC";
 }
