@@ -36,7 +36,7 @@ public class Config {
     }
 
     @Command
-    public String cats = "We now have five cats: Magpie, Oz, August, Voxel, and Peach. Voxel and Peach are our newest kittens, and very big troublemakers.";
+    public String cats = "We now have five cats: Magpie, Oz, August, Voxel, and Peach. Voxel and Peach are our newest kittens, and very big troublemakers. Spot is not technically our cat, but he has adopted us as his food givers.";
 
     @Command
     public String magpie = "Magpie is our special princess cat who visits stream sometimes. She is a grouchy old lady (11 years old) who very much wants you to pet her.";
@@ -48,10 +48,13 @@ public class Config {
     public String oz = "Oz is the second-oldest cat, and terrified of everything. He is part Siamese, and is perfectly happy just napping and hiding under furniture in the house. He has a surprising taste for human food that the other cats don't have.";
 
     @Command
-    public String voxel = "Voxel is one of our newest kittens. He is extremely chill, and loves to sleep.";
+    public String voxel = "Voxel is one of our newest kittens. He is extremely chill, and loves to sleep. Often, we will catch him on the roof of my office. We are not sure how he gets up there.";
 
     @Command
-    public String peach = "Peach is one of our newest kittens. She likes to spend her time on the barstool in our kitchen.";
+    public String peach = "Peach is one of our newest kittens. She tends to always get into mischief. She likes to catch cicadas and bring them into the house (still alive).";
+
+    @Command
+    public String spot = "Spot is a stray cat who hangs out at our place. He is Peach and Voxel's father, we are almost certain. Every evening he will come to our back porch and scream for food whenever he sees us.";
 
     @Command
     public String kittens = "Kitten pics -> https://imgur.com/18piqXC";
