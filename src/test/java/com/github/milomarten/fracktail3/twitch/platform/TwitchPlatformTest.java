@@ -1,8 +1,8 @@
 package com.github.milomarten.fracktail3.twitch.platform;
 
 import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
 import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticMessage;
+import com.github.milomarten.fracktail3.magic.platform.formatting.StdIntent;
 import com.github.milomarten.fracktail3.twitch.config.TwitchConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ class TwitchPlatformTest {
 
     @Test
     public void testRoleplayIntent() {
-        SemanticMessage sm = SemanticMessage.create(Intent.ROLEPLAY, "gives you an egg");
+        SemanticMessage sm = SemanticMessage.create(StdIntent.ROLEPLAY, "gives you an egg");
         String message = sm.toString(twitchPlatform);
         assertEquals("/me gives you an egg", message);
     }

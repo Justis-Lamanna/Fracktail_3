@@ -2,8 +2,8 @@ package com.github.milomarten.fracktail3.discord.platform;
 
 import com.github.milomarten.fracktail3.discord.config.DiscordConfiguration;
 import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
 import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticMessage;
+import com.github.milomarten.fracktail3.magic.platform.formatting.StdIntent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ class DiscordPlatformTest {
 
     @Test
     public void testQuoteIntent() {
-        SemanticMessage sm = SemanticMessage.create(Intent.QUOTE, "Hello\nMy name is\nMilo Marten!");
+        SemanticMessage sm = SemanticMessage.create(StdIntent.QUOTE, "Hello\nMy name is\nMilo Marten!");
         String message = sm.toString(discordPlatform);
         assertEquals("> Hello\n> My name is\n> Milo Marten!", message);
     }

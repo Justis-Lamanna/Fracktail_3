@@ -13,6 +13,7 @@ import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Formatting;
 import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
 import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticSupport;
+import com.github.milomarten.fracktail3.magic.platform.formatting.StdIntent;
 import com.github.milomarten.fracktail3.twitch.config.TwitchConfig;
 import com.github.milomarten.fracktail3.twitch.context.TwitchEverywhere;
 import com.github.milomarten.fracktail3.twitch.context.TwitchPerson;
@@ -251,7 +252,7 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
 
     @Override
     public Formatting forIntent(Intent intent) {
-        if(intent == Intent.ROLEPLAY) {
+        if(intent == StdIntent.ROLEPLAY) {
             return Formatting.prefixed("/me ");
         }
         return Formatting.NONE;
