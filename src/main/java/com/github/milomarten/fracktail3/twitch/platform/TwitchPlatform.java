@@ -255,6 +255,6 @@ public class TwitchPlatform extends BasePlatform implements HealthIndicator, Inf
         if(intent == StdIntent.ROLEPLAY) {
             return Formatting.prefixed("/me ");
         }
-        return Formatting.NONE;
+        return intent.getDefaultFormatting();
     }
 }
