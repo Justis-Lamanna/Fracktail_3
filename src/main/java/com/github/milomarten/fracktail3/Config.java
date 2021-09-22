@@ -1,8 +1,9 @@
 package com.github.milomarten.fracktail3;
 
 import com.github.milomarten.fracktail3.magic.platform.Person;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
 import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticMessage;
+import com.github.milomarten.fracktail3.magic.platform.formatting.StdIntent;
+import com.github.milomarten.fracktail3.magic.platform.formatting.TimestampIntent;
 import com.github.milomarten.fracktail3.spring.command.annotation.Command;
 import com.github.milomarten.fracktail3.spring.command.annotation.ForPlatform;
 import com.github.milomarten.fracktail3.spring.command.annotation.InjectPerson;
@@ -32,7 +33,7 @@ public class Config {
 
     @Command
     public SemanticMessage egg(@InjectPerson Person user) {
-        return SemanticMessage.create(Intent.ROLEPLAY, "Hands " + user.getName() + " an egg.");
+        return SemanticMessage.create(StdIntent.ROLEPLAY, "Hands " + user.getName() + " an egg.");
     }
 
     @Command
@@ -58,4 +59,7 @@ public class Config {
 
     @Command
     public String kittens = "Kitten pics -> https://imgur.com/18piqXC";
+
+    @Command
+    public SemanticMessage now = SemanticMessage.create(new TimestampIntent(TimestampIntent.Format.LONG_DATE_TIME), Long.toString(System.currentTimeMillis()));
 }

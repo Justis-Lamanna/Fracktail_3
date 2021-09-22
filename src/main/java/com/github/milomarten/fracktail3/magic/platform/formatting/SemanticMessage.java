@@ -24,7 +24,7 @@ public class SemanticMessage implements CommandAction {
      * @return A SemanticMessage with no intent
      */
     public static SemanticMessage create(String message) {
-        return create(Intent.NONE, message);
+        return create(StdIntent.NONE, message);
     }
 
     /**
@@ -54,7 +54,7 @@ public class SemanticMessage implements CommandAction {
         for(Object obj : message) {
             if(obj instanceof Intent) {
                 if(sb.length() > 0) {
-                    tokens.add(new Token(ObjectUtils.defaultIfNull(intent, Intent.NONE), sb.toString()));
+                    tokens.add(new Token(ObjectUtils.defaultIfNull(intent, StdIntent.NONE), sb.toString()));
                     sb.setLength(0);
                 }
                 intent = (Intent) obj;
@@ -63,7 +63,7 @@ public class SemanticMessage implements CommandAction {
             }
         }
         if(sb.length() > 0) {
-            tokens.add(new Token(ObjectUtils.defaultIfNull(intent, Intent.NONE), sb.toString()));
+            tokens.add(new Token(ObjectUtils.defaultIfNull(intent, StdIntent.NONE), sb.toString()));
         }
         return new SemanticMessage(tokens);
     }
@@ -96,7 +96,7 @@ public class SemanticMessage implements CommandAction {
      */
     public static Builder start(String message) {
         Builder builder = new Builder();
-        builder.tokens.add(new Token(Intent.NONE, message));
+        builder.tokens.add(new Token(StdIntent.NONE, message));
         return builder;
     }
 
@@ -118,7 +118,7 @@ public class SemanticMessage implements CommandAction {
      * @return A new SemanticMessage which is the sum of this one and the provided message
      */
     public SemanticMessage concat(String message) {
-        return concat(Intent.NONE, message);
+        return concat(StdIntent.NONE, message);
     }
 
     /**
@@ -207,7 +207,7 @@ public class SemanticMessage implements CommandAction {
          * @return This builder
          */
         public Builder then(String message) {
-            tokens.add(new Token(Intent.NONE, message));
+            tokens.add(new Token(StdIntent.NONE, message));
             return this;
         }
 

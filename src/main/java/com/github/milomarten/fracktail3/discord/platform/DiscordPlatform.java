@@ -16,9 +16,7 @@ import com.github.milomarten.fracktail3.magic.platform.SimpleTextCommandProcesso
 import com.github.milomarten.fracktail3.magic.platform.context.BasicCommandUseContext;
 import com.github.milomarten.fracktail3.magic.platform.context.ParameterParser;
 import com.github.milomarten.fracktail3.magic.platform.context.Parameters;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Formatting;
-import com.github.milomarten.fracktail3.magic.platform.formatting.Intent;
-import com.github.milomarten.fracktail3.magic.platform.formatting.SemanticSupport;
+import com.github.milomarten.fracktail3.magic.platform.formatting.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -50,6 +48,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
@@ -374,21 +373,61 @@ public class DiscordPlatform extends BasePlatform implements HealthIndicator, In
     }
 
     private static final Pattern QUOTE_PATTERN = Pattern.compile("(\n|^)");
-    private static final Map<Intent, Formatting> intentMap;
+    private static final Map<StdIntent, Formatting> intentMap;
     static {
-        intentMap = new EnumMap<>(Intent.class);
-        intentMap.put(Intent.CODE, Formatting.wrapped("```"));
-        intentMap.put(Intent.EMPHASIS, Formatting.wrapped("*"));
-        intentMap.put(Intent.STRONG, Formatting.wrapped("**"));
-        intentMap.put(Intent.SPOILER, Formatting.wrapped("||"));
-        intentMap.put(Intent.ROLEPLAY, Formatting.wrapped("*"));
-        intentMap.put(Intent.RETCON, Formatting.wrapped("~~"));
-        intentMap.put(Intent.QUOTE, Formatting.replace(QUOTE_PATTERN, "$1> "));
-        intentMap.put(Intent.CITE, Formatting.wrapped("*"));
+        intentMap = new EnumMap<>(StdIntent.class);
+        intentMap.put(StdIntent.CODE, Formatting.wrapped("```"));
+        intentMap.put(StdIntent.EMPHASIS, Formatting.wrapped("*"));
+        intentMap.put(StdIntent.STRONG, Formatting.wrapped("**"));
+        intentMap.put(StdIntent.SPOILER, Formatting.wrapped("||"));
+        intentMap.put(StdIntent.ROLEPLAY, Formatting.wrapped("*"));
+        intentMap.put(StdIntent.RETCON, Formatting.wrapped("~~"));
+        intentMap.put(StdIntent.QUOTE, Formatting.replace(QUOTE_PATTERN, "$1> "));
+        intentMap.put(StdIntent.CITE, Formatting.wrapped("*"));
     }
 
     @Override
     public Formatting forIntent(Intent intent) {
-        return intentMap.getOrDefault(intent, Formatting.NONE);
+        if(intent instanceof TimestampIntent) {
+            return forTimestampIntent((TimestampIntent)intent);
+        }
+
+        Formatting f = intentMap.get(intent);
+        if(f == null) {
+            f = intent.getDefaultFormatting();
+        }
+        return f;
+    }
+
+    private Formatting forTimestampIntent(TimestampIntent intent) {
+        return Formatting.transforming(new DiscordTimestampTransformer(getStyle(intent.getFormat())));
+    }
+
+    private String getStyle(TimestampIntent.Format format) {
+        switch (format) {
+            case SHORT_TIME: return "t";
+            case LONG_TIME: return "T";
+            case SHORT_DATE: return "d";
+            case LONG_DATE: return "D";
+            case SHORT_DATE_TIME: return "f";
+            case LONG_DATE_TIME: return "F";
+            case RELATIVE: return "R";
+            default: return null;
+        }
+    }
+
+    private static class DiscordTimestampTransformer implements Function<String, String> {
+        private final String style;
+
+        private DiscordTimestampTransformer(String style) {
+            this.style = style;
+        }
+
+        @Override
+        public String apply(String s) {
+            s = s.substring(0, s.length() - 3); //Discord takes seconds, not milliseconds
+            if(style == null) return "<t:" + s + ">";
+            else return "<t:" + s + ":" + style + ">";
+        }
     }
 }
