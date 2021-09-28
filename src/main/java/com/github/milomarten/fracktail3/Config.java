@@ -7,8 +7,13 @@ import com.github.milomarten.fracktail3.magic.platform.formatting.TimestampInten
 import com.github.milomarten.fracktail3.spring.command.annotation.Command;
 import com.github.milomarten.fracktail3.spring.command.annotation.ForPlatform;
 import com.github.milomarten.fracktail3.spring.command.annotation.InjectPerson;
+import com.github.milomarten.fracktail3.spring.command.annotation.Parameter;
 import com.github.milomarten.fracktail3.twitch.platform.TwitchPlatform;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.format.TextStyle;
+import java.util.Locale;
+import java.util.Optional;
 
 @Configuration
 public class Config {
@@ -61,5 +66,31 @@ public class Config {
     public String kittens = "Kitten pics -> https://imgur.com/18piqXC";
 
     @Command
-    public SemanticMessage now = SemanticMessage.create(new TimestampIntent(TimestampIntent.Format.LONG_DATE_TIME), Long.toString(System.currentTimeMillis()));
+    public SemanticMessage timestamp(@Parameter(0) String str, @Parameter(value = 1, optional = true) Optional<String> formatChar) {
+        TimestampIntent.Format format = formatChar
+                .map(String::toUpperCase)
+                .map(TimestampIntent.Format::valueOf)
+                .orElse(TimestampIntent.Format.DEFAULT);
+
+        return TimeFormat.parseBest(str, TimeFormat.FORMATS)
+                .map(zdt -> SemanticMessage.create(new TimestampIntent(format), zdt.toInstant().toEpochMilli()))
+                .orElseGet(() -> SemanticMessage.create("Unexpected format. Should be ISO Format, either as\n" +
+                        "a date (YYYY-MM-DD), assuming midnight\n" +
+                        "a time (HH:MM<:SS>), assuming today\n" +
+                        "a date and time (YYYY-MM-DDTHH:MM:SS), assuming the default timezone, or\n" +
+                        "a date, time, and offset (YYYY-MM-DDTHH:MM:SSZ+OO:OO).\n\nTimezone is assumed to be " +
+                        TimeFormat.DEFAULT.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + "."));
+    }
+
+    @Command
+    public SemanticMessage countdown(@Parameter(0) String str) {
+        return TimeFormat.parseBest(str, TimeFormat.FORMATS)
+                .map(zdt -> SemanticMessage.create(new TimestampIntent(TimestampIntent.Format.RELATIVE), zdt.toInstant().toEpochMilli()))
+                .orElseGet(() -> SemanticMessage.create("Unexpected format. Should be ISO Format, either as\n" +
+                        "a date (YYYY-MM-DD), assuming midnight\n" +
+                        "a time (HH:MM<:SS>), assuming today\n" +
+                        "a date and time (YYYY-MM-DDTHH:MM:SS), assuming the default timezone, or\n" +
+                        "a date, time, and offset (YYYY-MM-DDTHH:MM:SSZ+OO:OO).\n\nTimezone is assumed to be " +
+                        TimeFormat.DEFAULT.getDisplayName(TextStyle.FULL, Locale.ENGLISH) + "."));
+    }
 }
