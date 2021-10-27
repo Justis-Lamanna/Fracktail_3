@@ -2,12 +2,8 @@ package com.github.milomarten.fracktail3.modules.meta;
 
 import com.github.milomarten.fracktail3.discord.EmbedResponse;
 import com.github.milomarten.fracktail3.discord.context.DiscordPerson;
-import com.github.milomarten.fracktail3.discord.platform.DiscordPlatform;
-import com.github.milomarten.fracktail3.discord.util.FormatUtils;
 import com.github.milomarten.fracktail3.discord.util.spring.DiscordRegistryHook;
 import com.github.milomarten.fracktail3.spring.command.annotation.*;
-import com.github.milomarten.fracktail3.spring.schedule.annotation.Cron;
-import com.github.milomarten.fracktail3.spring.schedule.annotation.Schedule;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.micrometer.core.instrument.Measurement;
@@ -18,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
@@ -139,12 +134,12 @@ public class UptimeModule {
         }
     }
 
-    @Schedule
-    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
-    public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
-        return platform.sendMessage(BOT_TIME, FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!")
-                .then();
-    }
+//    @Schedule
+//    @Cron(hour = "22", dayOfWeek = "SUN-THU", timezone = "America/Chicago")
+//    public Mono<Void> sleepTimer(@InjectPlatform DiscordPlatform platform) {
+//        return platform.sendMessage(BOT_TIME, FormatUtils.mentionUser(ME) + ", GO THE HECK TO SLEEP!!")
+//                .then();
+//    }
 
     @Command
     @Usage("Evaluate an arbitrary math expression")

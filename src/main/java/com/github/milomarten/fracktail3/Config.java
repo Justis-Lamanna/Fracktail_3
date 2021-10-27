@@ -48,7 +48,7 @@ public class Config {
     public String magpie = "Magpie is our special princess cat who visits stream sometimes. She is a grouchy old lady (11 years old) who very much wants you to pet her.";
 
     @Command
-    public String august = "August is our middle cat, and one of our biggest troublemakers. He is the only one who explores the neighborhood around our house, although he always comes home when called. He is golden and has a very very tiny meow.";
+    public String august = "August is our middle cat, and one of our biggest troublemakers. He has recently been diagnosed with FLUTD, which requires a special diet and a lot of vet trips. He is golden and has a very very tiny meow.";
 
     @Command
     public String oz = "Oz is the second-oldest cat, and terrified of everything. He is part Siamese, and is perfectly happy just napping and hiding under furniture in the house. He has a surprising taste for human food that the other cats don't have.";

@@ -6,12 +6,11 @@ import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.channel.TextChannel;
 import org.reactivestreams.Publisher;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
+//@Component
 public class RerEventAdapter extends ReactiveEventAdapter {
     private static final Snowflake GUILD_ID = Snowflake.of(423976318082744321L);
     private static final Snowflake DRAGON_ROLE = Snowflake.of(560500269419331585L);
