@@ -66,6 +66,9 @@ public class Config {
     public String kittens = "Kitten pics -> https://imgur.com/18piqXC";
 
     @Command
+    public String luna = "Luna is Andi's precious princess lady with a russian accent. She is 3 and a half years old and perfect.";
+
+    @Command
     public SemanticMessage timestamp(@Parameter(0) String str, @Parameter(value = 1, optional = true) Optional<String> formatChar) {
         TimestampIntent.Format format = formatChar
                 .map(String::toUpperCase)
